@@ -36,7 +36,6 @@ dependencies {
     // Open API
     implementation(libs.ktor.server.openapi)
     implementation(libs.ktor.server.resources)
-    implementation(libs.ktor.server.locations)
 
     // PostgreSQL JDBC Driver
     implementation(libs.postgresql)
