@@ -21,7 +21,6 @@ repositories {
 
 dependencies {
     implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.openapi)
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
@@ -33,6 +32,11 @@ dependencies {
     implementation(libs.ktor.server.config.yaml)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
+
+    // Open API
+    implementation(libs.ktor.server.openapi)
+    implementation(libs.ktor.server.resources)
+    implementation(libs.ktor.server.locations)
 
     // PostgreSQL JDBC Driver
     implementation(libs.postgresql)
