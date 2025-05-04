@@ -1,4 +1,4 @@
-package com.peekr
+package com.peekr.config
 
 import io.ktor.server.application.Application
 import io.ktor.server.plugins.openapi.openAPI

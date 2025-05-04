@@ -1,7 +1,5 @@
-package com.peekr.common.util
+package com.peekr.config.exception
 
-import com.peekr.exception.ApiException
-import com.peekr.exception.ErrorResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install

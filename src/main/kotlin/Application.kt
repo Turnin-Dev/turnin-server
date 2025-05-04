@@ -1,22 +1,21 @@
 package com.peekr
 
-import com.peekr.common.config.configureDatabases
-import com.peekr.common.util.configureExceptionHandler
-import io.ktor.serialization.kotlinx.json.json
+import com.peekr.config.configureContentNegotiation
+import com.peekr.config.configureDatabases
+import com.peekr.config.configureHTTP
+import com.peekr.config.configureRouting
+import com.peekr.config.configureSecurity
+import com.peekr.config.configureSerialization
+import com.peekr.config.exception.configureExceptionHandler
 import io.ktor.server.application.Application
-import io.ktor.server.application.install
 import io.ktor.server.netty.EngineMain
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
 }
 
 fun Application.module() {
-    install(ContentNegotiation) {
-        json()
-    }
-
+    configureContentNegotiation()
     configureDatabases()
     configureExceptionHandler()
 

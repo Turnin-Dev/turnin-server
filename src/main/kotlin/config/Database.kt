@@ -1,4 +1,4 @@
-package com.peekr.common.config
+package com.peekr.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource

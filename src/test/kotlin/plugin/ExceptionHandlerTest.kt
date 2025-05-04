@@ -1,8 +1,8 @@
 package com.peekr.plugin
 
-import com.peekr.common.util.configureExceptionHandler
-import com.peekr.exception.ApiException
-import com.peekr.exception.ErrorResponse
+import com.peekr.config.exception.ApiException
+import com.peekr.config.exception.ErrorResponse
+import com.peekr.config.exception.configureExceptionHandler
 import com.peekr.util.testPlugin
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
