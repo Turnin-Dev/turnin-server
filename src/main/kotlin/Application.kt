@@ -1,7 +1,7 @@
 package com.peekr
 
-import com.peekr.plugin.configureDatabases
-import com.peekr.plugin.configureExceptionHandler
+import com.peekr.common.config.configureDatabases
+import com.peekr.common.util.configureExceptionHandler
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install

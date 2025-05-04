@@ -1,4 +1,4 @@
-package com.peekr.plugin
+package com.peekr.common.util
 
 import com.peekr.exception.ApiException
 import com.peekr.exception.ErrorResponse

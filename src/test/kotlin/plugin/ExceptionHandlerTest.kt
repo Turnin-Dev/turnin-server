@@ -1,5 +1,6 @@
 package com.peekr.plugin
 
+import com.peekr.common.util.configureExceptionHandler
 import com.peekr.exception.ApiException
 import com.peekr.exception.ErrorResponse
 import com.peekr.util.testPlugin
