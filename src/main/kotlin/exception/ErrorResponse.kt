@@ -9,5 +9,5 @@ import kotlinx.serialization.Serializable
 data class ErrorResponse(
     val code: String,
     val message: String,
-    val status: Int
+    val status: Int,
 )

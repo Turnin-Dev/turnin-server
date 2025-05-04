@@ -1,0 +1,43 @@
+root = true
+
+[*.{kt,kts}]
+
+# --- Indentation & spacing ---
+indent_style = space
+indent_size = 4
+continuation_indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+ktlint_standard_filename = disabled
+
+# --- Line length & wrapping ---
+max_line_length = 100
+
+# --- Imports ---
+ij_kotlin_imports_layout = *,java,javax,kotlin,android,^
+ij_kotlin_optimize_imports_on_the_fly = true
+ij_kotlin_allow_wildcard_imports = false
+
+# --- Naming conventions ---
+# These are guidelines — use detekt for deeper naming rules
+
+# --- Blank lines ---
+# Between class members
+ij_kotlin_blank_lines_around_class_members = 1
+# Before and after function declarations
+ij_kotlin_blank_lines_before_function = 1
+ij_kotlin_blank_lines_after_function = 1
+
+# --- Wrapping & alignment ---
+# Function parameter wrapping
+ij_kotlin_wrap_parameters = on_every_item
+# Chained method calls
+ij_kotlin_call_parameters_wrap = on_every_item
+
+# --- Kotlin-specific settings ---
+kotlin_code_style = official
+ij_kotlin_continue_statement_wrap = always
+ij_kotlin_else_on_new_line = true
+ij_kotlin_if_rparen_on_new_line = true
+ij_kotlin_method_parameters_wrap = on_every_item
+ij_kotlin_method_call_arguments_wrap = on_every_item

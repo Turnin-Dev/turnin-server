@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
     alias(libs.plugins.kotlin.plugin.serialization)
+    alias(libs.plugins.ktlint)
 }
 
 group = "com.peekr"
@@ -17,6 +18,18 @@ application {
 
 repositories {
     mavenCentral()
+}
+
+ktlint {
+    verbose.set(true)
+    android.set(false) // Android 프로젝트가 아니라면 false
+    outputToConsole.set(true)
+
+    // Reports (예: GitHub Actions용)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
 }
 
 dependencies {

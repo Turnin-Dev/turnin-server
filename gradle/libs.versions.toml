@@ -10,6 +10,7 @@ exposed-orm-version = "0.41.1"
 hikariCP-version = "5.0.1"
 dotenv-version = "6.4.0"
 jwt-version = "4.2.1"
+ktlint-version = "12.2.0"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -49,3 +50,5 @@ ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
+# Ktlint
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-version" }

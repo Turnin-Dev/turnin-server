@@ -3,7 +3,7 @@ package com.peekr.plugin
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.cdimascio.dotenv.dotenv
-import io.ktor.server.application.*
+import io.ktor.server.application.Application
 import org.jetbrains.exposed.sql.Database
 
 fun Application.configureDatabases() {
@@ -13,13 +13,14 @@ fun Application.configureDatabases() {
     val dbUser = dotenv["DB_USER"] ?: "defaultuser"
     val dbPassword = dotenv["DB_PASSWORD"] ?: "defaultpassword"
 
-    val hikariConfig = HikariConfig().apply {
-        jdbcUrl = dbUrl
-        driverClassName = "org.postgresql.Driver"
-        username = dbUser
-        password = dbPassword
-        maximumPoolSize = 10
-    }
+    val hikariConfig =
+        HikariConfig().apply {
+            jdbcUrl = dbUrl
+            driverClassName = "org.postgresql.Driver"
+            username = dbUser
+            password = dbPassword
+            maximumPoolSize = 10
+        }
 
     try {
         val dataSource = HikariDataSource(hikariConfig)

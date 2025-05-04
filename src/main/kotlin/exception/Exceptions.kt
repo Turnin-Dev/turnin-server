@@ -14,5 +14,5 @@ import io.ktor.http.HttpStatusCode
 open class ApiException(
     val code: String,
     override val message: String,
-    val status: HttpStatusCode
+    val status: HttpStatusCode,
 ) : RuntimeException(message)
