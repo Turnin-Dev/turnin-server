@@ -1,44 +1,45 @@
 # peekr-server
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
-
-Here are some useful links to get you started:
-
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
-
-## Features
-
-Here's a list of features included in this project:
-
-| Name                                                                   | Description                                                                        |
-| ------------------------------------------------------------------------|------------------------------------------------------------------------------------ |
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [OpenAPI](https://start.ktor.io/p/openapi)                             | Serves OpenAPI documentation                                                       |
-| [Authentication](https://start.ktor.io/p/auth)                         | Provides extension point for handling the Authorization header                     |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [Exposed](https://start.ktor.io/p/exposed)                             | Adds Exposed database to your application                                          |
-
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                          | Description                                                          |
-| -------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`              | Run the tests                                                        |
-| `./gradlew build`             | Build everything                                                     |
-| `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `run`                         | Run the server                                                       |
-| `runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
+## Project Structure
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+project/
+├── config/                  # 설정 관련 파일들
+│
+├── domain/                  # 핵심 도메인 계층
+│   ├── model/               # 도메인 모델
+│   ├── repository/          # 리포지토리 인터페이스
+│   ├── service/             # 서비스 인터페이스
+│   └── event/               # 이벤트 (optional)
+│
+├── application/             # 애플리케이션 계층
+│   ├── dto/                 # 데이터 전송 객체
+│   ├── usecase/             # 유스케이스 구현 (service와 유사)
+│
+├── controller/                   # 프레젠테이션 계층 (라우팅)
+│
+├── infrastructure/          # 인프라스트럭처 계층
+│   ├── entity/              # DB 엔티티
+│   ├── repository-impl/     # 리포지토리 구현체
+│   ├── service-impl/        # 서비스 구현체
+│   ├── mapper/              # 엔티티-도메인 모델 매퍼
+│   └── external/            # 외부 API 클라이언트
+│
+├── di/                      # 의존성 주입 설정
 ```
-
+## Dependency Direction
+```mermaid
+flowchart LR
+    c(controller) --> a(application)
+    a --> d(domain)
+    i(infrastructure) --> d
+    di(di) --> c
+    di(di) --> a
+    di(di) --> d
+    di(di) --> i
+```
+```
+controller -> application: 요청을 받고 유스케이스를 실행
+application -> domain: 도메인 인터페이스 호출
+infrastructure -> domain: 인터페이스 구현체 제공
+di: 모든 구성요소의 의존성을 설정 (하지만 나머지 계층은 di에 의존하지 않는다.)
+```
