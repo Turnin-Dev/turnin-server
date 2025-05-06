@@ -45,6 +45,8 @@ jwt = { module = "com.auth0:java-jwt", version.ref = "jwt-version" }
 # Open API
 ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor-version" }
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
+# Logging
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

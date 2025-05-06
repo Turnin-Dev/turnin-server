@@ -73,4 +73,7 @@ dependencies {
     // JWT
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.jwt)
+
+    // Logging
+    implementation(libs.ktor.server.call.logging)
 }
