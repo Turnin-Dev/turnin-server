@@ -10,11 +10,14 @@ exposed-orm-version = "0.41.1"
 hikariCP-version = "5.0.1"
 dotenv-version = "6.4.0"
 jwt-version = "4.2.1"
+ktlint-version = "12.2.0"
+koin-version = "4.0.3"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor-version" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-version" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-version" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
 h2 = { module = "com.h2database:h2", version.ref = "h2-version" }
@@ -24,6 +27,9 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor-version" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor-version" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-version" }
+# Status Pages
+ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor-version" }
+ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor-version" }
 # PostgreSQL JDBC Driver
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql-version" }
 # Exposed ORM
@@ -40,9 +46,15 @@ jwt = { module = "com.auth0:java-jwt", version.ref = "jwt-version" }
 # Open API
 ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor-version" }
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
-ktor-server-locations = { module = "io.ktor:ktor-server-locations", version.ref = "ktor-version" }
+# Logging
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor-version" }
+# DI
+koin = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
+koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
+# Ktlint
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-version" }
