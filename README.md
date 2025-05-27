@@ -1,6 +1,6 @@
 # peekr-server
 
-## Project Structure
+## Project Structure (Layered)
 ```
 project/
 ├── config/                  # 설정 관련 파일들
@@ -15,7 +15,7 @@ project/
 │   ├── dto/                 # 데이터 전송 객체
 │   ├── usecase/             # 유스케이스 구현 (service와 유사)
 │
-├── controller/                   # 프레젠테이션 계층 (라우팅)
+├── presentation/            # 프레젠테이션 계층 (라우팅)
 │
 ├── infrastructure/          # 인프라스트럭처 계층
 │   ├── entity/              # DB 엔티티
@@ -29,17 +29,11 @@ project/
 ## Dependency Direction
 ```mermaid
 flowchart LR
-    c(controller) --> a(application)
+    p(presentation) --> a(application)
     a --> d(domain)
-    i(infrastructure) --> d
-    di(di) --> c
+    d --> i(infrastructure)
+    di(di) --> p
     di(di) --> a
     di(di) --> d
     di(di) --> i
-```
-```
-controller -> application: 요청을 받고 유스케이스를 실행
-application -> domain: 도메인 인터페이스 호출
-infrastructure -> domain: 인터페이스 구현체 제공
-di: 모든 구성요소의 의존성을 설정 (하지만 나머지 계층은 di에 의존하지 않는다.)
 ```
