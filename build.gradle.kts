@@ -75,6 +75,7 @@ dependencies {
 
     // Logging
     implementation(libs.ktor.server.call.logging)
+    implementation(libs.logback.classic)
 
     // DI
     implementation(libs.koin)
