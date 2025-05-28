@@ -80,4 +80,7 @@ dependencies {
     // DI
     implementation(libs.koin)
     implementation(libs.koin.logger)
+
+    // Flyway
+    implementation(libs.flyway.core)
 }

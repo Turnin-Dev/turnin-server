@@ -12,6 +12,7 @@ dotenv-version = "6.4.0"
 jwt-version = "4.2.1"
 ktlint-version = "12.2.0"
 koin-version = "4.0.3"
+flyway-version = "11.8.2"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -51,6 +52,8 @@ ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", versio
 # DI
 koin = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-version" }
+# Flyway
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
