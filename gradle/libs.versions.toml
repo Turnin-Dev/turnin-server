@@ -53,7 +53,7 @@ ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", versio
 koin = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-version" }
 # Flyway
-flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway-version" }
+flyway-core = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
