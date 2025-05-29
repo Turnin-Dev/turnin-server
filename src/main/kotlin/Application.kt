@@ -1,8 +1,8 @@
 package com.peekr
 
+import com.peekr.config.DatabaseFactory
 import com.peekr.config.configureCallLogging
 import com.peekr.config.configureContentNegotiation
-import com.peekr.config.configureDatabases
 import com.peekr.config.configureHTTP
 import com.peekr.config.configureKoin
 import com.peekr.config.configureRouting
@@ -17,8 +17,8 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    DatabaseFactory.init()
     configureContentNegotiation()
-    configureDatabases()
     configureExceptionHandler()
     configureCallLogging()
 

@@ -37,3 +37,7 @@ out/
 
 ### dotenv ###
 .env
+
+### db file ###
+.sql
+.psql

@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
@@ -37,8 +36,6 @@ dependencies {
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.jdbc)
     implementation(libs.h2)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
@@ -59,10 +56,11 @@ dependencies {
     // PostgreSQL JDBC Driver
     implementation(libs.postgresql)
 
-    // Exposed ORM
-    implementation(libs.exposed.orm.core)
-    implementation(libs.exposed.orm.dao)
-    implementation(libs.exposed.orm.jdbc)
+    // Exposed
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.datatime)
 
     // HikariCP (Connection Pool)
     implementation(libs.hikariCP)
@@ -76,8 +74,12 @@ dependencies {
 
     // Logging
     implementation(libs.ktor.server.call.logging)
+    implementation(libs.logback.classic)
 
     // DI
     implementation(libs.koin)
     implementation(libs.koin.logger)
+
+    // Flyway
+    implementation(libs.flyway.core)
 }
