@@ -1,6 +1,7 @@
 
 [versions]
 exposed-version = "0.61.0"
+exposed-datetime-version = "1.0.0-beta-2"
 h2-version = "2.3.232"
 kotlin-version = "2.1.10"
 ktor-version = "3.1.2"
@@ -21,6 +22,7 @@ ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negoti
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-version" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
+exposed-datatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed-datetime-version" }
 h2 = { module = "com.h2database:h2", version.ref = "h2-version" }
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor-version" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor-version" }
