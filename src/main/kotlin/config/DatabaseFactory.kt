@@ -13,20 +13,15 @@ import org.flywaydb.core.api.FlywayException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface Database {
-    suspend fun <T> dbQuery(block: () -> T): T
-}
-
-class DatabaseImpl(
-    private val ioContext: CoroutineContext = Dispatchers.IO,
-) : com.peekr.config.Database {
+object DatabaseFactory {
+    private val ioContext: CoroutineContext = Dispatchers.IO
     private val dotenv = dotenv()
 
     private val dbUrl = dotenv["DB_URL"] ?: "jdbc:postgresql://localhost:5432/defaultdb"
     private val dbUser = dotenv["DB_USER"] ?: "defaultuser"
     private val dbPassword = dotenv["DB_PASSWORD"] ?: "defaultpassword"
 
-    init {
+    fun init() {
         try {
             val dataSource = hikariDataSource()
             migrate(dataSource)
@@ -45,7 +40,7 @@ class DatabaseImpl(
 //    }
     }
 
-    override suspend fun <T> dbQuery(block: () -> T): T =
+    suspend fun <T> dbQuery(block: () -> T): T =
         withContext(ioContext) {
             transaction { block() }
         }

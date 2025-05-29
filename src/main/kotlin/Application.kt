@@ -1,7 +1,6 @@
 package com.peekr
 
-import com.peekr.config.Database
-import com.peekr.config.DatabaseImpl
+import com.peekr.config.DatabaseFactory
 import com.peekr.config.configureCallLogging
 import com.peekr.config.configureContentNegotiation
 import com.peekr.config.configureHTTP
@@ -18,7 +17,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    val database: Database = DatabaseImpl()
+    DatabaseFactory.init()
     configureContentNegotiation()
     configureExceptionHandler()
     configureCallLogging()
