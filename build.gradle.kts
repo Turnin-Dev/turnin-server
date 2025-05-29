@@ -36,9 +36,6 @@ dependencies {
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.jdbc)
-    implementation(libs.exposed.datatime)
     implementation(libs.h2)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
@@ -59,10 +56,11 @@ dependencies {
     // PostgreSQL JDBC Driver
     implementation(libs.postgresql)
 
-    // Exposed ORM
-    implementation(libs.exposed.orm.core)
-    implementation(libs.exposed.orm.dao)
-    implementation(libs.exposed.orm.jdbc)
+    // Exposed
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.datatime)
 
     // HikariCP (Connection Pool)
     implementation(libs.hikariCP)

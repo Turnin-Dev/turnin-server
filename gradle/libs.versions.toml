@@ -1,13 +1,11 @@
 
 [versions]
 exposed-version = "0.61.0"
-exposed-datetime-version = "1.0.0-beta-2"
 h2-version = "2.3.232"
 kotlin-version = "2.1.10"
 ktor-version = "3.1.2"
 logback-version = "1.5.13"
 postgresql-version = "42.7.2"
-exposed-orm-version = "0.41.1"
 hikariCP-version = "5.0.1"
 dotenv-version = "6.4.0"
 jwt-version = "4.2.1"
@@ -20,9 +18,6 @@ ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-ve
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor-version" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-version" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-version" }
-exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
-exposed-datatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed-datetime-version" }
 h2 = { module = "com.h2database:h2", version.ref = "h2-version" }
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor-version" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor-version" }
@@ -35,10 +30,11 @@ ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.
 ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor-version" }
 # PostgreSQL JDBC Driver
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql-version" }
-# Exposed ORM
-exposed-orm-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-orm-version" }
-exposed-orm-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed-orm-version" }
-exposed-orm-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-orm-version" }
+# Exposed
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed-version" }
+exposed-datatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed-version" }
 # HikariCP (Connection Pool)
 hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikariCP-version" }
 # dot env
