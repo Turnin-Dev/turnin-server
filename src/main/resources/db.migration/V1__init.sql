@@ -1,26 +1,7 @@
 -- ✅ ENUM ------------------------------------------------------------
 
 -- 친구 상태
-CREATE TYPE friend_status AS ENUM ('pending', 'accepted', 'rejected');
-
--- ✅ 인덱스 ------------------------------------------------------------
-
--- 복합 인덱스
-CREATE INDEX idx_friend_requester_receiver ON friend (requester_id, receiver_id);
-CREATE INDEX idx_friend_receiver_requester ON friend (receiver_id, requester_id);
-CREATE INDEX idx_friend_status ON friend (status);
-
--- (선택적) 인덱스: 키워드별 댓글 조회 최적화
-CREATE INDEX idx_keywordcomment_keyword_created ON keyword_comment (keyword_id, created_at);
-
--- 인덱스 추가 (조회 성능 최적화)
-CREATE INDEX idx_userkeyword_keyword_user ON user_keyword (keyword_id, user_id);
-
--- 성능을 위한 인덱스 및 신고 중복 확인용
-CREATE INDEX idx_report_pair ON report (reporter_id, reported_id);
-
--- 유저 간 차단 상태 확인, 중복 방지용 인덱스
-CREATE INDEX idx_block_pair ON block (blocker_id, blocked_id);
+create type friend_status as ENUM ('pending', 'accepted', 'rejected');
 
 -- ✅ 테이블 ------------------------------------------------------------
 
@@ -135,3 +116,25 @@ CREATE TABLE refresh_tokens (
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ✅ 인덱스 ------------------------------------------------------------
+
+-- 복합 인덱스
+CREATE INDEX idx_friend_requester_receiver ON friend (requester_id, receiver_id);
+CREATE INDEX idx_friend_receiver_requester ON friend (receiver_id, requester_id);
+CREATE INDEX idx_friend_status ON friend (status);
+
+-- (선택적) 인덱스: 키워드별 댓글 조회 최적화
+CREATE INDEX idx_keywordcomment_keyword_created ON keyword_comment (keyword_id, created_at);
+
+-- 인덱스 추가 (조회 성능 최적화)
+CREATE INDEX idx_userkeyword_keyword_user ON user_keyword (keyword_id, user_id);
+
+-- 성능을 위한 인덱스 및 신고 중복 확인용
+CREATE INDEX idx_report_pair ON report (reporter_id, reported_id);
+
+-- 유저 간 차단 상태 확인, 중복 방지용 인덱스
+CREATE INDEX idx_block_pair ON block (blocker_id, blocked_id);
+
+-- 키워드 작성자 조회용 인덱스
+CREATE INDEX idx_keyword_created_by ON keyword(created_by);
