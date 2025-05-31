@@ -9,6 +9,7 @@ project/
 │   ├── route/               # 라우팅 정의
 │   ├── dto/                 # 요청/응답 DTO
 │   ├── exception/           # 프레젠테이션 공통 예외 및 핸들러
+│   ├── plugin/              # 미들웨어 역할 (Ex. 인증, 로깅, CORS 등)
 │   ├── util/                # 프레젠테이션 유틸
 │
 │
