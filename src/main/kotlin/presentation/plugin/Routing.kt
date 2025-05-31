@@ -1,4 +1,4 @@
-package com.peekr.config
+package com.peekr.presentation.plugin
 
 import io.ktor.server.application.Application
 import io.ktor.server.response.respondText
