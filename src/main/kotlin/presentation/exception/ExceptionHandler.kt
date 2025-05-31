@@ -1,4 +1,4 @@
-package com.peekr.config.exception
+package com.peekr.presentation.exception
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
