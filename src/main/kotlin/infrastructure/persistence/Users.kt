@@ -1,5 +1,6 @@
 package com.peekr.infrastructure.entity
 
+import com.peekr.domain.model.value.user.SocialLoginProvider
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.jetbrains.exposed.sql.javatime.timestamp
