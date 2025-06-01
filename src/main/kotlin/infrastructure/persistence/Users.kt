@@ -1,4 +1,4 @@
-package com.peekr.infrastructure.entity
+package com.peekr.infrastructure.persistence
 
 import com.peekr.domain.model.value.user.SocialLoginProvider
 import org.jetbrains.exposed.dao.id.LongIdTable
