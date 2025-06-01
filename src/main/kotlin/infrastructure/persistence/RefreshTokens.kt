@@ -1,4 +1,4 @@
-package com.peekr.infrastructure.entity
+package com.peekr.infrastructure.persistence
 
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp

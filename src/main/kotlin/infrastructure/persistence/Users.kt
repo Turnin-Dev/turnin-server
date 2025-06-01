@@ -1,11 +1,12 @@
-package com.peekr.infrastructure.entity
+package com.peekr.infrastructure.persistence
 
+import com.peekr.domain.model.value.user.SocialLoginProvider
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.jetbrains.exposed.sql.javatime.timestamp
 
 object Users : LongIdTable("user") {
-    val provider = varchar("provider", 50)
+    val provider = enumerationByName("provider", 50, SocialLoginProvider::class)
     val providerId = varchar("provider_id", 255)
     val name = varchar("name", 50).nullable()
     val nickname = varchar("nickname", 50).nullable()

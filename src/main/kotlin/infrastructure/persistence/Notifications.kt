@@ -1,4 +1,4 @@
-package com.peekr.infrastructure.entity
+package com.peekr.infrastructure.persistence
 
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp

@@ -3,12 +3,15 @@
 -- 친구 상태
 create type friend_status as ENUM ('pending', 'accepted', 'rejected');
 
+-- 소셜로그인 제공업
+create type social_login_provider as enum ('google', 'apple', 'kakao');
+
 -- ✅ 테이블 ------------------------------------------------------------
 
 -- 사용자 테이블
 CREATE TABLE "user" (
     id bigserial PRIMARY KEY,
-    provider VARCHAR(50) NOT NULL,
+    provider social_login_provider NOT NULL,
     provider_id VARCHAR(255) NOT NULL,
     name VARCHAR(50),
     nickname VARCHAR(50),
