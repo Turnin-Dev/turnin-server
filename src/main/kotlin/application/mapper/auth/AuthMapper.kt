@@ -1,7 +1,9 @@
 package com.peekr.application.mapper.auth
 
+import com.peekr.application.dto.auth.JwtTokenDto
 import com.peekr.application.dto.auth.LoginDto
 import com.peekr.domain.model.entity.auth.AuthUser
+import com.peekr.domain.model.entity.auth.JwtToken
 
 object AuthMapper {
     fun LoginDto.toDomain(): AuthUser =
@@ -14,4 +16,8 @@ object AuthMapper {
             profileImageUrl = profileImageUrl,
             introduce = introduce,
         )
+
+    fun JwtToken?.toDto(): JwtTokenDto? = this?.let {
+        JwtTokenDto(accessToken, refreshToken)
+    }
 }

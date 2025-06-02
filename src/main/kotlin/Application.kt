@@ -19,6 +19,11 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     DatabaseFactory.init()
+
+    configureKoin {
+        modules(authModule)
+    }
+
     configureContentNegotiation()
     configureExceptionHandler()
     configureCallLogging()
@@ -27,8 +32,4 @@ fun Application.module() {
     configureSecurity()
     configureSerialization()
     configureRouting()
-
-    configureKoin {
-        modules(authModule)
-    }
 }

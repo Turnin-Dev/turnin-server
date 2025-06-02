@@ -14,7 +14,7 @@ val authModule = module {
     // JWT Provider
     single<JwtTokenProvider> { JwtTokenProviderImpl() }
 
-    // Service
+    // Domain Service
     single<AuthService> {
         AuthServiceImpl(
             authRepository = get(),
