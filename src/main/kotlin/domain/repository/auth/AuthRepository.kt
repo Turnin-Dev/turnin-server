@@ -1,10 +1,11 @@
 package com.peekr.domain.repository.auth
 
-import domain.model.entity.auth.AuthUser
+import com.peekr.domain.model.entity.auth.AuthUser
+import com.peekr.domain.model.value.auth.SocialLoginProvider
 
-interface UserRepository {
+interface AuthRepository {
     suspend fun findByProviderAndProviderId(
-        provider: String,
+        provider: SocialLoginProvider,
         providerId: String,
     ): AuthUser?
 

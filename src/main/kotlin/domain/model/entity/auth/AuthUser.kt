@@ -1,4 +1,4 @@
-package domain.model.entity.auth
+package com.peekr.domain.model.entity.auth
 
 import com.peekr.domain.model.value.auth.SocialLoginProvider
 

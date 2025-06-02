@@ -1,7 +1,8 @@
 package com.peekr
 
+import com.peekr.di.AuthModule
+import com.peekr.infrastructure.DatabaseFactory
 import com.peekr.presentation.exception.configureExceptionHandler
-import com.peekr.presentation.plugin.DatabaseFactory
 import com.peekr.presentation.plugin.configureCallLogging
 import com.peekr.presentation.plugin.configureContentNegotiation
 import com.peekr.presentation.plugin.configureHTTP
@@ -28,5 +29,6 @@ fun Application.module() {
     configureRouting()
 
     configureKoin {
+        modules(AuthModule.module)
     }
 }

@@ -43,8 +43,6 @@ ij_kotlin_method_parameters_wrap = on_every_item
 ij_kotlin_method_call_arguments_wrap = on_every_item
 
 # --- function disabled rule ---
-# 우변이 Multi Line일 경우 새로운 Line에서 시작 (off)
 ktlint_standard_multiline-expression-wrapping = disabled
-# 함수 파라미터 각각 새로운 Line 할당 (off)
-# 함수 정의 시 반환 값 Line을 새로운 Line에서 시작 (off)
+ktlint_standard_string-template-indent = disabled
 ktlint_standard_function-signature = disabled

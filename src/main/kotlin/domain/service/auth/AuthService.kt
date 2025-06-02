@@ -1,6 +1,8 @@
 package com.peekr.domain.service.auth
 
-import domain.model.entity.auth.AuthUser
+import com.peekr.domain.model.entity.auth.AuthUser
+import com.peekr.domain.model.entity.auth.JwtToken
+import com.peekr.domain.model.value.auth.SocialLoginProvider
 
 interface AuthService {
     /**
@@ -10,22 +12,16 @@ interface AuthService {
      * 만약, 계정이 존재하지 않는다면 [register]를 통해 회원가입을 진행한다.
      */
     suspend fun login(
-        provider: String,
+        provider: SocialLoginProvider,
         providerId: String,
-    ): AuthUser?
+    ): JwtToken?
 
     /**
      * 회원가입
      *
-     * @param name 이름
-     * @param nickname 닉네임
-     * @param profileImageUrl 이미지 URL
-     * @param introduce 소개 글
+     * 단, 회원가입은 기존 회원이 존재하지 않는다는 가정하에 진행된다.
+     *
+     * @param authUser [AuthUser]
      */
-    suspend fun register(
-        name: String,
-        nickname: String,
-        profileImageUrl: String?,
-        introduce: String?,
-    ): AuthUser
+    suspend fun register(authUser: AuthUser): JwtToken
 }

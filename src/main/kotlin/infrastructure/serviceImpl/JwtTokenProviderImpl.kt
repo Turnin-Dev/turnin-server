@@ -2,19 +2,16 @@ package com.peekr.infrastructure.serviceImpl
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.peekr.domain.model.entity.auth.AuthUser
+import com.peekr.domain.model.entity.auth.JwtToken
 import com.peekr.domain.service.auth.JwtTokenProvider
-import domain.model.entity.auth.AuthUser
-import domain.model.entity.auth.JwtToken
 import io.github.cdimascio.dotenv.dotenv
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
-class JwtTokenProviderImpl(
-    private val accessTokenExpiresAt: Long = AccessTokenExpiresAt,
-    private val refreshTokenExpiresAt: Long = RefreshTokenExpiresAt,
-) : JwtTokenProvider {
+class JwtTokenProviderImpl : JwtTokenProvider {
     private val env = dotenv()
     private val secretKey = env["JWT_SECRET"] ?: "null"
     private val issuer = env["JWT_ISSUER"] ?: "null"
@@ -33,7 +30,7 @@ class JwtTokenProviderImpl(
                 .withSubject(authUser.id.toString())
                 .withClaim("name", authUser.name)
                 .withIssuedAt(Date.from(now))
-                .withExpiresAt(Date.from(now.plusMillis(accessTokenExpiresAt)))
+                .withExpiresAt(Date.from(now.plusMillis(AccessTokenExpiresAt)))
                 .sign(algorithm)
 
         val refreshToken =
@@ -41,7 +38,7 @@ class JwtTokenProviderImpl(
                 .create()
                 .withSubject(authUser.id.toString())
                 .withIssuedAt(Date.from(now))
-                .withExpiresAt(Date.from(now.plusMillis(refreshTokenExpiresAt)))
+                .withExpiresAt(Date.from(now.plusMillis(RefreshTokenExpiresAt)))
                 .sign(algorithm)
 
         return JwtToken(accessToken, refreshToken)
