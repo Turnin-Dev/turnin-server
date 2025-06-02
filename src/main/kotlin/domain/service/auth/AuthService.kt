@@ -1,8 +1,8 @@
-package com.peekr.domain.service.user
+package com.peekr.domain.service.auth
 
-import domain.model.user.User
+import domain.model.entity.auth.AuthUser
 
-interface UserService {
+interface AuthService {
     /**
      * 소셜로그인
      *
@@ -12,7 +12,7 @@ interface UserService {
     suspend fun login(
         provider: String,
         providerId: String,
-    ): User?
+    ): AuthUser?
 
     /**
      * 회원가입
@@ -27,5 +27,5 @@ interface UserService {
         nickname: String,
         profileImageUrl: String?,
         introduce: String?,
-    ): User
+    ): AuthUser
 }
