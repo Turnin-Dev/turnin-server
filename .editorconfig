@@ -14,7 +14,7 @@ ktlint_standard_filename = disabled
 max_line_length = 100
 
 # --- Imports ---
-ij_kotlin_imports_layout = *,java,javax,kotlin,android,^
+ij_kotlin_imports_layout = *, java, javax, kotlin, android, ^
 ij_kotlin_optimize_imports_on_the_fly = true
 ij_kotlin_allow_wildcard_imports = false
 
@@ -41,3 +41,10 @@ ij_kotlin_else_on_new_line = true
 ij_kotlin_if_rparen_on_new_line = true
 ij_kotlin_method_parameters_wrap = on_every_item
 ij_kotlin_method_call_arguments_wrap = on_every_item
+
+# --- function disabled rule ---
+# 우변이 Multi Line일 경우 새로운 Line에서 시작 (off)
+ktlint_standard_multiline-expression-wrapping = disabled
+# 함수 파라미터 각각 새로운 Line 할당 (off)
+# 함수 정의 시 반환 값 Line을 새로운 Line에서 시작 (off)
+ktlint_standard_function-signature = disabled
