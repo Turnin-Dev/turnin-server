@@ -6,14 +6,12 @@ import com.peekr.infrastructure.serviceImpl.AuthServiceImpl
 import com.peekr.infrastructure.serviceImpl.JwtTokenProviderImpl
 import org.koin.dsl.module
 
-object AuthModule {
-    val module = module {
-        single<JwtTokenProvider> { JwtTokenProviderImpl() }
-        single<AuthService> {
-            AuthServiceImpl(
-                authRepository = get(),
-                jwtTokenProvider = get(),
-            )
-        }
+val authModule = module {
+    single<JwtTokenProvider> { JwtTokenProviderImpl() }
+    single<AuthService> {
+        AuthServiceImpl(
+            authRepository = get(),
+            jwtTokenProvider = get(),
+        )
     }
 }

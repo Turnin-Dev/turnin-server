@@ -1,6 +1,6 @@
 package com.peekr
 
-import com.peekr.di.AuthModule
+import com.peekr.di.authModule
 import com.peekr.infrastructure.DatabaseFactory
 import com.peekr.presentation.exception.configureExceptionHandler
 import com.peekr.presentation.plugin.configureCallLogging
@@ -29,6 +29,6 @@ fun Application.module() {
     configureRouting()
 
     configureKoin {
-        modules(AuthModule.module)
+        modules(authModule)
     }
 }
