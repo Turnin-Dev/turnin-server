@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.ktor)
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.ksp)
 }
 
 group = "com.peekr"
@@ -79,6 +80,8 @@ dependencies {
     // DI
     implementation(libs.koin)
     implementation(libs.koin.logger)
+    implementation(libs.koin.annotations)
+    ksp(libs.koin.ksp.compiler)
 
     // Flyway
     implementation(libs.flyway.core)

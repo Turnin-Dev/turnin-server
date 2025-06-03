@@ -11,6 +11,8 @@ jwt-version = "4.2.1"
 ktlint-version = "12.2.0"
 koin-version = "4.0.3"
 flyway-version = "11.8.2"
+koin-ksp-version = "2.0.1-RC1"
+ksp = "2.1.10-1.0.30"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -49,6 +51,8 @@ ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", versio
 # DI
 koin = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-version" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-ksp-version" }
+koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-ksp-version" }
 # Flyway
 flyway-core = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-version" }
 
@@ -58,3 +62,4 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
 # Ktlint
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-version" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
