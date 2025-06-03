@@ -1,8 +1,9 @@
-package com.peekr.common.presentation.plugin
+package com.peekr.common.di
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.koin.core.KoinApplication
+import org.koin.ksp.generated.defaultModule
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
@@ -23,5 +24,6 @@ fun Application.configureKoin(module: KoinApplication.() -> Unit) {
     install(Koin) {
         slf4jLogger()
         module
+        defaultModule()
     }
 }
