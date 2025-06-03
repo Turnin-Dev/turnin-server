@@ -1,15 +1,15 @@
 package com.peekr
 
-import com.peekr.di.authModule
-import com.peekr.infrastructure.DatabaseFactory
-import com.peekr.presentation.exception.configureExceptionHandler
-import com.peekr.presentation.plugin.configureCallLogging
-import com.peekr.presentation.plugin.configureContentNegotiation
-import com.peekr.presentation.plugin.configureHTTP
-import com.peekr.presentation.plugin.configureKoin
-import com.peekr.presentation.plugin.configureRouting
-import com.peekr.presentation.plugin.configureSerialization
-import com.peekr.presentation.plugin.security.configureSecurity
+import com.peekr.common.infrastructure.DatabaseFactory
+import com.peekr.common.presentation.exception.configureExceptionHandler
+import com.peekr.common.presentation.plugin.configureCallLogging
+import com.peekr.common.presentation.plugin.configureContentNegotiation
+import com.peekr.common.presentation.plugin.configureHTTP
+import com.peekr.common.presentation.plugin.configureKoin
+import com.peekr.common.presentation.plugin.configureRouting
+import com.peekr.common.presentation.plugin.configureSerialization
+import com.peekr.common.presentation.plugin.security.configureSecurity
+import com.peekr.domain.auth.di.authModule
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
 
