@@ -1,8 +1,8 @@
-package domain.model.user
+package com.peekr.domain.model.entity.auth
 
-import com.peekr.domain.model.value.user.SocialLoginProvider
+import com.peekr.domain.model.value.auth.SocialLoginProvider
 
-data class User(
+data class AuthUser(
     val id: Long,
     val provider: SocialLoginProvider,
     val providerId: String,

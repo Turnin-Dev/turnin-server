@@ -13,7 +13,7 @@ CREATE TABLE "user" (
     id bigserial PRIMARY KEY,
     provider social_login_provider NOT NULL,
     provider_id VARCHAR(255) NOT NULL,
-    name VARCHAR(50),
+    name VARCHAR(50) NOT NULL,
     nickname VARCHAR(50),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     profile_image_url VARCHAR(500),

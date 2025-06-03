@@ -1,4 +1,4 @@
-package com.peekr.infrastructure.persistence
+package com.peekr.domain.model.value.friend
 
 enum class FriendStatus {
     PENDING,

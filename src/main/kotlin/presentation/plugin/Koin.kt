@@ -2,6 +2,7 @@ package com.peekr.presentation.plugin
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import org.koin.core.KoinApplication
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
@@ -18,7 +19,7 @@ import org.koin.logger.slf4jLogger
  *
  * @param module 모듈 블록
  */
-fun Application.configureKoin(module: () -> Unit) {
+fun Application.configureKoin(module: KoinApplication.() -> Unit) {
     install(Koin) {
         slf4jLogger()
         module

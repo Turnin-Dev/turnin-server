@@ -1,5 +1,6 @@
 package com.peekr.infrastructure.persistence
 
+import com.peekr.domain.model.value.friend.FriendStatus
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.jetbrains.exposed.sql.javatime.timestamp
