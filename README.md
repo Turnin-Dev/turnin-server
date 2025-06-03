@@ -11,6 +11,7 @@ project/
 │   ├── application/             # 공통 애플리케이션 계층
 │   ├── domain/                  # 공통 도메인 계층
 │   ├── infrastructure/          # 공통 인프라스트럭처 계층
+│   └── util/                    # 유틸
 │
 ├── domain/                     # 도메인 모듈들
 │   ├── auth/                     # 각 도메인 모듈
