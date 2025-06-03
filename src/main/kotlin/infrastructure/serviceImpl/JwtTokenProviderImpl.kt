@@ -21,25 +21,24 @@ class JwtTokenProviderImpl : JwtTokenProvider {
 
     override fun generate(authUser: AuthUser): JwtToken {
         val now = Instant.now()
+        val claim = "${authUser.provider}/${authUser.name}/${authUser.nickname}"
 
-        val accessToken =
-            JWT
-                .create()
-                .withIssuer(issuer)
-                .withAudience(audience)
-                .withSubject(authUser.id.toString())
-                .withClaim("name", authUser.name)
-                .withIssuedAt(Date.from(now))
-                .withExpiresAt(Date.from(now.plusMillis(AccessTokenExpiresAt)))
-                .sign(algorithm)
+        val accessToken = JWT
+            .create()
+            .withIssuer(issuer)
+            .withAudience(audience)
+            .withSubject(authUser.id.toString())
+            .withClaim("name", claim)
+            .withIssuedAt(Date.from(now))
+            .withExpiresAt(Date.from(now.plusMillis(AccessTokenExpiresAt)))
+            .sign(algorithm)
 
-        val refreshToken =
-            JWT
-                .create()
-                .withSubject(authUser.id.toString())
-                .withIssuedAt(Date.from(now))
-                .withExpiresAt(Date.from(now.plusMillis(RefreshTokenExpiresAt)))
-                .sign(algorithm)
+        val refreshToken = JWT
+            .create()
+            .withSubject(authUser.id.toString())
+            .withIssuedAt(Date.from(now))
+            .withExpiresAt(Date.from(now.plusMillis(RefreshTokenExpiresAt)))
+            .sign(algorithm)
 
         return JwtToken(accessToken, refreshToken)
     }
