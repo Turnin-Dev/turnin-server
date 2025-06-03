@@ -35,9 +35,10 @@ out/
 ### VS Code ###
 .vscode/
 
-### dotenv ###
+### dotenv & config ###
 .env
+*.yaml
 
 ### db file ###
-.sql
-.psql
+resources/*.sql
+resources/*.psql
