@@ -41,5 +41,5 @@ out/
 **/src/main/resources/**/*.yml
 
 ### db file ###
-**/src/main/resources/*.sql
-**/src/main/resources/*.psql
+**/src/main/resources/**/*.sql
+**/src/main/resources/**/*.psql
