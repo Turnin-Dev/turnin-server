@@ -37,8 +37,9 @@ out/
 
 ### dotenv & config ###
 .env
-*.yaml
+**/src/main/resources/**/*.yaml
+**/src/main/resources/**/*.yml
 
 ### db file ###
-resources/*.sql
-resources/*.psql
+**/src/main/resources/*.sql
+**/src/main/resources/*.psql
