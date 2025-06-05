@@ -1,4 +1,4 @@
-package com.peekr.common.presentation.plugin.security
+package com.peekr.common.plugin.security
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install

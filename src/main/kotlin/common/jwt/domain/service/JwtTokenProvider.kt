@@ -1,6 +1,6 @@
-package com.peekr.common.domain.service
+package com.peekr.common.jwt.domain.service
 
-import com.peekr.common.domain.entity.JwtToken
+import com.peekr.common.jwt.domain.entity.JwtToken
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 
 interface JwtTokenProvider {

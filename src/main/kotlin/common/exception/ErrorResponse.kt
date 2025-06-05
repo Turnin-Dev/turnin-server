@@ -1,4 +1,4 @@
-package com.peekr.common.presentation.exception
+package com.peekr.common.exception
 
 import kotlinx.serialization.Serializable
 

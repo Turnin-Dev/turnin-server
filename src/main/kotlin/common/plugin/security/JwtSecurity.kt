@@ -1,4 +1,4 @@
-package com.peekr.common.presentation.plugin.security
+package com.peekr.common.plugin.security
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm

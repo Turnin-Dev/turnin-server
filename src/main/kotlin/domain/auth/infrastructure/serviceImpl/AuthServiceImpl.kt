@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.infrastructure.serviceImpl
 
-import com.peekr.common.domain.entity.JwtToken
-import com.peekr.common.domain.service.JwtTokenProvider
+import com.peekr.common.jwt.domain.entity.JwtToken
+import com.peekr.common.jwt.domain.service.JwtTokenProvider
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository

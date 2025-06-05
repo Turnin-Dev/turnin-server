@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.di
 
-import com.peekr.common.domain.service.JwtTokenProvider
-import com.peekr.common.infrastructure.serviceImpl.JwtTokenProviderImpl
+import com.peekr.common.jwt.domain.service.JwtTokenProvider
+import com.peekr.common.jwt.infrastructure.serviceImpl.JwtTokenProviderImpl
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.application.usecase.AuthUseCaseImpl
 import com.peekr.domain.auth.domain.repository.AuthRepository

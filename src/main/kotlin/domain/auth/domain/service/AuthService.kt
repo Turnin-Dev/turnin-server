@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.domain.service
 
-import com.peekr.common.domain.entity.JwtToken
+import com.peekr.common.jwt.domain.entity.JwtToken
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 

@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
-import com.peekr.common.infrastructure.DatabaseFactory
+import com.peekr.common.plugin.DatabaseFactory
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository

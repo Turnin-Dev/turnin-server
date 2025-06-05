@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.presentation.route
 
-import com.peekr.common.presentation.exception.ApiException
+import com.peekr.common.exception.ApiException
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.mapper.toDto
