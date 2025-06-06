@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.presentation.route
 
-import com.peekr.common.exception.ApiException
+import com.peekr.common.exception.ApiErrorCode
+import com.peekr.common.exception.ErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.mapper.toDto
@@ -22,13 +23,10 @@ fun Route.authRoutes() {
             val request = call.receive<LoginRequest>()
             val token = authUseCase.login(request.toDto())
             if (token == null) {
-                throw ApiException(
-                    code = "",
-                    message = "사용자가 존재하지 않습니다.",
-                    status = HttpStatusCode.NotFound,
-                )
+                call.respond(AuthErrorResponse)
+            } else {
+                call.respond(token.toResponse())
             }
-            call.respond(token.toResponse())
         }
 
         post("/register") {
@@ -38,3 +36,9 @@ fun Route.authRoutes() {
         }
     }
 }
+
+private val AuthErrorResponse = ErrorResponse(
+    code = ApiErrorCode.Auth.value,
+    message = "로그인에 문제가 있습니다. (토큰 생성 실패)",
+    status = HttpStatusCode.NotFound.value,
+)

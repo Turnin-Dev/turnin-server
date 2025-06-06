@@ -8,27 +8,36 @@ import io.ktor.server.response.respond
 
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
+        exception<DefaultException> { call, cause ->
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                message = ErrorResponse(
+                    code = cause.code.value,
+                    message = cause.message,
+                    status = HttpStatusCode.InternalServerError.value,
+                ),
+            )
+        }
+
         exception<ApiException> { call, cause ->
             call.respond(
                 status = cause.status,
-                message =
-                    ErrorResponse(
-                        code = cause.code,
-                        message = cause.message,
-                        status = cause.status.value,
-                    ),
+                message = ErrorResponse(
+                    code = cause.code.value,
+                    message = cause.message,
+                    status = cause.status.value,
+                ),
             )
         }
 
         exception<Throwable> { call, cause ->
             call.respond(
                 status = HttpStatusCode.InternalServerError,
-                message =
-                    ErrorResponse(
-                        code = INTERNAL_SERVER_ERROR_CODE,
-                        message = cause.localizedMessage ?: UNKNOWN_ERROR_MESSAGE,
-                        status = HttpStatusCode.InternalServerError.value,
-                    ),
+                message = ErrorResponse(
+                    code = INTERNAL_SERVER_ERROR_CODE,
+                    message = cause.localizedMessage ?: UNKNOWN_ERROR_MESSAGE,
+                    status = HttpStatusCode.InternalServerError.value,
+                ),
             )
         }
     }
