@@ -2,7 +2,7 @@ package com.peekr.common.jwt.infrastructure.serviceImpl
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.peekr.common.jwt.domain.entity.JwtToken
+import com.peekr.common.jwt.domain.model.entity.JwtToken
 import com.peekr.common.jwt.domain.service.JwtTokenProvider
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 import io.github.cdimascio.dotenv.dotenv

@@ -7,6 +7,6 @@ sealed class TokenException(
     message: String,
 ) : DefaultException(DefaultErrorCode.Token, message) {
     class InvalidTokenException(
-        message: String,
+        message: String = "invalid token",
     ) : TokenException(message)
 }

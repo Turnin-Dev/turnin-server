@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.application.mapper
 
 import com.peekr.common.jwt.application.dto.JwtTokenDto
-import com.peekr.common.jwt.domain.entity.JwtToken
+import com.peekr.common.jwt.domain.model.entity.JwtToken
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 
