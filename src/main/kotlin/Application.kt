@@ -3,6 +3,7 @@ package com.peekr
 import com.peekr.common.di.configureKoin
 import com.peekr.common.exception.configureExceptionHandler
 import com.peekr.common.jwt.configureJwtSecurity
+import com.peekr.common.jwt.di.jwtModule
 import com.peekr.common.plugin.DatabaseFactory
 import com.peekr.common.plugin.configureCallLogging
 import com.peekr.common.plugin.configureContentNegotiation
@@ -21,7 +22,10 @@ fun Application.module() {
     DatabaseFactory.init()
 
     configureKoin {
-        modules(authModule)
+        modules(
+            authModule,
+            jwtModule,
+        )
     }
 
     configureContentNegotiation()

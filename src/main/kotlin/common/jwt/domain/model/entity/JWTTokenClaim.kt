@@ -1,9 +1,9 @@
 package com.peekr.common.jwt.domain.model.entity
 
-import com.peekr.common.jwt.domain.model.value.JwtClaimName
+import com.peekr.common.jwt.domain.model.value.JWTClaimName
 
 data class JwtTokenPayload(
     val subject: String,
-    val claimName: JwtClaimName,
+    val claimName: JWTClaimName,
     val claim: String,
 )

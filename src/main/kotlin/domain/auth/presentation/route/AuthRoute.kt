@@ -39,6 +39,6 @@ fun Route.authRoutes() {
 
 private val AuthErrorResponse = ErrorResponse(
     code = ApiErrorCode.Auth.value,
-    message = "로그인에 문제가 있습니다. (토큰 생성 실패)",
+    message = "로그인에 문제가 발생했습니다. (토큰 생성 실패)",
     status = HttpStatusCode.NotFound.value,
 )

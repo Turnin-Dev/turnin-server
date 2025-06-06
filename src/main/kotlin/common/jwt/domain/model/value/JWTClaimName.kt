@@ -1,5 +1,5 @@
 package com.peekr.common.jwt.domain.model.value
 
-enum class JwtClaimName {
+enum class JWTClaimName {
     Name,
 }

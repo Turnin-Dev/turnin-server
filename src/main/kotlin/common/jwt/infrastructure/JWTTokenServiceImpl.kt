@@ -1,26 +1,18 @@
-package com.peekr.common.jwt.infrastructure.serviceImpl
+package com.peekr.common.jwt.infrastructure
 
 import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.interfaces.JWTVerifier
-import com.peekr.common.jwt.domain.model.entity.JwtToken
+import com.peekr.common.jwt.domain.model.entity.JWTToken
+import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
 import com.peekr.common.jwt.domain.model.entity.JwtTokenPayload
-import com.peekr.common.jwt.exception.TokenException
+import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppConfig
 import java.time.Instant
 import java.util.Date
-import org.koin.core.annotation.Single
 
-/** JWT Token 을 생성하고 검증하는 클래스 */
-@Single
-class JwtTokenService(
+class JWTTokenServiceImpl(
     private val appConfig: AppConfig,
-) {
-    val jwtName by lazy {
-        appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.name")?.getString()
-            ?: "jwt-name"
-    }
-
+    private val jwtConfigFactory: JWTConfigFactory,
+) : JWTTokenService {
     val realm by lazy {
         appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.realm")?.getString()
             ?: "jwt-realm"
@@ -60,10 +52,9 @@ class JwtTokenService(
     }
 
     private val now = Instant.now()
-    private val algorithm = Algorithm.HMAC256(secretKey)
+    val algorithm = jwtConfigFactory.createAlgorithm(secretKey)
 
-    /** [JwtTokenPayload]를 기반으로 JWT Token을 생성한다. */
-    fun generate(payload: JwtTokenPayload): JwtToken {
+    override fun generate(payload: JwtTokenPayload): JWTToken {
         val accessToken = JWT
             .create()
             .withAudience(audience)
@@ -81,20 +72,9 @@ class JwtTokenService(
             .withExpiresAt(Date.from(now.plusMillis(refreshTokenExpiresIn)))
             .sign(algorithm)
 
-        return JwtToken(accessToken, refreshToken)
+        return JWTToken(accessToken, refreshToken)
     }
 
-    /**
-     * JWT Token을 검증하고 [JWTVerifier]를 반환한다.
-     * @throws TokenException.InvalidTokenException - 토큰 검증 과정에서 예외가 발생 했을 시
-     */
-    fun verify(): JWTVerifier = try {
-        JWT
-            .require(algorithm)
-            .withAudience(audience)
-            .withIssuer(issuer)
-            .build()
-    } catch (e: Exception) {
-        throw TokenException.InvalidTokenException("Invalid token")
-    }
+    override fun getVerifierConfig(): JWTVerifierConfig =
+        JWTVerifierConfig(secretKey, audience, issuer)
 }
