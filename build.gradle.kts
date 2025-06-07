@@ -85,4 +85,7 @@ dependencies {
 
     // Flyway
     implementation(libs.flyway.core)
+
+    // Mockk
+    testImplementation(libs.mockk)
 }
