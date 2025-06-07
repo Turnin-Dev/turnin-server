@@ -1,5 +1,6 @@
-package com.peekr.plugin
+package com.peekr.common.plugin
 
+import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.configureExceptionHandler
@@ -59,7 +60,7 @@ class ExceptionHandlerTest {
     companion object {
         private val ApiExceptionRoute = "/api-exception-test"
         private val GeneralExceptionRoute = "/general-exception-test"
-        private val TestCode = "Test Code"
+        private val TestCode = ApiErrorCode.Auth
         private val TestMessage = "Test Message"
         private val TestStatus = HttpStatusCode.BadRequest
         private val TestApiException =
@@ -70,7 +71,7 @@ class ExceptionHandlerTest {
             )
         private val TestErrorResponse =
             ErrorResponse(
-                code = TestCode,
+                code = TestCode.value,
                 message = TestMessage,
                 status = TestStatus.value,
             )

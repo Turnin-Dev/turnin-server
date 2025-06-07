@@ -2,8 +2,8 @@ package com.peekr.common.jwt.infrastructure
 
 import com.auth0.jwt.JWT
 import com.peekr.common.jwt.domain.model.entity.JWTToken
+import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
-import com.peekr.common.jwt.domain.model.entity.JwtTokenPayload
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppConfig
 import java.time.Instant
@@ -54,7 +54,7 @@ class JWTTokenServiceImpl(
     private val now = Instant.now()
     val algorithm = jwtConfigFactory.createAlgorithm(secretKey)
 
-    override fun generate(payload: JwtTokenPayload): JWTToken {
+    override fun generate(payload: JWTTokenPayload): JWTToken {
         val accessToken = JWT
             .create()
             .withAudience(audience)

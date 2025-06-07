@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.infrastructure.serviceImpl
 
 import com.peekr.common.jwt.domain.model.entity.JWTToken
-import com.peekr.common.jwt.domain.model.entity.JwtTokenPayload
+import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.value.JWTClaimName
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.domain.auth.domain.model.entity.AuthUser
@@ -21,7 +21,7 @@ class AuthServiceImpl(
 
         if (authUser == null) return null
 
-        val payload = JwtTokenPayload(
+        val payload = JWTTokenPayload(
             subject = authUser.id.toString(),
             claimName = JWTClaimName.Name,
             claim = authUser.name,
@@ -32,7 +32,7 @@ class AuthServiceImpl(
     override suspend fun register(authUser: AuthUser): JWTToken {
         val savedAuthUser = authRepository.save(authUser)
 
-        val payload = JwtTokenPayload(
+        val payload = JWTTokenPayload(
             subject = savedAuthUser.id.toString(),
             claimName = JWTClaimName.Name,
             claim = savedAuthUser.name,
