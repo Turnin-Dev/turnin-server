@@ -1,9 +1,9 @@
 package com.peekr.common.jwt
 
 import com.peekr.common.jwt.domain.model.value.JWTClaimName
+import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.jwt.infrastructure.JWTConfigFactory
-import com.peekr.common.jwt.infrastructure.JWTTokenServiceImpl
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -11,7 +11,7 @@ import io.ktor.server.auth.jwt.jwt
 import org.koin.ktor.ext.inject
 
 fun Application.configureJwtSecurity() {
-    val jwtService: JWTTokenServiceImpl by inject()
+    val jwtService: JWTTokenService by inject()
     val jwtConfigFactory: JWTConfigFactory by inject()
     val verifier = jwtConfigFactory.createVerifier(jwtService.getVerifierConfig())
 
@@ -20,12 +20,9 @@ fun Application.configureJwtSecurity() {
             verifier(verifier)
             realm = jwtService.realm
             validate { credential ->
-                if (credential.payload
-                        .getClaim(JWTClaimName.Name.name)
-                        .asString()
-                        .isNotEmpty() &&
-                    credential.payload.audience.contains(jwtService.audience)
-                ) {
+                val nameClaim = credential.payload.getClaim(JWTClaimName.Name.name)?.asString()
+                val hasAudience = credential.payload.audience.contains(jwtService.audience)
+                if (nameClaim?.isNotEmpty() == true && hasAudience) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

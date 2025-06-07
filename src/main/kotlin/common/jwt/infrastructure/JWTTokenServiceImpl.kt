@@ -13,17 +13,17 @@ class JWTTokenServiceImpl(
     private val appConfig: AppConfig,
     private val jwtConfigFactory: JWTConfigFactory,
 ) : JWTTokenService {
-    val realm by lazy {
+    override val realm by lazy {
         appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.realm")?.getString()
             ?: "jwt-realm"
     }
 
-    val audience by lazy {
+    override val audience by lazy {
         appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.audience")?.getString()
             ?: "jwt-audience"
     }
 
-    private val issuer by lazy {
+    override val issuer by lazy {
         appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.issuer")?.getString()
             ?: "jwt-issuer"
     }
