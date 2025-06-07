@@ -42,9 +42,15 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
 
+    // Test
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.client.content.negotiation)
+    // Test (Mockk)
+    testImplementation(libs.mockk)
+    // Test (Client)
+    testImplementation(libs.ktor.client.core)
+    testImplementation(libs.ktor.client.cio)
 
     // Status Pages
     implementation(libs.ktor.server.host.common)
@@ -85,7 +91,4 @@ dependencies {
 
     // Flyway
     implementation(libs.flyway.core)
-
-    // Mockk
-    testImplementation(libs.mockk)
 }

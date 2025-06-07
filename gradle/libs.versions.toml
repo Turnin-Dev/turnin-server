@@ -58,6 +58,9 @@ koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref =
 flyway-core = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-version" }
 # Mockk
 mockk = { module = "io.mockk:mockk", version.ref = "mockk-version" }
+# Client (for test)
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-version" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
