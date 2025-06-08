@@ -8,22 +8,11 @@ import io.ktor.server.response.respond
 
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
-        exception<DefaultException> { call, cause ->
-            call.respond(
-                status = HttpStatusCode.InternalServerError,
-                message = ErrorResponse(
-                    code = cause.code.value,
-                    message = cause.message,
-                    status = HttpStatusCode.InternalServerError.value,
-                ),
-            )
-        }
-
         exception<ApiException> { call, cause ->
             call.respond(
                 status = cause.status,
                 message = ErrorResponse(
-                    code = cause.code.value,
+                    code = cause.errorCode.code,
                     message = cause.message,
                     status = cause.status.value,
                 ),

@@ -1,8 +1,8 @@
 package com.peekr.domain.auth.presentation.route
 
-import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
+import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
@@ -38,7 +38,7 @@ fun Route.authRoutes() {
 }
 
 private val AuthErrorResponse = ErrorResponse(
-    code = ApiErrorCode.Auth.value,
+    code = AuthErrorCode.LoginFailed.code,
     message = "로그인에 문제가 발생했습니다. (토큰 생성 실패)",
     status = HttpStatusCode.NotFound.value,
 )

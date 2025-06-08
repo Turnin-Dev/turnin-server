@@ -20,6 +20,6 @@ class JWTConfigFactory {
             .withIssuer(verifierConfig.issuer)
             .build()
     } catch (e: Exception) {
-        throw TokenException.InvalidTokenException()
+        throw TokenException.CannotCreateTokenVerifier()
     }
 }
