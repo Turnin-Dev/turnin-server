@@ -13,6 +13,7 @@ koin-version = "4.0.3"
 flyway-version = "11.8.2"
 koin-ksp-version = "2.0.1-RC1"
 ksp = "2.1.10-1.0.30"
+mockk-version = "1.14.2"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -55,6 +56,11 @@ koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "
 koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-ksp-version" }
 # Flyway
 flyway-core = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-version" }
+# Mockk
+mockk = { module = "io.mockk:mockk", version.ref = "mockk-version" }
+# Client (for test)
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-version" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

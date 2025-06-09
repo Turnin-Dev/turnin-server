@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.domain.service
 
-import com.peekr.common.domain.entity.JwtToken
+import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 
@@ -14,7 +14,7 @@ interface AuthService {
     suspend fun login(
         provider: SocialLoginProvider,
         providerId: String,
-    ): JwtToken?
+    ): JWTToken?
 
     /**
      * 회원가입
@@ -23,5 +23,5 @@ interface AuthService {
      *
      * @param authUser [com.peekr.domain.auth.domain.model.entity.AuthUser]
      */
-    suspend fun register(authUser: AuthUser): JwtToken
+    suspend fun register(authUser: AuthUser): JWTToken
 }

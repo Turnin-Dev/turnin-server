@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.application.mapper
 
-import com.peekr.common.application.dto.JwtTokenDto
-import com.peekr.common.domain.entity.JwtToken
+import com.peekr.common.jwt.application.dto.JWTTokenDto
+import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 
@@ -17,7 +17,7 @@ object AuthMapper {
             introduce = introduce,
         )
 
-    fun JwtToken?.toDto(): JwtTokenDto? = this?.let {
-        JwtTokenDto(accessToken, refreshToken)
+    fun JWTToken?.toDto(): JWTTokenDto? = this?.let {
+        JWTTokenDto(accessToken, refreshToken)
     }
 }
