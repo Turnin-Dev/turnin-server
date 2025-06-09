@@ -1,10 +1,9 @@
 package com.peekr.common.plugin
 
-import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.configureExceptionHandler
-import com.peekr.util.testPlugin
+import com.peekr.domain.auth.exception.AuthErrorCode
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -19,36 +18,34 @@ import org.junit.Test
 
 class ExceptionHandlerTest {
     @Test
-    fun testApiException() =
-        testApplication {
-            application {
-                testPlugin()
-                configureExceptionHandler()
-                fakeRouting()
-            }
-
-            val response = client.get(ApiExceptionRoute)
-            val actualResponse = Json.decodeFromString<ErrorResponse>(response.bodyAsText())
-
-            assertEquals(TestStatus, response.status)
-            assertEquals(TestErrorResponse, actualResponse)
+    fun testApiException() = testApplication {
+        application {
+            configureContentNegotiation()
+            configureExceptionHandler()
+            fakeRouting()
         }
+
+        val response = client.get(ApiExceptionRoute)
+        val actualResponse = Json.decodeFromString<ErrorResponse>(response.bodyAsText())
+
+        assertEquals(TestStatus, response.status)
+        assertEquals(TestErrorResponse, actualResponse)
+    }
 
     @Test
-    fun testGeneralException() =
-        testApplication {
-            application {
-                testPlugin()
-                configureExceptionHandler()
-                fakeRouting()
-            }
-
-            val response = client.get(GeneralExceptionRoute)
-            val actualResponse = Json.decodeFromString<ErrorResponse>(response.bodyAsText())
-
-            assertEquals(HttpStatusCode.InternalServerError, response.status)
-            assertEquals(HttpStatusCode.InternalServerError.value, actualResponse.status)
+    fun testGeneralException() = testApplication {
+        application {
+            configureContentNegotiation()
+            configureExceptionHandler()
+            fakeRouting()
         }
+
+        val response = client.get(GeneralExceptionRoute)
+        val actualResponse = Json.decodeFromString<ErrorResponse>(response.bodyAsText())
+
+        assertEquals(HttpStatusCode.InternalServerError, response.status)
+        assertEquals(HttpStatusCode.InternalServerError.value, actualResponse.status)
+    }
 
     private fun Application.fakeRouting() {
         routing {
@@ -60,18 +57,18 @@ class ExceptionHandlerTest {
     companion object {
         private val ApiExceptionRoute = "/api-exception-test"
         private val GeneralExceptionRoute = "/general-exception-test"
-        private val TestCode = ApiErrorCode.Auth
+        private val TestCode = AuthErrorCode.LoginFailed
         private val TestMessage = "Test Message"
         private val TestStatus = HttpStatusCode.BadRequest
         private val TestApiException =
             ApiException(
-                code = TestCode,
+                errorCode = TestCode,
                 message = TestMessage,
                 status = TestStatus,
             )
         private val TestErrorResponse =
             ErrorResponse(
-                code = TestCode.value,
+                code = TestCode.code,
                 message = TestMessage,
                 status = TestStatus.value,
             )
