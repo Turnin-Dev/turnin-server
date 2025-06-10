@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
+    implementation("io.ktor:ktor-server-cors:3.1.2")
 
     // Test
     testImplementation(libs.ktor.server.test.host)
@@ -58,7 +59,15 @@ dependencies {
 
     // Open API
     implementation(libs.ktor.server.openapi)
+    implementation(libs.ktor.server.swagger)
+    implementation(libs.swagger.codegen.generator)
+    constraints {
+        implementation("commons-codec:commons-codec:1.18.0")
+    }
     implementation(libs.ktor.server.resources)
+
+    // CORS
+    implementation(libs.ktor.server.cors)
 
     // PostgreSQL JDBC Driver
     implementation(libs.postgresql)
