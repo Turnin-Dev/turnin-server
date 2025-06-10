@@ -30,6 +30,12 @@ ktlint {
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
     }
+
+    filter {
+        exclude("**/build/generated/ksp/**")
+        exclude("**/build/generated/source/ksp/**")
+        exclude("**/build/generated/ksp/main/kotlin/**")
+    }
 }
 
 dependencies {
@@ -93,6 +99,7 @@ dependencies {
 
     // DI
     implementation(libs.koin)
+    implementation(libs.koin.core)
     implementation(libs.koin.logger)
     implementation(libs.koin.annotations)
     ksp(libs.koin.ksp.compiler)
