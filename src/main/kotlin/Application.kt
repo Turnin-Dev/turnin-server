@@ -30,6 +30,10 @@ fun Application.module() {
         )
     }
 
+    configureResources()
+    configureCors()
+    configureOpenAPI()
+
     configureContentNegotiation()
     configureExceptionHandler()
     configureCallLogging()
@@ -37,8 +41,4 @@ fun Application.module() {
     configureHTTP()
     configureJwtSecurity()
     configureRouting()
-
-    configureResources()
-    configureCors()
-    configureOpenAPI()
 }
