@@ -7,9 +7,11 @@ import com.peekr.common.jwt.di.jwtModule
 import com.peekr.common.plugin.DatabaseFactory
 import com.peekr.common.plugin.configureCallLogging
 import com.peekr.common.plugin.configureContentNegotiation
+import com.peekr.common.plugin.configureCors
 import com.peekr.common.plugin.configureHTTP
+import com.peekr.common.plugin.configureOpenAPI
+import com.peekr.common.plugin.configureResources
 import com.peekr.common.plugin.configureRouting
-import com.peekr.common.plugin.configureSerialization
 import com.peekr.domain.auth.di.authModule
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
@@ -28,12 +30,15 @@ fun Application.module() {
         )
     }
 
+    configureResources()
+    configureCors()
+    configureOpenAPI()
+
     configureContentNegotiation()
     configureExceptionHandler()
     configureCallLogging()
 
     configureHTTP()
     configureJwtSecurity()
-    configureSerialization()
     configureRouting()
 }
