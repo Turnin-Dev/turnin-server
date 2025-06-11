@@ -18,7 +18,6 @@ application {
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://jitpack.io") }
 }
 
 ktlint {
@@ -65,8 +64,8 @@ dependencies {
 
     // Open API
     implementation(libs.ktor.server.resources)
-    implementation(libs.ktor.openapi.generator)
-//    implementation(libs.ktor.server.openapi)
+    implementation(libs.smiley4.swagger.ui)
+    implementation(libs.smiley4.openapi)
 //    implementation(libs.ktor.server.swagger)
 //    implementation(libs.swagger.codegen.generator)
 //    constraints {

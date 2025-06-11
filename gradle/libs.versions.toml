@@ -15,7 +15,7 @@ koin-ksp-version = "2.0.1-RC1"
 ksp = "2.1.10-1.0.30"
 mockk-version = "1.14.2"
 swagger-codegen-version = "1.0.56"
-ktor-openapi-generator-version = "0.3-beta.3"
+smiley-openapi-version = "5.0.2"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -47,11 +47,12 @@ dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv-v
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor-version" }
 jwt = { module = "com.auth0:java-jwt", version.ref = "jwt-version" }
 # Open API
-ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor-version" }
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
+ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor-version" }
 ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor-version" }
 swagger-codegen-generator = { module = "io.swagger.codegen.v3:swagger-codegen-generators", version.ref = "swagger-codegen-version" }
-ktor-openapi-generator = { module = "com.github.papsign:Ktor-OpenAPI-Generator", version.ref = "ktor-openapi-generator-version" }
+smiley4-swagger-ui = { module = "io.github.smiley4:ktor-swagger-ui", version.ref = "smiley-openapi-version" }
+smiley4-openapi = { module = "io.github.smiley4:ktor-openapi", version.ref = "smiley-openapi-version" }
 # Logging
 ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor-version" }
 # DI
