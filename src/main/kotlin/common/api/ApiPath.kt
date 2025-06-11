@@ -1,6 +1,6 @@
 package com.peekr.common.api
 
-object ApiPath {
+object Api {
     private const val API = "/api"
 
     object V1 {
@@ -8,7 +8,7 @@ object ApiPath {
         const val BASE = "$API$VERSION"
 
         object Auth {
-            const val ROOT = "/auth"
+            const val ROOT = "$BASE/auth"
             const val LOGIN = "$ROOT/login"
             const val REGISTER = "$ROOT/register"
         }
