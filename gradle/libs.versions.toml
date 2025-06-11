@@ -15,6 +15,7 @@ koin-ksp-version = "2.0.1-RC1"
 ksp = "2.1.10-1.0.30"
 mockk-version = "1.14.2"
 swagger-codegen-version = "1.0.56"
+ktor-openapi-generator-version = "0.3-beta.3"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -50,6 +51,7 @@ ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "k
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
 ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor-version" }
 swagger-codegen-generator = { module = "io.swagger.codegen.v3:swagger-codegen-generators", version.ref = "swagger-codegen-version" }
+ktor-openapi-generator = { module = "com.github.papsign:Ktor-OpenAPI-Generator", version.ref = "ktor-openapi-generator-version" }
 # Logging
 ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor-version" }
 # DI

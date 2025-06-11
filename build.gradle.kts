@@ -18,6 +18,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://jitpack.io") }
 }
 
 ktlint {
@@ -63,13 +64,14 @@ dependencies {
     implementation(libs.ktor.server.status.pages)
 
     // Open API
-    implementation(libs.ktor.server.openapi)
-    implementation(libs.ktor.server.swagger)
-    implementation(libs.swagger.codegen.generator)
-    constraints {
-        implementation("commons-codec:commons-codec:1.18.0")
-    }
     implementation(libs.ktor.server.resources)
+    implementation(libs.ktor.openapi.generator)
+//    implementation(libs.ktor.server.openapi)
+//    implementation(libs.ktor.server.swagger)
+//    implementation(libs.swagger.codegen.generator)
+//    constraints {
+//        implementation("commons-codec:commons-codec:1.18.0")
+//    }
 
     // CORS
     implementation(libs.ktor.server.cors)
