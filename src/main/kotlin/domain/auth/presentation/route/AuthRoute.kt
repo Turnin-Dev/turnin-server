@@ -1,35 +1,44 @@
 package com.peekr.domain.auth.presentation.route
 
+import com.peekr.common.api.Api
 import com.peekr.common.exception.ErrorResponse
+import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
+import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.LoginRequest
+import com.peekr.domain.auth.presentation.dto.LoginResponse
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
+import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.post
+import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
-import io.ktor.server.routing.route
 import kotlin.getValue
 import org.koin.ktor.ext.inject
 
-fun Route.authRoutes() {
+fun Route.authRoutes(route: Api.V1.Auth) {
     val authUseCase by inject<AuthUseCase>()
 
-    route("/auth") {
-        post("/login") {
+    route(route.ROUTE, {
+        tags = setOf(route.TAG)
+        description = "Auth API"
+    }) {
+        post(Api.V1.Auth.LOGIN, { loginDocs() }) {
             val request = call.receive<LoginRequest>()
             val token = authUseCase.login(request.toDto())
             if (token == null) {
-                call.respond(AuthErrorResponse)
+                call.respond(AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest))
             } else {
                 call.respond(token.toResponse())
             }
         }
 
-        post("/register") {
+        post(Api.V1.Auth.REGISTER) {
             val request = call.receive<LoginRequest>()
             val token = authUseCase.register(request.toDto())
             call.respond(token.toResponse())
@@ -37,8 +46,47 @@ fun Route.authRoutes() {
     }
 }
 
-private val AuthErrorResponse = ErrorResponse(
-    code = AuthErrorCode.LoginFailed.code,
-    message = "로그인에 문제가 발생했습니다. (토큰 생성 실패)",
-    status = HttpStatusCode.NotFound.value,
-)
+// ------------------------------ Route Docs ------------------------------
+private fun RouteConfig.loginDocs() {
+    summary = "소셜 로그인"
+    description = "소셜 로그인"
+    request {
+        body<LoginRequest> {
+            description = "로그인 요청 본문"
+            example("LoginRequest") {
+                value = LoginRequest(
+                    provider = SocialLoginProvider.Google,
+                    providerId = "1231312312312",
+                    name = "홍길동",
+                    nickname = "길동이이이이",
+                    profileImageUrl = "https://imageserver.com/13123123",
+                    introduce = "안녕하세요!",
+                )
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<LoginResponse> {
+                description = "로그인 응답 본문 (JWT 토큰)"
+                example("LoginResponse") {
+                    value = LoginResponse(
+                        accessToken = "aaa.bbb.ccc",
+                        refreshToken = "aaa.bbb.ccc",
+                    )
+                }
+            }
+        }
+        default {
+            body<ErrorResponse> {
+                example("ErrorResponse") {
+                    value = ErrorResponse(
+                        code = AuthErrorCode.LoginFailed.code,
+                        message = "Login failed",
+                        status = HttpStatusCode.BadRequest.value,
+                    )
+                }
+            }
+        }
+    }
+}

@@ -30,6 +30,12 @@ ktlint {
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
         reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
     }
+
+    filter {
+        exclude("**/build/generated/ksp/**")
+        exclude("**/build/generated/source/ksp/**")
+        exclude("**/build/generated/ksp/main/kotlin/**")
+    }
 }
 
 dependencies {
@@ -41,7 +47,6 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
-    implementation("io.ktor:ktor-server-cors:3.1.2")
 
     // Test
     testImplementation(libs.ktor.server.test.host)
@@ -58,13 +63,14 @@ dependencies {
     implementation(libs.ktor.server.status.pages)
 
     // Open API
-    implementation(libs.ktor.server.openapi)
-    implementation(libs.ktor.server.swagger)
-    implementation(libs.swagger.codegen.generator)
-    constraints {
-        implementation("commons-codec:commons-codec:1.18.0")
-    }
     implementation(libs.ktor.server.resources)
+    implementation(libs.smiley4.swagger.ui)
+    implementation(libs.smiley4.openapi)
+//    implementation(libs.ktor.server.swagger)
+//    implementation(libs.swagger.codegen.generator)
+//    constraints {
+//        implementation("commons-codec:commons-codec:1.18.0")
+//    }
 
     // CORS
     implementation(libs.ktor.server.cors)
@@ -94,6 +100,7 @@ dependencies {
 
     // DI
     implementation(libs.koin)
+    implementation(libs.koin.core)
     implementation(libs.koin.logger)
     implementation(libs.koin.annotations)
     ksp(libs.koin.ksp.compiler)

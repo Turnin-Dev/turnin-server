@@ -11,7 +11,7 @@ import java.util.Date
 
 class JWTTokenServiceImpl(
     private val appConfig: AppConfig,
-    private val jwtConfigFactory: JWTConfigFactory,
+    jwtConfigFactory: JWTConfigFactory,
 ) : JWTTokenService {
     override val realm by lazy {
         appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.realm")?.getString()

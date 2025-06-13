@@ -1,5 +1,7 @@
 package com.peekr.common.exception
 
+import io.ktor.http.HttpStatusCode
+
 /**
  * 커스텀 에러 코드
  *
@@ -23,17 +25,8 @@ open class ApiErrorCode(
     val description: String,
 )
 
-/** [ApiErrorCode.code]에 대한 코드 생성기 */
-object RawErrorCodeFactory {
-    /**
-     * ##### 사용 예시
-     * ```
-     * val HEADER = "A"
-     * HEADER.toErrorCode(1)
-     * // -> A001 출력
-     * ```
-     * @param this 에러 코드 헤더 문자열
-     * @param num 에러 코드 번호
-     */
-    fun String.toErrorCode(num: Int): String = this + "$num".padStart(3, '0')
-}
+fun ApiErrorCode.toErrorResponse(status: HttpStatusCode): ErrorResponse = ErrorResponse(
+    code = this.code,
+    message = description,
+    status = status.value,
+)
