@@ -1,16 +1,25 @@
 package com.peekr.common.api
 
+/**
+ * API 경로
+ *
+ * **`ROUTE`** : 부모 경로 명
+ *
+ * **`PATH(Ex. LOGIN)`** : 자식 경로 명
+ *
+ * **`TAG`** : 경로 그룹 명
+ */
 object Api {
-    private const val API = "/api"
+    const val ROUTE = "/api"
 
     object V1 {
-        private const val VERSION = "/v1"
-        const val BASE = "$API$VERSION"
+        const val ROUTE = "/V1"
 
         object Auth {
-            const val ROOT = "$BASE/auth"
-            const val LOGIN = "$ROOT/login"
-            const val REGISTER = "$ROOT/register"
+            const val ROUTE = "/auth"
+            const val TAG = "Auth"
+            const val LOGIN = "/login"
+            const val REGISTER = "/register"
         }
     }
 
