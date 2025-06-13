@@ -2,6 +2,7 @@ package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.exception.ErrorResponse
+import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthErrorCode
@@ -26,7 +27,7 @@ fun Route.authRoutes() {
         val request = call.receive<LoginRequest>()
         val token = authUseCase.login(request.toDto())
         if (token == null) {
-            call.respond(AuthErrorResponse)
+            call.respond(AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest))
         } else {
             call.respond(token.toResponse())
         }
@@ -38,12 +39,6 @@ fun Route.authRoutes() {
         call.respond(token.toResponse())
     }
 }
-
-private val AuthErrorResponse = ErrorResponse(
-    code = AuthErrorCode.LoginFailed.code,
-    message = "로그인에 문제가 발생했습니다. (토큰 생성 실패)",
-    status = HttpStatusCode.NotFound.value,
-)
 
 // ------------------------------ Route Docs ------------------------------
 private fun RouteConfig.loginDocs() {

@@ -1,5 +1,7 @@
 package com.peekr.common.exception
 
+import io.ktor.http.HttpStatusCode
+
 /**
  * 커스텀 에러 코드
  *
@@ -21,4 +23,10 @@ package com.peekr.common.exception
 open class ApiErrorCode(
     val code: String,
     val description: String,
+)
+
+fun ApiErrorCode.toErrorResponse(status: HttpStatusCode): ErrorResponse = ErrorResponse(
+    code = this.code,
+    message = description,
+    status = status.value,
 )
