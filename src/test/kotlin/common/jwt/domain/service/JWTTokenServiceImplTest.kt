@@ -5,8 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
+import com.peekr.common.jwt.JWTTestDoubles.MockApplicationConfig
 import com.peekr.common.jwt.JWTTestDoubles.SECRET
-import com.peekr.common.jwt.JWTTestDoubles.TestApplicationConfig
 import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.common.jwt.infrastructure.JWTTokenServiceImpl
 import com.peekr.common.util.AppConfig
@@ -25,7 +25,7 @@ class JWTTokenServiceImplTest {
     fun setup() {
         // mock AppConfig
         appConfig = mockk {
-            every { applicationConfiguration } returns TestApplicationConfig
+            every { applicationConfiguration } returns MockApplicationConfig
         }
 
         jwtConfigFactory = mockk {
@@ -38,7 +38,7 @@ class JWTTokenServiceImplTest {
     @Test
     fun `generate should create valid access and refresh tokens`() {
         // given
-        val payload = JWTTestDoubles.TestPayload
+        val payload = JWTTestDoubles.MockJWTTokenPayload
 
         // when
         val token = jwtTokenService.generate(payload)

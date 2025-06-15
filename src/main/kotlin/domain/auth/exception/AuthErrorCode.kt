@@ -8,6 +8,10 @@ sealed class AuthErrorCode(
 ) : ApiErrorCode(raw, description) {
     data object LoginFailed :
         AuthErrorCode(A001, "로그인에 문제가 발생했습니다. (토큰 생성 실패)")
+
+    data object UserDuplicated :
+        AuthErrorCode(A002, "중복된 사용자 입니다.")
 }
 
 private const val A001 = "A001"
+private const val A002 = "A002"
