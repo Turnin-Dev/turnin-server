@@ -28,8 +28,8 @@ fun Application.configureJwtSecurity() {
                     null
                 }
             }
-            challenge { _, _ ->
-                throw TokenException.InvalidTokenException()
+            challenge { e1, e2 ->
+                throw TokenException.InvalidTokenException("$e1\n$e2")
             }
         }
     }

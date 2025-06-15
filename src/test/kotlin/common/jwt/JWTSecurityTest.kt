@@ -3,8 +3,8 @@ package com.peekr.common.jwt
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
+import com.peekr.common.jwt.JWTTestDoubles.MockJWTTokenPayload
 import com.peekr.common.jwt.JWTTestDoubles.REALM
-import com.peekr.common.jwt.JWTTestDoubles.TestPayload
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
@@ -20,7 +20,6 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
@@ -35,16 +34,16 @@ class JWTSecurityTest {
     @Before
     fun setUp() {
         jwtConfigFactory = mockk {
-            every { createAlgorithm(any()) } returns JWTTestDoubles.TestAlgorithm
-            every { createVerifier(any()) } returns JWTTestDoubles.TestVerifier
+            every { createAlgorithm(any()) } returns JWTTestDoubles.MockAlgorithm
+            every { createVerifier(any()) } returns JWTTestDoubles.MockVerifier
         }
 
         jwtTokenService = mockk {
             every { realm } returns REALM
             every { audience } returns AUDIENCE
             every { issuer } returns ISSUER
-            every { generate(any()) } returns JWTTestDoubles.TestJWTToken
-            every { getVerifierConfig() } returns JWTTestDoubles.TestJWTVerifierConfig
+            every { generate(any()) } returns JWTTestDoubles.MockJWTToken
+            every { getVerifierConfig() } returns JWTTestDoubles.MockJWTVerifierConfig
         }
     }
 
@@ -56,7 +55,7 @@ class JWTSecurityTest {
             plugin = { configureJwtSecurity() },
             routing = { protectedRoute() },
         )
-        val token = jwtTokenService.generate(TestPayload)
+        val token = jwtTokenService.generate(MockJWTTokenPayload)
 
         // When
         val response = client.get(TEST_ENDPOINT) {

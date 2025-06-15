@@ -5,9 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.peekr.common.jwt.JWTTestDoubles.ACCESS_TOKEN_EXPIRES_IN
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
+import com.peekr.common.jwt.JWTTestDoubles.MockAlgorithm
+import com.peekr.common.jwt.JWTTestDoubles.MockJWTTokenPayload
 import com.peekr.common.jwt.JWTTestDoubles.REFRESH_TOKEN_EXPIRES_IN
-import com.peekr.common.jwt.JWTTestDoubles.TestAlgorithm
-import com.peekr.common.jwt.JWTTestDoubles.TestPayload
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
@@ -26,13 +26,13 @@ internal object JWTTestDoubles {
     const val ACCESS_TOKEN_EXPIRES_IN = 3600000L // 1 hour
     const val REFRESH_TOKEN_EXPIRES_IN = 86400000L // 1 day
 
-    val TestPayload = JWTTokenPayload(
+    val MockJWTTokenPayload = JWTTokenPayload(
         subject = "user123",
         claimName = JWTClaimName.Name,
         claim = "USER",
     )
 
-    val TestApplicationConfig = mockk<ApplicationConfig> {
+    val MockApplicationConfig = mockk<ApplicationConfig> {
         every { propertyOrNull("ktor.security.jwt.realm")?.getString() } returns REALM
         every { propertyOrNull("ktor.security.jwt.issuer")?.getString() } returns ISSUER
         every { propertyOrNull("ktor.security.jwt.audience")?.getString() } returns AUDIENCE
@@ -45,18 +45,18 @@ internal object JWTTestDoubles {
         } returns REFRESH_TOKEN_EXPIRES_IN.toString()
     }
 
-    val TestJWTVerifierConfig = JWTVerifierConfig(
+    val MockJWTVerifierConfig = JWTVerifierConfig(
         secretKey = SECRET,
         audience = AUDIENCE,
         issuer = ISSUER,
     )
-    val TestAlgorithm = Algorithm.HMAC256(SECRET)
-    val TestVerifier = JWT
-        .require(TestAlgorithm)
-        .withAudience(TestJWTVerifierConfig.audience)
-        .withIssuer(TestJWTVerifierConfig.issuer)
+    val MockAlgorithm = Algorithm.HMAC256(SECRET)
+    val MockVerifier = JWT
+        .require(MockAlgorithm)
+        .withAudience(MockJWTVerifierConfig.audience)
+        .withIssuer(MockJWTVerifierConfig.issuer)
         .build()
-    val TestJWTToken = generateTestToken()
+    val MockJWTToken = generateTestToken()
 }
 
 private fun generateTestToken(): JWTToken {
@@ -65,17 +65,17 @@ private fun generateTestToken(): JWTToken {
         .create()
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
-        .withSubject(TestPayload.subject)
-        .withClaim(TestPayload.claimName.name, TestPayload.claim)
+        .withSubject(MockJWTTokenPayload.subject)
+        .withClaim(MockJWTTokenPayload.claimName.name, MockJWTTokenPayload.claim)
         .withIssuedAt(Date.from(now))
         .withExpiresAt(Date.from(now.plusMillis(ACCESS_TOKEN_EXPIRES_IN)))
-        .sign(TestAlgorithm)
+        .sign(MockAlgorithm)
     val refreshToken = JWT
         .create()
-        .withSubject(TestPayload.subject)
+        .withSubject(MockJWTTokenPayload.subject)
         .withIssuedAt(Date.from(now))
         .withExpiresAt(Date.from(now.plusMillis(REFRESH_TOKEN_EXPIRES_IN)))
-        .sign(TestAlgorithm)
+        .sign(MockAlgorithm)
 
     return JWTToken(accessToken, refreshToken)
 }

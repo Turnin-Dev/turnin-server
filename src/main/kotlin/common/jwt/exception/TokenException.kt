@@ -5,19 +5,25 @@ import com.peekr.common.exception.ApiException
 import io.ktor.http.HttpStatusCode
 
 sealed class TokenException(
+    val detail: String,
     code: ApiErrorCode,
-    message: String,
     status: HttpStatusCode = HttpStatusCode.Unauthorized,
-) : ApiException(errorCode = code, message = message, status = status) {
-    class InvalidTokenException :
+) : ApiException(errorCode = code, message = detail, status = status) {
+    class InvalidTokenException(detail: String? = null) :
         TokenException(
             code = TokenErrorCode.InvalidToken,
-            message = TokenErrorCode.InvalidToken.description,
+            detail = detail ?: TokenErrorCode.InvalidToken.description,
         )
 
-    class CannotCreateTokenVerifier :
+    class CannotCreateTokenVerifier(detail: String? = null) :
         TokenException(
             code = TokenErrorCode.InvalidVerifier,
-            message = TokenErrorCode.InvalidVerifier.description,
+            detail = detail ?: TokenErrorCode.InvalidVerifier.description,
+        )
+
+    class CannotCreateToken(detail: String? = null) :
+        TokenException(
+            code = TokenErrorCode.GenerateTokenError,
+            detail = detail ?: TokenErrorCode.GenerateTokenError.description,
         )
 }
