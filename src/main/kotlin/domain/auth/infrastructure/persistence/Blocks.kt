@@ -1,19 +1,28 @@
 package com.peekr.domain.auth.infrastructure.persistence
 
-import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
-import org.jetbrains.exposed.sql.javatime.timestamp
+import com.peekr.common.db.BaseEntity
+import com.peekr.common.db.BaseEntityClass
+import com.peekr.common.db.BaseLongIdTable
+import org.jetbrains.exposed.dao.id.EntityID
 
-object Blocks : LongIdTable("block") {
+object Blocks : BaseLongIdTable("block") {
     val blockerId = reference("blocker_id", Users)
     val blockedId = reference("blocked_id", Users)
     val reasonId = reference("reason_id", BlockReasons)
     val customReason = text("custom_reason").nullable()
     val isBlocked = bool("is_blocked").default(true)
-    val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp)
-    val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp)
 
     init {
         index("idx_block_pair", false, blockerId, blockedId)
     }
+}
+
+class Block(id: EntityID<Long>) : BaseEntity(id, Blocks) {
+    companion object : BaseEntityClass<Block>(Blocks)
+
+    var blockerId by Blocks.blockerId
+    var blockedId by Blocks.blockedId
+    var reasonId by Blocks.reasonId
+    var customReason by Blocks.customReason
+    var isBlocked by Blocks.isBlocked
 }
