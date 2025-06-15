@@ -13,6 +13,7 @@ object TestDatabaseFactory {
             driver = "org.h2.Driver",
         )
         transaction {
+            SchemaUtils.drop(Users)
             SchemaUtils.create(Users) // 실제 테이블 모델 그대로 사용
         }
     }
