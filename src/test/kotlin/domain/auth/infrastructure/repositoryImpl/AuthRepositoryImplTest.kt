@@ -2,6 +2,7 @@ package com.peekr.domain.auth.infrastructure.repositoryImpl
 
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,7 +11,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.junit.Before
 
 class AuthRepositoryImplTest {
@@ -52,7 +52,7 @@ class AuthRepositoryImplTest {
 
         assertTrue(savedUser.id > 0L)
 
-        val exception = assertFailsWith<ExposedSQLException> {
+        val exception = assertFailsWith<AuthException.DuplicateUserException> {
             repository.save(MockAuthUser) // 동일한 providerId 삽입 시도
         }
 
