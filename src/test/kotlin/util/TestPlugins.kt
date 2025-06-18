@@ -1,14 +1,10 @@
 package com.peekr.util
 
-import com.peekr.common.exception.ApiException
-import com.peekr.common.exception.ErrorResponse
-import io.ktor.http.HttpStatusCode
+import com.peekr.common.exception.configureExceptionHandler
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.statuspages.StatusPages
-import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.ApplicationTestBuilder
@@ -51,35 +47,34 @@ private fun Application.testContentNegotiation() {
 
 private fun ApplicationTestBuilder.testKoinModule(module: Module) {
     install(Koin) {
+        allowOverride(true)
         modules(module)
     }
 }
 
 private fun Application.testExceptionHandler() {
-    install(StatusPages) {
-        exception<ApiException> { call, cause ->
-            call.respond(
-                status = cause.status,
-                message = ErrorResponse(
-                    code = cause.errorCode.code,
-                    message = cause.message,
-                    status = cause.status.value,
-                ),
-            )
-        }
-
-        exception<Throwable> { call, cause ->
-            call.respond(
-                status = HttpStatusCode.InternalServerError,
-                message = ErrorResponse(
-                    code = INTERNAL_SERVER_ERROR_CODE,
-                    message = cause.localizedMessage ?: UNKNOWN_ERROR_MESSAGE,
-                    status = HttpStatusCode.InternalServerError.value,
-                ),
-            )
-        }
-    }
+    configureExceptionHandler()
+//    install(StatusPages) {
+//        exception<ApiException> { call, cause ->
+//            call.respond(
+//                status = cause.status,
+//                message = ErrorResponse(
+//                    code = cause.errorCode.code,
+//                    message = cause.message,
+//                    status = cause.status.value,
+//                ),
+//            )
+//        }
+//
+//        exception<Throwable> { call, cause ->
+//            call.respond(
+//                status = HttpStatusCode.InternalServerError,
+//                message = ErrorResponse(
+//                    code = INTERNAL_SERVER_ERROR_CODE,
+//                    message = cause.localizedMessage ?: UNKNOWN_ERROR_MESSAGE,
+//                    status = HttpStatusCode.InternalServerError.value,
+//                ),
+//            )
+//        }
+//    }
 }
-
-private const val INTERNAL_SERVER_ERROR_CODE = "INTERNAL_SERVER_ERROR"
-private const val UNKNOWN_ERROR_MESSAGE = "Unknown error occurred"
