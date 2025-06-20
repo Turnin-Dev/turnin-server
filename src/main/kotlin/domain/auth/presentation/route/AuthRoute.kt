@@ -46,7 +46,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase? = null) {
             val request = call.receive<RegisterRequest>()
             request.validate()
             val token = authUseCase.register(request.toDto())
-            call.respond(token.toResponse())
+            call.respond(HttpStatusCode.Created, token.toResponse())
         }
     }
 }

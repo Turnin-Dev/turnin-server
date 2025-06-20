@@ -17,7 +17,5 @@ object AuthMapper {
         introduce = introduce,
     )
 
-    fun JWTToken?.toDto(): JWTTokenDto? = this?.let {
-        JWTTokenDto(accessToken, refreshToken)
-    }
+    fun JWTToken.toDto(): JWTTokenDto = JWTTokenDto(accessToken, refreshToken)
 }

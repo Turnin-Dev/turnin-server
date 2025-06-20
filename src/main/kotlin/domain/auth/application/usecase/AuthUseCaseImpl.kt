@@ -10,12 +10,12 @@ import com.peekr.domain.auth.domain.service.AuthService
 class AuthUseCaseImpl(private val authService: AuthService) : AuthUseCase {
     override suspend fun login(loginDto: LoginDto): JWTTokenDto? {
         val jwtToken = authService.login(loginDto.provider, loginDto.providerId)
-        return jwtToken.toDto()
+        return jwtToken?.toDto()
     }
 
     override suspend fun register(registerDto: RegisterDto): JWTTokenDto {
         val authUser = registerDto.toDomain()
         val jwtToken = authService.register(authUser)
-        return jwtToken.toDto()!!
+        return jwtToken.toDto()
     }
 }
