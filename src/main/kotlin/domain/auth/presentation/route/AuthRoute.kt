@@ -8,6 +8,7 @@ import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.LoginResponse
+import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -42,7 +43,8 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase? = null) {
         }
 
         post(route.REGISTER) {
-            val request = call.receive<LoginRequest>()
+            val request = call.receive<RegisterRequest>()
+            request.validate()
             val token = authUseCase.register(request.toDto())
             call.respond(token.toResponse())
         }
@@ -60,10 +62,6 @@ private fun RouteConfig.loginDocs() {
                 value = LoginRequest(
                     provider = SocialLoginProvider.Google.name,
                     providerId = "1231312312312",
-                    name = "홍길동",
-                    nickname = "길동이이이이",
-                    profileImageUrl = "https://imageserver.com/13123123",
-                    introduce = "안녕하세요!",
                 )
             }
         }
