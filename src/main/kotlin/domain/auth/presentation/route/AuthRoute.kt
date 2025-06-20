@@ -29,6 +29,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase? = null) {
     }) {
         post(route.LOGIN, { loginDocs() }) {
             val request = call.receive<LoginRequest>()
+            request.validate()
             val token = authUseCase.login(request.toDto())
             if (token == null) {
                 call.respond(
@@ -57,7 +58,7 @@ private fun RouteConfig.loginDocs() {
             description = "로그인 요청 본문"
             example("LoginRequest") {
                 value = LoginRequest(
-                    provider = SocialLoginProvider.Google,
+                    provider = SocialLoginProvider.Google.name,
                     providerId = "1231312312312",
                     name = "홍길동",
                     nickname = "길동이이이이",

@@ -6,3 +6,10 @@ enum class SocialLoginProvider {
     Kakao,
     Apple,
 }
+
+fun String.toSocialLoginProvider() = when (this) {
+    "Google" -> SocialLoginProvider.Google
+    "Kakao" -> SocialLoginProvider.Kakao
+    "Apple" -> SocialLoginProvider.Apple
+    else -> throw IllegalArgumentException("Invalid social login provider: $this")
+}

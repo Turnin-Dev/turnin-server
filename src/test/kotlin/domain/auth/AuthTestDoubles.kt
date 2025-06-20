@@ -16,12 +16,21 @@ object AuthTestDoubles {
         introduce = "Hello!",
     )
 
-    val MockLoginRequest = LoginRequest(
-        provider = SocialLoginProvider.Google,
+    val MockValidLoginRequest = LoginRequest(
+        provider = SocialLoginProvider.Google.name,
         providerId = "providerIDDDDD",
         name = "honggd",
         nickname = "honggggg",
-        profileImageUrl = "http://example.com/profile.jpg",
+        profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
+        introduce = "Hello!",
+    )
+
+    val MockInvalidLoginRequest = LoginRequest(
+        provider = SocialLoginProvider.Google.name,
+        providerId = "??",
+        name = "",
+        nickname = "",
+        profileImageUrl = "abcde",
         introduce = "Hello!",
     )
 

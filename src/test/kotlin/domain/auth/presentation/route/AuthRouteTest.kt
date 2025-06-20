@@ -3,8 +3,9 @@ package com.peekr.domain.auth.presentation.route
 import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
+import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
-import com.peekr.domain.auth.AuthTestDoubles.MockLoginRequest
+import com.peekr.domain.auth.AuthTestDoubles.MockValidLoginRequest
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.util.TestClientFactory.createTestClient
@@ -41,7 +42,7 @@ class AuthRouteTest {
         val loginEndPoint = "${route.ROUTE}${route.LOGIN}"
         val response = client.post(loginEndPoint) {
             contentType(ContentType.Application.Json)
-            setBody(MockLoginRequest)
+            setBody(MockValidLoginRequest)
         }
         val responseBody = response.bodyAsText()
 
@@ -49,6 +50,30 @@ class AuthRouteTest {
         coVerify(exactly = 1) { authUseCase.login(any()) }
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(responseBody.contains(MockJWTTokenDto.accessToken))
+    }
+
+    @Test
+    fun `login 실패 테스트 - 요청 바디 유효성 검사 실패`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.login(any()) } returns MockJWTTokenDto
+
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val loginEndPoint = "${route.ROUTE}${route.LOGIN}"
+        val response = client.post(loginEndPoint) {
+            contentType(ContentType.Application.Json)
+            setBody(MockInvalidLoginRequest)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(responseBody.contains(CommonErrorCode.Validation.code))
     }
 
     @Test
@@ -98,7 +123,7 @@ class AuthRouteTest {
         val loginEndPoint = "${route.ROUTE}${route.LOGIN}"
         val response = client.post(loginEndPoint) {
             contentType(ContentType.Application.Json)
-            setBody(MockLoginRequest)
+            setBody(MockValidLoginRequest)
         }
         val responseBody = response.bodyAsText()
 
@@ -124,7 +149,7 @@ class AuthRouteTest {
         val loginEndPoint = "${route.ROUTE}${route.LOGIN}"
         val response = client.post(loginEndPoint) {
             contentType(ContentType.Application.Json)
-            setBody(MockLoginRequest)
+            setBody(MockValidLoginRequest)
         }
         val responseBody = response.bodyAsText()
 
