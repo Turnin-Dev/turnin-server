@@ -4,8 +4,10 @@ import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
+import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
 import com.peekr.domain.auth.AuthTestDoubles.MockValidLoginRequest
+import com.peekr.domain.auth.AuthTestDoubles.MockValidRegisterRequest
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.util.TestClientFactory.createTestClient
@@ -53,7 +55,7 @@ class AuthRouteTest {
     }
 
     @Test
-    fun `login 실패 테스트 - 요청 바디 유효성 검사 실패`() = testApplication {
+    fun `login 실패 테스트 - 요청 바디 유효성 검사를 실패하는 경우`() = testApplication {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
@@ -107,7 +109,7 @@ class AuthRouteTest {
     }
 
     @Test
-    fun `login 예외 테스트 - AuthUseCase에서 예외 발생하는 경우 `() = testApplication {
+    fun `login 예외 테스트 - AuthUseCase에서 예외가 발생하는 경우`() = testApplication {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
@@ -160,5 +162,77 @@ class AuthRouteTest {
                 AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest).message,
             ),
         )
+    }
+
+    @Test
+    fun `register 성공 테스트`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.register(any()) } returns MockJWTTokenDto
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val registerEndPoint = "${route.ROUTE}${route.REGISTER}"
+        val response = client.post(registerEndPoint) {
+            contentType(ContentType.Application.Json)
+            setBody(MockValidRegisterRequest)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        coVerify(exactly = 1) { authUseCase.register(any()) }
+        assertEquals(HttpStatusCode.Created, response.status)
+        assertTrue(responseBody.contains(MockJWTTokenDto.accessToken))
+    }
+
+    @Test
+    fun `register 실패 테스트 - 요청 바디 유효성 검사를 실패하는 경우`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.register(any()) } returns MockJWTTokenDto
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val registerEndPoint = "${route.ROUTE}${route.REGISTER}"
+        val response = client.post(registerEndPoint) {
+            contentType(ContentType.Application.Json)
+            setBody(MockInvalidRegisterRequest)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(responseBody.contains(CommonErrorCode.Validation.code))
+    }
+
+    @Test
+    fun `register 실패 테스트 - AuthUseCase에서 예외가 발생하는 경우`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery {
+            authUseCase.register(any())
+        } throws IllegalArgumentException()
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val registerEndPoint = "${route.ROUTE}${route.REGISTER}"
+        val response = client.post(registerEndPoint) {
+            contentType(ContentType.Application.Json)
+            setBody(MockValidRegisterRequest)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.InternalServerError, response.status)
+        assertTrue(responseBody.contains("${HttpStatusCode.InternalServerError.value}"))
     }
 }

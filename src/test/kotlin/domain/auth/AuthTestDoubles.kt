@@ -4,6 +4,7 @@ import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.domain.auth.domain.model.entity.AuthUser
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 import com.peekr.domain.auth.presentation.dto.LoginRequest
+import com.peekr.domain.auth.presentation.dto.RegisterRequest
 
 object AuthTestDoubles {
     val MockAuthUser = AuthUser(
@@ -26,14 +27,23 @@ object AuthTestDoubles {
         providerId = "",
     )
 
-//    val MockValidLoginRequest = LoginRequest(
-//        provider = SocialLoginProvider.Google.name,
-//        providerId = "providerIDDDDD",
-//        name = "honggd",
-//        nickname = "honggggg",
-//        profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
-//        introduce = "Hello!",
-//    )
+    val MockValidRegisterRequest = RegisterRequest(
+        provider = SocialLoginProvider.Google.name,
+        providerId = "providerIDDDDD",
+        name = "honggd",
+        nickname = "honggggg",
+        profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
+        introduce = "Hello!",
+    )
+
+    val MockInvalidRegisterRequest = RegisterRequest(
+        provider = SocialLoginProvider.Google.name,
+        providerId = "providerIDDDDD",
+        name = "",
+        nickname = "",
+        profileImageUrl = "aaaa",
+        introduce = "Hello!",
+    )
 
     val MockJWTTokenDto = JWTTokenDto(
         accessToken = "aaa.bbb.ccc",
