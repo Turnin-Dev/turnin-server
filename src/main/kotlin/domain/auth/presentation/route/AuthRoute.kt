@@ -18,27 +18,30 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
-import kotlin.getValue
 import org.koin.ktor.ext.inject
 
-fun Route.authRoutes(route: Api.V1.Auth) {
-    val authUseCase by inject<AuthUseCase>()
+fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase? = null) {
+    val authUseCase = authUseCase ?: inject<AuthUseCase>().value
 
     route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "Auth API"
     }) {
-        post(Api.V1.Auth.LOGIN, { loginDocs() }) {
+        post(route.LOGIN, { loginDocs() }) {
             val request = call.receive<LoginRequest>()
+            request.validate()
             val token = authUseCase.login(request.toDto())
             if (token == null) {
-                call.respond(AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest))
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest),
+                )
             } else {
                 call.respond(token.toResponse())
             }
         }
 
-        post(Api.V1.Auth.REGISTER) {
+        post(route.REGISTER) {
             val request = call.receive<LoginRequest>()
             val token = authUseCase.register(request.toDto())
             call.respond(token.toResponse())
@@ -55,7 +58,7 @@ private fun RouteConfig.loginDocs() {
             description = "로그인 요청 본문"
             example("LoginRequest") {
                 value = LoginRequest(
-                    provider = SocialLoginProvider.Google,
+                    provider = SocialLoginProvider.Google.name,
                     providerId = "1231312312312",
                     name = "홍길동",
                     nickname = "길동이이이이",
