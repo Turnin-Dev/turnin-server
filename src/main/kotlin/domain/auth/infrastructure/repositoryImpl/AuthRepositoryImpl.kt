@@ -1,13 +1,13 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
 import com.peekr.common.db.DatabaseFactory
+import com.peekr.common.db.scheme.User
+import com.peekr.common.db.scheme.Users
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
-import com.peekr.domain.auth.infrastructure.persistence.User
-import com.peekr.domain.auth.infrastructure.persistence.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and

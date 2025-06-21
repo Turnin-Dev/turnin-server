@@ -1,6 +1,6 @@
 package com.peekr.util
 
-import com.peekr.domain.auth.infrastructure.persistence.Users
+import com.peekr.common.db.scheme.Users
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
