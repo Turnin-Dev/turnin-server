@@ -25,10 +25,10 @@ fun ApplicationTestBuilder.testPlugin(
     routing: Routing.() -> Unit = {},
     routingApplicationScope: Application.() -> Unit = {},
 ) {
-    module?.let {
-        testKoinModule(module = module)
-    }
     application {
+        module?.let {
+            testKoinModule(module = module)
+        }
         testContentNegotiation()
         testExceptionHandler()
         plugin()
@@ -45,7 +45,7 @@ private fun Application.testContentNegotiation() {
     }
 }
 
-private fun ApplicationTestBuilder.testKoinModule(module: Module) {
+private fun Application.testKoinModule(module: Module) {
     install(Koin) {
         allowOverride(true)
         modules(module)
