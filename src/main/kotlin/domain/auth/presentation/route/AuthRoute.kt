@@ -6,8 +6,8 @@ import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthErrorCode
+import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
-import com.peekr.domain.auth.presentation.dto.LoginResponse
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
@@ -18,11 +18,13 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.post
 import org.koin.ktor.ext.inject
 
-fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase? = null) {
-    val authUseCase = authUseCase ?: inject<AuthUseCase>().value
+// ------------------------------ Route ------------------------------
+fun Route.authRoutes(route: Api.V1.Auth, authUseCaseParam: AuthUseCase? = null) {
+    val authUseCase by lazy {
+        authUseCaseParam ?: inject<AuthUseCase>().value
+    }
 
     route(route.ROUTE, {
         tags = setOf(route.TAG)
@@ -42,7 +44,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase? = null) {
             }
         }
 
-        post(route.REGISTER) {
+        post(route.REGISTER, { registerDocs() }) {
             val request = call.receive<RegisterRequest>()
             request.validate()
             val token = authUseCase.register(request.toDto())
@@ -68,10 +70,10 @@ private fun RouteConfig.loginDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            body<LoginResponse> {
+            body<JWTTokenResponse> {
                 description = "로그인 응답 본문 (JWT 토큰)"
-                example("LoginResponse") {
-                    value = LoginResponse(
+                example("JWTTokenResponse") {
+                    value = JWTTokenResponse(
                         accessToken = "aaa.bbb.ccc",
                         refreshToken = "aaa.bbb.ccc",
                     )
@@ -85,6 +87,50 @@ private fun RouteConfig.loginDocs() {
                         code = AuthErrorCode.LoginFailed.code,
                         message = "Login failed",
                         status = HttpStatusCode.BadRequest.value,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.registerDocs() {
+    summary = "회원가입"
+    description = "회원가입"
+    request {
+        body<RegisterRequest> {
+            description = "회원가입 요청 본문"
+            example("RegisterRequest") {
+                value = RegisterRequest(
+                    provider = SocialLoginProvider.Google.name,
+                    providerId = "providerIDDDDD",
+                    name = "honggd",
+                    nickname = "honggggg",
+                    profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
+                    introduce = "Hello!",
+                )
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.Created) {
+            body<JWTTokenResponse> {
+                description = "회원가입 응답 본문 (JWT 토큰)"
+                example("JWTTokenResponse") {
+                    value = JWTTokenResponse(
+                        accessToken = "aaa.bbb.ccc",
+                        refreshToken = "aaa.bbb.ccc",
+                    )
+                }
+            }
+        }
+        default {
+            body<ErrorResponse> {
+                example("ErrorResponse") {
+                    value = ErrorResponse(
+                        code = AuthErrorCode.UserDuplicated.code,
+                        message = "Register failed",
+                        status = HttpStatusCode.Conflict.value,
                     )
                 }
             }
