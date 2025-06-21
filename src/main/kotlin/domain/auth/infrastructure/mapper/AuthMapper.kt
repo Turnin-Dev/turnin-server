@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.infrastructure.mapper
 
-import com.peekr.domain.auth.domain.model.entity.AuthUser
+import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.infrastructure.persistence.Users
 import org.jetbrains.exposed.sql.ResultRow
 

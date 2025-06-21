@@ -1,8 +1,8 @@
 package com.peekr.domain.auth.domain.service
 
 import com.peekr.common.jwt.domain.model.entity.JWTToken
-import com.peekr.domain.auth.domain.model.entity.AuthUser
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 
 interface AuthService {
     /**
@@ -24,7 +24,7 @@ interface AuthService {
      *
      * 단, 회원가입은 기존 회원이 존재하지 않는다는 가정하에 진행된다.
      *
-     * @param authUser [com.peekr.domain.auth.domain.model.entity.AuthUser]
+     * @param authUser [AuthUser]
      */
     suspend fun register(authUser: AuthUser): JWTToken
 }

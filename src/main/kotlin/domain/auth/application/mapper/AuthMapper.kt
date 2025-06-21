@@ -3,8 +3,8 @@ package com.peekr.domain.auth.application.mapper
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.domain.auth.application.dto.RegisterDto
-import com.peekr.domain.auth.domain.model.entity.AuthUser
-import com.peekr.domain.auth.domain.model.value.toSocialLoginProvider
+import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.toSocialLoginProvider
 
 object AuthMapper {
     fun RegisterDto.toDomain(): AuthUser = AuthUser(

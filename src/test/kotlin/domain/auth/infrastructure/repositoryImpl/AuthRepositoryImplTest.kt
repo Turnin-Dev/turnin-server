@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.Test
