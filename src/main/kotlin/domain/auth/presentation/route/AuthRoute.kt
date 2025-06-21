@@ -4,7 +4,7 @@ import com.peekr.common.api.Api
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest

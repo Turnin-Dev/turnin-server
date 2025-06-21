@@ -1,8 +1,8 @@
 package com.peekr.domain.auth
 
 import com.peekr.common.jwt.application.dto.JWTTokenDto
-import com.peekr.domain.auth.domain.model.entity.AuthUser
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
 

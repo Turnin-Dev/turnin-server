@@ -3,7 +3,7 @@ package com.peekr.domain.auth.infrastructure.serviceImpl
 import com.peekr.common.jwt.JWTTestDoubles.MockJWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.exception.AuthException
 import io.mockk.coEvery

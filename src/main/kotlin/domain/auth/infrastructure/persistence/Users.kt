@@ -3,7 +3,7 @@ package com.peekr.domain.auth.infrastructure.persistence
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import org.jetbrains.exposed.dao.id.EntityID
 
 object Users : BaseLongIdTable("user") {

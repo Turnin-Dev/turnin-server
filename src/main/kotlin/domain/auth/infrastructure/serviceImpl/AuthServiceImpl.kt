@@ -4,8 +4,8 @@ import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.value.JWTClaimName
 import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.domain.auth.domain.model.entity.AuthUser
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.service.AuthService
 

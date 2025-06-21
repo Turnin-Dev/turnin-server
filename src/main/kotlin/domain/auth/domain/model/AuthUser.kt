@@ -1,6 +1,4 @@
-package com.peekr.domain.auth.domain.model.entity
-
-import com.peekr.domain.auth.domain.model.value.SocialLoginProvider
+package com.peekr.domain.auth.domain.model
 
 /**
  * 인증에 필요한 User 모델
