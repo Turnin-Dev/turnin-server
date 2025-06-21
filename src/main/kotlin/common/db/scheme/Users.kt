@@ -20,8 +20,8 @@ object Users : BaseLongIdTable("user") {
 }
 
 // 엔티티 정의 (단수형 정의)
-class User(id: EntityID<Long>) : BaseEntity(id, Users) {
-    companion object : BaseEntityClass<User>(Users)
+class UserEntity(id: EntityID<Long>) : BaseEntity(id, Users) {
+    companion object : BaseEntityClass<UserEntity>(Users)
 
     var provider by Users.provider
     var providerId by Users.providerId

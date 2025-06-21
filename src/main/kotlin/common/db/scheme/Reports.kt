@@ -16,8 +16,8 @@ object Reports : BaseLongIdTable("report") {
     }
 }
 
-class Report(id: EntityID<Long>) : BaseEntity(id, Reports) {
-    companion object : BaseEntityClass<Report>(Reports)
+class ReportEntity(id: EntityID<Long>) : BaseEntity(id, Reports) {
+    companion object : BaseEntityClass<ReportEntity>(Reports)
 
     var reporterId by Reports.reporterId
     var reportedId by Reports.reportedId

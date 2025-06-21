@@ -14,8 +14,8 @@ object Keywords : BaseLongIdTable("keyword") {
     }
 }
 
-class Keyword(id: EntityID<Long>) : BaseEntity(id, Keywords) {
-    companion object : BaseEntityClass<Keyword>(Keywords)
+class KeywordEntity(id: EntityID<Long>) : BaseEntity(id, Keywords) {
+    companion object : BaseEntityClass<KeywordEntity>(Keywords)
 
     var keyword by Keywords.keyword
     var createdBy by Keywords.createdBy

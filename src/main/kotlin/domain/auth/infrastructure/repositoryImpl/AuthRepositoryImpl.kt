@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
 import com.peekr.common.db.DatabaseFactory
-import com.peekr.common.db.scheme.User
+import com.peekr.common.db.scheme.UserEntity
 import com.peekr.common.db.scheme.Users
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.SocialLoginProvider
@@ -17,7 +17,7 @@ class AuthRepositoryImpl : AuthRepository {
         provider: SocialLoginProvider,
         providerId: String,
     ): AuthUser? = DatabaseFactory.dbQuery {
-        User
+        UserEntity
             .find((Users.provider eq provider) and (Users.providerId eq providerId))
             .map {
                 AuthMapper.toDomain(it.readValues)
@@ -26,7 +26,7 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun save(authUser: AuthUser): AuthUser = DatabaseFactory.dbQuery {
         try {
-            val savedUser = User.new {
+            val savedUserEntity = UserEntity.new {
                 this.provider = authUser.provider
                 this.providerId = authUser.providerId
                 this.name = authUser.name
@@ -35,7 +35,7 @@ class AuthRepositoryImpl : AuthRepository {
                 this.introduce = authUser.introduce
             }
 
-            authUser.copy(id = savedUser.id.value)
+            authUser.copy(id = savedUserEntity.id.value)
         } catch (e: ExposedSQLException) {
             if (e.message?.contains("Unique index") == true ||
                 e.message?.contains("primary key violation") == true

@@ -20,8 +20,8 @@ object Friends : BaseLongIdTable("friend") {
     }
 }
 
-class Friend(id: EntityID<Long>) : BaseEntity(id, Friends) {
-    companion object : BaseEntityClass<Friend>(Friends)
+class FriendEntity(id: EntityID<Long>) : BaseEntity(id, Friends) {
+    companion object : BaseEntityClass<FriendEntity>(Friends)
 
     var requesterId by Friends.requesterId
     var receiverId by Friends.receiverId

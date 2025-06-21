@@ -15,8 +15,8 @@ object KeywordComments : BaseLongIdTable("keyword_comment") {
     }
 }
 
-class KeywordComment(id: EntityID<Long>) : BaseEntity(id, KeywordComments) {
-    companion object : BaseEntityClass<KeywordComment>(KeywordComments)
+class KeywordCommentEntity(id: EntityID<Long>) : BaseEntity(id, KeywordComments) {
+    companion object : BaseEntityClass<KeywordCommentEntity>(KeywordComments)
 
     var userId by KeywordComments.userId
     var keywordId by KeywordComments.keywordId

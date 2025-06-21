@@ -17,8 +17,8 @@ object UserKeywords : BaseLongIdTable("user_keyword") {
     }
 }
 
-class UserKeyword(id: EntityID<Long>) : BaseEntity(id, UserKeywords) {
-    companion object : BaseEntityClass<UserKeyword>(UserKeywords)
+class UserKeywordEntity(id: EntityID<Long>) : BaseEntity(id, UserKeywords) {
+    companion object : BaseEntityClass<UserKeywordEntity>(UserKeywords)
 
     var userId by UserKeywords.userId
     var keywordId by UserKeywords.keywordId

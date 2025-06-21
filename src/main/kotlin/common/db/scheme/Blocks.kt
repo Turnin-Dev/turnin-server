@@ -17,8 +17,8 @@ object Blocks : BaseLongIdTable("block") {
     }
 }
 
-class Block(id: EntityID<Long>) : BaseEntity(id, Blocks) {
-    companion object : BaseEntityClass<Block>(Blocks)
+class BlockEntity(id: EntityID<Long>) : BaseEntity(id, Blocks) {
+    companion object : BaseEntityClass<BlockEntity>(Blocks)
 
     var blockerId by Blocks.blockerId
     var blockedId by Blocks.blockedId
