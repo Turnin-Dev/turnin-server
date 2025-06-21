@@ -10,7 +10,7 @@ object Users : BaseLongIdTable("user") {
     val provider = enumerationByName("provider", 50, SocialLoginProvider::class)
     val providerId = varchar("provider_id", 255)
     val name = varchar("name", 50)
-    val nickname = varchar("nickname", 50).nullable()
+    val nickname = varchar("nickname", 50)
     val profileImageUrl = varchar("profile_image_url", 500).nullable()
     val introduce = text("introduce").nullable()
 
