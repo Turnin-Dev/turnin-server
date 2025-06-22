@@ -1,17 +1,17 @@
 package com.peekr.domain.user.infrastructure.mapper
 
-import com.peekr.common.db.scheme.Users
+import com.peekr.common.db.scheme.UserEntity
 import com.peekr.domain.user.domain.model.User
-import org.jetbrains.exposed.sql.ResultRow
 
 object UserMapper {
-    fun toDomain(row: ResultRow): User = User(
-        id = row[Users.id].value,
-        provider = row[Users.provider].name,
-        providerId = row[Users.providerId],
-        name = row[Users.name],
-        nickname = row[Users.nickname],
-        profileImageUrl = row[Users.profileImageUrl],
-        introduce = row[Users.introduce],
+    /** ##### 반드시 db transaction 범위 내에서 실행되어야 한다. */
+    fun toDomain(entity: UserEntity): User = User(
+        id = entity.id.value,
+        provider = entity.provider.name,
+        providerId = entity.providerId,
+        name = entity.name,
+        nickname = entity.nickname,
+        profileImageUrl = entity.profileImageUrl,
+        introduce = entity.introduce,
     )
 }
