@@ -2,6 +2,7 @@ package com.peekr.common.di
 
 import com.peekr.common.jwt.di.jwtModule
 import com.peekr.domain.auth.di.authModule
+import com.peekr.domain.user.di.userModule
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.koin.ksp.generated.defaultModule
@@ -16,6 +17,7 @@ fun Application.configureKoin() {
         modules(
             jwtModule,
             authModule,
+            userModule,
         )
     }
 }
