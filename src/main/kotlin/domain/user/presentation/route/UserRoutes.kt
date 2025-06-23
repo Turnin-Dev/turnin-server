@@ -1,0 +1,43 @@
+package com.peekr.domain.user.presentation.route
+
+import com.peekr.common.api.Api
+import com.peekr.common.validator.PeekrValidator.validation
+import com.peekr.domain.user.application.usecase.UserUseCase
+import com.peekr.domain.user.presentation.dto.toResponse
+import io.github.smiley4.ktoropenapi.get
+import io.github.smiley4.ktoropenapi.route
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import org.koin.ktor.ext.inject
+
+fun Route.userRoutes(route: Api.V1.User, userUseCaseParam: UserUseCase? = null) {
+    val userUseCase by lazy {
+        userUseCaseParam ?: inject<UserUseCase>().value
+    }
+
+    route(route.BY_ID, {
+        tags = setOf(route.TAG)
+        description = "User API"
+    }) {
+        get(route.ROUTE, {}) {
+            val userIdParam = call.pathParameters["id"]
+            val userId = userIdValidatorAndReturn(userIdParam)
+            val user = userUseCase.getUserById(userId)
+            if (user != null) {
+                call.respond(user.toResponse())
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+    }
+}
+
+private fun userIdValidatorAndReturn(userId: String?): Long {
+    validation(userId != null) { "사용자 ID가 필요합니다." }
+    userId?.let {
+        validation(userId.isNotEmpty()) { "사용자 ID가 비어있습니다." }
+        validation(userId.toLongOrNull() != null) { "사용자 ID는 숫자형식만 허용됩니다." }
+    }
+    return userId!!.toLong()
+}
