@@ -1,6 +1,7 @@
 package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.api.Api
+import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.validator.PeekrValidator.validation
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.domain.user.presentation.dto.toResponse
@@ -16,18 +17,21 @@ fun Route.userRoutes(route: Api.V1.User, userUseCaseParam: UserUseCase? = null) 
         userUseCaseParam ?: inject<UserUseCase>().value
     }
 
-    route(route.BY_ID, {
+    route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "User API"
     }) {
-        get(route.ROUTE, {}) {
+        get(route.BY_ID, {}) {
             val userIdParam = call.pathParameters["id"]
             val userId = userIdValidatorAndReturn(userIdParam)
             val user = userUseCase.getUserById(userId)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {
-                call.respond(HttpStatusCode.NotFound)
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    notFoundErrorMessage("사용자"),
+                )
             }
         }
     }
@@ -41,3 +45,12 @@ private fun userIdValidatorAndReturn(userId: String?): Long {
     }
     return userId!!.toLong()
 }
+
+private fun notFoundErrorMessage(subject: String): ErrorResponse = ErrorResponse(
+    code = NF001,
+    message = "$subject$NOT_FOUND_MESSAGE",
+    status = HttpStatusCode.NotFound.value,
+)
+
+private const val NF001 = "NF001"
+private const val NOT_FOUND_MESSAGE = "를(을) 찾을 수 없습니다."
