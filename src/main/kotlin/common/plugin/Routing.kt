@@ -2,6 +2,7 @@ package com.peekr.common.plugin
 
 import com.peekr.common.api.Api
 import com.peekr.domain.auth.presentation.route.authRoutes
+import com.peekr.domain.user.presentation.route.userRoutes
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
 import io.github.smiley4.ktorswaggerui.swaggerUI
@@ -17,6 +18,7 @@ fun Application.configureRouting() {
         route(Api.ROUTE, { description = "Peekr API" }) {
             route(Api.V1.ROUTE, { description = "Peekr API V1" }) {
                 authRoutes(route = Api.V1.Auth)
+                userRoutes(route = Api.V1.User)
             }
         }
     }

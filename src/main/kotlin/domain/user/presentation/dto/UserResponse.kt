@@ -12,7 +12,19 @@ data class UserResponse(
     val nickname: String,
     val profileImageUrl: String?,
     val introduce: String?,
-)
+) {
+    companion object {
+        val sample = UserResponse(
+            id = 1L,
+            provider = "Google",
+            providerId = "1231231231",
+            name = "honggd",
+            nickname = "hongddddddd",
+            profileImageUrl = "https://www.example.com/image.jpg",
+            introduce = "hello world!",
+        )
+    }
+}
 
 fun UserDto.toResponse(): UserResponse = UserResponse(
     id = id,
