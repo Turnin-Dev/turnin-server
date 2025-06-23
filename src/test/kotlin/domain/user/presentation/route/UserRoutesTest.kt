@@ -17,8 +17,7 @@ import kotlin.test.assertTrue
 import org.junit.Test
 
 class UserRoutesTest {
-    val route = Api.V1.User
-
+    private val route = Api.V1.User
     private val userUseCase = mockk<UserUseCase>()
 
     @Test
