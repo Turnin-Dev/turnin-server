@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.persistence
+package com.peekr.common.db.scheme
 
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
@@ -17,8 +17,8 @@ object Blocks : BaseLongIdTable("block") {
     }
 }
 
-class Block(id: EntityID<Long>) : BaseEntity(id, Blocks) {
-    companion object : BaseEntityClass<Block>(Blocks)
+class BlockEntity(id: EntityID<Long>) : BaseEntity(id, Blocks) {
+    companion object : BaseEntityClass<BlockEntity>(Blocks)
 
     var blockerId by Blocks.blockerId
     var blockedId by Blocks.blockedId

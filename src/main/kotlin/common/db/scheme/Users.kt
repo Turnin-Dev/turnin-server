@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.persistence
+package com.peekr.common.db.scheme
 
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
@@ -10,7 +10,7 @@ object Users : BaseLongIdTable("user") {
     val provider = enumerationByName("provider", 50, SocialLoginProvider::class)
     val providerId = varchar("provider_id", 255)
     val name = varchar("name", 50)
-    val nickname = varchar("nickname", 50).nullable()
+    val nickname = varchar("nickname", 50)
     val profileImageUrl = varchar("profile_image_url", 500).nullable()
     val introduce = text("introduce").nullable()
 
@@ -20,8 +20,8 @@ object Users : BaseLongIdTable("user") {
 }
 
 // 엔티티 정의 (단수형 정의)
-class User(id: EntityID<Long>) : BaseEntity(id, Users) {
-    companion object : BaseEntityClass<User>(Users)
+class UserEntity(id: EntityID<Long>) : BaseEntity(id, Users) {
+    companion object : BaseEntityClass<UserEntity>(Users)
 
     var provider by Users.provider
     var providerId by Users.providerId

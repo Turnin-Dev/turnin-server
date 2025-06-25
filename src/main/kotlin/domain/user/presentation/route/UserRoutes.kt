@@ -1,0 +1,92 @@
+package com.peekr.domain.user.presentation.route
+
+import com.peekr.common.api.Api
+import com.peekr.common.exception.ErrorResponse
+import com.peekr.common.validator.PeekrValidator.validation
+import com.peekr.domain.user.application.usecase.UserUseCase
+import com.peekr.domain.user.presentation.dto.UserResponse
+import com.peekr.domain.user.presentation.dto.toResponse
+import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.get
+import io.github.smiley4.ktoropenapi.route
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import org.koin.ktor.ext.inject
+
+// ------------------------------ Route ------------------------------
+fun Route.userRoutes(route: Api.V1.User, userUseCaseParam: UserUseCase? = null) {
+    val userUseCase by lazy {
+        userUseCaseParam ?: inject<UserUseCase>().value
+    }
+
+    route(route.ROUTE, {
+        tags = setOf(route.TAG)
+        description = "User API"
+    }) {
+        get(route.BY_ID, { getUserByIdDocs() }) {
+            val userIdParam = call.pathParameters["id"]
+            val userId = userIdValidatorAndReturn(userIdParam)
+            val user = userUseCase.getUserById(userId)
+            if (user != null) {
+                call.respond(user.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    notFoundErrorMessage("사용자"),
+                )
+            }
+        }
+    }
+}
+
+// ------------------------------ Route Docs ------------------------------
+fun RouteConfig.getUserByIdDocs() {
+    summary = "사용자 조회"
+    description = "사용자 ID로 사용자를 조회한다."
+    request {
+        pathParameter<Long>("id") {
+            description = "사용자 ID 파라미터"
+            example("Example") {
+                value = 1
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<UserResponse> {
+                description = "사용자 정보"
+                example("UserResponse") {
+                    value = UserResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자가 존재하지 않는 경우"
+                example("UserResponse") {
+                    value = notFoundErrorMessage("사용자")
+                }
+            }
+        }
+    }
+}
+
+// ------------------------------ Util ------------------------------
+private fun userIdValidatorAndReturn(userId: String?): Long {
+    validation(userId != null) { "사용자 ID가 필요합니다." }
+    userId?.let {
+        validation(userId.isNotEmpty()) { "사용자 ID가 비어있습니다." }
+        validation(userId.toLongOrNull() != null) { "사용자 ID는 숫자형식만 허용됩니다." }
+    }
+    return userId!!.toLong()
+}
+
+private fun notFoundErrorMessage(subject: String): ErrorResponse = ErrorResponse(
+    code = NF001,
+    message = "$subject$NOT_FOUND_MESSAGE",
+    status = HttpStatusCode.NotFound.value,
+)
+
+private const val NF001 = "NF001"
+private const val NOT_FOUND_MESSAGE = "를(을) 찾을 수 없습니다."

@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.persistence
+package com.peekr.common.db.scheme
 
 import com.peekr.common.util.PeekrDateTime
 import org.jetbrains.exposed.sql.Table

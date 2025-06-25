@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.persistence
+package com.peekr.common.db.scheme
 
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
@@ -12,8 +12,8 @@ object Notifications : BaseLongIdTable("notification") {
     val isRead = bool("is_read").default(false)
 }
 
-class Notification(id: EntityID<Long>) : BaseEntity(id, Notifications) {
-    companion object : BaseEntityClass<Notification>(Notifications)
+class NotificationEntity(id: EntityID<Long>) : BaseEntity(id, Notifications) {
+    companion object : BaseEntityClass<NotificationEntity>(Notifications)
 
     var userId by Notifications.userId
     var notiType by Notifications.notiType

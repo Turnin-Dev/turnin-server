@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.persistence
+package com.peekr.common.db.scheme
 
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
@@ -10,8 +10,8 @@ object ReportReasons : BaseLongIdTable("report_reason") {
     val description = text("description")
 }
 
-class ReportReason(id: EntityID<Long>) : BaseEntity(id, ReportReasons) {
-    companion object : BaseEntityClass<ReportReason>(ReportReasons)
+class ReportReasonEntity(id: EntityID<Long>) : BaseEntity(id, ReportReasons) {
+    companion object : BaseEntityClass<ReportReasonEntity>(ReportReasons)
 
     var code by ReportReasons.code
     var description by ReportReasons.description

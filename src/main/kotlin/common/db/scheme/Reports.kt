@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.persistence
+package com.peekr.common.db.scheme
 
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
@@ -16,8 +16,8 @@ object Reports : BaseLongIdTable("report") {
     }
 }
 
-class Report(id: EntityID<Long>) : BaseEntity(id, Reports) {
-    companion object : BaseEntityClass<Report>(Reports)
+class ReportEntity(id: EntityID<Long>) : BaseEntity(id, Reports) {
+    companion object : BaseEntityClass<ReportEntity>(Reports)
 
     var reporterId by Reports.reporterId
     var reportedId by Reports.reportedId

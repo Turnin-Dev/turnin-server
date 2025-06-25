@@ -15,7 +15,7 @@ fun Application.configureExceptionHandler() {
                 status = cause.status,
                 message = ErrorResponse(
                     code = cause.errorCode.code,
-                    message = cause.errorCode.description,
+                    message = cause.message,
                     status = cause.status.value,
                 ),
             )

@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.persistence
+package com.peekr.common.db.scheme
 
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
@@ -14,8 +14,8 @@ object Keywords : BaseLongIdTable("keyword") {
     }
 }
 
-class Keyword(id: EntityID<Long>) : BaseEntity(id, Keywords) {
-    companion object : BaseEntityClass<Keyword>(Keywords)
+class KeywordEntity(id: EntityID<Long>) : BaseEntity(id, Keywords) {
+    companion object : BaseEntityClass<KeywordEntity>(Keywords)
 
     var keyword by Keywords.keyword
     var createdBy by Keywords.createdBy

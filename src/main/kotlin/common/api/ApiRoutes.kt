@@ -21,6 +21,12 @@ object Api {
             const val LOGIN = "/login"
             const val REGISTER = "/register"
         }
+
+        object User {
+            const val ROUTE = "/user"
+            const val TAG = "User"
+            const val BY_ID = "/{id}"
+        }
     }
 
     // Samples
