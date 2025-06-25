@@ -2,8 +2,10 @@ package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.exception.ErrorResponse
+import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.validator.PeekrValidator.validation
 import com.peekr.domain.user.application.usecase.UserUseCase
+import com.peekr.domain.user.exception.UserErrorCode
 import com.peekr.domain.user.presentation.dto.UserResponse
 import com.peekr.domain.user.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -33,7 +35,7 @@ fun Route.userRoutes(route: Api.V1.User, userUseCaseParam: UserUseCase? = null) 
             } else {
                 call.respond(
                     HttpStatusCode.NotFound,
-                    notFoundErrorMessage("사용자"),
+                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
                 )
             }
         }
@@ -65,7 +67,7 @@ fun RouteConfig.getUserByIdDocs() {
             body<ErrorResponse> {
                 description = "사용자가 존재하지 않는 경우"
                 example("UserResponse") {
-                    value = notFoundErrorMessage("사용자")
+                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
                 }
             }
         }
@@ -81,12 +83,3 @@ private fun userIdValidatorAndReturn(userId: String?): Long {
     }
     return userId!!.toLong()
 }
-
-private fun notFoundErrorMessage(subject: String): ErrorResponse = ErrorResponse(
-    code = NF001,
-    message = "$subject$NOT_FOUND_MESSAGE",
-    status = HttpStatusCode.NotFound.value,
-)
-
-private const val NF001 = "NF001"
-private const val NOT_FOUND_MESSAGE = "를(을) 찾을 수 없습니다."
