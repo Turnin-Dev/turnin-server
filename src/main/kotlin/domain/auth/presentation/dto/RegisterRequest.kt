@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.presentation.dto
 
 import com.peekr.common.validator.PeekrValidator.validation
+import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,5 +31,16 @@ data class RegisterRequest(
             option = RegexOption.IGNORE_CASE,
         )
         return url.matches(urlRegex)
+    }
+
+    companion object {
+        val sample = RegisterRequest(
+            provider = SocialLoginProvider.Google.name,
+            providerId = "providerIDDDDD",
+            name = "honggd",
+            nickname = "honggggg",
+            profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
+            introduce = "Hello!",
+        )
     }
 }

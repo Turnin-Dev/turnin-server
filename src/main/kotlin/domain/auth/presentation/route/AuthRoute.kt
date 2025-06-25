@@ -4,7 +4,6 @@ import com.peekr.common.api.Api
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
@@ -61,10 +60,7 @@ private fun RouteConfig.loginDocs() {
         body<LoginRequest> {
             description = "로그인 요청 본문"
             example("LoginRequest") {
-                value = LoginRequest(
-                    provider = SocialLoginProvider.Google.name,
-                    providerId = "1231312312312",
-                )
+                value = LoginRequest.sample
             }
         }
     }
@@ -73,10 +69,7 @@ private fun RouteConfig.loginDocs() {
             body<JWTTokenResponse> {
                 description = "로그인 응답 본문 (JWT 토큰)"
                 example("JWTTokenResponse") {
-                    value = JWTTokenResponse(
-                        accessToken = "aaa.bbb.ccc",
-                        refreshToken = "aaa.bbb.ccc",
-                    )
+                    value = JWTTokenResponse.sample
                 }
             }
         }
@@ -101,14 +94,7 @@ private fun RouteConfig.registerDocs() {
         body<RegisterRequest> {
             description = "회원가입 요청 본문"
             example("RegisterRequest") {
-                value = RegisterRequest(
-                    provider = SocialLoginProvider.Google.name,
-                    providerId = "providerIDDDDD",
-                    name = "honggd",
-                    nickname = "honggggg",
-                    profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
-                    introduce = "Hello!",
-                )
+                value = RegisterRequest.sample
             }
         }
     }
@@ -117,10 +103,7 @@ private fun RouteConfig.registerDocs() {
             body<JWTTokenResponse> {
                 description = "회원가입 응답 본문 (JWT 토큰)"
                 example("JWTTokenResponse") {
-                    value = JWTTokenResponse(
-                        accessToken = "aaa.bbb.ccc",
-                        refreshToken = "aaa.bbb.ccc",
-                    )
+                    value = JWTTokenResponse.sample
                 }
             }
         }
