@@ -19,4 +19,16 @@ data class AuthUser(
     val nickname: String,
     val profileImageUrl: String?,
     val introduce: String?,
-)
+) {
+    companion object {
+        val sample: AuthUser = AuthUser(
+            id = 1L,
+            provider = SocialLoginProvider.Google,
+            providerId = "123123123",
+            name = "honggd",
+            nickname = "honggddddddd",
+            profileImageUrl = "https://example.com/image.jpg",
+            introduce = "hello world!",
+        )
+    }
+}

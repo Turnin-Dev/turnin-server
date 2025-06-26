@@ -49,23 +49,27 @@ class AuthServiceImpl(
         val decodedRefreshToken = verifyRefreshToken(token)
         val persistedName = refreshTokenRepository.findNameByRefreshToken(token)
 
-        return if (decodedRefreshToken != null && persistedName != null) {
-            val foundedAuthUser: AuthUser? = authRepository.getUserByName(persistedName)
-            val nameFromRefreshToken: String? =
-                decodedRefreshToken.getClaim(JWTClaimName.Name.name)?.asString()
+        return try {
+            if (decodedRefreshToken != null && persistedName != null) {
+                val foundedAuthUser: AuthUser? = authRepository.getUserByName(persistedName)
+                val nameFromRefreshToken: String? =
+                    decodedRefreshToken.getClaim(JWTClaimName.Name.name)?.asString()
 
-            if (foundedAuthUser != null && nameFromRefreshToken == foundedAuthUser.name) {
-                val payload = JWTTokenPayload(
-                    subject = foundedAuthUser.id.toString(),
-                    claimName = JWTClaimName.Name,
-                    claim = nameFromRefreshToken,
-                )
-                val jwtToken = jwtTokenService.generate(payload)
-                jwtToken
+                if (foundedAuthUser != null && nameFromRefreshToken == foundedAuthUser.name) {
+                    val payload = JWTTokenPayload(
+                        subject = foundedAuthUser.id.toString(),
+                        claimName = JWTClaimName.Name,
+                        claim = nameFromRefreshToken,
+                    )
+                    val jwtToken = jwtTokenService.generate(payload)
+                    jwtToken
+                } else {
+                    null
+                }
             } else {
                 null
             }
-        } else {
+        } catch (e: Exception) {
             null
         }
     }
