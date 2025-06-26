@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
+import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.auth.application.usecase.AuthUseCase
@@ -11,6 +12,7 @@ import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
@@ -48,6 +50,18 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCaseParam: AuthUseCase? = null) 
             request.validate()
             val token = authUseCase.register(request.toDto())
             call.respond(HttpStatusCode.Created, token.toResponse())
+        }
+
+        get(route.REFRESH, {}) {
+            val refreshToken = call.request.headers["Authorization"]
+            refreshToken?.let {
+                val token = authUseCase.refresh(refreshToken)
+                if (token == null) {
+                    call.respond(AuthErrorCode.RefreshTokenExpired.toErrorResponse(HttpStatusCode.Unauthorized))
+                } else {
+                    call.respond(token.toResponse())
+                }
+            } ?: call.respond(CommonErrorCode.EmptyRequestHeader.toErrorResponse(HttpStatusCode.BadRequest))
         }
     }
 }

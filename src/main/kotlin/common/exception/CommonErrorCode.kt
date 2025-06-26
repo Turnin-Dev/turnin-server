@@ -16,7 +16,13 @@ sealed class CommonErrorCode(
             ErrorCodes.Validation.Default.description,
         )
 
-    data object Unexpected : CommonErrorCode("UN001", "예상하지 못한 오류입니다.")
+    data object EmptyRequestHeader :
+        CommonErrorCode(
+            ErrorCodes.EmptyRequest.Header.code,
+            ErrorCodes.EmptyRequest.Header.description,
+        )
+
+    object Unexpected : CommonErrorCode("UN001", "예상하지 못한 오류입니다.")
 }
 
 private object ErrorCodes {
@@ -32,5 +38,12 @@ private object ErrorCodes {
         val description: String,
     ) {
         Default("VD001", "기본 유효성 검사 실패"),
+    }
+
+    enum class EmptyRequest(
+        val code: String,
+        val description: String,
+    ) {
+        Header("EMP001", "요청 헤더 값이 비어있습니다."),
     }
 }

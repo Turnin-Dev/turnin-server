@@ -18,4 +18,9 @@ class AuthUseCaseImpl(private val authService: AuthService) : AuthUseCase {
         val jwtToken = authService.register(authUser)
         return jwtToken.toDto()
     }
+
+    override suspend fun refresh(token: String): JWTTokenDto? {
+        val jwtToken = authService.refresh(token)
+        return jwtToken?.toDto()
+    }
 }

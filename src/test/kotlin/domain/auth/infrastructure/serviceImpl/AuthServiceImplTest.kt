@@ -2,9 +2,11 @@ package com.peekr.domain.auth.infrastructure.serviceImpl
 
 import com.peekr.common.jwt.JWTTestDoubles.MockJWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
+import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
 import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
 import io.mockk.coEvery
 import io.mockk.every
@@ -18,12 +20,14 @@ import org.junit.Before
 
 class AuthServiceImplTest {
     private val authRepository = mockk<AuthRepository>()
+    private val refreshTokenRepository = mockk<RefreshTokenRepository>()
     private val jwtTokenService = mockk<JWTTokenService>()
+    private val jwtConfigFactory = mockk<JWTConfigFactory>()
     private lateinit var authService: AuthServiceImpl
 
     @Before
     fun setup() {
-        authService = AuthServiceImpl(authRepository, jwtTokenService)
+        authService = AuthServiceImpl(authRepository, refreshTokenRepository, jwtTokenService, jwtConfigFactory)
     }
 
     @Test

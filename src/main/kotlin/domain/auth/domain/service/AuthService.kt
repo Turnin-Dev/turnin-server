@@ -27,4 +27,14 @@ interface AuthService {
      * @param authUser [AuthUser]
      */
     suspend fun register(authUser: AuthUser): JWTToken
+
+    /**
+     * 리프레쉬 토큰 갱신
+     *
+     * @param token 리프레쉬 토큰
+     *
+     * @return [JWTToken] 정상적으로 리프레쉬 토큰이 갱신된 경우
+     * (만약 리프레쉬 토큰 만료시 **`null`** 반환)
+     */
+    suspend fun refresh(token: String): JWTToken?
 }

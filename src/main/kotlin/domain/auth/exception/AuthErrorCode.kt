@@ -13,7 +13,12 @@ sealed class AuthErrorCode(
     /** 중복된 사용자 에러 */
     data object UserDuplicated :
         AuthErrorCode(A002, "중복된 사용자 입니다.")
+
+    /** 리프레쉬 토큰 만료 에러 */
+    data object RefreshTokenExpired :
+        AuthErrorCode(A003, "새로고침 토큰이 만료되었습니다.")
 }
 
 private const val A001 = "A001"
 private const val A002 = "A002"
+private const val A003 = "A003"
