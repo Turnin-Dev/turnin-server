@@ -248,7 +248,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
         }
@@ -271,7 +271,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
         val response = client.get(refreshEndPoint)
         val responseBody = response.bodyAsText()
 
@@ -291,7 +291,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Is Token?")
         }
@@ -313,7 +313,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
         }
