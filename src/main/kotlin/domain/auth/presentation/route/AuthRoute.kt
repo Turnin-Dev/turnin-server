@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
+import com.peekr.common.api.Api.byId
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
@@ -54,7 +55,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCaseParam: AuthUseCase? = null) 
             call.respond(HttpStatusCode.Created, token.toResponse())
         }
 
-        get(route.REFRESH_BY_ID, {}) {
+        get(route.REFRESH.byId("id"), {}) {
             val refreshToken = call.request.headers["Authorization"]
             val userIdParam = call.pathParameters["id"]
             val userId = userIdValidatorAndReturn(userIdParam)

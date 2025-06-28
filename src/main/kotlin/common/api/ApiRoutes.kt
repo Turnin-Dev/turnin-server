@@ -20,7 +20,7 @@ object Api {
             const val TAG = "Auth"
             const val LOGIN = "/login"
             const val REGISTER = "/register"
-            const val REFRESH_BY_ID = "/refresh/{id}"
+            const val REFRESH = "/refresh"
         }
 
         object User {
@@ -29,6 +29,8 @@ object Api {
             const val BY_ID = "/{id}"
         }
     }
+
+    fun String.byId(idName: String) = "$this/{$idName}"
 
     // Samples
 //    object User {
