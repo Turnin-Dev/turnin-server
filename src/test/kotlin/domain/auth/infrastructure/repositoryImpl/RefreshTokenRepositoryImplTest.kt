@@ -4,12 +4,12 @@ import com.peekr.common.db.scheme.RefreshTokens
 import com.peekr.common.db.scheme.UserEntity
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.util.TestDatabaseFactory
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.upsert
 import org.junit.Before
@@ -38,8 +38,6 @@ class RefreshTokenRepositoryImplTest {
             RefreshTokens.upsert {
                 it[user] = userId
                 it[refreshToken] = MOCK_REFRESH_TOKEN
-                it[expiresAt] = Instant.now().plus(30, ChronoUnit.DAYS)
-                it[createdAt] = Instant.now()
             }
         }
 
@@ -63,5 +61,37 @@ class RefreshTokenRepositoryImplTest {
     companion object {
         private const val MOCK_REFRESH_TOKEN = "aaa.bbb.ccc"
         private val MockUser = AuthUser.sample
+    }
+
+    @Test
+    fun `save 성공 테스트`() = runTest {
+        // given
+        val userId = TestDatabaseFactory.dbQuery {
+            val savedUserEntity = UserEntity.new {
+                this.provider = MockUser.provider
+                this.providerId = MockUser.providerId
+                this.name = MockUser.name
+                this.nickname = MockUser.nickname
+                this.profileImageUrl = MockUser.profileImageUrl
+                this.introduce = MockUser.introduce
+            }
+            savedUserEntity.id.value
+        }
+
+        // when
+        val result = refreshTokenRepository.save(userId, MOCK_REFRESH_TOKEN)
+        val name = refreshTokenRepository.findNameByRefreshToken(MOCK_REFRESH_TOKEN)
+
+        // then
+        assertTrue(result)
+        assertNotNull(name)
+        assertEquals(name, MockUser.name)
+    }
+
+    @Test
+    fun `save 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
+        assertFalse {
+            refreshTokenRepository.save(1L, MOCK_REFRESH_TOKEN)
+        }
     }
 }
