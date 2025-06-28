@@ -5,6 +5,7 @@ import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.domain.model.entity.JWTToken
+import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
@@ -53,11 +54,13 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCaseParam: AuthUseCase? = null) 
             call.respond(HttpStatusCode.Created, token.toResponse())
         }
 
-        get(route.REFRESH, {}) {
+        get(route.REFRESH_BY_ID, {}) {
             val refreshToken = call.request.headers["Authorization"]
+            val userIdParam = call.pathParameters["id"]
+            val userId = userIdValidatorAndReturn(userIdParam)
             refreshToken?.let {
                 JWTToken.validate(refreshToken)
-                val token = authUseCase.refresh(refreshToken)
+                val token = authUseCase.refresh(userId, refreshToken)
                 if (token == null) {
                     call.respond(
                         HttpStatusCode.Unauthorized,

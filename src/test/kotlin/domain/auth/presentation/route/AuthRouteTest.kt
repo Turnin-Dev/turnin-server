@@ -242,13 +242,13 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
         }
@@ -265,13 +265,13 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
         val response = client.get(refreshEndPoint)
         val responseBody = response.bodyAsText()
 
@@ -285,13 +285,13 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Is Token?")
         }
@@ -307,13 +307,13 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any()) } returns null
+        coEvery { authUseCase.refresh(any(), any()) } returns null
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH_BY_ID}"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
         }

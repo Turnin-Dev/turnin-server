@@ -13,7 +13,7 @@ interface AuthRepository {
      *
      * @return [AuthUser] - 사용자를 찾을 수 없으면 **`null`** 반환
      */
-    suspend fun findByProviderAndProviderId(
+    suspend fun findAuthUserByProviderAndProviderId(
         provider: SocialLoginProvider,
         providerId: String,
     ): AuthUser?

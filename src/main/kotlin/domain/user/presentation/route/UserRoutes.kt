@@ -3,7 +3,7 @@ package com.peekr.domain.user.presentation.route
 import com.peekr.common.api.Api
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
-import com.peekr.common.validator.PeekrValidator.validation
+import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.domain.user.exception.UserErrorCode
 import com.peekr.domain.user.presentation.dto.UserResponse
@@ -72,14 +72,4 @@ fun RouteConfig.getUserByIdDocs() {
             }
         }
     }
-}
-
-// ------------------------------ Util ------------------------------
-private fun userIdValidatorAndReturn(userId: String?): Long {
-    validation(userId != null) { "사용자 ID가 필요합니다." }
-    userId?.let {
-        validation(userId.isNotEmpty()) { "사용자 ID가 비어있습니다." }
-        validation(userId.toLongOrNull() != null) { "사용자 ID는 숫자형식만 허용됩니다." }
-    }
-    return userId!!.toLong()
 }

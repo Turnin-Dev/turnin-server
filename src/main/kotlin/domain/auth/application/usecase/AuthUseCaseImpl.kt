@@ -6,21 +6,36 @@ import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDomain
 import com.peekr.domain.auth.domain.service.AuthService
+import com.peekr.domain.auth.domain.service.RefreshTokenService
 
-class AuthUseCaseImpl(private val authService: AuthService) : AuthUseCase {
+class AuthUseCaseImpl(
+    private val authService: AuthService,
+    private val refreshTokenService: RefreshTokenService,
+) : AuthUseCase {
     override suspend fun login(loginDto: LoginDto): JWTTokenDto? {
-        val jwtToken = authService.login(loginDto.provider, loginDto.providerId)
-        return jwtToken?.toDto()
+        val loginResult = authService.login(loginDto.provider, loginDto.providerId)
+        if (loginResult == null) return null
+        saveRefreshToken(loginResult.authUser.id, loginResult.jwtToken.refreshToken)
+        return loginResult.jwtToken.toDto()
     }
 
     override suspend fun register(registerDto: RegisterDto): JWTTokenDto {
         val authUser = registerDto.toDomain()
         val jwtToken = authService.register(authUser)
+        val jwtTokenDto = jwtToken.toDto()
+        saveRefreshToken(authUser.id, jwtTokenDto.refreshToken)
         return jwtToken.toDto()
     }
 
-    override suspend fun refresh(token: String): JWTTokenDto? {
-        val jwtToken = authService.refresh(token)
-        return jwtToken?.toDto()
+    override suspend fun refresh(userId: Long, token: String): JWTTokenDto? {
+        val newToken = authService.refresh(token)
+        return newToken?.let {
+            saveRefreshToken(userId, it.refreshToken)
+            newToken.toDto()
+        }
+    }
+
+    private suspend fun saveRefreshToken(userId: Long, token: String) {
+        refreshTokenService.save(userId, token)
     }
 }

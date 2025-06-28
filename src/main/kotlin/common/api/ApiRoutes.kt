@@ -20,7 +20,7 @@ object Api {
             const val TAG = "Auth"
             const val LOGIN = "/login"
             const val REGISTER = "/register"
-            const val REFRESH = "/refresh"
+            const val REFRESH_BY_ID = "/refresh/{id}"
         }
 
         object User {

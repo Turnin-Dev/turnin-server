@@ -40,26 +40,27 @@ class AuthServiceImplTest {
     fun `login 성공 테스트`() = runTest {
         // given
         coEvery {
-            authRepository.findByProviderAndProviderId(any(), any())
+            authRepository.findAuthUserByProviderAndProviderId(any(), any())
         } returns MockAuthUser
 
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()
 
         // when
-        val token = authService.login(
+        val loginResult = authService.login(
             provider = SocialLoginProvider.Google,
             providerId = "123123",
         )
 
         // then
-        assertEquals(token, getMockJWTToken())
+        assertNotNull(loginResult)
+        assertEquals(loginResult.jwtToken, getMockJWTToken())
     }
 
     @Test
     fun `login 실패 테스트 - 존재하지 않는 사용자`() = runTest {
         // given
         coEvery {
-            authRepository.findByProviderAndProviderId(any(), any())
+            authRepository.findAuthUserByProviderAndProviderId(any(), any())
         } returns null
 
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()

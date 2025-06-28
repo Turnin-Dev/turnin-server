@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 
 class AuthRepositoryImpl : AuthRepository {
-    override suspend fun findByProviderAndProviderId(
+    override suspend fun findAuthUserByProviderAndProviderId(
         provider: SocialLoginProvider,
         providerId: String,
     ): AuthUser? = dbQuery {
