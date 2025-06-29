@@ -55,7 +55,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCaseParam: AuthUseCase? = null) 
             call.respond(HttpStatusCode.Created, token.toResponse())
         }
 
-        get(route.REFRESH.byId("id"), {}) {
+        get(route.REFRESH.byId("id"), { refreshDocs() }) {
             val refreshToken = call.request.headers["Authorization"]
             val userIdParam = call.pathParameters["id"]
             val userId = userIdValidatorAndReturn(userIdParam)
@@ -141,6 +141,48 @@ private fun RouteConfig.registerDocs() {
                         message = "Register failed",
                         status = HttpStatusCode.Conflict.value,
                     )
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.refreshDocs() {
+    summary = "리프레쉬 토큰 갱신"
+    description = "리프레쉬 토큰 갱신 요청"
+    request {
+        pathParameter<Long>("id") {
+            description = "사용자 ID 파라미터"
+            example("Example") {
+                value = 1
+            }
+        }
+        headerParameter<String>("Authorization") {
+            description = "리프레쉬 토큰"
+            example("Example") {
+                value = "Bearer aaa.bbb.ccc"
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<JWTTokenResponse> {
+                example("JWTTokenResponse") {
+                    value = JWTTokenResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.Unauthorized) {
+            body<ErrorResponse> {
+                example("ErrorResponse") {
+                    value = AuthErrorCode.RefreshTokenExpired.toErrorResponse(HttpStatusCode.Unauthorized)
+                }
+            }
+        }
+        code(HttpStatusCode.BadRequest) {
+            body<ErrorResponse> {
+                example("ErrorResponse") {
+                    value = CommonErrorCode.EmptyRequestHeader.toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }
