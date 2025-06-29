@@ -7,6 +7,7 @@ import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
 import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.routing
 
@@ -18,7 +19,9 @@ fun Application.configureRouting() {
         route(Api.ROUTE, { description = "Peekr API" }) {
             route(Api.V1.ROUTE, { description = "Peekr API V1" }) {
                 authRoutes(route = Api.V1.Auth)
-                userRoutes(route = Api.V1.User)
+                authenticate {
+                    userRoutes(route = Api.V1.User)
+                }
             }
         }
     }
