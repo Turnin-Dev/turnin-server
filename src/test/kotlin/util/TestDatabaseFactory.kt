@@ -1,6 +1,7 @@
 package com.peekr.util
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.scheme.RefreshTokens
 import com.peekr.common.db.scheme.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
@@ -15,9 +16,12 @@ object TestDatabaseFactory {
             url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;",
             driver = "org.h2.Driver",
         )
+        // 실제 테이블 모델 그대로 사용
         transaction {
+            SchemaUtils.drop(RefreshTokens)
             SchemaUtils.drop(Users)
-            SchemaUtils.create(Users) // 실제 테이블 모델 그대로 사용
+            SchemaUtils.create(Users)
+            SchemaUtils.create(RefreshTokens)
         }
     }
 

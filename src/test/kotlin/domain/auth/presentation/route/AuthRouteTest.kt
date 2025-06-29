@@ -12,6 +12,7 @@ import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -234,5 +235,93 @@ class AuthRouteTest {
         // then
         assertEquals(HttpStatusCode.InternalServerError, response.status)
         assertTrue(responseBody.contains("${HttpStatusCode.InternalServerError.value}"))
+    }
+
+    @Test
+    fun `refresh 성공 테스트`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val response = client.get(refreshEndPoint) {
+            headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(responseBody.contains(MockJWTTokenDto.accessToken))
+        assertTrue(responseBody.contains(MockJWTTokenDto.refreshToken))
+    }
+
+    @Test
+    fun `refresh 실패 테스트 - 요청 헤더에 토큰이 없는 경우`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val response = client.get(refreshEndPoint)
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(responseBody.contains(CommonErrorCode.EmptyRequestHeader.description))
+    }
+
+    @Test
+    fun `refresh 실패 테스트 - 요청 헤더에 토큰 형식이 잘못된 경우`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val response = client.get(refreshEndPoint) {
+            headers.append("Authorization", "Is Token?")
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(responseBody.contains(CommonErrorCode.Validation.code))
+    }
+
+    @Test
+    fun `refresh 실패 테스트 - AuthUseCase(refresh())에서 null을 반환하는 경우`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.refresh(any(), any()) } returns null
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val response = client.get(refreshEndPoint) {
+            headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertTrue(responseBody.contains(AuthErrorCode.RefreshTokenExpired.code))
+        assertTrue(responseBody.contains(AuthErrorCode.RefreshTokenExpired.description))
     }
 }

@@ -21,4 +21,11 @@ sealed class AuthException(
             detail = detail ?: AuthErrorCode.UserDuplicated.description,
             status = HttpStatusCode.Conflict,
         )
+
+    class CannotSaveRefreshTokenException(detail: String? = null) :
+        AuthException(
+            code = AuthErrorCode.CannotSaveRefreshToken,
+            detail = detail ?: AuthErrorCode.CannotSaveRefreshToken.description,
+            status = HttpStatusCode.Unauthorized,
+        )
 }

@@ -2,6 +2,7 @@ package com.peekr.domain.auth.domain.service
 
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.SocialLoginProvider
 
 interface AuthService {
@@ -11,13 +12,13 @@ interface AuthService {
      * [provider]와 [providerId]로 유저를 조회하고 로그인을 진행한다.
      * 만약, 계정이 존재하지 않는다면 [register]를 통해 회원가입을 진행한다.
      *
-     * @return [JWTToken] 정상적으로 로그인이 진행된 경우
+     * @return [LoginResult] 정상적으로 로그인이 진행된 경우 로그인 결과 값 반환
      * (로그인 실패 (사용자를 가져올 수 없는 경우) **`null`** 반환)
      */
     suspend fun login(
         provider: SocialLoginProvider,
         providerId: String,
-    ): JWTToken?
+    ): LoginResult?
 
     /**
      * 회원가입
@@ -27,4 +28,14 @@ interface AuthService {
      * @param authUser [AuthUser]
      */
     suspend fun register(authUser: AuthUser): JWTToken
+
+    /**
+     * 리프레쉬 토큰 갱신
+     *
+     * @param token 리프레쉬 토큰
+     *
+     * @return [JWTToken] 정상적으로 리프레쉬 토큰이 갱신된 경우
+     * (만약 리프레쉬 토큰 만료시 **`null`** 반환)
+     */
+    suspend fun refresh(token: String): JWTToken?
 }

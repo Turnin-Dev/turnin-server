@@ -57,22 +57,8 @@ class JWTTokenServiceImpl(
 
     override fun generate(payload: JWTTokenPayload): JWTToken {
         try {
-            val accessToken = JWT
-                .create()
-                .withAudience(audience)
-                .withIssuer(issuer)
-                .withSubject(payload.subject)
-                .withClaim(payload.claimName.name, payload.claim)
-                .withIssuedAt(Date.from(now))
-                .withExpiresAt(Date.from(now.plusMillis(accessTokenExpiresIn)))
-                .sign(algorithm)
-
-            val refreshToken = JWT
-                .create()
-                .withSubject(payload.subject)
-                .withIssuedAt(Date.from(now))
-                .withExpiresAt(Date.from(now.plusMillis(refreshTokenExpiresIn)))
-                .sign(algorithm)
+            val accessToken = createJWTToken(payload, accessTokenExpiresIn)
+            val refreshToken = createJWTToken(payload, refreshTokenExpiresIn)
 
             return JWTToken(accessToken, refreshToken)
         } catch (e: Exception) {
@@ -87,4 +73,17 @@ class JWTTokenServiceImpl(
             throw TokenException.CannotCreateTokenVerifier(e.message)
         }
     }
+
+    private fun createJWTToken(
+        payload: JWTTokenPayload,
+        expiresIn: Long,
+    ): String = JWT
+        .create()
+        .withAudience(audience)
+        .withIssuer(issuer)
+        .withSubject(payload.subject)
+        .withClaim(payload.claimName.name, payload.claim)
+        .withIssuedAt(Date.from(now))
+        .withExpiresAt(Date.from(now.plusMillis(expiresIn)))
+        .sign(algorithm)
 }

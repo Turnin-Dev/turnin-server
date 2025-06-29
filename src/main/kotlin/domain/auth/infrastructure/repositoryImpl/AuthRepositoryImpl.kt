@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
-import com.peekr.common.db.DatabaseFactory
+import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.scheme.UserEntity
 import com.peekr.common.db.scheme.Users
 import com.peekr.domain.auth.domain.model.AuthUser
@@ -13,10 +13,10 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 
 class AuthRepositoryImpl : AuthRepository {
-    override suspend fun findByProviderAndProviderId(
+    override suspend fun findAuthUserByProviderAndProviderId(
         provider: SocialLoginProvider,
         providerId: String,
-    ): AuthUser? = DatabaseFactory.dbQuery {
+    ): AuthUser? = dbQuery {
         UserEntity
             .find((Users.provider eq provider) and (Users.providerId eq providerId))
             .map {
@@ -24,7 +24,15 @@ class AuthRepositoryImpl : AuthRepository {
             }.singleOrNull()
     }
 
-    override suspend fun save(authUser: AuthUser): AuthUser = DatabaseFactory.dbQuery {
+    override suspend fun getUserByName(name: String): AuthUser? = dbQuery {
+        UserEntity
+            .find((Users.name eq name))
+            .map {
+                AuthMapper.toDomain(it.readValues)
+            }.singleOrNull()
+    }
+
+    override suspend fun save(authUser: AuthUser): AuthUser = dbQuery {
         try {
             val savedUserEntity = UserEntity.new {
                 this.provider = authUser.provider

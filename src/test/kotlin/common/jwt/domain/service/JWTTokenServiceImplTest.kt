@@ -38,7 +38,7 @@ class JWTTokenServiceImplTest {
     @Test
     fun `generate should create valid access and refresh tokens`() {
         // given
-        val payload = JWTTestDoubles.MockJWTTokenPayload
+        val payload = JWTTestDoubles.getJWTTokenPayload()
 
         // when
         val token = jwtTokenService.generate(payload)

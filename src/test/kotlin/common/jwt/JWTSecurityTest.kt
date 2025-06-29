@@ -3,7 +3,6 @@ package com.peekr.common.jwt
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
-import com.peekr.common.jwt.JWTTestDoubles.MockJWTTokenPayload
 import com.peekr.common.jwt.JWTTestDoubles.REALM
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
@@ -42,8 +41,8 @@ class JWTSecurityTest {
             every { realm } returns REALM
             every { audience } returns AUDIENCE
             every { issuer } returns ISSUER
-            every { generate(any()) } returns JWTTestDoubles.MockJWTToken
-            every { getVerifierConfig() } returns JWTTestDoubles.MockJWTVerifierConfig
+            every { generate(any()) } returns JWTTestDoubles.getMockJWTToken()
+            every { getVerifierConfig() } returns JWTTestDoubles.MockVerifierConfig
         }
     }
 
@@ -55,7 +54,7 @@ class JWTSecurityTest {
             plugin = { configureJwtSecurity() },
             routing = { protectedRoute() },
         )
-        val token = jwtTokenService.generate(MockJWTTokenPayload)
+        val token = jwtTokenService.generate(JWTTestDoubles.getJWTTokenPayload())
 
         // When
         val response = client.get(TEST_ENDPOINT) {
