@@ -5,5 +5,5 @@ import org.koin.core.annotation.Singleton
 
 @Singleton
 class AppConfig {
-    val applicationConfiguration: ApplicationConfig = ApplicationConfig("application.yaml")
+    val applicationConfiguration: ApplicationConfig = ApplicationConfig("application.conf")
 }
