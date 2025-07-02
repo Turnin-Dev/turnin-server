@@ -36,9 +36,11 @@ out/
 .vscode/
 
 ### dotenv & config ###
-.env
+.env*
 **/src/main/resources/**/*.yaml
 **/src/main/resources/**/*.yml
+.conf
+**/src/main/resources/**/*.conf
 
 ### db file ###
 **/src/main/resources/**/*.sql
