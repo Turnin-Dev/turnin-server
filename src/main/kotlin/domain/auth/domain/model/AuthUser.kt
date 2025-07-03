@@ -25,7 +25,7 @@ data class AuthUser(
     companion object {
         val sample: AuthUser = AuthUser(
             id = 1L,
-            provider = SocialLoginProvider.Google,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123123",
             name = "honggd",
             nickname = "honggddddddd",

@@ -9,7 +9,7 @@ import com.peekr.domain.auth.presentation.dto.RegisterRequest
 object AuthTestDoubles {
     val MockAuthUser = AuthUser(
         id = 0L,
-        provider = SocialLoginProvider.Google,
+        provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
         name = "honggd",
         nickname = "honggggg",
@@ -18,17 +18,17 @@ object AuthTestDoubles {
     )
 
     val MockValidLoginRequest = LoginRequest(
-        provider = SocialLoginProvider.Google.value,
+        provider = SocialLoginProvider.GOOGLE.name,
         providerId = "providerIDDDDD",
     )
 
     val MockInvalidLoginRequest = LoginRequest(
-        provider = SocialLoginProvider.Google.value,
+        provider = SocialLoginProvider.GOOGLE.name,
         providerId = "",
     )
 
     val MockValidRegisterRequest = RegisterRequest(
-        provider = SocialLoginProvider.Google.value,
+        provider = SocialLoginProvider.GOOGLE.name,
         providerId = "providerIDDDDD",
         name = "honggd",
         nickname = "honggggg",
@@ -37,7 +37,7 @@ object AuthTestDoubles {
     )
 
     val MockInvalidRegisterRequest = RegisterRequest(
-        provider = SocialLoginProvider.Google.value,
+        provider = SocialLoginProvider.GOOGLE.name,
         providerId = "providerIDDDDD",
         name = "",
         nickname = "",

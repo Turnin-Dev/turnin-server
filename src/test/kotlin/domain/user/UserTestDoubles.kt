@@ -6,7 +6,7 @@ import com.peekr.domain.user.application.dto.UserDto
 
 object UserTestDoubles {
     fun getUserEntity() = UserEntity.new {
-        this.provider = SocialLoginProvider.Google
+        this.provider = SocialLoginProvider.GOOGLE
         this.providerId = "123901239"
         this.name = "honggd"
         this.nickname = "hongdddddddd"

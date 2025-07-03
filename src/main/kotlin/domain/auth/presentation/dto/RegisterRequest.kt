@@ -35,7 +35,7 @@ data class RegisterRequest(
 
     companion object {
         val sample = RegisterRequest(
-            provider = SocialLoginProvider.Google.value,
+            provider = SocialLoginProvider.GOOGLE.name,
             providerId = "providerIDDDDD",
             name = "honggd",
             nickname = "honggggg",

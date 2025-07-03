@@ -16,7 +16,7 @@ data class LoginRequest(
 
     companion object {
         val sample = LoginRequest(
-            provider = SocialLoginProvider.Google.value,
+            provider = SocialLoginProvider.GOOGLE.name,
             providerId = "1231312312312",
         )
     }

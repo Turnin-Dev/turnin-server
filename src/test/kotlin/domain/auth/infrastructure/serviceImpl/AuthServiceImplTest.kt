@@ -47,7 +47,7 @@ class AuthServiceImplTest {
 
         // when
         val loginResult = authService.login(
-            provider = SocialLoginProvider.Google,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123",
         )
 
@@ -67,7 +67,7 @@ class AuthServiceImplTest {
 
         // when
         val token = authService.login(
-            provider = SocialLoginProvider.Google,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123",
         )
 
