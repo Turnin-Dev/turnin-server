@@ -1,7 +1,7 @@
 package com.peekr.domain.user
 
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.db.scheme.UserEntity
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.user.application.dto.UserDto
 
 object UserTestDoubles {

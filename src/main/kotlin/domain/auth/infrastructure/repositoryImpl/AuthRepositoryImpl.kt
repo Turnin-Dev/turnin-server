@@ -1,10 +1,10 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
 import com.peekr.common.db.DatabaseFactory.dbQuery
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.db.scheme.UserEntity
 import com.peekr.common.db.scheme.Users
 import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper

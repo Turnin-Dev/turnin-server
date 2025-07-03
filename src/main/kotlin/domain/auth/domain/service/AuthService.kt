@@ -1,9 +1,9 @@
 package com.peekr.domain.auth.domain.service
 
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 
 interface AuthService {
     /**

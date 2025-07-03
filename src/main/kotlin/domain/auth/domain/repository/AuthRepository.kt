@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.domain.repository
 
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthException
 
 interface AuthRepository {
