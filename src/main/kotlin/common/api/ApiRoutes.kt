@@ -13,7 +13,7 @@ object Api {
     const val ROUTE = "/api"
 
     object V1 {
-        const val ROUTE = "/V1"
+        const val ROUTE = "/v1"
 
         object Auth {
             const val ROUTE = "/auth"
