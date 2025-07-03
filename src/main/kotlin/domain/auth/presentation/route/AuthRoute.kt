@@ -22,14 +22,9 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import org.koin.ktor.ext.inject
 
 // ------------------------------ Route ------------------------------
-fun Route.authRoutes(route: Api.V1.Auth, authUseCaseParam: AuthUseCase? = null) {
-    val authUseCase by lazy {
-        authUseCaseParam ?: inject<AuthUseCase>().value
-    }
-
+fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
     route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "Auth API"
