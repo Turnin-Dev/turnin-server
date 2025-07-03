@@ -35,6 +35,16 @@ abstract class BaseLongIdTable(
 }
 
 /**
+ * [BaseLongIdTable]의 timestamp 필드(created_at, updated_at) 없는 버전
+ *
+ * @see BaseLongIdTable
+ */
+abstract class BaseLongIdTableWithoutTimestamp(
+    name: String,
+    idName: String = "id",
+) : LongIdTable(name, idName)
+
+/**
  * 모든 Entity의 기초가 되는 추상 클래스
  *
  * (단수형으로 정의된) 엔티티에서 사용
@@ -58,6 +68,13 @@ abstract class BaseEntity(
     val createdAt by table.createdAt
     var updatedAt by table.updatedAt
 }
+
+/**
+ * [BaseEntity]의 timestamp 필드(created_at, updated_at) 없는 버전
+ *
+ * @see BaseEntity
+ */
+abstract class BaseEntityWithoutTimestamp(id: EntityID<Long>) : LongEntity(id)
 
 /**
  * 공통적으로 updatedAt 필드를 자동으로 갱신하는 기능을 부여하는 공통 베이스 클래스
