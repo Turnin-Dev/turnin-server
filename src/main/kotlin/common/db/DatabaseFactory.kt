@@ -24,7 +24,7 @@ object DatabaseFactory {
     fun init() {
         try {
             val dataSource = hikariDataSource()
-            migrate(dataSource)
+            migrate("dev", dataSource)
             Database.connect(dataSource)
             LOGGER.info("Database connection successfully: $dbUrl")
         } catch (e: FlywayException) {
@@ -33,11 +33,6 @@ object DatabaseFactory {
         } catch (e: Exception) {
             LOGGER.error("Database connection failed: ${e.message}")
         }
-//    //TODO: 추후 삭제 예정
-//    transaction {
-//        SchemaUtils.drop(Users) // 데이터베이스 초기화 (개발 중에만 사용)
-//        SchemaUtils.create(Users) // Users 테이블 생성
-//    }
     }
 
     suspend fun <T> dbQuery(block: () -> T): T = newSuspendedTransaction(ioContext) {
@@ -62,14 +57,20 @@ object DatabaseFactory {
             },
         )
 
-    private fun migrate(dataSource: DataSource) {
-        val flyway =
-            Flyway
-                .configure()
-                .dataSource(dataSource)
-//                    .locations("classpath:db/migration") // 필요 시 명시
-                .baselineOnMigrate(true) // 기존 DB에 적용 시 필요
-                .load()
+    private fun migrate(env: String, dataSource: DataSource) {
+        val flywayBuilder = Flyway
+            .configure()
+            .dataSource(dataSource)
+            .locations("classpath:db/migration") // 필요 시 명시
+            .baselineOnMigrate(true) // 기존 DB에 적용 시 필요
+
+        // TODO: 추후에 실행 환경 enum class 로 만들기 (하드코딩 X)
+        val flyway = if (env == "dev") {
+            flywayBuilder.cleanDisabled(false).load().also { it.clean() }
+        } else { // prod
+            flywayBuilder.cleanDisabled(true).load()
+        }
+
         flyway.migrate()
     }
 }
