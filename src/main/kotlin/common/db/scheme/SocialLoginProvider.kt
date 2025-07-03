@@ -13,8 +13,8 @@ enum class SocialLoginProvider {
  * @throws IllegalArgumentException 소셜로그인 플랫폼에 해당하지 않은 문자열 변환 시 예외 발생
  */
 fun String.toSocialLoginProvider() = when (this) {
-    "google" -> SocialLoginProvider.GOOGLE
-    "kakao" -> SocialLoginProvider.KAKAO
-    "apple" -> SocialLoginProvider.APPLE
+    SocialLoginProvider.GOOGLE.name -> SocialLoginProvider.GOOGLE
+    SocialLoginProvider.KAKAO.name -> SocialLoginProvider.KAKAO
+    SocialLoginProvider.APPLE.name -> SocialLoginProvider.APPLE
     else -> throw IllegalArgumentException("Invalid social login provider: $this")
 }
