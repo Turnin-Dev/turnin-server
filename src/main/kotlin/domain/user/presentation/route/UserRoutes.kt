@@ -14,14 +14,9 @@ import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import org.koin.ktor.ext.inject
 
 // ------------------------------ Route ------------------------------
-fun Route.userRoutes(route: Api.V1.User, userUseCaseParam: UserUseCase? = null) {
-    val userUseCase by lazy {
-        userUseCaseParam ?: inject<UserUseCase>().value
-    }
-
+fun Route.userRoutes(route: Api.V1.User, userUseCase: UserUseCase) {
     route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "User API"
