@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.domain.value
+package com.peekr.common.db.scheme
 
 enum class FriendStatus {
     PENDING,
