@@ -9,7 +9,7 @@ import com.peekr.common.jwt.JWTTestDoubles.MockApplicationConfig
 import com.peekr.common.jwt.JWTTestDoubles.SECRET
 import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.common.jwt.infrastructure.JWTTokenServiceImpl
-import com.peekr.common.util.AppConfig
+import com.peekr.common.util.config.AppConfig
 import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.assertEquals

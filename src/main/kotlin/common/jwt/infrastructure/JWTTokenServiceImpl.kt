@@ -6,7 +6,7 @@ import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.util.AppConfig
+import com.peekr.common.util.config.AppConfig
 import java.time.Instant
 import java.util.Date
 
