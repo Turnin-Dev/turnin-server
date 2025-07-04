@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.VarCharColumnType
 import org.jetbrains.exposed.sql.castTo
+import org.postgresql.util.PGobject
 
 /**
  * 데이터베이스 관련 (스키마, 테이블 등) 유틸
@@ -20,14 +21,25 @@ object DatabaseUtils {
      * @param name 테이블 컬럼명
      * @param sqlName 데이터베이스에서 사용할 SQL 타입 이름 (null이면 기본 타입 사용)
      */
-    inline fun <reified T : Enum<T>> Table.customEnum(
+    inline fun <reified T : Enum<T>> Table.customPostgresEnum(
         name: String,
         sqlName: String?,
     ): Column<T> = customEnumeration(
         name = name,
         sql = sqlName,
-        fromDb = { enumValueOf<T>(it as String) },
-        toDb = { it.name },
+        fromDb = { value ->
+            when (value) {
+                is String -> enumValueOf<T>(value)
+                is PGobject -> enumValueOf<T>(value.value!!)
+                else -> enumValueOf<T>(value.toString())
+            }
+        },
+        toDb = { enum ->
+            PGobject().apply {
+                type = sqlName
+                value = enum.name
+            }
+        },
     )
 
     /**
