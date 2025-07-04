@@ -3,11 +3,11 @@ package com.peekr.common.db.scheme
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
+import com.peekr.common.db.DatabaseUtils.customPostgresEnum
 import org.jetbrains.exposed.dao.id.EntityID
 
 object Users : BaseLongIdTable("user") {
-    val provider = enumerationByName("provider", 50, SocialLoginProvider::class)
+    val provider = customPostgresEnum<SocialLoginProvider>("provider", "social_login_provider")
     val providerId = varchar("provider_id", 255)
     val name = varchar("name", 50)
     val nickname = varchar("nickname", 50)

@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.infrastructure.serviceImpl
 
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
 import com.peekr.common.jwt.JWTTestDoubles.MockVerifier
@@ -9,7 +10,6 @@ import com.peekr.common.jwt.JWTTestDoubles.getMockJWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
@@ -47,7 +47,7 @@ class AuthServiceImplTest {
 
         // when
         val loginResult = authService.login(
-            provider = SocialLoginProvider.Google,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123",
         )
 
@@ -67,7 +67,7 @@ class AuthServiceImplTest {
 
         // when
         val token = authService.login(
-            provider = SocialLoginProvider.Google,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123",
         )
 

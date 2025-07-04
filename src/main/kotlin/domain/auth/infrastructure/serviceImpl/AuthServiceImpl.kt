@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.infrastructure.serviceImpl
 
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.value.JWTClaimName
@@ -8,7 +9,6 @@ import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.domain.service.AuthService

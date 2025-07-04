@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.presentation.dto
 
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.validator.PeekrValidator.validation
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,7 +16,7 @@ data class LoginRequest(
 
     companion object {
         val sample = LoginRequest(
-            provider = SocialLoginProvider.Google.name,
+            provider = SocialLoginProvider.GOOGLE.name,
             providerId = "1231312312312",
         )
     }

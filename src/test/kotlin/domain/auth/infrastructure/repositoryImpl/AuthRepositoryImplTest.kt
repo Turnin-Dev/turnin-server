@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
-import com.peekr.domain.auth.domain.model.SocialLoginProvider
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.Test
@@ -39,7 +39,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findByProviderAndProviderId 실패 테스트 - 존재하지 않는 사용자`() = runTest {
         val notFoundUser = repository.findAuthUserByProviderAndProviderId(
-            provider = SocialLoginProvider.Kakao,
+            provider = SocialLoginProvider.KAKAO,
             providerId = "not_found_id",
         )
 

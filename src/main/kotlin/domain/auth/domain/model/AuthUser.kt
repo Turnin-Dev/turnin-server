@@ -1,5 +1,7 @@
 package com.peekr.domain.auth.domain.model
 
+import com.peekr.common.db.scheme.SocialLoginProvider
+
 /**
  * 인증에 필요한 User 모델
  *
@@ -23,7 +25,7 @@ data class AuthUser(
     companion object {
         val sample: AuthUser = AuthUser(
             id = 1L,
-            provider = SocialLoginProvider.Google,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123123",
             name = "honggd",
             nickname = "honggddddddd",
