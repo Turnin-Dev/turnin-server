@@ -1,6 +1,8 @@
 package com.peekr
 
-import com.peekr.common.db.DatabaseFactory
+import com.peekr.ApplicationUtils.initDatabase
+import com.peekr.ApplicationUtils.printSection
+import com.peekr.ApplicationUtils.printServerSettings
 import com.peekr.common.di.configureKoin
 import com.peekr.common.exception.configureExceptionHandler
 import com.peekr.common.jwt.configureJwtSecurity
@@ -18,10 +20,12 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    DatabaseFactory.init()
-
     configureKoin()
 
+    // ------------------------------ Initialize ------------------------------
+    initDatabase()
+
+    // ------------------------------ Plugins ------------------------------
     configureResources()
     configureCors()
 
@@ -33,4 +37,9 @@ fun Application.module() {
 
     configureAPIDocuments()
     configureRouting()
+
+    // ------------------------------ Print ------------------------------
+    printSection {
+        printServerSettings()
+    }
 }

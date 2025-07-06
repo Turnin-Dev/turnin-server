@@ -6,7 +6,7 @@ import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.util.AppConfig
+import com.peekr.common.util.config.AppConfig
 import java.time.Instant
 import java.util.Date
 
@@ -15,41 +15,27 @@ class JWTTokenServiceImpl(
     jwtConfigFactory: JWTConfigFactory,
 ) : JWTTokenService {
     override val realm by lazy {
-        appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.realm")?.getString()
-            ?: "jwt-realm"
+        appConfig.getOrDefault("ktor.security.jwt.realm", "jwt-realm")
     }
 
     override val audience by lazy {
-        appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.audience")?.getString()
-            ?: "jwt-audience"
+        appConfig.getOrDefault("ktor.security.jwt.audience", "jwt-audience")
     }
 
     override val issuer by lazy {
-        appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.issuer")?.getString()
-            ?: "jwt-issuer"
+        appConfig.getOrDefault("ktor.security.jwt.issuer", "jwt-issuer")
     }
 
     private val accessTokenExpiresIn by lazy {
-        appConfig.applicationConfiguration
-            .propertyOrNull(
-                "ktor.security.jwt.accessTokenExpiresIn",
-            )?.getString()
-            ?.toLong()
-            ?: 0L
+        appConfig.get("ktor.security.jwt.accessTokenExpiresIn")?.toLong() ?: 0L
     }
 
     private val refreshTokenExpiresIn by lazy {
-        appConfig.applicationConfiguration
-            .propertyOrNull(
-                "ktor.security.jwt.accessTokenExpiresIn",
-            )?.getString()
-            ?.toLong()
-            ?: 0L
+        appConfig.get("ktor.security.jwt.accessTokenExpiresIn")?.toLong() ?: 0L
     }
 
     private val secretKey by lazy {
-        appConfig.applicationConfiguration.propertyOrNull("ktor.security.jwt.secret")?.getString()
-            ?: "jwt-secret"
+        appConfig.getOrDefault("ktor.security.jwt.secret", "jwt-secret")
     }
 
     private val now = Instant.now()
