@@ -4,6 +4,7 @@ import com.peekr.common.util.config.RunEnvironment
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.util.logging.KtorSimpleLogger
+import java.sql.SQLException
 import javax.sql.DataSource
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,8 @@ object DatabaseFactory {
         try {
             block()
         } catch (e: ExposedSQLException) {
+            throw DatabaseException.DBQueryException(e.message)
+        } catch (e: SQLException) {
             throw DatabaseException.DBQueryException(e.message)
         } catch (e: Exception) {
             throw e
