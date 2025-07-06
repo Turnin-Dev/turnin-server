@@ -21,10 +21,11 @@ class AuthUseCaseImpl(
 
     override suspend fun register(registerDto: RegisterDto): JWTTokenDto {
         val authUser = registerDto.toDomain()
-        val jwtToken = authService.register(authUser)
-        val jwtTokenDto = jwtToken.toDto()
-        saveRefreshToken(authUser.id, jwtTokenDto.refreshToken)
-        return jwtToken.toDto()
+        val registerResult = authService.register(authUser)
+        val savedAuthUser = registerResult.authUser
+        val jwtTokenDto = registerResult.jwtToken.toDto()
+        saveRefreshToken(savedAuthUser.id, jwtTokenDto.refreshToken)
+        return jwtTokenDto
     }
 
     override suspend fun refresh(userId: Long, token: String): JWTTokenDto? {

@@ -4,6 +4,7 @@ import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult
+import com.peekr.domain.auth.domain.model.domain.auth.domain.model.RegisterResult
 
 interface AuthService {
     /**
@@ -27,7 +28,7 @@ interface AuthService {
      *
      * @param authUser [AuthUser]
      */
-    suspend fun register(authUser: AuthUser): JWTToken
+    suspend fun register(authUser: AuthUser): RegisterResult
 
     /**
      * 리프레쉬 토큰 갱신

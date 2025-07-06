@@ -9,6 +9,7 @@ import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult
+import com.peekr.domain.auth.domain.model.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.domain.service.AuthService
@@ -37,7 +38,7 @@ class AuthServiceImpl(
         return loginResult
     }
 
-    override suspend fun register(authUser: AuthUser): JWTToken {
+    override suspend fun register(authUser: AuthUser): RegisterResult {
         val savedAuthUser = authRepository.save(authUser)
 
         val payload = JWTTokenPayload(
@@ -45,7 +46,10 @@ class AuthServiceImpl(
             claimName = JWTClaimName.Name,
             claim = savedAuthUser.name,
         )
-        return jwtTokenService.generate(payload)
+
+        val jwtToken = jwtTokenService.generate(payload)
+
+        return RegisterResult(jwtToken, savedAuthUser)
     }
 
     override suspend fun refresh(token: String): JWTToken? {
