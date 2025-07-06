@@ -9,6 +9,7 @@ import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
+import java.sql.SQLException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
@@ -46,13 +47,20 @@ class AuthRepositoryImpl : AuthRepository {
             }
 
             authUser.copy(id = savedUserEntity.id.value)
-        } catch (e: ExposedSQLException) {
+        } catch (e: Exception) {
+            processSQLException(e)
+            throw e
+        }
+    }
+
+    private fun processSQLException(e: Throwable) {
+        if (e is ExposedSQLException || e is SQLException) {
             if (e.message?.contains("Unique index") == true ||
-                e.message?.contains("primary key violation") == true
+                e.message?.contains("primary key violation") == true ||
+                e.message?.contains("already exists") == true
             ) {
                 throw AuthException.DuplicateUserException(e.message)
             }
-            throw e
         }
     }
 }
