@@ -38,6 +38,52 @@ ktlint {
     }
 }
 
+tasks.withType<JavaExec> {
+    val configFile = System.getProperty("config.file")
+    if (configFile != null) {
+        systemProperty("config.file", configFile)
+    }
+}
+
+fun loadDotenv(environment: String): Map<String, String> {
+    val dotenvFile = rootProject.file(".env.$environment")
+    if (!dotenvFile.exists()) return emptyMap()
+
+    return dotenvFile
+        .readLines()
+        .filter { it.isNotBlank() && !it.startsWith("#") }
+        .associate { it.substringBefore("=") to it.substringAfter("=") }
+}
+
+val envDev = loadDotenv("dev")
+val envProd = loadDotenv("prod")
+
+tasks.register<JavaExec>("runDev") {
+    group = "application"
+    description = "Run the application in development mode"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("io.ktor.server.netty.EngineMain")
+    systemProperty("config.resource", "application-dev.conf")
+    envDev.forEach { (key, value) ->
+        environment(key, value)
+    }
+}
+
+tasks.register<JavaExec>("runProd") {
+    group = "application"
+    description = "Run the application in production mode"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("io.ktor.server.netty.EngineMain")
+    systemProperty("config.resource", "application-prod.conf")
+    envProd.forEach { (key, value) -> environment(key, value) }
+}
+
+// 테스트 설정 파일 추가 시 활성화
+// tasks.test {
+//    systemProperty("config.file", "application-test.conf")
+//    useJUnitPlatform()
+// }
+
 dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.auth)
