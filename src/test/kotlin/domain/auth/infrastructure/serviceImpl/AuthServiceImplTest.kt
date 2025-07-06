@@ -84,7 +84,7 @@ class AuthServiceImplTest {
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()
 
         // when
-        val token = authService.register(MockAuthUser)
+        val token = authService.register(MockAuthUser).jwtToken
 
         // then
         assertEquals(token, getMockJWTToken())
