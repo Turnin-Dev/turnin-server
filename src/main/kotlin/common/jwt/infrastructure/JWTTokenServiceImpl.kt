@@ -6,9 +6,12 @@ import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
+import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.config.AppConfig
 import java.time.Instant
 import java.util.Date
+
+private typealias JWTChecksum = Pair<String, String>
 
 class JWTTokenServiceImpl(
     private val appConfig: AppConfig,
@@ -43,8 +46,8 @@ class JWTTokenServiceImpl(
 
     override fun generate(payload: JWTTokenPayload): JWTToken {
         try {
-            val accessToken = createJWTToken(payload, accessTokenExpiresIn)
-            val refreshToken = createJWTToken(payload, refreshTokenExpiresIn)
+            val accessToken = createAccessToken(payload, accessTokenExpiresIn)
+            val refreshToken = createRefreshToken(payload, refreshTokenExpiresIn)
 
             return JWTToken(accessToken, refreshToken)
         } catch (e: Exception) {
@@ -60,16 +63,43 @@ class JWTTokenServiceImpl(
         }
     }
 
-    private fun createJWTToken(
+    private fun createAccessToken(
         payload: JWTTokenPayload,
         expiresIn: Long,
-    ): String = JWT
-        .create()
-        .withAudience(audience)
-        .withIssuer(issuer)
-        .withSubject(payload.subject)
-        .withClaim(payload.claimName.name, payload.claim)
-        .withIssuedAt(Date.from(now))
-        .withExpiresAt(Date.from(now.plusMillis(expiresIn)))
-        .sign(algorithm)
+    ): String {
+        val checksum = createRandomChecksum()
+
+        return JWT
+            .create()
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .withSubject(payload.subject)
+            .withClaim(payload.claimName.name, payload.claim)
+            .withClaim(checksum.first, checksum.second)
+            .withIssuedAt(Date.from(now))
+            .withExpiresAt(Date.from(now.plusMillis(expiresIn)))
+            .sign(algorithm)
+    }
+
+    private fun createRefreshToken(
+        payload: JWTTokenPayload,
+        expiresIn: Long,
+    ): String {
+        val checksum = createRandomChecksum()
+
+        return JWT
+            .create()
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .withClaim(payload.claimName.name, payload.claim)
+            .withClaim(checksum.first, checksum.second)
+            .withIssuedAt(Date.from(now))
+            .withExpiresAt(Date.from(now.plusMillis(expiresIn)))
+            .sign(algorithm)
+    }
+
+    private fun createRandomChecksum(): JWTChecksum {
+        val randomValue = PeekrDateTime.now().toEpochMilli().toString()
+        return JWTChecksum("checksum", randomValue)
+    }
 }
