@@ -1,5 +1,6 @@
 package com.peekr.common.db
 
+import com.peekr.common.util.config.RunEnvironment
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.util.logging.KtorSimpleLogger
@@ -16,13 +17,14 @@ object DatabaseFactory {
     private val ioContext: CoroutineContext = Dispatchers.IO
 
     fun initialize(
+        environment: RunEnvironment,
         dbUrl: String,
         dbUser: String,
         dbPassword: String,
     ) {
         try {
             val dataSource = hikariDataSource(dbUrl, dbUser, dbPassword)
-            migrate("dev", dataSource)
+            migrate(environment, dataSource)
             Database.connect(dataSource)
             LOGGER.info("Database connection successfully: $dbUrl")
         } catch (e: FlywayException) {
@@ -59,18 +61,21 @@ object DatabaseFactory {
             },
         )
 
-    private fun migrate(env: String, dataSource: DataSource) {
+    private fun migrate(env: RunEnvironment, dataSource: DataSource) {
         val flywayBuilder = Flyway
             .configure()
             .dataSource(dataSource)
             .locations("classpath:db/migration") // 필요 시 명시
             .baselineOnMigrate(true) // 기존 DB에 적용 시 필요
 
-        // TODO: 추후에 실행 환경 enum class 로 만들기 (하드코딩 X)
-        val flyway = if (env == "dev") {
-            flywayBuilder.cleanDisabled(false).load().also { it.clean() }
-        } else { // prod
-            flywayBuilder.cleanDisabled(true).load()
+        val flyway = when (env) {
+            RunEnvironment.Dev -> {
+                flywayBuilder.cleanDisabled(false).load().also { it.clean() }
+            }
+
+            RunEnvironment.Prod -> {
+                flywayBuilder.cleanDisabled(true).load()
+            }
         }
 
         flyway.migrate()
