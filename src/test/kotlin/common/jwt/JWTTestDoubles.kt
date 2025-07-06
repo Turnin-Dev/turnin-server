@@ -11,9 +11,6 @@ import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
 import com.peekr.common.jwt.domain.model.value.JWTClaimName
-import io.ktor.server.config.ApplicationConfig
-import io.mockk.every
-import io.mockk.mockk
 import java.time.Instant
 import java.util.Date
 
@@ -24,19 +21,6 @@ internal object JWTTestDoubles {
     const val REALM = "test-realm"
     const val ACCESS_TOKEN_EXPIRES_IN = 3600000L // 1 hour
     const val REFRESH_TOKEN_EXPIRES_IN = 86400000L // 1 day
-
-    val MockApplicationConfig = mockk<ApplicationConfig> {
-        every { propertyOrNull("ktor.security.jwt.realm")?.getString() } returns REALM
-        every { propertyOrNull("ktor.security.jwt.issuer")?.getString() } returns ISSUER
-        every { propertyOrNull("ktor.security.jwt.audience")?.getString() } returns AUDIENCE
-        every { propertyOrNull("ktor.security.jwt.secret")?.getString() } returns SECRET
-        every {
-            propertyOrNull("ktor.security.jwt.accessTokenExpiresIn")?.getString()
-        } returns ACCESS_TOKEN_EXPIRES_IN.toString()
-        every {
-            propertyOrNull("ktor.security.jwt.refreshTokenExpiresIn")?.getString()
-        } returns REFRESH_TOKEN_EXPIRES_IN.toString()
-    }
 
     val MockVerifierConfig = JWTVerifierConfig(
         secretKey = SECRET,

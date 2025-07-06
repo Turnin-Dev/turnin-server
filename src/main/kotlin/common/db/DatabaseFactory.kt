@@ -2,7 +2,6 @@ package com.peekr.common.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.github.cdimascio.dotenv.dotenv
 import io.ktor.util.logging.KtorSimpleLogger
 import javax.sql.DataSource
 import kotlin.coroutines.CoroutineContext
@@ -15,15 +14,14 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 object DatabaseFactory {
     private val ioContext: CoroutineContext = Dispatchers.IO
-    private val dotenv = dotenv()
 
-    private val dbUrl = dotenv["DB_URL"] ?: "jdbc:postgresql://localhost:5432/defaultdb"
-    private val dbUser = dotenv["DB_USER"] ?: "defaultuser"
-    private val dbPassword = dotenv["DB_PASSWORD"] ?: "defaultpassword"
-
-    fun init() {
+    fun initialize(
+        dbUrl: String,
+        dbUser: String,
+        dbPassword: String,
+    ) {
         try {
-            val dataSource = hikariDataSource()
+            val dataSource = hikariDataSource(dbUrl, dbUser, dbPassword)
             migrate("dev", dataSource)
             Database.connect(dataSource)
             LOGGER.info("Database connection successfully: $dbUrl")
@@ -45,7 +43,11 @@ object DatabaseFactory {
         }
     }
 
-    private fun hikariDataSource(): HikariDataSource =
+    private fun hikariDataSource(
+        dbUrl: String,
+        dbUser: String,
+        dbPassword: String,
+    ): HikariDataSource =
         HikariDataSource(
             HikariConfig().apply {
                 driverClassName = "org.postgresql.Driver"
