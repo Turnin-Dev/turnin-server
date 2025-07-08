@@ -1,6 +1,5 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
-import com.peekr.common.db.DatabaseFactory
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.scheme.RefreshTokens
 import com.peekr.common.db.scheme.UserEntity
@@ -9,10 +8,10 @@ import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException
 import org.jetbrains.exposed.sql.JoinType
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.upsert
 
 class RefreshTokenRepositoryImpl : RefreshTokenRepository {
-    override suspend fun findNameByRefreshToken(token: String): String? = DatabaseFactory.dbQuery {
+    override suspend fun findNameByRefreshToken(token: String): String? = dbQuery {
         val result = RefreshTokens
             .join(Users, JoinType.INNER, RefreshTokens.user, Users.id)
             .select(Users.name)
@@ -30,7 +29,7 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
             if (userEntity == null) {
                 false
             } else {
-                RefreshTokens.insert {
+                RefreshTokens.upsert {
                     it[user] = userEntity.id
                     it[refreshToken] = token
                 }

@@ -6,6 +6,7 @@ import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.domain.model.entity.JWTToken
+import com.peekr.common.jwt.domain.model.entity.JWTToken.Companion.removeBearerHeader
 import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
@@ -51,11 +52,12 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         }
 
         get(route.REFRESH.byId("id"), { refreshDocs() }) {
-            val refreshToken = call.request.headers["Authorization"]
+            val refreshTokenParam = call.request.headers["Authorization"]
             val userIdParam = call.pathParameters["id"]
             val userId = userIdValidatorAndReturn(userIdParam)
-            refreshToken?.let {
-                JWTToken.validate(refreshToken)
+            refreshTokenParam?.let {
+                JWTToken.validate(refreshTokenParam)
+                val refreshToken = refreshTokenParam.removeBearerHeader()
                 val token = authUseCase.refresh(userId, refreshToken)
                 if (token == null) {
                     call.respond(

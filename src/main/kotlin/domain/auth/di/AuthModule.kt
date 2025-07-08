@@ -19,7 +19,6 @@ val authModule = module {
             authRepository = get(),
             refreshTokenRepository = get(),
             jwtTokenService = get(),
-            jwtConfigFactory = get(),
         )
     }
     single<RefreshTokenService> {
