@@ -71,12 +71,12 @@ class JWTTokenServiceImplTest {
         val decodedAccessToken = JWT.decode(token.accessToken)
         val decodedRefreshToken = JWT.decode(token.refreshToken)
 
-        assertEquals(decodedAccessToken.subject, payload.subject)
+        assertEquals(decodedAccessToken.subject, payload.userId)
         assertEquals(decodedAccessToken.getClaim(payload.claimName.name).asString(), payload.claim)
         assertEquals(decodedAccessToken.issuer, ISSUER)
         assert(AUDIENCE in decodedAccessToken.audience)
 
-        assertEquals(decodedRefreshToken.subject, payload.subject)
+        assertEquals(decodedRefreshToken.subject, payload.userId)
     }
 
     @Test

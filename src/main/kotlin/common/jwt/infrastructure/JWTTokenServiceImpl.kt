@@ -7,9 +7,9 @@ import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.util.PeekrDateTime
+import com.peekr.common.util.PeekrDateTime.toDate
 import com.peekr.common.util.config.AppConfig
-import java.time.Instant
-import java.util.Date
+import io.ktor.util.logging.KtorSimpleLogger
 
 private typealias JWTChecksum = Pair<String, String>
 
@@ -41,7 +41,6 @@ class JWTTokenServiceImpl(
         appConfig.getOrDefault("ktor.security.jwt.secret", "jwt-secret")
     }
 
-    private val now = Instant.now()
     val algorithm = jwtConfigFactory.createAlgorithm(secretKey)
 
     override fun generate(payload: JWTTokenPayload): JWTToken {
@@ -68,16 +67,19 @@ class JWTTokenServiceImpl(
         expiresIn: Long,
     ): String {
         val checksum = createRandomChecksum()
+        val now = PeekrDateTime.now()
+        val issuedAt = now.toDate()
+        val expiresAt = now.plusMillis(expiresIn).toDate()
 
         return JWT
             .create()
             .withAudience(audience)
             .withIssuer(issuer)
-            .withSubject(payload.subject)
+            .withSubject(payload.userId)
             .withClaim(payload.claimName.name, payload.claim)
             .withClaim(checksum.first, checksum.second)
-            .withIssuedAt(Date.from(now))
-            .withExpiresAt(Date.from(now.plusMillis(expiresIn)))
+            .withIssuedAt(issuedAt)
+            .withExpiresAt(expiresAt)
             .sign(algorithm)
     }
 
@@ -86,15 +88,16 @@ class JWTTokenServiceImpl(
         expiresIn: Long,
     ): String {
         val checksum = createRandomChecksum()
+        val now = PeekrDateTime.now()
+        val issuedAt = now.toDate()
+        val expiresAt = now.plusMillis(expiresIn).toDate()
 
         return JWT
             .create()
-            .withAudience(audience)
-            .withIssuer(issuer)
-            .withClaim(payload.claimName.name, payload.claim)
-            .withClaim(checksum.first, checksum.second)
-            .withIssuedAt(Date.from(now))
-            .withExpiresAt(Date.from(now.plusMillis(expiresIn)))
+            .withSubject(payload.userId)
+            .withJWTId(checksum.second)
+            .withIssuedAt(issuedAt)
+            .withExpiresAt(expiresAt)
             .sign(algorithm)
     }
 
@@ -103,3 +106,5 @@ class JWTTokenServiceImpl(
         return JWTChecksum("checksum", randomValue)
     }
 }
+
+private val LOGGER = KtorSimpleLogger(JWTTokenServiceImpl::class.simpleName ?: "JWTTokenServiceImpl")

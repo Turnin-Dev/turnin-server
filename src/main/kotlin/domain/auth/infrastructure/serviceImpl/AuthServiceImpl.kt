@@ -29,7 +29,7 @@ class AuthServiceImpl(
         if (authUser == null) return null
 
         val payload = JWTTokenPayload(
-            subject = authUser.id.toString(),
+            userId = authUser.id.toString(),
             claimName = JWTClaimName.Name,
             claim = authUser.name,
         )
@@ -42,7 +42,7 @@ class AuthServiceImpl(
         val savedAuthUser = authRepository.save(authUser)
 
         val payload = JWTTokenPayload(
-            subject = savedAuthUser.id.toString(),
+            userId = savedAuthUser.id.toString(),
             claimName = JWTClaimName.Name,
             claim = savedAuthUser.name,
         )
@@ -64,7 +64,7 @@ class AuthServiceImpl(
 
                 if (foundedAuthUser != null && nameFromRefreshToken == foundedAuthUser.name) {
                     val payload = JWTTokenPayload(
-                        subject = foundedAuthUser.id.toString(),
+                        userId = foundedAuthUser.id.toString(),
                         claimName = JWTClaimName.Name,
                         claim = nameFromRefreshToken,
                     )

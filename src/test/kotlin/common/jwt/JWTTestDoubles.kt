@@ -39,7 +39,7 @@ internal object JWTTestDoubles {
         claimName: JWTClaimName = JWTClaimName.Name,
         claim: String = "USER",
     ): JWTTokenPayload = JWTTokenPayload(
-        subject = subject,
+        userId = subject,
         claimName = claimName,
         claim = claim,
     )
@@ -55,7 +55,7 @@ private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
         .create()
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
-        .withSubject(payload.subject)
+        .withSubject(payload.userId)
         .withClaim(payload.claimName.name, payload.claim)
         .withIssuedAt(Date.from(now))
         .withExpiresAt(Date.from(now.plusMillis(ACCESS_TOKEN_EXPIRES_IN)))
@@ -64,7 +64,7 @@ private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
         .create()
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
-        .withSubject(payload.subject)
+        .withSubject(payload.userId)
         .withClaim(payload.claimName.name, payload.claim)
         .withIssuedAt(Date.from(now))
         .withExpiresAt(Date.from(now.plusMillis(REFRESH_TOKEN_EXPIRES_IN)))
