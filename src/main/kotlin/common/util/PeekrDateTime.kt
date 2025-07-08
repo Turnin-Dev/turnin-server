@@ -2,7 +2,7 @@ package com.peekr.common.util
 
 import io.ktor.util.logging.KtorSimpleLogger
 import java.time.Instant
-import java.time.ZoneOffset
+import java.util.Date
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.jetbrains.exposed.sql.javatime.CurrentTimestampBase
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -64,6 +64,8 @@ object PeekrDateTime {
         }
         return cachedTime
     }
+
+    fun Instant.toDate(): Date = Date.from(this)
 }
 
 /**
@@ -78,10 +80,9 @@ internal object TimeQuery {
     fun getInstant(): Instant = transaction {
         exec("SELECT CURRENT_TIMESTAMP") { rs ->
             rs.next()
-            rs.getTimestamp(1).toLocalDateTime().toInstant(ZONE_OFFSET)
+            rs.getTimestamp(1).toInstant()
         }!!
     }
 }
 
-private val ZONE_OFFSET: ZoneOffset = ZoneOffset.UTC
 private val LOGGER = KtorSimpleLogger("PeekrDateTime")
