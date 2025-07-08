@@ -40,7 +40,7 @@ class AuthServiceImplTest {
         every { jwtTokenService.audience } returns AUDIENCE
         every { jwtTokenService.issuer } returns ISSUER
         every { jwtTokenService.generate(any()) } returns mockJWTToken
-        every { jwtTokenService.createVerifier() } returns MockVerifier
+        every { jwtTokenService.createVerifier(any()) } returns MockVerifier
     }
 
     @Test

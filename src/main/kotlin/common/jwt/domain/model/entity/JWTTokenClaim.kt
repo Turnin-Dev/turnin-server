@@ -6,4 +6,6 @@ data class JWTTokenPayload(
     val userId: String,
     val claimName: JWTClaimName,
     val claim: String,
-)
+) {
+    constructor(userId: String) : this(userId, JWTClaimName.Name, "")
+}

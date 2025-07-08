@@ -36,7 +36,7 @@ class JWTSecurityTest {
             every { audience } returns AUDIENCE
             every { issuer } returns ISSUER
             every { generate(any()) } returns JWTTestDoubles.getMockJWTToken()
-            every { createVerifier() } returns MockVerifier
+            every { createVerifier(any()) } returns MockVerifier
         }
     }
 
