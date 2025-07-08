@@ -6,7 +6,6 @@ import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.value.JWTClaimName
 import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.domain.auth.domain.model.RegisterResult
@@ -18,7 +17,6 @@ class AuthServiceImpl(
     private val authRepository: AuthRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtTokenService: JWTTokenService,
-    private val jwtConfigFactory: JWTConfigFactory,
 ) : AuthService {
     override suspend fun login(
         provider: SocialLoginProvider,
@@ -96,7 +94,7 @@ class AuthServiceImpl(
     }
 
     private fun getDecodedJWT(token: String): DecodedJWT? = try {
-        val verifier = jwtConfigFactory.createVerifier(jwtTokenService.getVerifierConfig())
+        val verifier = jwtTokenService.createVerifier()
         verifier.verify(token)
     } catch (e: Exception) {
         null

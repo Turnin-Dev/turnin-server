@@ -3,7 +3,6 @@ package com.peekr.common.jwt
 import com.peekr.common.jwt.domain.model.value.JWTClaimName
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -12,8 +11,7 @@ import org.koin.ktor.ext.inject
 
 fun Application.configureJwtSecurity() {
     val jwtService: JWTTokenService by inject()
-    val jwtConfigFactory: JWTConfigFactory by inject()
-    val verifier = jwtConfigFactory.createVerifier(jwtService.getVerifierConfig())
+    val verifier = jwtService.createVerifier()
 
     authentication {
         jwt {

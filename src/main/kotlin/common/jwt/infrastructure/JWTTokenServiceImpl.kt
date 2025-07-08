@@ -1,9 +1,10 @@
 package com.peekr.common.jwt.infrastructure
 
 import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
+import com.auth0.jwt.algorithms.Algorithm
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
-import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.util.PeekrDateTime
@@ -13,10 +14,7 @@ import io.ktor.util.logging.KtorSimpleLogger
 
 private typealias JWTChecksum = Pair<String, String>
 
-class JWTTokenServiceImpl(
-    private val appConfig: AppConfig,
-    jwtConfigFactory: JWTConfigFactory,
-) : JWTTokenService {
+class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
     override val realm by lazy {
         appConfig.getOrDefault("ktor.security.jwt.realm", "jwt-realm")
     }
@@ -34,14 +32,14 @@ class JWTTokenServiceImpl(
     }
 
     private val refreshTokenExpiresIn by lazy {
-        appConfig.get("ktor.security.jwt.accessTokenExpiresIn")?.toLong() ?: 0L
+        appConfig.get("ktor.security.jwt.refreshTokenExpiresIn")?.toLong() ?: 0L
     }
 
     private val secretKey by lazy {
         appConfig.getOrDefault("ktor.security.jwt.secret", "jwt-secret")
     }
 
-    val algorithm = jwtConfigFactory.createAlgorithm(secretKey)
+    private val algorithm = Algorithm.HMAC256(secretKey)
 
     override fun generate(payload: JWTTokenPayload): JWTToken {
         try {
@@ -54,12 +52,14 @@ class JWTTokenServiceImpl(
         }
     }
 
-    override fun getVerifierConfig(): JWTVerifierConfig {
-        try {
-            return JWTVerifierConfig(secretKey, audience, issuer)
-        } catch (e: Exception) {
-            throw TokenException.CannotCreateTokenVerifier(e.message)
-        }
+    override fun createVerifier(): JWTVerifier = try {
+        JWT
+            .require(algorithm)
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .build()
+    } catch (e: Exception) {
+        throw TokenException.CannotCreateTokenVerifier(e.message)
     }
 
     private fun createAccessToken(

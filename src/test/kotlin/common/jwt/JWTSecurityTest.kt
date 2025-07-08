@@ -3,11 +3,11 @@ package com.peekr.common.jwt
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
+import com.peekr.common.jwt.JWTTestDoubles.MockVerifier
 import com.peekr.common.jwt.JWTTestDoubles.REALM
 import com.peekr.common.jwt.domain.model.entity.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.jwt.infrastructure.JWTConfigFactory
 import com.peekr.util.TestSerialization.decode
 import com.peekr.util.testPlugin
 import io.ktor.client.request.get
@@ -27,22 +27,16 @@ import org.junit.Before
 import org.junit.Test
 
 class JWTSecurityTest {
-    private lateinit var jwtConfigFactory: JWTConfigFactory
     private lateinit var jwtTokenService: JWTTokenService
 
     @Before
     fun setUp() {
-        jwtConfigFactory = mockk {
-            every { createAlgorithm(any()) } returns JWTTestDoubles.MockAlgorithm
-            every { createVerifier(any()) } returns JWTTestDoubles.MockVerifier
-        }
-
         jwtTokenService = mockk {
             every { realm } returns REALM
             every { audience } returns AUDIENCE
             every { issuer } returns ISSUER
             every { generate(any()) } returns JWTTestDoubles.getMockJWTToken()
-            every { getVerifierConfig() } returns JWTTestDoubles.MockVerifierConfig
+            every { createVerifier() } returns MockVerifier
         }
     }
 
@@ -94,7 +88,6 @@ class JWTSecurityTest {
 
     private val testJwtModule = org.koin.dsl.module {
         single<JWTTokenService> { jwtTokenService }
-        single<JWTConfigFactory> { jwtConfigFactory }
     }
 
     private fun Route.protectedRoute() {
