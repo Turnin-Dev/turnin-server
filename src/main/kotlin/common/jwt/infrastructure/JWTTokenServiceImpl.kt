@@ -3,9 +3,9 @@ package com.peekr.common.jwt.infrastructure
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.peekr.common.jwt.domain.model.entity.JWTToken
-import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
-import com.peekr.common.jwt.domain.model.entity.JWTTokenType
+import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.domain.model.JWTTokenPayload
+import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.util.PeekrDateTime

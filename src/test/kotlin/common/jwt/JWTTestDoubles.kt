@@ -7,10 +7,9 @@ import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
 import com.peekr.common.jwt.JWTTestDoubles.MockAlgorithm
 import com.peekr.common.jwt.JWTTestDoubles.REFRESH_TOKEN_EXPIRES_IN
-import com.peekr.common.jwt.domain.model.entity.JWTToken
-import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
-import com.peekr.common.jwt.domain.model.entity.JWTVerifierConfig
-import com.peekr.common.jwt.domain.model.value.JWTClaimName
+import com.peekr.common.jwt.domain.model.JWTClaimName
+import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import java.time.Instant
 import java.util.Date
 
@@ -22,16 +21,11 @@ internal object JWTTestDoubles {
     const val ACCESS_TOKEN_EXPIRES_IN = 3600000L // 1 hour
     const val REFRESH_TOKEN_EXPIRES_IN = 86400000L // 1 day
 
-    val MockVerifierConfig = JWTVerifierConfig(
-        secretKey = SECRET,
-        audience = AUDIENCE,
-        issuer = ISSUER,
-    )
     val MockAlgorithm = Algorithm.HMAC256(SECRET)
     val MockVerifier = JWT
         .require(MockAlgorithm)
-        .withAudience(MockVerifierConfig.audience)
-        .withIssuer(MockVerifierConfig.issuer)
+        .withAudience(AUDIENCE)
+        .withIssuer(ISSUER)
         .build()
 
     fun getJWTTokenPayload(

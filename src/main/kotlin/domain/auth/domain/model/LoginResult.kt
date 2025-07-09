@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.domain.model
 
-import com.peekr.common.jwt.domain.model.entity.JWTToken
+import com.peekr.common.jwt.domain.model.JWTToken
 
 /**
  * 로그인 후 얻게되는 결과 값

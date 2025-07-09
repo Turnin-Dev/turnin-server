@@ -1,4 +1,4 @@
-package com.peekr.common.jwt.domain.model.entity
+package com.peekr.common.jwt.domain.model
 
 import com.peekr.common.validator.PeekrValidator.validation
 

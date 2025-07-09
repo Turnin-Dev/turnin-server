@@ -2,10 +2,10 @@ package com.peekr.domain.auth.infrastructure.serviceImpl
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.peekr.common.db.scheme.SocialLoginProvider
-import com.peekr.common.jwt.domain.model.entity.JWTToken
-import com.peekr.common.jwt.domain.model.entity.JWTTokenPayload
-import com.peekr.common.jwt.domain.model.entity.JWTTokenType
-import com.peekr.common.jwt.domain.model.value.JWTClaimName
+import com.peekr.common.jwt.domain.model.JWTClaimName
+import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.domain.model.JWTTokenPayload
+import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult

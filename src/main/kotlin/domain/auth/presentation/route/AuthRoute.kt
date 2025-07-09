@@ -5,8 +5,8 @@ import com.peekr.common.api.Api.byId
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
-import com.peekr.common.jwt.domain.model.entity.JWTToken
-import com.peekr.common.jwt.domain.model.entity.JWTToken.Companion.removeBearerHeader
+import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode

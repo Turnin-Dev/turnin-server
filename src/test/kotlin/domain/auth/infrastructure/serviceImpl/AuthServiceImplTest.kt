@@ -7,7 +7,7 @@ import com.peekr.common.jwt.JWTTestDoubles.MockVerifier
 import com.peekr.common.jwt.JWTTestDoubles.REALM
 import com.peekr.common.jwt.JWTTestDoubles.getJWTTokenPayload
 import com.peekr.common.jwt.JWTTestDoubles.getMockJWTToken
-import com.peekr.common.jwt.domain.model.entity.JWTToken
+import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
 import com.peekr.domain.auth.domain.repository.AuthRepository

@@ -5,7 +5,7 @@ import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
 import com.peekr.common.jwt.JWTTestDoubles.MockVerifier
 import com.peekr.common.jwt.JWTTestDoubles.REALM
-import com.peekr.common.jwt.domain.model.entity.JWTToken
+import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.util.TestSerialization.decode
