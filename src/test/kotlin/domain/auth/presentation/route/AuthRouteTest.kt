@@ -3,6 +3,8 @@ package com.peekr.domain.auth.presentation.route
 import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
+import com.peekr.common.validator.CommonValidator
+import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
@@ -22,13 +24,30 @@ import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class AuthRouteTest {
     private val authUseCase: AuthUseCase = mockk()
+
+    @Before
+    fun setup() {
+        mockkObject(CommonValidator)
+        every { userIdValidatorAndReturn(any()) } returns 1L
+        coEvery { authUseCase.extractUserId(any()) } returns ""
+    }
+
+    @After
+    fun teardown() {
+        unmockkObject(CommonValidator)
+    }
 
     @Test
     fun `login 성공 테스트`() = testApplication {
@@ -248,7 +267,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
         }
@@ -271,7 +290,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
         val response = client.get(refreshEndPoint)
         val responseBody = response.bodyAsText()
 
@@ -291,7 +310,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Is Token?")
         }
@@ -313,7 +332,7 @@ class AuthRouteTest {
         )
 
         // when
-        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}/1"
+        val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
         val response = client.get(refreshEndPoint) {
             headers.append("Authorization", "Bearer ${MockJWTTokenDto.refreshToken}")
         }

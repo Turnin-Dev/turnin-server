@@ -39,4 +39,7 @@ class AuthUseCaseImpl(
     private suspend fun saveRefreshToken(userId: Long, token: String) {
         refreshTokenService.save(userId, token)
     }
+
+    override suspend fun extractUserId(token: String): String? =
+        refreshTokenService.extractUserId(token)
 }

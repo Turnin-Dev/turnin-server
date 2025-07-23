@@ -22,7 +22,7 @@ val authModule = module {
         )
     }
     single<RefreshTokenService> {
-        RefreshTokenServiceImpl(get())
+        RefreshTokenServiceImpl(get(), get())
     }
 
     // Repository
