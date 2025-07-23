@@ -3,6 +3,7 @@ package com.peekr.common.jwt.infrastructure
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.JWTDecodeException
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
@@ -114,5 +115,11 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
     private fun createRandomChecksum(): JWTChecksum {
         val randomValue = PeekrDateTime.now().toEpochMilli().toString()
         return JWTChecksum("checksum", randomValue)
+    }
+
+    override fun extractUserId(token: String): String? = try {
+        JWT.decode(token).subject
+    } catch (e: JWTDecodeException) {
+        throw TokenException.CannotDecodedException(e.message)
     }
 }

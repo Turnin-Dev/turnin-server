@@ -26,4 +26,10 @@ sealed class TokenException(
             code = TokenErrorCode.GenerateTokenError,
             detail = detail ?: TokenErrorCode.GenerateTokenError.description,
         )
+
+    class CannotDecodedException(detail: String? = null) :
+        TokenException(
+            code = TokenErrorCode.DecodeTokenError,
+            detail = detail ?: TokenErrorCode.DecodeTokenError.description,
+        )
 }

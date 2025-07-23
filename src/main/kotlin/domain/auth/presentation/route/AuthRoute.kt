@@ -1,7 +1,6 @@
 package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
-import com.peekr.common.api.Api.byId
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
@@ -51,11 +50,12 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             call.respond(HttpStatusCode.Created, token.toResponse())
         }
 
-        get(route.REFRESH.byId("id"), { refreshDocs() }) {
+        get(route.REFRESH, { refreshDocs() }) {
             val refreshTokenParam = call.request.headers["Authorization"]
-            val userIdParam = call.pathParameters["id"]
-            val userId = userIdValidatorAndReturn(userIdParam)
             refreshTokenParam?.let {
+                val extractedUserId = authUseCase.extractUserId(refreshTokenParam)
+                val userId = userIdValidatorAndReturn(extractedUserId)
+
                 JWTToken.validate(refreshTokenParam)
                 val refreshToken = refreshTokenParam.removeBearerHeader()
                 val token = authUseCase.refresh(userId, refreshToken)
@@ -148,12 +148,6 @@ private fun RouteConfig.refreshDocs() {
     summary = "리프레쉬 토큰 갱신"
     description = "리프레쉬 토큰 갱신 요청"
     request {
-        pathParameter<Long>("id") {
-            description = "사용자 ID 파라미터"
-            example("Example") {
-                value = 1
-            }
-        }
         headerParameter<String>("Authorization") {
             description = "리프레쉬 토큰"
             example("Example") {

@@ -14,8 +14,12 @@ sealed class TokenErrorCode(
 
     data object GenerateTokenError :
         TokenErrorCode(raw = T003, description = "토큰을 생성할 수 없습니다.")
+
+    data object DecodeTokenError :
+        TokenErrorCode(raw = T004, description = "토큰을 디코딩 할 수 없습니다.")
 }
 
 private const val T001 = "T001"
 private const val T002 = "T002"
 private const val T003 = "T003"
+private const val T004 = "T004"
