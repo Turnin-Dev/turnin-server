@@ -148,12 +148,6 @@ private fun RouteConfig.refreshDocs() {
     summary = "리프레쉬 토큰 갱신"
     description = "리프레쉬 토큰 갱신 요청"
     request {
-        pathParameter<Long>("id") {
-            description = "사용자 ID 파라미터"
-            example("Example") {
-                value = 1
-            }
-        }
         headerParameter<String>("Authorization") {
             description = "리프레쉬 토큰"
             example("Example") {
