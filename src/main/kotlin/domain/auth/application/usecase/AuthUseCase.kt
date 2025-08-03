@@ -1,7 +1,9 @@
 package com.peekr.domain.auth.application.usecase
 
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.exception.TokenException
+import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 
@@ -44,4 +46,11 @@ interface AuthUseCase {
      * @throws TokenException.CannotDecodedException 토큰이 정상적으로 디코딩 할 수 없는 형식인 경우 예외 발생
      */
     suspend fun extractUserId(token: String): String?
+
+    /**
+     * 로그인을 수행하기 전에 이미 가입되어 있는 사용자인지 찾는다.
+     *
+     * @return [FindUserResultDto] 이미 가입된 사용자면 `true`, 신규 사용자면 'false'
+     */
+    suspend fun findUser(provider: SocialLoginProvider, providerId: String): FindUserResultDto
 }

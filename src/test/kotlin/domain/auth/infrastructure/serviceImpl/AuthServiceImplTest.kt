@@ -21,6 +21,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 
@@ -180,5 +181,33 @@ class AuthServiceImplTest {
 
         // then
         assertNull(token)
+    }
+
+    @Test
+    fun `findUser 성공 테스트 - 사용자가 존재하는 경우`() = runTest {
+        // given
+        coEvery {
+            authRepository.findAuthUserByProviderAndProviderId(any(), any())
+        } returns MockAuthUser
+
+        // when
+        val findUserResult = authService.findUser(SocialLoginProvider.GOOGLE, "123123")
+
+        // then
+        assertTrue(findUserResult.isExist)
+    }
+
+    @Test
+    fun `findUser 성공 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
+        // given
+        coEvery {
+            authRepository.findAuthUserByProviderAndProviderId(any(), any())
+        } returns null
+
+        // when
+        val findUserResult = authService.findUser(SocialLoginProvider.GOOGLE, "123123")
+
+        // then
+        assertTrue(!findUserResult.isExist)
     }
 }

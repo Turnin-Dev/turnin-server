@@ -3,6 +3,7 @@ package com.peekr.domain.auth.domain.service
 import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.RegisterResult
 
@@ -39,4 +40,10 @@ interface AuthService {
      * (만약 리프레쉬 토큰 만료시 **`null`** 반환)
      */
     suspend fun refresh(token: String): JWTToken?
+
+    /** [provider]와 [providerId]로 사용자를 찾는다. */
+    suspend fun findUser(
+        provider: SocialLoginProvider,
+        providerId: String,
+    ): FindUserResult
 }
