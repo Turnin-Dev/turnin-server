@@ -366,7 +366,7 @@ class AuthRouteTest {
     }
 
     @Test
-    fun `existUser 실패 테스트 - PathParameter 비어있는 경우`() = testApplication {
+    fun `existUser 실패 테스트 - 유효하지 않은 provider 값인 경우`() = testApplication {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
@@ -384,7 +384,7 @@ class AuthRouteTest {
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertTrue(
             responseBody.contains(
-                AuthErrorCode.ProviderValueInvalid("").description,
+                AuthErrorCode.ProviderValueInvalid.description,
             ),
         )
     }

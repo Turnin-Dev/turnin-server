@@ -85,11 +85,7 @@ class AuthServiceImpl(
         providerId: String,
     ): FindUserResult {
         val result = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
-        return if (result == null) {
-            FindUserResult(false)
-        } else {
-            FindUserResult(true)
-        }
+        return FindUserResult(result != null)
     }
 
     private fun verifyRefreshToken(token: String): DecodedJWT? = try {
