@@ -18,11 +18,15 @@ sealed class AuthErrorCode(
     data object RefreshTokenExpired :
         AuthErrorCode(A003, "새로고침 토큰이 만료되었습니다.")
 
+    /** 리프레쉬 토큰을 저장할 수 없는 에러 */
     data object CannotSaveRefreshToken :
         AuthErrorCode(A004, "해당 사용자의 새로고침 토큰을 저장할 수 없습니다.")
+
+    data class ProviderValueInvalid(val cause: String) : AuthErrorCode(A005, "${cause}의 입력 값 형식이 잘못되었습니다.")
 }
 
 private const val A001 = "A001"
 private const val A002 = "A002"
 private const val A003 = "A003"
 private const val A004 = "A004"
+private const val A005 = "A005"

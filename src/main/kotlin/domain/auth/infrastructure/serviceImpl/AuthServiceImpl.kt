@@ -8,6 +8,7 @@ import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.repository.AuthRepository
@@ -77,6 +78,18 @@ class AuthServiceImpl(
         }
     } catch (e: Exception) {
         null
+    }
+
+    override suspend fun findUser(
+        provider: SocialLoginProvider,
+        providerId: String,
+    ): FindUserResult {
+        val result = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
+        return if (result == null) {
+            FindUserResult(false)
+        } else {
+            FindUserResult(true)
+        }
     }
 
     private fun verifyRefreshToken(token: String): DecodedJWT? = try {

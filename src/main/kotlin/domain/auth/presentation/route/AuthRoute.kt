@@ -1,6 +1,8 @@
 package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
+import com.peekr.common.api.Api.byId
+import com.peekr.common.db.scheme.toSocialLoginProvider
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
@@ -9,6 +11,7 @@ import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
+import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
@@ -71,6 +74,31 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
                 HttpStatusCode.BadRequest,
                 CommonErrorCode.EmptyRequestHeader.toErrorResponse(HttpStatusCode.BadRequest),
             )
+        }
+
+        get(route.EXIST_USER.byId("provider", "providerId"), { findUserDocs() }) {
+            val provider = call.request.pathVariables["provider"]
+            val providerId = call.request.pathVariables["providerId"]
+            when {
+                provider == null -> {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        AuthErrorCode.ProviderValueInvalid("provider").toErrorResponse(HttpStatusCode.BadRequest),
+                    )
+                }
+
+                providerId == null -> {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        AuthErrorCode.ProviderValueInvalid("providerId").toErrorResponse(HttpStatusCode.BadRequest),
+                    )
+                }
+
+                else -> {
+                    val findUserResultDto = authUseCase.findUser(provider.toSocialLoginProvider(), providerId)
+                    call.respond(findUserResultDto.toResponse())
+                }
+            }
         }
     }
 }
@@ -174,6 +202,47 @@ private fun RouteConfig.refreshDocs() {
             body<ErrorResponse> {
                 example("ErrorResponse") {
                     value = CommonErrorCode.EmptyRequestHeader.toErrorResponse(HttpStatusCode.BadRequest)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.findUserDocs() {
+    summary = "사용자 찾기"
+    description = "사용자 존재 여부 확인"
+    request {
+        pathParameter<String>("provider") {
+            description = "소셜로그인 플랫폼 (대문자 형식)"
+            example("google") {
+                value = "GOOGLE"
+            }
+        }
+        pathParameter<String>("providerId") {
+            description = "소셜로그인 플랫폼에서 제공하는 ID"
+            example("google") {
+                value = "129387"
+            }
+        }
+    }
+
+    response {
+        code(HttpStatusCode.OK) {
+            body<FindUserResultResponse> {
+                example("FindUserResultResponse") {
+                    value = """
+                        {
+                            "isExist": true
+                        }
+                    """.trimIndent()
+                }
+            }
+        }
+
+        code(HttpStatusCode.BadRequest) {
+            body<ErrorResponse> {
+                example("ErrorResponse") {
+                    value = AuthErrorCode.ProviderValueInvalid("provider").toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }

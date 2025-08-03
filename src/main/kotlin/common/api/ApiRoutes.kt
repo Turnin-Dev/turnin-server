@@ -21,6 +21,7 @@ object Api {
             const val LOGIN = "/login"
             const val REGISTER = "/register"
             const val REFRESH = "/refresh"
+            const val EXIST_USER = "/exist"
         }
 
         object User {
@@ -30,7 +31,11 @@ object Api {
         }
     }
 
+    /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */
     fun String.byId(idName: String) = "$this/{$idName}"
+
+    /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */
+    fun String.byId(idName: String, idName2: String) = "$this/{$idName}/{$idName2}"
 
     // Samples
 //    object User {
