@@ -79,25 +79,14 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         get(route.EXIST_USER.byId("provider", "providerId"), { findUserDocs() }) {
             val provider = call.request.pathVariables["provider"]
             val providerId = call.request.pathVariables["providerId"]
-            when {
-                provider == null -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        AuthErrorCode.ProviderValueInvalid("provider").toErrorResponse(HttpStatusCode.BadRequest),
-                    )
-                }
-
-                providerId == null -> {
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        AuthErrorCode.ProviderValueInvalid("providerId").toErrorResponse(HttpStatusCode.BadRequest),
-                    )
-                }
-
-                else -> {
-                    val findUserResultDto = authUseCase.findUser(provider.toSocialLoginProvider(), providerId)
-                    call.respond(findUserResultDto.toResponse())
-                }
+            try {
+                val findUserResultDto = authUseCase.findUser(provider!!.toSocialLoginProvider(), providerId!!)
+                call.respond(findUserResultDto.toResponse())
+            } catch (e: IllegalArgumentException) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    AuthErrorCode.ProviderValueInvalid("provider").toErrorResponse(HttpStatusCode.BadRequest),
+                )
             }
         }
     }

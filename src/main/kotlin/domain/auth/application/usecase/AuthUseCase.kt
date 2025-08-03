@@ -50,7 +50,7 @@ interface AuthUseCase {
     /**
      * 로그인을 수행하기 전에 이미 가입되어 있는 사용자인지 찾는다.
      *
-     * @return [] 이미 가입된 사용자면 `true`, 신규 사용자면 'false'
+     * @return [FindUserResultDto] 이미 가입된 사용자면 `true`, 신규 사용자면 'false'
      */
     suspend fun findUser(provider: SocialLoginProvider, providerId: String): FindUserResultDto
 }
