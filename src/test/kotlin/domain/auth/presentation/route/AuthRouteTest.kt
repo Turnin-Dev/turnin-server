@@ -10,6 +10,7 @@ import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
 import com.peekr.domain.auth.AuthTestDoubles.MockValidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockValidRegisterRequest
+import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.util.TestClientFactory.createTestClient
@@ -342,5 +343,49 @@ class AuthRouteTest {
         assertEquals(HttpStatusCode.Unauthorized, response.status)
         assertTrue(responseBody.contains(AuthErrorCode.RefreshTokenExpired.code))
         assertTrue(responseBody.contains(AuthErrorCode.RefreshTokenExpired.description))
+    }
+
+    @Test
+    fun `existUser 성공 테스트 - 사용자가 존재하는 경우`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.findUser(any(), any()) } returns FindUserResultDto(true)
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val existUserEndPoint = "${route.ROUTE}${route.EXIST_USER}/GOOGLE/123123"
+        val response = client.get(existUserEndPoint)
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(responseBody.contains(true.toString()))
+    }
+
+    @Test
+    fun `existUser 실패 테스트 - PathParameter 비어있는 경우`() = testApplication {
+        // given
+        val route = Api.V1.Auth
+        val client = createTestClient()
+        coEvery { authUseCase.findUser(any(), any()) } returns FindUserResultDto(true)
+        testPlugin(
+            routing = { authRoutes(route, authUseCase) },
+        )
+
+        // when
+        val existUserEndPoint = "${route.ROUTE}${route.EXIST_USER}/a/a"
+        val response = client.get(existUserEndPoint)
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(
+            responseBody.contains(
+                AuthErrorCode.ProviderValueInvalid("").description,
+            ),
+        )
     }
 }
