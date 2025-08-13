@@ -1,13 +1,15 @@
 package com.peekr.domain.user
 
+import com.peekr.common.db.scheme.Role
 import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.db.scheme.UserEntity
-import com.peekr.common.db.scheme.UserRole
 import com.peekr.domain.user.application.dto.UserDto
+import com.peekr.domain.user.domain.model.RoleForUser
+import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 
 object UserTestDoubles {
     fun getUserEntity() = UserEntity.new {
-        this.role = UserRole.USER
+        this.role = Role.USER
         this.provider = SocialLoginProvider.GOOGLE
         this.providerId = "123901239"
         this.displayId = "hong_gd_123"
@@ -18,8 +20,8 @@ object UserTestDoubles {
 
     val MockUserDto = UserDto(
         id = 1L,
-        role = "USER",
-        provider = "GOOGLE",
+        role = RoleForUser.USER,
+        provider = SocialLoginProviderForUser.GOOGLE,
         providerId = "123901239",
         displayId = "hong_gd_123",
         name = "honggd",

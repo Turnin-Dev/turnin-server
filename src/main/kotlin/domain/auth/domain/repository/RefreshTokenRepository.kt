@@ -8,7 +8,7 @@ interface RefreshTokenRepository {
      *
      * @param token 리프레쉬 토큰
      */
-    suspend fun findNameByRefreshToken(token: String): String?
+    suspend fun findDisplayIdByRefreshToken(token: String): String?
 
     /**
      * 리프레쉬 토큰을 저장한다.

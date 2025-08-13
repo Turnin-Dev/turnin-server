@@ -39,6 +39,7 @@ class UserRoutesTest {
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(responseBody.contains(MockUserDto.name))
         assertTrue(responseBody.contains(MockUserDto.displayId))
+        assertTrue(responseBody.contains(MockUserDto.role.name))
     }
 
     @Test
@@ -85,7 +86,6 @@ class UserRoutesTest {
 
     companion object {
         private const val NOT_NUMBER_USER_ID = "asd"
-        private const val EMPTY_USER_ID = "asd"
-        private val invalidUserIds = listOf(NOT_NUMBER_USER_ID, EMPTY_USER_ID)
+        private val invalidUserIds = listOf(NOT_NUMBER_USER_ID)
     }
 }

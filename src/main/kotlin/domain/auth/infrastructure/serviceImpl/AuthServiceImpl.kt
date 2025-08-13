@@ -1,7 +1,6 @@
 package com.peekr.domain.auth.infrastructure.serviceImpl
 
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.domain.model.JWTClaimName
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
@@ -11,6 +10,7 @@ import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.RegisterResult
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.domain.service.AuthService
@@ -21,7 +21,7 @@ class AuthServiceImpl(
     private val jwtTokenService: JWTTokenService,
 ) : AuthService {
     override suspend fun login(
-        provider: SocialLoginProvider,
+        provider: SocialLoginProviderForAuth,
         providerId: String,
     ): LoginResult? {
         val authUser = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
@@ -30,8 +30,8 @@ class AuthServiceImpl(
 
         val payload = JWTTokenPayload(
             userId = authUser.id.toString(),
-            claimName = JWTClaimName.Name,
-            claim = authUser.name,
+            claimName = JWTClaimName.DISPLAY_ID,
+            claim = authUser.displayId,
         )
         val jwtToken = jwtTokenService.generate(payload)
 
@@ -44,8 +44,8 @@ class AuthServiceImpl(
 
         val payload = JWTTokenPayload(
             userId = savedAuthUser.id.toString(),
-            claimName = JWTClaimName.Name,
-            claim = savedAuthUser.name,
+            claimName = JWTClaimName.DISPLAY_ID,
+            claim = savedAuthUser.displayId,
         )
 
         val jwtToken = jwtTokenService.generate(payload)
@@ -56,20 +56,20 @@ class AuthServiceImpl(
     override suspend fun refresh(token: String): JWTToken? = try {
         val decodedRefreshToken = verifyRefreshToken(token)
 
-        val name = refreshTokenRepository.findNameByRefreshToken(token)
-        val authUser: AuthUser? = name?.let {
-            authRepository.getUserByDisplayId(name)
+        val displayId = refreshTokenRepository.findDisplayIdByRefreshToken(token)
+        val authUser: AuthUser? = displayId?.let {
+            authRepository.findUserByDisplayId(displayId)
         }
 
         if (decodedRefreshToken != null &&
-            name != null &&
+            displayId != null &&
             authUser != null &&
-            name == authUser.name
+            displayId == authUser.name
         ) {
             val payload = JWTTokenPayload(
                 userId = authUser.id.toString(),
-                claimName = JWTClaimName.Name,
-                claim = authUser.name,
+                claimName = JWTClaimName.DISPLAY_ID,
+                claim = authUser.displayId,
             )
             val jwtToken = jwtTokenService.generate(payload)
             jwtToken
@@ -81,7 +81,7 @@ class AuthServiceImpl(
     }
 
     override suspend fun findUser(
-        provider: SocialLoginProvider,
+        provider: SocialLoginProviderForAuth,
         providerId: String,
     ): FindUserResult {
         val result = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)

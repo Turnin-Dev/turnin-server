@@ -1,18 +1,33 @@
 package com.peekr.domain.user.infrastructure.mapper
 
+import com.peekr.common.db.scheme.Role
+import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.db.scheme.UserEntity
+import com.peekr.domain.user.domain.model.RoleForUser
+import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User
 
 object UserMapper {
     /** ##### 반드시 db transaction 범위 내에서 실행되어야 한다. */
     fun toDomain(entity: UserEntity): User = User(
         id = entity.id.value,
-        role = entity.role.name,
-        provider = entity.provider.name,
+        role = entity.role.toRoleForUser(),
+        provider = entity.provider.toSocialLoginProviderForUser(),
         providerId = entity.providerId,
         displayId = entity.displayId,
         name = entity.name,
         profileImageUrl = entity.profileImageUrl,
         introduce = entity.introduce,
     )
+
+    private fun Role.toRoleForUser(): RoleForUser = when (this) {
+        Role.USER -> RoleForUser.USER
+        Role.ADMIN -> RoleForUser.ADMIN
+    }
+
+    private fun SocialLoginProvider.toSocialLoginProviderForUser(): SocialLoginProviderForUser = when (this) {
+        SocialLoginProvider.GOOGLE -> SocialLoginProviderForUser.GOOGLE
+        SocialLoginProvider.KAKAO -> SocialLoginProviderForUser.KAKAO
+        SocialLoginProvider.APPLE -> SocialLoginProviderForUser.APPLE
+    }
 }

@@ -30,8 +30,8 @@ data class UserResponse(
 
 fun UserDto.toResponse(): UserResponse = UserResponse(
     id = id,
-    role = role,
-    provider = provider,
+    role = role.name,
+    provider = provider.name,
     providerId = providerId,
     displayId = displayId,
     name = name,

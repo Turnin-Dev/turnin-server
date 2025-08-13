@@ -1,6 +1,5 @@
 package com.peekr.domain.auth.application.usecase
 
-import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.application.dto.toDto
 import com.peekr.domain.auth.application.dto.FindUserResultDto
@@ -8,6 +7,7 @@ import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDomain
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDto
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.service.AuthService
 import com.peekr.domain.auth.domain.service.RefreshTokenService
 
@@ -40,7 +40,7 @@ class AuthUseCaseImpl(
     }
 
     override suspend fun findUser(
-        provider: SocialLoginProvider,
+        provider: SocialLoginProviderForAuth,
         providerId: String,
     ): FindUserResultDto {
         val findUserResult = authService.findUser(provider, providerId)

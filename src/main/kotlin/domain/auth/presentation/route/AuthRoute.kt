@@ -2,7 +2,6 @@ package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byId
-import com.peekr.common.db.scheme.toSocialLoginProvider
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
@@ -10,6 +9,7 @@ import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
@@ -90,7 +90,10 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             }
 
             try {
-                val findUserResultDto = authUseCase.findUser(provider.toSocialLoginProvider(), providerId)
+                val findUserResultDto = authUseCase.findUser(
+                    provider = SocialLoginProviderForAuth.valueOf(provider),
+                    providerId = providerId,
+                )
                 call.respond(findUserResultDto.toResponse())
             } catch (e: IllegalArgumentException) {
                 call.respond(

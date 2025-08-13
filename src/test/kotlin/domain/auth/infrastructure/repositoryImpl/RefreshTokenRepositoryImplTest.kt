@@ -3,6 +3,8 @@ package com.peekr.domain.auth.infrastructure.repositoryImpl
 import com.peekr.common.db.scheme.RefreshTokens
 import com.peekr.common.db.scheme.UserEntity
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.infrastructure.mapper.AuthMapper.toRole
+import com.peekr.domain.auth.infrastructure.mapper.AuthMapper.toSocialLoginProvider
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,12 +25,12 @@ class RefreshTokenRepositoryImplTest {
     }
 
     @Test
-    fun `findNameByRefreshToken 성공 테스트`() = runTest {
+    fun `findDisplayIdByRefreshToken 성공 테스트`() = runTest {
         // given
         TestDatabaseFactory.dbQuery {
             val savedUserEntity = UserEntity.new {
-                this.role = MockUser.role
-                this.provider = MockUser.provider
+                this.role = MockUser.role.toRole()
+                this.provider = MockUser.provider.toSocialLoginProvider()
                 this.providerId = MockUser.providerId
                 this.displayId = MockUser.displayId
                 this.name = MockUser.name
@@ -43,17 +45,17 @@ class RefreshTokenRepositoryImplTest {
         }
 
         // when
-        val name = refreshTokenRepository.findNameByRefreshToken(MOCK_REFRESH_TOKEN)
+        val displayId = refreshTokenRepository.findDisplayIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
-        assertNotNull(name)
-        assertEquals(name, MockUser.name)
+        assertNotNull(displayId)
+        assertEquals(displayId, MockUser.displayId)
     }
 
     @Test
-    fun `findNameByRefreshToken 실패 테스트 - 유효하지 않은 토큰으로 조회했을 경우`() = runTest {
+    fun `findDisplayIdByRefreshToken 실패 테스트 - 유효하지 않은 토큰으로 조회했을 경우`() = runTest {
         // when
-        val name = refreshTokenRepository.findNameByRefreshToken(MOCK_REFRESH_TOKEN)
+        val name = refreshTokenRepository.findDisplayIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
         assertNull(name)
@@ -69,8 +71,8 @@ class RefreshTokenRepositoryImplTest {
         // given
         val userId = TestDatabaseFactory.dbQuery {
             val savedUserEntity = UserEntity.new {
-                this.role = MockUser.role
-                this.provider = MockUser.provider
+                this.role = MockUser.role.toRole()
+                this.provider = MockUser.provider.toSocialLoginProvider()
                 this.providerId = MockUser.providerId
                 this.displayId = MockUser.displayId
                 this.name = MockUser.name
@@ -82,12 +84,12 @@ class RefreshTokenRepositoryImplTest {
 
         // when
         val result = refreshTokenRepository.save(userId, MOCK_REFRESH_TOKEN)
-        val name = refreshTokenRepository.findNameByRefreshToken(MOCK_REFRESH_TOKEN)
+        val displayId = refreshTokenRepository.findDisplayIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
         assertTrue(result)
-        assertNotNull(name)
-        assertEquals(name, MockUser.name)
+        assertNotNull(displayId)
+        assertEquals(displayId, MockUser.displayId)
     }
 
     @Test

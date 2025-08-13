@@ -14,8 +14,8 @@ package com.peekr.domain.user.domain.model
  */
 data class User(
     val id: Long,
-    val role: String,
-    val provider: String,
+    val role: RoleForUser,
+    val provider: SocialLoginProviderForUser,
     val providerId: String,
     val displayId: String,
     val name: String,

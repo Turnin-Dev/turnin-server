@@ -11,16 +11,16 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.upsert
 
 class RefreshTokenRepositoryImpl : RefreshTokenRepository {
-    override suspend fun findNameByRefreshToken(token: String): String? = dbQuery {
+    override suspend fun findDisplayIdByRefreshToken(token: String): String? = dbQuery {
         val result = RefreshTokens
             .join(Users, JoinType.INNER, RefreshTokens.user, Users.id)
-            .select(Users.name)
+            .select(Users.displayId)
             .where { RefreshTokens.refreshToken eq token }
             .singleOrNull()
 
         if (result == null) null
 
-        result?.get(Users.name)
+        result?.get(Users.displayId)
     }
 
     override suspend fun save(userId: Long, token: String): Boolean = dbQuery {

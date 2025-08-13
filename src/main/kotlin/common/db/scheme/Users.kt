@@ -7,7 +7,7 @@ import com.peekr.common.db.DatabaseUtils.customPostgresEnum
 import org.jetbrains.exposed.dao.id.EntityID
 
 object Users : BaseLongIdTable("user") {
-    val role = customPostgresEnum<UserRole>("role", "user_role")
+    val role = customPostgresEnum<Role>("role", "user_role").default(Role.USER)
     val provider = customPostgresEnum<SocialLoginProvider>("provider", "social_login_provider")
     val providerId = varchar("provider_id", 255)
     val displayId = varchar("display_id", 30)
@@ -17,6 +17,7 @@ object Users : BaseLongIdTable("user") {
 
     init {
         uniqueIndex("unique_provider_user", provider, providerId)
+        uniqueIndex("unique_display_id", displayId)
     }
 }
 

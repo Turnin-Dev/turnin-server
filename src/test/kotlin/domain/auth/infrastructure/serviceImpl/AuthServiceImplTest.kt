@@ -1,6 +1,5 @@
 package com.peekr.domain.auth.infrastructure.serviceImpl
 
-import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
 import com.peekr.common.jwt.JWTTestDoubles.MockVerifier
@@ -10,6 +9,7 @@ import com.peekr.common.jwt.JWTTestDoubles.getMockJWTToken
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
@@ -55,7 +55,7 @@ class AuthServiceImplTest {
 
         // when
         val loginResult = authService.login(
-            provider = SocialLoginProvider.GOOGLE,
+            provider = SocialLoginProviderForAuth.GOOGLE,
             providerId = "123123",
         )
 
@@ -75,7 +75,7 @@ class AuthServiceImplTest {
 
         // when
         val token = authService.login(
-            provider = SocialLoginProvider.GOOGLE,
+            provider = SocialLoginProviderForAuth.GOOGLE,
             providerId = "123123",
         )
 
@@ -116,10 +116,10 @@ class AuthServiceImplTest {
     fun `refresh 성공 테스트`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findNameByRefreshToken(any())
+            refreshTokenRepository.findDisplayIdByRefreshToken(any())
         } returns MockAuthUser.name
         coEvery {
-            authRepository.getUserByDisplayId(any())
+            authRepository.findUserByDisplayId(any())
         } returns MockAuthUser
 
         // when
@@ -135,10 +135,10 @@ class AuthServiceImplTest {
     fun `refresh 실패 테스트 - 토큰으로 사용자 이름을 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findNameByRefreshToken(any())
+            refreshTokenRepository.findDisplayIdByRefreshToken(any())
         } returns null
         coEvery {
-            authRepository.getUserByDisplayId(any())
+            authRepository.findUserByDisplayId(any())
         } returns MockAuthUser
 
         // when
@@ -152,10 +152,10 @@ class AuthServiceImplTest {
     fun `refresh 실패 테스트 - 이름으로 사용자를 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findNameByRefreshToken(any())
+            refreshTokenRepository.findDisplayIdByRefreshToken(any())
         } returns MockAuthUser.name
         coEvery {
-            authRepository.getUserByDisplayId(any())
+            authRepository.findUserByDisplayId(any())
         } returns null
 
         // when
@@ -170,10 +170,10 @@ class AuthServiceImplTest {
         // given
         val expectedException = NullPointerException()
         coEvery {
-            refreshTokenRepository.findNameByRefreshToken(any())
+            refreshTokenRepository.findDisplayIdByRefreshToken(any())
         } returns MockAuthUser.name
         coEvery {
-            authRepository.getUserByDisplayId(any())
+            authRepository.findUserByDisplayId(any())
         } throws expectedException
 
         // when
@@ -191,7 +191,7 @@ class AuthServiceImplTest {
         } returns MockAuthUser
 
         // when
-        val findUserResult = authService.findUser(SocialLoginProvider.GOOGLE, "123123")
+        val findUserResult = authService.findUser(SocialLoginProviderForAuth.GOOGLE, "123123")
 
         // then
         assertTrue(findUserResult.isExist)
@@ -205,7 +205,7 @@ class AuthServiceImplTest {
         } returns null
 
         // when
-        val findUserResult = authService.findUser(SocialLoginProvider.GOOGLE, "123123")
+        val findUserResult = authService.findUser(SocialLoginProviderForAuth.GOOGLE, "123123")
 
         // then
         assertTrue(!findUserResult.isExist)

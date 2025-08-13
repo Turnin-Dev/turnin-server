@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
-import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.Test
@@ -39,7 +39,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findByProviderAndProviderId 실패 테스트 - 존재하지 않는 사용자`() = runTest {
         val notFoundUser = repository.findAuthUserByProviderAndProviderId(
-            provider = SocialLoginProvider.KAKAO,
+            provider = SocialLoginProviderForAuth.KAKAO,
             providerId = "not_found_id",
         )
 
@@ -60,13 +60,13 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun `getUserByDisplayId 성공 테스트`() = runTest {
+    fun `findUserByDisplayId 성공 테스트`() = runTest {
         // given
         val savedUser = repository.save(MockAuthUser)
         assertTrue(savedUser.id > 0L)
 
         // when
-        val foundedUser = repository.getUserByDisplayId(savedUser.displayId)
+        val foundedUser = repository.findUserByDisplayId(savedUser.displayId)
 
         // then
         assertNotNull(foundedUser)
@@ -74,9 +74,9 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun `getUserByName 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
+    fun `findUserByDisplayId 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
         // when
-        val foundedUser = repository.getUserByDisplayId("not-username")
+        val foundedUser = repository.findUserByDisplayId("not-username")
 
         // then
         assertNull(foundedUser)

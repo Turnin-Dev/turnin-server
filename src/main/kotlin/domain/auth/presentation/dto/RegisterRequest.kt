@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.presentation.dto
 
+import com.peekr.common.db.scheme.Role
 import com.peekr.common.db.scheme.SocialLoginProvider
-import com.peekr.common.db.scheme.UserRole
 import com.peekr.common.validator.PeekrValidator.validation
 import kotlinx.serialization.Serializable
 
@@ -17,7 +17,7 @@ data class RegisterRequest(
 ) {
     companion object {
         val sample = RegisterRequest(
-            role = UserRole.USER.name,
+            role = Role.USER.name,
             provider = SocialLoginProvider.GOOGLE.name,
             providerId = "providerIDDDDD",
             displayId = "hong_gd_123",
@@ -31,11 +31,11 @@ data class RegisterRequest(
 fun RegisterRequest.validate() {
     validation(providerId.isNotBlank()) { "providerId는 존재하지 않습니다." }
     validation(name.isNotBlank() && name.length in 1..30) { "이름은 1~30자 이내여야 합니다." }
-    validation(name.matches(Regex("^[a-zA-Z0-9가-힣]{1,30}$"))) {
-        "이름는 영문/숫자/한글만 허용되며 1~30자여야 합니다."
+    validation(name.matches(Regex("^[a-zA-Z0-9가-힣]$"))) {
+        "이름은 영문/숫자/한글만 허용되며 1~30자여야 합니다."
     }
     validation(displayId.isNotBlank() && displayId.length in 1..30) { "ID는 1~30자 이내여야 합니다." }
-    validation(displayId.matches(Regex("^[a-zA-Z0-9_]{1,30}$"))) {
+    validation(displayId.matches(Regex("^[a-zA-Z0-9_]$"))) {
         "ID는 영문/숫자/밑줄만 허용되며 1~30자여야 합니다."
     }
     validation(profileImageUrl == null || isValidUrl(profileImageUrl)) { "프로필 이미지 URL 형식이 올바르지 않습니다." }
