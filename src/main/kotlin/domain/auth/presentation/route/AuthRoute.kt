@@ -57,10 +57,9 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         get(route.REFRESH, { refreshDocs() }) {
             val refreshTokenParam = call.request.headers["Authorization"]
             refreshTokenParam?.let {
+                JWTValidator.validate(refreshTokenParam)
                 val extractedUserId = authUseCase.extractUserId(refreshTokenParam)
                 val userId = userIdValidatorAndReturn(extractedUserId)
-
-                JWTValidator.validate(refreshTokenParam)
                 val refreshToken = refreshTokenParam.removeBearerHeader()
                 val token = authUseCase.refresh(userId, refreshToken)
                 if (token == null) {
@@ -91,8 +90,8 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
 
             try {
                 val findUserResultDto = authUseCase.findUser(
-                    provider = SocialLoginProviderForAuth.valueOf(provider.uppercase()),
-                    providerId = providerId,
+                    provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
+                    providerId = providerId.trim(),
                 )
                 call.respond(findUserResultDto.toResponse())
             } catch (e: IllegalArgumentException) {

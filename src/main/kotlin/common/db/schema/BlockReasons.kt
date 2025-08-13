@@ -1,4 +1,4 @@
-package com.peekr.common.db.scheme
+package com.peekr.common.db.schema
 
 import com.peekr.common.db.BaseEntityWithoutTimestamp
 import com.peekr.common.db.BaseLongIdTableWithoutTimestamp

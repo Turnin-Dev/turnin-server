@@ -1,8 +1,8 @@
 package com.peekr.domain.user.infrastructure.mapper
 
-import com.peekr.common.db.scheme.Role
-import com.peekr.common.db.scheme.SocialLoginProvider
-import com.peekr.common.db.scheme.UserEntity
+import com.peekr.common.db.schema.Role
+import com.peekr.common.db.schema.SocialLoginProvider
+import com.peekr.common.db.schema.UserEntity
 import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User

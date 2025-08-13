@@ -1,4 +1,4 @@
-package com.peekr.common.db.scheme
+package com.peekr.common.db.schema
 
 import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass

@@ -1,4 +1,4 @@
-package com.peekr.common.db.scheme
+package com.peekr.common.db.schema
 
 import com.peekr.common.util.PeekrDateTime
 import org.jetbrains.exposed.sql.Table

@@ -2,8 +2,8 @@ package com.peekr.domain.auth.infrastructure.repositoryImpl
 
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.DatabaseUtils.eqEnum
-import com.peekr.common.db.scheme.UserEntity
-import com.peekr.common.db.scheme.Users
+import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.Users
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository

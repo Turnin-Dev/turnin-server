@@ -1,9 +1,9 @@
 package com.peekr.domain.auth.infrastructure.repositoryImpl
 
 import com.peekr.common.db.DatabaseFactory.dbQuery
-import com.peekr.common.db.scheme.RefreshTokens
-import com.peekr.common.db.scheme.UserEntity
-import com.peekr.common.db.scheme.Users
+import com.peekr.common.db.schema.RefreshTokens
+import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.Users
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException
