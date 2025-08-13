@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.javatime.timestamp
 object Friends : BaseLongIdTable("friend") {
     val requesterId = reference("requester_id", Users)
     val receiverId = reference("receiver_id", Users)
-    val status = customPostgresEnum<FriendStatuses>("status", sqlName = "friend_status").default(FriendStatuses.PENDING)
+    val status = customPostgresEnum<FriendStatus>("status", sqlName = "friend_status").default(FriendStatus.PENDING)
     val respondedAt = timestamp("responded_at").nullable()
 
     init {

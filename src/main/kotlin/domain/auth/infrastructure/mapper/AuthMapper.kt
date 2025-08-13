@@ -17,29 +17,29 @@ object AuthMapper {
             providerId = row[Users.providerId],
             displayId = row[Users.displayId],
             name = row[Users.name],
-            profileImageUrl = row[Users.profileImageUrl] ?: "",
-            introduce = row[Users.introduce] ?: "",
+            profileImageUrl = row[Users.profileImageUrl],
+            introduce = row[Users.introduce],
         )
+}
 
-    private fun Role.toRoleForAuth(): RoleForAuth = when (this) {
-        Role.USER -> RoleForAuth.USER
-        Role.ADMIN -> RoleForAuth.ADMIN
-    }
+private fun Role.toRoleForAuth(): RoleForAuth = when (this) {
+    Role.USER -> RoleForAuth.USER
+    Role.ADMIN -> RoleForAuth.ADMIN
+}
 
-    fun RoleForAuth.toRole(): Role = when (this) {
-        RoleForAuth.USER -> Role.USER
-        RoleForAuth.ADMIN -> Role.ADMIN
-    }
+fun RoleForAuth.toRole(): Role = when (this) {
+    RoleForAuth.USER -> Role.USER
+    RoleForAuth.ADMIN -> Role.ADMIN
+}
 
-    private fun SocialLoginProvider.toSocialLoginProviderForAuth(): SocialLoginProviderForAuth = when (this) {
-        SocialLoginProvider.GOOGLE -> SocialLoginProviderForAuth.GOOGLE
-        SocialLoginProvider.KAKAO -> SocialLoginProviderForAuth.KAKAO
-        SocialLoginProvider.APPLE -> SocialLoginProviderForAuth.APPLE
-    }
+private fun SocialLoginProvider.toSocialLoginProviderForAuth(): SocialLoginProviderForAuth = when (this) {
+    SocialLoginProvider.GOOGLE -> SocialLoginProviderForAuth.GOOGLE
+    SocialLoginProvider.KAKAO -> SocialLoginProviderForAuth.KAKAO
+    SocialLoginProvider.APPLE -> SocialLoginProviderForAuth.APPLE
+}
 
-    fun SocialLoginProviderForAuth.toSocialLoginProvider(): SocialLoginProvider = when (this) {
-        SocialLoginProviderForAuth.GOOGLE -> SocialLoginProvider.GOOGLE
-        SocialLoginProviderForAuth.KAKAO -> SocialLoginProvider.KAKAO
-        SocialLoginProviderForAuth.APPLE -> SocialLoginProvider.APPLE
-    }
+fun SocialLoginProviderForAuth.toSocialLoginProvider(): SocialLoginProvider = when (this) {
+    SocialLoginProviderForAuth.GOOGLE -> SocialLoginProvider.GOOGLE
+    SocialLoginProviderForAuth.KAKAO -> SocialLoginProvider.KAKAO
+    SocialLoginProviderForAuth.APPLE -> SocialLoginProvider.APPLE
 }

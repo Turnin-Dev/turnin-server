@@ -1,6 +1,6 @@
 package com.peekr.common.db.scheme
 
-enum class FriendStatuses {
+enum class FriendStatus {
     PENDING,
     ACCEPTED,
     REJECTED,

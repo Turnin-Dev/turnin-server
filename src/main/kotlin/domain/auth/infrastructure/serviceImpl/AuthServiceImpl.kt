@@ -58,13 +58,13 @@ class AuthServiceImpl(
 
         val displayId = refreshTokenRepository.findDisplayIdByRefreshToken(token)
         val authUser: AuthUser? = displayId?.let {
-            authRepository.findUserByDisplayId(displayId)
+            authRepository.findUserByDisplayId(it)
         }
 
         if (decodedRefreshToken != null &&
             displayId != null &&
             authUser != null &&
-            displayId == authUser.name
+            displayId == authUser.displayId
         ) {
             val payload = JWTTokenPayload(
                 userId = authUser.id.toString(),

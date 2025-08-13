@@ -3,8 +3,8 @@ package com.peekr.domain.auth.infrastructure.repositoryImpl
 import com.peekr.common.db.scheme.RefreshTokens
 import com.peekr.common.db.scheme.UserEntity
 import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.infrastructure.mapper.AuthMapper.toRole
-import com.peekr.domain.auth.infrastructure.mapper.AuthMapper.toSocialLoginProvider
+import com.peekr.domain.auth.infrastructure.mapper.toRole
+import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,16 +49,16 @@ class RefreshTokenRepositoryImplTest {
 
         // then
         assertNotNull(displayId)
-        assertEquals(displayId, MockUser.displayId)
+        assertEquals(MockUser.displayId, displayId)
     }
 
     @Test
     fun `findDisplayIdByRefreshToken 실패 테스트 - 유효하지 않은 토큰으로 조회했을 경우`() = runTest {
         // when
-        val name = refreshTokenRepository.findDisplayIdByRefreshToken(MOCK_REFRESH_TOKEN)
+        val displayId = refreshTokenRepository.findDisplayIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
-        assertNull(name)
+        assertNull(displayId)
     }
 
     companion object {
@@ -89,7 +89,7 @@ class RefreshTokenRepositoryImplTest {
         // then
         assertTrue(result)
         assertNotNull(displayId)
-        assertEquals(displayId, MockUser.displayId)
+        assertEquals(MockUser.displayId, displayId)
     }
 
     @Test

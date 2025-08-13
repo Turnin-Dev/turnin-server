@@ -12,13 +12,13 @@ import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
 
 fun LoginRequest.toDto(): LoginDto = LoginDto(
-    provider = SocialLoginProviderForAuth.valueOf(provider),
+    provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
     providerId = providerId,
 )
 
 fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
-    role = RoleForAuth.valueOf(role),
-    provider = SocialLoginProviderForAuth.valueOf(provider),
+    role = RoleForAuth.valueOf(role.trim().uppercase()),
+    provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
     providerId = providerId,
     displayId = displayId,
     name = name,

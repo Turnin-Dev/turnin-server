@@ -9,8 +9,8 @@ import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
-import com.peekr.domain.auth.infrastructure.mapper.AuthMapper.toRole
-import com.peekr.domain.auth.infrastructure.mapper.AuthMapper.toSocialLoginProvider
+import com.peekr.domain.auth.infrastructure.mapper.toRole
+import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
 import java.sql.SQLException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

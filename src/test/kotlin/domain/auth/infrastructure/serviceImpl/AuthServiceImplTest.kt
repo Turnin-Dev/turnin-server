@@ -19,6 +19,7 @@ import io.mockk.mockk
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -36,7 +37,7 @@ class AuthServiceImplTest {
     fun setup() {
         authService = AuthServiceImpl(authRepository, refreshTokenRepository, jwtTokenService)
 
-        mockJWTToken = getMockJWTToken(getJWTTokenPayload(claim = MockAuthUser.name))
+        mockJWTToken = getMockJWTToken(getJWTTokenPayload(claim = MockAuthUser.displayId))
         every { jwtTokenService.realm } returns REALM
         every { jwtTokenService.audience } returns AUDIENCE
         every { jwtTokenService.issuer } returns ISSUER
@@ -117,7 +118,7 @@ class AuthServiceImplTest {
         // given
         coEvery {
             refreshTokenRepository.findDisplayIdByRefreshToken(any())
-        } returns MockAuthUser.name
+        } returns MockAuthUser.displayId
         coEvery {
             authRepository.findUserByDisplayId(any())
         } returns MockAuthUser
@@ -132,7 +133,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    fun `refresh 실패 테스트 - 토큰으로 사용자 이름을 찾지 못하는 경우`() = runTest {
+    fun `refresh 실패 테스트 - 토큰으로 사용자 ID를 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
             refreshTokenRepository.findDisplayIdByRefreshToken(any())
@@ -149,11 +150,11 @@ class AuthServiceImplTest {
     }
 
     @Test
-    fun `refresh 실패 테스트 - 이름으로 사용자를 찾지 못하는 경우`() = runTest {
+    fun `refresh 실패 테스트 - 사용자 ID로 사용자를 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
             refreshTokenRepository.findDisplayIdByRefreshToken(any())
-        } returns MockAuthUser.name
+        } returns MockAuthUser.displayId
         coEvery {
             authRepository.findUserByDisplayId(any())
         } returns null
@@ -171,7 +172,7 @@ class AuthServiceImplTest {
         val expectedException = NullPointerException()
         coEvery {
             refreshTokenRepository.findDisplayIdByRefreshToken(any())
-        } returns MockAuthUser.name
+        } returns MockAuthUser.displayId
         coEvery {
             authRepository.findUserByDisplayId(any())
         } throws expectedException
@@ -208,6 +209,6 @@ class AuthServiceImplTest {
         val findUserResult = authService.findUser(SocialLoginProviderForAuth.GOOGLE, "123123")
 
         // then
-        assertTrue(!findUserResult.isExist)
+        assertFalse(findUserResult.isExist)
     }
 }

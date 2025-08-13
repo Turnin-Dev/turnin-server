@@ -31,11 +31,11 @@ data class RegisterRequest(
 fun RegisterRequest.validate() {
     validation(providerId.isNotBlank()) { "providerId는 존재하지 않습니다." }
     validation(name.isNotBlank() && name.length in 1..30) { "이름은 1~30자 이내여야 합니다." }
-    validation(name.matches(Regex("^[a-zA-Z0-9가-힣]$"))) {
+    validation(name.matches(Regex("^[a-zA-Z0-9가-힣]+$"))) {
         "이름은 영문/숫자/한글만 허용되며 1~30자여야 합니다."
     }
     validation(displayId.isNotBlank() && displayId.length in 1..30) { "ID는 1~30자 이내여야 합니다." }
-    validation(displayId.matches(Regex("^[a-zA-Z0-9_]$"))) {
+    validation(displayId.matches(Regex("^[a-zA-Z0-9_]+$"))) {
         "ID는 영문/숫자/밑줄만 허용되며 1~30자여야 합니다."
     }
     validation(profileImageUrl == null || isValidUrl(profileImageUrl)) { "프로필 이미지 URL 형식이 올바르지 않습니다." }
