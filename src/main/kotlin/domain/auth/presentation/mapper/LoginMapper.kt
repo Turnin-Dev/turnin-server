@@ -16,10 +16,11 @@ fun LoginRequest.toDto(): LoginDto = LoginDto(
 )
 
 fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
+    role = role,
     provider = provider,
     providerId = providerId,
+    displayId = displayId,
     name = name,
-    nickname = nickname,
     profileImageUrl = profileImageUrl,
     introduce = introduce,
 )

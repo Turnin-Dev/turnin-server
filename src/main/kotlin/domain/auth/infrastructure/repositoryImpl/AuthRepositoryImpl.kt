@@ -27,9 +27,9 @@ class AuthRepositoryImpl : AuthRepository {
             }.singleOrNull()
     }
 
-    override suspend fun getUserByName(name: String): AuthUser? = dbQuery {
+    override suspend fun getUserByDisplayId(displayId: String): AuthUser? = dbQuery {
         UserEntity
-            .find((Users.name eq name))
+            .find((Users.displayId eq displayId))
             .map {
                 AuthMapper.toDomain(it.readValues)
             }.singleOrNull()
@@ -38,10 +38,11 @@ class AuthRepositoryImpl : AuthRepository {
     override suspend fun save(authUser: AuthUser): AuthUser = dbQuery {
         try {
             val savedUserEntity = UserEntity.new {
+                this.role = authUser.role
                 this.provider = authUser.provider
                 this.providerId = authUser.providerId
                 this.name = authUser.name
-                this.nickname = authUser.nickname
+                this.displayId = authUser.displayId
                 this.profileImageUrl = authUser.profileImageUrl
                 this.introduce = authUser.introduce
             }

@@ -58,7 +58,7 @@ class AuthServiceImpl(
 
         val name = refreshTokenRepository.findNameByRefreshToken(token)
         val authUser: AuthUser? = name?.let {
-            authRepository.getUserByName(name)
+            authRepository.getUserByDisplayId(name)
         }
 
         if (decodedRefreshToken != null &&

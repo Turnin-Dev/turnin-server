@@ -27,10 +27,11 @@ class RefreshTokenRepositoryImplTest {
         // given
         TestDatabaseFactory.dbQuery {
             val savedUserEntity = UserEntity.new {
+                this.role = MockUser.role
                 this.provider = MockUser.provider
                 this.providerId = MockUser.providerId
+                this.displayId = MockUser.displayId
                 this.name = MockUser.name
-                this.nickname = MockUser.nickname
                 this.profileImageUrl = MockUser.profileImageUrl
                 this.introduce = MockUser.introduce
             }
@@ -68,10 +69,11 @@ class RefreshTokenRepositoryImplTest {
         // given
         val userId = TestDatabaseFactory.dbQuery {
             val savedUserEntity = UserEntity.new {
+                this.role = MockUser.role
                 this.provider = MockUser.provider
                 this.providerId = MockUser.providerId
+                this.displayId = MockUser.displayId
                 this.name = MockUser.name
-                this.nickname = MockUser.nickname
                 this.profileImageUrl = MockUser.profileImageUrl
                 this.introduce = MockUser.introduce
             }

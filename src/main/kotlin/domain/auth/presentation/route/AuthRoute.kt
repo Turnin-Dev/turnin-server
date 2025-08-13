@@ -15,6 +15,7 @@ import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
+import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig

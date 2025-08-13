@@ -119,7 +119,7 @@ class AuthServiceImplTest {
             refreshTokenRepository.findNameByRefreshToken(any())
         } returns MockAuthUser.name
         coEvery {
-            authRepository.getUserByName(any())
+            authRepository.getUserByDisplayId(any())
         } returns MockAuthUser
 
         // when
@@ -138,7 +138,7 @@ class AuthServiceImplTest {
             refreshTokenRepository.findNameByRefreshToken(any())
         } returns null
         coEvery {
-            authRepository.getUserByName(any())
+            authRepository.getUserByDisplayId(any())
         } returns MockAuthUser
 
         // when
@@ -155,7 +155,7 @@ class AuthServiceImplTest {
             refreshTokenRepository.findNameByRefreshToken(any())
         } returns MockAuthUser.name
         coEvery {
-            authRepository.getUserByName(any())
+            authRepository.getUserByDisplayId(any())
         } returns null
 
         // when
@@ -173,7 +173,7 @@ class AuthServiceImplTest {
             refreshTokenRepository.findNameByRefreshToken(any())
         } returns MockAuthUser.name
         coEvery {
-            authRepository.getUserByName(any())
+            authRepository.getUserByDisplayId(any())
         } throws expectedException
 
         // when

@@ -38,7 +38,7 @@ class UserRoutesTest {
         // then
         assertEquals(HttpStatusCode.OK, response.status)
         assertTrue(responseBody.contains(MockUserDto.name))
-        assertTrue(responseBody.contains(MockUserDto.nickname))
+        assertTrue(responseBody.contains(MockUserDto.displayId))
     }
 
     @Test

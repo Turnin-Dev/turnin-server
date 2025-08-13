@@ -6,20 +6,22 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserResponse(
     val id: Long,
+    val role: String,
     val provider: String,
     val providerId: String,
+    val displayId: String,
     val name: String,
-    val nickname: String,
     val profileImageUrl: String?,
     val introduce: String?,
 ) {
     companion object {
         val sample = UserResponse(
             id = 1L,
-            provider = "Google",
+            role = "USER",
+            provider = "GOOGLE",
             providerId = "1231231231",
+            displayId = "hong_gd_123",
             name = "honggd",
-            nickname = "hongddddddd",
             profileImageUrl = "https://www.example.com/image.jpg",
             introduce = "hello world!",
         )
@@ -28,10 +30,11 @@ data class UserResponse(
 
 fun UserDto.toResponse(): UserResponse = UserResponse(
     id = id,
+    role = role,
     provider = provider,
     providerId = providerId,
+    displayId = displayId,
     name = name,
-    nickname = nickname,
     profileImageUrl = profileImageUrl,
     introduce = introduce,
 )

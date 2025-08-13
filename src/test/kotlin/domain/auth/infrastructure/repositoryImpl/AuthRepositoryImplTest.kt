@@ -60,13 +60,13 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun `getUserByName 성공 테스트`() = runTest {
+    fun `getUserByDisplayId 성공 테스트`() = runTest {
         // given
         val savedUser = repository.save(MockAuthUser)
         assertTrue(savedUser.id > 0L)
 
         // when
-        val foundedUser = repository.getUserByName(savedUser.name)
+        val foundedUser = repository.getUserByDisplayId(savedUser.displayId)
 
         // then
         assertNotNull(foundedUser)
@@ -76,7 +76,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `getUserByName 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
         // when
-        val foundedUser = repository.getUserByName("not-username")
+        val foundedUser = repository.getUserByDisplayId("not-username")
 
         // then
         assertNull(foundedUser)

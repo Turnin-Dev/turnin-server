@@ -8,10 +8,11 @@ object AuthMapper {
     fun toDomain(row: ResultRow): AuthUser =
         AuthUser(
             id = row[Users.id].value,
+            role = row[Users.role],
             provider = row[Users.provider],
             providerId = row[Users.providerId],
+            displayId = row[Users.displayId],
             name = row[Users.name],
-            nickname = row[Users.nickname] ?: "",
             profileImageUrl = row[Users.profileImageUrl] ?: "",
             introduce = row[Users.introduce] ?: "",
         )
