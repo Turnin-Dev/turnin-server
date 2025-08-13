@@ -13,7 +13,7 @@ object UserKeywords : BaseLongIdTable("user_keyword") {
 
     init {
         // TODO: 인덱스 검토
-        uniqueIndex("unique_user_keyword", userId, keywordId)
+        uniqueIndex("uq_user_keyword", userId, keywordId)
         index("idx_userkeyword_keyword_user", false, keywordId, userId)
     }
 }

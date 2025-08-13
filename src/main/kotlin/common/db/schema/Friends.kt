@@ -15,9 +15,11 @@ object Friends : BaseLongIdTable("friend") {
     val respondedAt = timestamp("responded_at").nullable()
 
     init {
+        // 중복 친구 요청 방지
         uniqueIndex("uq_friend_requester_receiver", requesterId, receiverId)
         index("idx_friend_receiver_requester", false, receiverId, requesterId)
         index("idx_friend_status", false, status)
+        // 자기 자신에게 친구 요청 방지
         check("chk_friend_not_self") { requesterId neq receiverId }
     }
 }

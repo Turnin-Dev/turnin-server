@@ -16,8 +16,8 @@ object Users : BaseLongIdTable("user") {
     val introduce = text("introduce").nullable()
 
     init {
-        uniqueIndex("unique_provider_user", provider, providerId)
-        uniqueIndex("unique_display_id", displayId)
+        uniqueIndex("uq_provider_user", provider, providerId)
+        uniqueIndex("uq_display_id", displayId)
     }
 }
 

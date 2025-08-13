@@ -18,8 +18,6 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
             .where { RefreshTokens.refreshToken eq token }
             .singleOrNull()
 
-        if (result == null) null
-
         result?.get(Users.displayId)
     }
 

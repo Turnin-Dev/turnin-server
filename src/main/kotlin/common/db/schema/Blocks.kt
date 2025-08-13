@@ -4,10 +4,11 @@ import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.ReferenceOption
 
 object Blocks : BaseLongIdTable("block") {
-    val blockerId = reference("blocker_id", Users)
-    val blockedId = reference("blocked_id", Users)
+    val blockerId = reference("blocker_id", Users, onDelete = ReferenceOption.CASCADE)
+    val blockedId = reference("blocked_id", Users, onDelete = ReferenceOption.CASCADE)
     val reasonId = reference("reason_id", BlockReasons)
     val customReason = text("custom_reason").nullable()
     val isBlocked = bool("is_blocked").default(true)
