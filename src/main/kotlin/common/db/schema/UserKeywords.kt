@@ -4,10 +4,11 @@ import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.ReferenceOption
 
 object UserKeywords : BaseLongIdTable("user_keyword") {
-    val userId = reference("user_id", Users)
-    val keywordId = reference("keyword_id", Keywords)
+    val userId = reference("user_id", Users, onDelete = ReferenceOption.CASCADE)
+    val keywordId = reference("keyword_id", Keywords, onDelete = ReferenceOption.CASCADE)
     val description = text("description").nullable()
 
     init {

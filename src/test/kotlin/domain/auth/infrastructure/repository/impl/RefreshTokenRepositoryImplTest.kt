@@ -1,7 +1,7 @@
-package com.peekr.domain.auth.infrastructure.repositoryImpl
+package com.peekr.domain.auth.infrastructure.repository.impl
 
-import com.peekr.common.db.scheme.RefreshTokens
-import com.peekr.common.db.scheme.UserEntity
+import com.peekr.common.db.schema.RefreshTokens
+import com.peekr.common.db.schema.UserEntity
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.infrastructure.mapper.toRole
 import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider

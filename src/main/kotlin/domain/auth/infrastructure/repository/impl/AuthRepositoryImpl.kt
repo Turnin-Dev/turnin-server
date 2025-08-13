@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.repositoryImpl
+package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.DatabaseUtils.eqEnum

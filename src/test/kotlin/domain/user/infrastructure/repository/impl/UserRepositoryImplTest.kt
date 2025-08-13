@@ -1,4 +1,4 @@
-package com.peekr.domain.user.infrastructure.repositoryImpl
+package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.domain.user.UserTestDoubles
 import com.peekr.domain.user.domain.repository.UserRepository

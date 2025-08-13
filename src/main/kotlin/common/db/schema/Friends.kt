@@ -5,18 +5,20 @@ import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import com.peekr.common.db.DatabaseUtils.customPostgresEnum
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.javatime.timestamp
 
 object Friends : BaseLongIdTable("friend") {
-    val requesterId = reference("requester_id", Users)
-    val receiverId = reference("receiver_id", Users)
+    val requesterId = reference("requester_id", Users, onDelete = ReferenceOption.CASCADE)
+    val receiverId = reference("receiver_id", Users, onDelete = ReferenceOption.CASCADE)
     val status = customPostgresEnum<FriendStatus>("status", sqlName = "friend_status").default(FriendStatus.PENDING)
     val respondedAt = timestamp("responded_at").nullable()
 
     init {
-        index("idx_friend_requester_receiver", false, requesterId, receiverId)
+        uniqueIndex("uq_friend_requester_receiver", requesterId, receiverId)
         index("idx_friend_receiver_requester", false, receiverId, requesterId)
         index("idx_friend_status", false, status)
+        check("chk_friend_not_self") { requesterId neq receiverId }
     }
 }
 

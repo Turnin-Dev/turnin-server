@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.serviceImpl
+package com.peekr.domain.auth.infrastructure.service.impl
 
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER

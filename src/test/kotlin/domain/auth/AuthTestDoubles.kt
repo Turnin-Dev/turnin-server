@@ -1,7 +1,7 @@
 package com.peekr.domain.auth
 
-import com.peekr.common.db.scheme.Role
-import com.peekr.common.db.scheme.SocialLoginProvider
+import com.peekr.common.db.schema.Role
+import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RoleForAuth

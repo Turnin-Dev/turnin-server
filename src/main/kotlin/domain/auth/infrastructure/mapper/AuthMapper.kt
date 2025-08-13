@@ -27,12 +27,12 @@ private fun Role.toRoleForAuth(): RoleForAuth = when (this) {
     Role.ADMIN -> RoleForAuth.ADMIN
 }
 
-fun RoleForAuth.toRole(): Role = when (this) {
+internal fun RoleForAuth.toRole(): Role = when (this) {
     RoleForAuth.USER -> Role.USER
     RoleForAuth.ADMIN -> Role.ADMIN
 }
 
-private fun SocialLoginProvider.toSocialLoginProviderForAuth(): SocialLoginProviderForAuth = when (this) {
+fun SocialLoginProvider.toSocialLoginProviderForAuth(): SocialLoginProviderForAuth = when (this) {
     SocialLoginProvider.GOOGLE -> SocialLoginProviderForAuth.GOOGLE
     SocialLoginProvider.KAKAO -> SocialLoginProviderForAuth.KAKAO
     SocialLoginProvider.APPLE -> SocialLoginProviderForAuth.APPLE

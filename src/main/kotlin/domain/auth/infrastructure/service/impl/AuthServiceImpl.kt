@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.serviceImpl
+package com.peekr.domain.auth.infrastructure.service.impl
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.peekr.common.jwt.domain.model.JWTClaimName

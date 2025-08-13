@@ -1,8 +1,8 @@
 package com.peekr.util
 
 import com.peekr.common.db.DatabaseException
-import com.peekr.common.db.scheme.RefreshTokens
-import com.peekr.common.db.scheme.Users
+import com.peekr.common.db.schema.RefreshTokens
+import com.peekr.common.db.schema.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

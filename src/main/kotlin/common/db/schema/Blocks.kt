@@ -13,7 +13,7 @@ object Blocks : BaseLongIdTable("block") {
     val isBlocked = bool("is_blocked").default(true)
 
     init {
-        index("idx_block_pair", false, blockerId, blockedId)
+        uniqueIndex("uq_block_pair", blockerId, blockedId)
     }
 }
 

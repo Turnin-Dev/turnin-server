@@ -6,10 +6,10 @@ import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.domain.service.AuthService
 import com.peekr.domain.auth.domain.service.RefreshTokenService
-import com.peekr.domain.auth.infrastructure.repositoryImpl.AuthRepositoryImpl
-import com.peekr.domain.auth.infrastructure.repositoryImpl.RefreshTokenRepositoryImpl
-import com.peekr.domain.auth.infrastructure.serviceImpl.AuthServiceImpl
-import com.peekr.domain.auth.infrastructure.serviceImpl.RefreshTokenServiceImpl
+import com.peekr.domain.auth.infrastructure.repository.impl.AuthRepositoryImpl
+import com.peekr.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
+import com.peekr.domain.auth.infrastructure.service.impl.AuthServiceImpl
+import com.peekr.domain.auth.infrastructure.service.impl.RefreshTokenServiceImpl
 import org.koin.dsl.module
 
 val authModule = module {

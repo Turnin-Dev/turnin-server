@@ -1,4 +1,4 @@
-package com.peekr.domain.user.infrastructure.repositoryImpl
+package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.UserEntity

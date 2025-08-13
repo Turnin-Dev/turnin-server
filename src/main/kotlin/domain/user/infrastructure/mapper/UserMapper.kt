@@ -19,15 +19,21 @@ object UserMapper {
         profileImageUrl = entity.profileImageUrl,
         introduce = entity.introduce,
     )
+}
 
-    private fun Role.toRoleForUser(): RoleForUser = when (this) {
-        Role.USER -> RoleForUser.USER
-        Role.ADMIN -> RoleForUser.ADMIN
-    }
+fun Role.toRoleForUser(): RoleForUser = when (this) {
+    Role.USER -> RoleForUser.USER
+    Role.ADMIN -> RoleForUser.ADMIN
+}
 
-    private fun SocialLoginProvider.toSocialLoginProviderForUser(): SocialLoginProviderForUser = when (this) {
-        SocialLoginProvider.GOOGLE -> SocialLoginProviderForUser.GOOGLE
-        SocialLoginProvider.KAKAO -> SocialLoginProviderForUser.KAKAO
-        SocialLoginProvider.APPLE -> SocialLoginProviderForUser.APPLE
-    }
+fun SocialLoginProvider.toSocialLoginProviderForUser(): SocialLoginProviderForUser = when (this) {
+    SocialLoginProvider.GOOGLE -> SocialLoginProviderForUser.GOOGLE
+    SocialLoginProvider.KAKAO -> SocialLoginProviderForUser.KAKAO
+    SocialLoginProvider.APPLE -> SocialLoginProviderForUser.APPLE
+}
+
+fun SocialLoginProviderForUser.toSocialLoginProvider(): SocialLoginProvider = when (this) {
+    SocialLoginProviderForUser.GOOGLE -> SocialLoginProvider.GOOGLE
+    SocialLoginProviderForUser.KAKAO -> SocialLoginProvider.KAKAO
+    SocialLoginProviderForUser.APPLE -> SocialLoginProvider.APPLE
 }

@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.infrastructure.repositoryImpl
+package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth

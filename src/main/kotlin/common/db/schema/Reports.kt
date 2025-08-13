@@ -13,6 +13,8 @@ object Reports : BaseLongIdTable("report") {
 
     init {
         index("idx_report_pair", false, reporterId, reportedId)
+        // 동일 신고자→피신고자에 대해 동일 사유(reason) 중복 신고를 막으려면 유니크 인덱스(3컬럼) 생성
+        uniqueIndex("uq_report_reporter_reported_reason", reporterId, reportedId, reasonId)
     }
 }
 
