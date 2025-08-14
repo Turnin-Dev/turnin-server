@@ -7,9 +7,9 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
 object Blocks : BaseLongIdTable("block") {
-    val blockerId = reference("blocker_id", Users, onDelete = ReferenceOption.CASCADE)
-    val blockedId = reference("blocked_id", Users, onDelete = ReferenceOption.CASCADE)
-    val reasonId = reference("reason_id", BlockReasons)
+    val blockerId = reference("blocker_id", Users, onDelete = ReferenceOption.RESTRICT)
+    val blockedId = reference("blocked_id", Users, onDelete = ReferenceOption.RESTRICT)
+    val reasonId = reference("reason_id", BlockReasons, onDelete = ReferenceOption.RESTRICT)
     val customReason = text("custom_reason").nullable()
     val isBlocked = bool("is_blocked").default(true)
 

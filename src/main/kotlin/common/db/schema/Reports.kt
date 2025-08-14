@@ -7,9 +7,9 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
 object Reports : BaseLongIdTable("report") {
-    val reporterId = reference("reporter_id", Users, onDelete = ReferenceOption.CASCADE)
-    val reportedId = reference("reported_id", Users, onDelete = ReferenceOption.CASCADE)
-    val reasonId = reference("reason_id", ReportReasons)
+    val reporterId = reference("reporter_id", Users, onDelete = ReferenceOption.RESTRICT)
+    val reportedId = reference("reported_id", Users, onDelete = ReferenceOption.RESTRICT)
+    val reasonId = reference("reason_id", ReportReasons, onDelete = ReferenceOption.RESTRICT)
     val customReason = text("custom_reason").nullable()
 
     init {

@@ -10,14 +10,13 @@ object Users : BaseLongIdTable("user") {
     val role = customPostgresEnum<Role>("role", "user_role").default(Role.USER)
     val provider = customPostgresEnum<SocialLoginProvider>("provider", "social_login_provider")
     val providerId = varchar("provider_id", 255)
-    val displayId = varchar("display_id", 30)
+    val displayId = varchar("display_id", 30).uniqueIndex()
     val name = varchar("name", 30)
     val profileImageUrl = varchar("profile_image_url", 500).nullable()
     val introduce = text("introduce").nullable()
 
     init {
         uniqueIndex("uq_provider_user", provider, providerId)
-        uniqueIndex("uq_display_id", displayId)
     }
 }
 

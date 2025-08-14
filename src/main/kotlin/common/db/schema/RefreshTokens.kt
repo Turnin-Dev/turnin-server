@@ -12,7 +12,7 @@ object RefreshTokens : Table("refresh_tokens") {
     override val primaryKey = PrimaryKey(user)
 
     init {
-        // 추후 만료 토큰 일괄 정리를 위해 인덱스 생성
-        index("idx_refresh_tokens_created_at", false, createdAt)
+        // 사용자별 토큰 조회용
+        index("idx_refresh_tokens_user_id", false, user)
     }
 }

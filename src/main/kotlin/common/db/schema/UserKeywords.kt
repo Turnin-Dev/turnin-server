@@ -7,14 +7,13 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
 object UserKeywords : BaseLongIdTable("user_keyword") {
-    val userId = reference("user_id", Users, onDelete = ReferenceOption.CASCADE)
+    val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
     val keywordId = reference("keyword_id", Keywords, onDelete = ReferenceOption.CASCADE)
     val description = text("description").nullable()
 
     init {
-        // TODO: 인덱스 검토
-        uniqueIndex("uq_user_keyword", userId, keywordId)
-        index("idx_userkeyword_keyword_user", false, keywordId, userId)
+        uniqueIndex("uq_userkeyword_user_keyword", userId, keywordId)
+        index("idx_user_keyword_user_id", false, userId)
     }
 }
 

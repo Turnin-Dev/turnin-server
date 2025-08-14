@@ -8,11 +8,7 @@ import org.jetbrains.exposed.sql.ReferenceOption
 
 object Keywords : BaseLongIdTable("keyword") {
     val keyword = varchar("keyword", 100).uniqueIndex()
-    val createdBy = reference("created_by", Users, onDelete = ReferenceOption.CASCADE)
-
-    init {
-        index("idx_keyword_created_by", false, createdBy)
-    }
+    val createdBy = reference("created_by", Users, onDelete = ReferenceOption.RESTRICT)
 }
 
 class KeywordEntity(id: EntityID<Long>) : BaseEntity(id, Keywords) {
