@@ -14,6 +14,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
+/** 데이터베이스를 초기화하고 전용 쿼리 메서드를 제공한다. */
 object DatabaseFactory {
     private val ioContext: CoroutineContext = Dispatchers.IO
 

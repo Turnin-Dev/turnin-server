@@ -4,6 +4,13 @@ import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
 import io.ktor.http.HttpStatusCode
 
+/**
+ * 데이터베이스 커스텀 예외
+ *
+ * @property detail 예외 자세한 설명
+ * @property code [ApiErrorCode]
+ * @property status HTTP 상태코드
+ */
 sealed class DatabaseException(
     val detail: String,
     code: ApiErrorCode,
