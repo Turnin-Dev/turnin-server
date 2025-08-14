@@ -5,23 +5,26 @@ import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import com.peekr.common.db.DatabaseUtils.customPostgresEnum
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.javatime.timestamp
 
+/** 사용자 엔티티 클래스 (복수형) */
 object Users : BaseLongIdTable("user") {
     val role = customPostgresEnum<Role>("role", "user_role").default(Role.USER)
     val provider = customPostgresEnum<SocialLoginProvider>("provider", "social_login_provider")
     val providerId = varchar("provider_id", 255)
-    val displayId = varchar("display_id", 30)
+    val displayId = varchar("display_id", 30).uniqueIndex("uq_users_display_id")
     val name = varchar("name", 30)
     val profileImageUrl = varchar("profile_image_url", 500).nullable()
     val introduce = text("introduce").nullable()
+    val isActive = bool("is_active").default(true)
+    val lastLoginAt = timestamp("last_login_at").nullable()
 
     init {
         uniqueIndex("uq_provider_user", provider, providerId)
-        uniqueIndex("uq_display_id", displayId)
     }
 }
 
-// 엔티티 정의 (단수형 정의)
+/** 사용자 엔티티 클래스 (단수형) */
 class UserEntity(id: EntityID<Long>) : BaseEntity(id, Users) {
     companion object : BaseEntityClass<UserEntity>(Users)
 
@@ -32,4 +35,6 @@ class UserEntity(id: EntityID<Long>) : BaseEntity(id, Users) {
     var name by Users.name
     var profileImageUrl by Users.profileImageUrl
     var introduce by Users.introduce
+    var isActive by Users.isActive
+    var lastLoginAt by Users.lastLoginAt
 }

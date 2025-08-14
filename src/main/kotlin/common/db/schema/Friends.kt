@@ -8,22 +8,24 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.javatime.timestamp
 
+/** 친구 엔티티 클래스 (복수형) */
 object Friends : BaseLongIdTable("friend") {
-    val requesterId = reference("requester_id", Users, onDelete = ReferenceOption.CASCADE)
-    val receiverId = reference("receiver_id", Users, onDelete = ReferenceOption.CASCADE)
-    val status = customPostgresEnum<FriendStatus>("status", sqlName = "friend_status").default(FriendStatus.PENDING)
+    val requesterId = reference("requester_id", Users, onDelete = ReferenceOption.RESTRICT)
+    val receiverId = reference("receiver_id", Users, onDelete = ReferenceOption.RESTRICT)
+    val status = customPostgresEnum<FriendStatus>("status", "friend_status").default(FriendStatus.PENDING)
     val respondedAt = timestamp("responded_at").nullable()
 
     init {
         // 중복 친구 요청 방지
         uniqueIndex("uq_friend_requester_receiver", requesterId, receiverId)
-        index("idx_friend_receiver_requester", false, receiverId, requesterId)
-        index("idx_friend_status", false, status)
+        // 친구 관계 조회를 위한 인덱스
+        index("idx_friend_receiver_status", false, receiverId, status)
         // 자기 자신에게 친구 요청 방지
         check("chk_friend_not_self") { requesterId neq receiverId }
     }
 }
 
+/** 친구 엔티티 클래스 (단수형) */
 class FriendEntity(id: EntityID<Long>) : BaseEntity(id, Friends) {
     companion object : BaseEntityClass<FriendEntity>(Friends)
 
