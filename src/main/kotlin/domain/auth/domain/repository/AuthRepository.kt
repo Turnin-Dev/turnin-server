@@ -1,31 +1,31 @@
 package com.peekr.domain.auth.domain.repository
 
-import com.peekr.common.db.scheme.SocialLoginProvider
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthException
 
 interface AuthRepository {
     /**
      * Provider(소셜로그인 플랫폼)와 Provider(소셜로그인 ID)로 [AuthUser]를 찾는다.
      *
-     * @param provider 소셜로그인 플랫폼 [SocialLoginProvider]
+     * @param provider 소셜로그인 플랫폼
      * @param providerId 소셜로그인 ID
      *
      * @return [AuthUser] - 사용자를 찾을 수 없으면 **`null`** 반환
      */
     suspend fun findAuthUserByProviderAndProviderId(
-        provider: SocialLoginProvider,
+        provider: SocialLoginProviderForAuth,
         providerId: String,
     ): AuthUser?
 
     /**
-     * 이름을 통해 사용자를 조회한다.
+     * 사용자 표시 ID를 통해 사용자를 조회한다.
      *
-     * @param name 사용자 이름
+     * @param displayId 사용자 표시 ID
      *
      * @return [AuthUser] - 사용자를 찾을 수 없으면 **`null`** 반환
      */
-    suspend fun getUserByName(name: String): AuthUser?
+    suspend fun findUserByDisplayId(displayId: String): AuthUser?
 
     /**
      * [AuthUser]로 회원가입(저장)을 한다.

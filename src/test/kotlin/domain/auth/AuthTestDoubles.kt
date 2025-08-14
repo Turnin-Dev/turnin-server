@@ -1,18 +1,22 @@
 package com.peekr.domain.auth
 
-import com.peekr.common.db.scheme.SocialLoginProvider
+import com.peekr.common.db.schema.Role
+import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.RoleForAuth
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
 
 object AuthTestDoubles {
     val MockAuthUser = AuthUser(
         id = 0L,
-        provider = SocialLoginProvider.GOOGLE,
+        role = RoleForAuth.USER,
+        provider = SocialLoginProviderForAuth.GOOGLE,
         providerId = "providerIDDDDD",
+        displayId = "hong_gd_123",
         name = "honggd",
-        nickname = "honggggg",
         profileImageUrl = "http://example.com/profile.jpg",
         introduce = "Hello!",
     )
@@ -28,19 +32,21 @@ object AuthTestDoubles {
     )
 
     val MockValidRegisterRequest = RegisterRequest(
+        role = Role.USER.name,
         provider = SocialLoginProvider.GOOGLE.name,
         providerId = "providerIDDDDD",
+        displayId = "hong_gd_123",
         name = "honggd",
-        nickname = "honggggg",
         profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
         introduce = "Hello!",
     )
 
     val MockInvalidRegisterRequest = RegisterRequest(
+        role = Role.USER.name,
         provider = SocialLoginProvider.GOOGLE.name,
         providerId = "providerIDDDDD",
+        displayId = "",
         name = "",
-        nickname = "",
         profileImageUrl = "aaaa",
         introduce = "Hello!",
     )

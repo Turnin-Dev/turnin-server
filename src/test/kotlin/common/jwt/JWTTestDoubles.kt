@@ -30,8 +30,8 @@ internal object JWTTestDoubles {
 
     fun getJWTTokenPayload(
         subject: String = "user123",
-        claimName: JWTClaimName = JWTClaimName.Name,
-        claim: String = "USER",
+        claimName: JWTClaimName = JWTClaimName.DISPLAY_ID,
+        claim: String = "DISPLAY_ID123",
     ): JWTTokenPayload = JWTTokenPayload(
         userId = subject,
         claimName = claimName,

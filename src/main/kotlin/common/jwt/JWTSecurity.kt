@@ -20,9 +20,9 @@ fun Application.configureJwtSecurity() {
             verifier(verifier)
             realm = jwtService.realm
             validate { credential ->
-                val nameClaim = credential.payload.getClaim(JWTClaimName.Name.name)?.asString()
+                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
                 val hasAudience = credential.payload.audience.contains(jwtService.audience)
-                if (nameClaim?.isNotEmpty() == true && hasAudience) {
+                if (displayIdClaim?.isNotEmpty() == true && hasAudience) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

@@ -2,19 +2,20 @@ package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byId
-import com.peekr.common.db.scheme.toSocialLoginProvider
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
-import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.JWTValidator
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
+import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -56,10 +57,9 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         get(route.REFRESH, { refreshDocs() }) {
             val refreshTokenParam = call.request.headers["Authorization"]
             refreshTokenParam?.let {
+                JWTValidator.validate(refreshTokenParam)
                 val extractedUserId = authUseCase.extractUserId(refreshTokenParam)
                 val userId = userIdValidatorAndReturn(extractedUserId)
-
-                JWTToken.validate(refreshTokenParam)
                 val refreshToken = refreshTokenParam.removeBearerHeader()
                 val token = authUseCase.refresh(userId, refreshToken)
                 if (token == null) {
@@ -89,7 +89,10 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             }
 
             try {
-                val findUserResultDto = authUseCase.findUser(provider.toSocialLoginProvider(), providerId)
+                val findUserResultDto = authUseCase.findUser(
+                    provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
+                    providerId = providerId.trim(),
+                )
                 call.respond(findUserResultDto.toResponse())
             } catch (e: IllegalArgumentException) {
                 call.respond(

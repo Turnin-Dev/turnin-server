@@ -4,11 +4,11 @@ import com.peekr.domain.auth.exception.AuthException
 
 interface RefreshTokenRepository {
     /**
-     * 리프레쉬 토큰으로 사용자의 이름을 찾는다.
+     * 리프레쉬 토큰으로 사용자의 표시 ID를 찾는다.
      *
      * @param token 리프레쉬 토큰
      */
-    suspend fun findNameByRefreshToken(token: String): String?
+    suspend fun findDisplayIdByRefreshToken(token: String): String?
 
     /**
      * 리프레쉬 토큰을 저장한다.

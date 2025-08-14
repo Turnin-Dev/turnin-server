@@ -20,7 +20,6 @@ import org.jetbrains.exposed.sql.javatime.timestamp
  * ```
  * object Users : BaseLongIdTable("user") {
  *     val name = varchar("name", 50)
- *     val nickname = varchar("nickname", 50).nullable()
  *     val profileImageUrl = varchar("profile_image_url", 500).nullable()
  *     val introduce = text("introduce").nullable()
  * }
@@ -55,7 +54,6 @@ abstract class BaseLongIdTableWithoutTimestamp(
  *     companion object : BaseEntityClass<User>(Users)
  *
  *     val name by Users.name
- *     val nickname by Users.nickname
  *     val profileImageUrl by Users.profileImageUrl
  *     val introduce by Users.introduce
  * }
@@ -88,7 +86,6 @@ abstract class BaseEntityWithoutTimestamp(id: EntityID<Long>) : LongEntity(id)
  *     companion object : BaseEntityClass<User>(Users)
  *
  *     val name by Users.name
- *     val nickname by Users.nickname
  *     val profileImageUrl by Users.profileImageUrl
  *     val introduce by Users.introduce
  * }

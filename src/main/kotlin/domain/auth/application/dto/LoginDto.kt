@@ -1,8 +1,8 @@
 package com.peekr.domain.auth.application.dto
 
-import com.peekr.common.db.scheme.SocialLoginProvider
+import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 
 data class LoginDto(
-    val provider: SocialLoginProvider,
+    val provider: SocialLoginProviderForAuth,
     val providerId: String,
 )

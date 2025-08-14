@@ -1,6 +1,5 @@
 package com.peekr.domain.auth.application.mapper
 
-import com.peekr.common.db.scheme.toSocialLoginProvider
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.domain.model.AuthUser
@@ -9,10 +8,11 @@ import com.peekr.domain.auth.domain.model.FindUserResult
 object AuthMapper {
     fun RegisterDto.toDomain(): AuthUser = AuthUser(
         id = 0L,
-        provider = provider.toSocialLoginProvider(),
+        role = role,
+        provider = provider,
         providerId = providerId,
         name = name,
-        nickname = nickname,
+        displayId = displayId,
         profileImageUrl = profileImageUrl,
         introduce = introduce,
     )
