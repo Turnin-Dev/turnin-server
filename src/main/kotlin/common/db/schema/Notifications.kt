@@ -6,6 +6,11 @@ import com.peekr.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
+// TODO 확장 필요
+// -- notification 테이블에 관련 엔티티 ID 추가 (확장성)
+// ALTER TABLE notification
+// ADD COLUMN related_id BIGINT, -- 관련 엔티티의 ID (friend_id, keyword_id 등)
+// ADD COLUMN related_type VARCHAR(50); -- 관련 엔티티 타입
 object Notifications : BaseLongIdTable("notification") {
     val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
     val notiType = varchar("noti_type", 50)

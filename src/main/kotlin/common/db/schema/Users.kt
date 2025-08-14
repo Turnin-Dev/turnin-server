@@ -5,6 +5,7 @@ import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import com.peekr.common.db.DatabaseUtils.customPostgresEnum
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.javatime.timestamp
 
 object Users : BaseLongIdTable("user") {
     val role = customPostgresEnum<Role>("role", "user_role").default(Role.USER)
@@ -14,6 +15,8 @@ object Users : BaseLongIdTable("user") {
     val name = varchar("name", 30)
     val profileImageUrl = varchar("profile_image_url", 500).nullable()
     val introduce = text("introduce").nullable()
+    val isActive = bool("is_active").default(true)
+    val lastLoginAt = timestamp("last_login_at").nullable()
 
     init {
         uniqueIndex("uq_provider_user", provider, providerId)
