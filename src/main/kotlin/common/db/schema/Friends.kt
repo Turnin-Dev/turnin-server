@@ -8,6 +8,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.javatime.timestamp
 
+/** 친구 엔티티 클래스 (복수형) */
 object Friends : BaseLongIdTable("friend") {
     val requesterId = reference("requester_id", Users, onDelete = ReferenceOption.RESTRICT)
     val receiverId = reference("receiver_id", Users, onDelete = ReferenceOption.RESTRICT)
@@ -24,6 +25,7 @@ object Friends : BaseLongIdTable("friend") {
     }
 }
 
+/** 친구 엔티티 클래스 (단수형) */
 class FriendEntity(id: EntityID<Long>) : BaseEntity(id, Friends) {
     companion object : BaseEntityClass<FriendEntity>(Friends)
 

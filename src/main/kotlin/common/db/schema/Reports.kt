@@ -6,6 +6,7 @@ import com.peekr.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
+/** 신고 엔티티 클래스 (복수형) */
 object Reports : BaseLongIdTable("report") {
     val reporterId = reference("reporter_id", Users, onDelete = ReferenceOption.RESTRICT)
     val reportedId = reference("reported_id", Users, onDelete = ReferenceOption.RESTRICT)
@@ -18,6 +19,7 @@ object Reports : BaseLongIdTable("report") {
     }
 }
 
+/** 신고 엔티티 클래스 (단수형) */
 class ReportEntity(id: EntityID<Long>) : BaseEntity(id, Reports) {
     companion object : BaseEntityClass<ReportEntity>(Reports)
 
