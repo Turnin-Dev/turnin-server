@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.ReferenceOption
 
 object KeywordComments : BaseLongIdTable("keyword_comment") {
     val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
-    val keywordId = reference("keyword_id", Keywords, onDelete = ReferenceOption.CASCADE)
+    val keywordId = reference("user_keyword_id", UserKeywords, onDelete = ReferenceOption.CASCADE)
     val comment = text("comment")
 
     init {
