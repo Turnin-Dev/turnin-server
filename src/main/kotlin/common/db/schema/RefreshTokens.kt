@@ -11,9 +11,4 @@ object RefreshTokens : Table("refresh_tokens") {
     val refreshToken = text("refresh_token").uniqueIndex("uq_refresh_tokens_token")
     val createdAt = timestamp("created_at").defaultExpression(PeekrDateTime.timestamp)
     override val primaryKey = PrimaryKey(user)
-
-    init {
-        // 사용자별 토큰 조회용
-        index("idx_refresh_tokens_user_id", false, user)
-    }
 }

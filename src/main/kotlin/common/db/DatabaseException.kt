@@ -16,6 +16,11 @@ sealed class DatabaseException(
     code: ApiErrorCode,
     status: HttpStatusCode,
 ) : ApiException(code, detail, status) {
+    /**
+     * DB 쿼리 관련 예외
+     *
+     * [detail]이 `null`이면 [DatabaseErrorCode.DBQueryError.description]값을 기본으로 사용한다.
+     */
     class DBQueryException(detail: String? = null) :
         DatabaseException(
             code = DatabaseErrorCode.DBQueryError,

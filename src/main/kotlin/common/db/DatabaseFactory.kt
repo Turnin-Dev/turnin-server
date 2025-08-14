@@ -14,7 +14,14 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
-/** 데이터베이스를 초기화하고 전용 쿼리 메서드를 제공한다. */
+/**
+ * 데이터베이스 초기화(마이그레이션(Flyway) 수행, HikariCP 데이터소스 구성 포함)
+ * 코루틴 기반 트랜잭션 헬퍼(dbQuery) 제공을 담당합니다.
+ *
+ * 주의:
+ * - Dev 환경에서는 migrate 시 clean()을 호출하여 기존 스키마가 초기화됩니다.
+ * - 트랜잭션 헬퍼(dbQuery)는 IO 전용 컨텍스트(Dispatchers.IO)에서 newSuspendedTransaction을 실행합니다.
+ */
 object DatabaseFactory {
     private val ioContext: CoroutineContext = Dispatchers.IO
 

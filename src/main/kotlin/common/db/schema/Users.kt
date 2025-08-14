@@ -12,7 +12,7 @@ object Users : BaseLongIdTable("user") {
     val role = customPostgresEnum<Role>("role", "user_role").default(Role.USER)
     val provider = customPostgresEnum<SocialLoginProvider>("provider", "social_login_provider")
     val providerId = varchar("provider_id", 255)
-    val displayId = varchar("display_id", 30).uniqueIndex()
+    val displayId = varchar("display_id", 30).uniqueIndex("uq_users_display_id")
     val name = varchar("name", 30)
     val profileImageUrl = varchar("profile_image_url", 500).nullable()
     val introduce = text("introduce").nullable()
@@ -35,4 +35,6 @@ class UserEntity(id: EntityID<Long>) : BaseEntity(id, Users) {
     var name by Users.name
     var profileImageUrl by Users.profileImageUrl
     var introduce by Users.introduce
+    var isActive by Users.isActive
+    var lastLoginAt by Users.lastLoginAt
 }
