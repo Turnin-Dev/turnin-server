@@ -1,11 +1,17 @@
 package com.peekr.common.db
 
+import java.time.OffsetDateTime
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Expression
+import org.jetbrains.exposed.sql.Function
 import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.QueryBuilder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.VarCharColumnType
 import org.jetbrains.exposed.sql.castTo
+import org.jetbrains.exposed.sql.javatime.JavaOffsetDateTimeColumnType
+import org.jetbrains.exposed.sql.javatime.timestampWithTimeZone
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect
 import org.jetbrains.exposed.sql.vendors.currentDialect
 import org.postgresql.util.PGobject
@@ -59,4 +65,17 @@ object DatabaseUtils {
      */
     infix fun <T : Enum<T>> Column<T>.eqEnum(value: T): Op<Boolean> =
         this.castTo(VarCharColumnType()) eq value.name
+
+    /**
+     * [timestampWithTimeZone] 간소화 버전
+     */
+    fun Table.timestamptz(name: String): Column<OffsetDateTime> =
+        timestampWithTimeZone(name).defaultExpression(timestampExpression)
+}
+
+/** Exposed Expression<OffsetDateTime> 타입의 타임스탬프 */
+private val timestampExpression: Expression<OffsetDateTime> = object : Function<OffsetDateTime>(
+    JavaOffsetDateTimeColumnType(),
+) {
+    override fun toQueryBuilder(queryBuilder: QueryBuilder) = queryBuilder { append("CURRENT_TIMESTAMP") }
 }

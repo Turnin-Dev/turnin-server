@@ -113,4 +113,13 @@ class PeekrDateTimeTest {
         assertTrue(result.isBefore(Instant.now().plus(1, ChronoUnit.MINUTES)))
         assertTrue(result.isAfter(Instant.now().minus(1, ChronoUnit.MINUTES)))
     }
+
+    @Test
+    fun `Instant에서 변환된 OffsetDateTime을 다시 Instant화 시켜도 항상 같아야 한다`() {
+        val instant = PeekrDateTime.now()
+        val offsetDateTime = instant.toOffsetDateTime()
+        val instant2 = offsetDateTime.toInstant()
+
+        assertEquals(instant, instant2)
+    }
 }

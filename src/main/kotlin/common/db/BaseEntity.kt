@@ -1,6 +1,8 @@
 package com.peekr.common.db
 
+import com.peekr.common.db.DatabaseUtils.timestamptz
 import com.peekr.common.util.PeekrDateTime
+import com.peekr.common.util.toOffsetDateTime
 import io.ktor.util.logging.KtorSimpleLogger
 import org.jetbrains.exposed.dao.EntityChangeType
 import org.jetbrains.exposed.dao.EntityHook
@@ -9,7 +11,6 @@ import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.dao.toEntity
-import org.jetbrains.exposed.sql.javatime.timestamp
 
 /**
  * 모든 `LongIdTable`의 기초가 되는 추상 클래스
@@ -29,8 +30,8 @@ abstract class BaseLongIdTable(
     name: String,
     idName: String = "id",
 ) : LongIdTable(name, idName) {
-    val createdAt = timestamp("created_at").defaultExpression(PeekrDateTime.timestamp)
-    val updatedAt = timestamp("updated_at").defaultExpression(PeekrDateTime.timestamp)
+    val createdAt = timestamptz("created_at")
+    val updatedAt = timestamptz("updated_at")
 }
 
 /**
@@ -96,7 +97,7 @@ abstract class BaseEntityClass<E : BaseEntity>(table: BaseLongIdTable) : LongEnt
         EntityHook.subscribe { action ->
             if (action.changeType == EntityChangeType.Updated) {
                 try {
-                    action.toEntity(this)?.updatedAt = PeekrDateTime.now()
+                    action.toEntity(this)?.updatedAt = PeekrDateTime.now().toOffsetDateTime()
                 } catch (e: Exception) {
                     LOGGER.warn("Failed to update entity $this updatedAt:\n${e.message}")
                 }
