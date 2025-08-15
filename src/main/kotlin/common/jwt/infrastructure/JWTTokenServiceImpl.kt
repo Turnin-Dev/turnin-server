@@ -10,8 +10,8 @@ import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.PeekrDateTime.toDate
 import com.peekr.common.util.config.AppConfig
+import com.peekr.common.util.toDate
 
 private typealias JWTChecksum = Pair<String, String>
 
