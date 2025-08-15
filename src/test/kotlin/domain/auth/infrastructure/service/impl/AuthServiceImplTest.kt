@@ -195,7 +195,7 @@ class AuthServiceImplTest {
         val findUserResult = authService.findUser(SocialLoginProviderForAuth.GOOGLE, "123123")
 
         // then
-        assertTrue(findUserResult.isExist)
+        assertTrue(findUserResult.exists)
     }
 
     @Test
@@ -209,6 +209,6 @@ class AuthServiceImplTest {
         val findUserResult = authService.findUser(SocialLoginProviderForAuth.GOOGLE, "123123")
 
         // then
-        assertFalse(findUserResult.isExist)
+        assertFalse(findUserResult.exists)
     }
 }

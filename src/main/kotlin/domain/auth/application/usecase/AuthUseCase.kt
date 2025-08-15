@@ -52,7 +52,7 @@ interface AuthUseCase {
      *
      * @param provider 소셜 로그인 제공자
      * @param providerId 소셜 로그인 제공자에서 제공한 ID
-     * @return [FindUserResultDto] 가입 여부(`isExist`)
+     * @return [FindUserResultDto] 가입 여부(`exists`)
      */
     suspend fun findUser(provider: SocialLoginProviderForAuth, providerId: String): FindUserResultDto
 }

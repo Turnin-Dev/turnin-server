@@ -5,6 +5,7 @@ import com.peekr.common.validator.PeekrValidator.validation
 object CommonValidator {
     fun userIdValidatorAndReturn(userId: Long?): Long {
         validation(userId != null) { "사용자 ID가 필요합니다." }
+        validation((userId ?: 0L) > 0) { "사용자 ID는 양수여야 합니다." }
         return userId!!
     }
 
@@ -13,6 +14,7 @@ object CommonValidator {
         userId?.let {
             validation(userId.isNotEmpty()) { "사용자 ID가 비어있습니다." }
             validation(userId.toLongOrNull() != null) { "사용자 ID는 숫자형식만 허용됩니다." }
+            validation((userId.toLong()) > 0) { "사용자 ID는 양수여야 합니다." }
         }
         return userId!!.toLong()
     }

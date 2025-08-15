@@ -3,7 +3,6 @@ package com.peekr.domain.auth.application.usecase
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.application.dto.toDto
 import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.debug
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto

@@ -19,5 +19,5 @@ object AuthMapper {
         lastLoginAt = lastLoginAt,
     )
 
-    fun FindUserResult.toDto(): FindUserResultDto = FindUserResultDto(isExist)
+    fun FindUserResult.toDto(): FindUserResultDto = FindUserResultDto(exists)
 }

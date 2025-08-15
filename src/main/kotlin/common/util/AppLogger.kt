@@ -1,30 +1,30 @@
 package com.peekr.common.util
 
-import io.ktor.util.logging.KtorSimpleLogger
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * 애플리케이션 로거 타입
  */
-class AppLogger(val logger: Logger)
+class AppLogger(private val logger: Logger) {
+    /**
+     * 디버깅 로그
+     *
+     * @param message 로그 메시지
+     */
+    fun debug(message: String, e: Throwable? = null) {
+        if (e != null) logger.debug(message, e) else logger.debug(message)
+    }
 
-/**
- * 디버깅 로그
- *
- * @param message 로그 메시지
- */
-fun AppLogger.debug(message: String, e: Throwable? = null) {
-    logger.debug(message, e)
-}
-
-/**
- * 오류 로그
- *
- * @param e [Throwable]
- * @param message 로그 메시지
- */
-fun AppLogger.error(e: Throwable, message: String? = null) {
-    logger.error(message, e)
+    /**
+     * 오류 로그
+     *
+     * @param e [Throwable]
+     * @param message 로그 메시지
+     */
+    fun error(e: Throwable, message: String?) {
+        logger.error(message, e)
+    }
 }
 
 /**
@@ -36,5 +36,7 @@ object AppLoggerFactory {
      *
      * 로거 형태는 언제든지 바뀔 수 있다.
      */
-    fun createLogger(name: String): AppLogger = AppLogger(KtorSimpleLogger(name))
+    fun createLogger(name: String): AppLogger = AppLogger(LoggerFactory.getLogger(name))
+
+    inline fun <reified T> createLogger(): AppLogger = createLogger(T::class.java.name)
 }

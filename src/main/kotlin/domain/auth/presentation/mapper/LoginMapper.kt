@@ -31,4 +31,4 @@ fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
 
 fun JWTTokenDto.toResponse(): JWTTokenResponse = JWTTokenResponse(accessToken, refreshToken)
 
-fun FindUserResultDto.toResponse(): FindUserResultResponse = FindUserResultResponse(isExist)
+fun FindUserResultDto.toResponse(): FindUserResultResponse = FindUserResultResponse(exists)

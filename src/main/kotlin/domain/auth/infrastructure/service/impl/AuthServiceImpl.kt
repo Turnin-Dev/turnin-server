@@ -7,8 +7,6 @@ import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.debug
-import com.peekr.common.util.error
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.FindUserResult
@@ -88,7 +86,7 @@ class AuthServiceImpl(
             null
         }
     } catch (e: Exception) {
-        LOGGER.error(e)
+        LOGGER.error(e, e.message)
         null
     }
 
@@ -104,7 +102,7 @@ class AuthServiceImpl(
         val verifier = jwtTokenService.createVerifier(JWTTokenType.Refresh)
         verifier.verify(token)
     } catch (e: Exception) {
-        LOGGER.error(e)
+        LOGGER.error(e, e.message)
         null
     }
 }

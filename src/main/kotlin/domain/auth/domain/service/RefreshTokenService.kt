@@ -19,7 +19,7 @@ interface RefreshTokenService {
     ): Boolean
 
     /**
-     * JWT 형식의 토큰에서 String 타입의 UserId를 추출한다.
+     * JWT 형식의 토큰에서 Long 타입의 UserId를 추출한다.
      *
      * @param token JWT 형식의 토큰
      * @return [Long] UserID, UserID 형식이 아니거나 추출하지 못한다면 null

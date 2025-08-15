@@ -5,7 +5,6 @@ import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.error
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException
