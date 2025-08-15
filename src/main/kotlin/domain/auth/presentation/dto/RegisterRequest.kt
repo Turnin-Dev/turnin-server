@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.validator.PeekrValidator.validation
 import kotlinx.serialization.Serializable
 
+/** 회원가입 요청 바디 */
 @Serializable
 data class RegisterRequest(
     val role: String,

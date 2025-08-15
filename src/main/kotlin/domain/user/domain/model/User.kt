@@ -1,5 +1,7 @@
 package com.peekr.domain.user.domain.model
 
+import java.time.Instant
+
 /**
  * User
  *
@@ -11,6 +13,8 @@ package com.peekr.domain.user.domain.model
  * @param name 사용자 이름
  * @param profileImageUrl 사용자 프로필 이미지 url
  * @param introduce 사용자 소개 글
+ * @param isActive 사용자 활성 여부
+ * @param lastLoginAt 마지막 로그인 일시
  */
 data class User(
     val id: Long,
@@ -21,4 +25,6 @@ data class User(
     val name: String,
     val profileImageUrl: String?,
     val introduce: String?,
+    val isActive: Boolean,
+    val lastLoginAt: Instant?,
 )

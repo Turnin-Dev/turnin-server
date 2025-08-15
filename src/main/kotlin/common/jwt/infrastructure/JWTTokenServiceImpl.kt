@@ -11,7 +11,6 @@ import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.config.AppConfig
-import com.peekr.common.util.toDate
 
 private typealias JWTChecksum = Pair<String, String>
 
@@ -78,9 +77,8 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         expiresIn: Long,
     ): String {
         val checksum = createRandomChecksum()
-        val now = PeekrDateTime.now()
-        val issuedAt = now.toDate()
-        val expiresAt = now.plusMillis(expiresIn).toDate()
+        val issuedAt = PeekrDateTime.now()
+        val expiresAt = issuedAt.plusMillis(expiresIn)
 
         return JWT
             .create()
@@ -99,9 +97,8 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         expiresIn: Long,
     ): String {
         val checksum = createRandomChecksum()
-        val now = PeekrDateTime.now()
-        val issuedAt = now.toDate()
-        val expiresAt = now.plusMillis(expiresIn).toDate()
+        val issuedAt = PeekrDateTime.now()
+        val expiresAt = issuedAt.plusMillis(expiresIn)
 
         return JWT
             .create()

@@ -18,6 +18,8 @@ object UserMapper {
         name = entity.name,
         profileImageUrl = entity.profileImageUrl,
         introduce = entity.introduce,
+        isActive = entity.isActive,
+        lastLoginAt = entity.lastLoginAt,
     )
 }
 
