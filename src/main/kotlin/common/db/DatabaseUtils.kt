@@ -70,10 +70,7 @@ object DatabaseUtils {
      * [timestampWithTimeZone] 간소화 버전
      */
     fun Table.timestamptz(name: String): Column<OffsetDateTime> =
-        when (currentDialect) {
-            is PostgreSQLDialect -> timestampWithTimeZone(name).defaultExpression(timestampExpression)
-            else -> error("timestamptz is supported only on PostgreSQL (current: ${currentDialect::class.simpleName})")
-        }
+        timestampWithTimeZone(name).defaultExpression(timestampExpression)
 }
 
 /**

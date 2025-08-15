@@ -4,6 +4,7 @@ import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
@@ -29,9 +30,9 @@ class AuthRepositoryImpl : AuthRepository {
             }.singleOrNull()
     }
 
-    override suspend fun findUserByDisplayId(displayId: String): AuthUser? = dbQuery {
+    override suspend fun findUserByUserId(userId: Long): AuthUser? = dbQuery {
         UserEntity
-            .find((Users.displayId eq displayId))
+            .find((Users.id eq userId))
             .map {
                 AuthMapper.toDomain(it.readValues)
             }.singleOrNull()
@@ -67,3 +68,5 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger("AuthRepositoryImpl")

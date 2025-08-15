@@ -22,8 +22,22 @@ object AppLoggerFactory {
     /**
      * 디버깅 로그
      *
-     * @param header 로그 앞 부분 설명
      * @param message 로그 메시지
      */
-    fun AppLogger.debug(header: String, message: String) = logger.debug(message)
+    fun AppLogger.debug(message: String) {
+        val header = logger.name
+        logger.debug("[$header]: $message")
+    }
+
+    /**
+     * 오류 로그
+     *
+     * @param e [Throwable]
+     * @param message 로그 메시지
+     */
+    fun AppLogger.error(e: Throwable, message: String? = null) {
+        val header = logger.name
+        val messageBody = message?.let { "message:\n$it" } ?: ""
+        logger.error("[$header]:\nerror:\n${e.message}\n$messageBody")
+    }
 }

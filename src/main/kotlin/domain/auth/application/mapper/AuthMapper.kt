@@ -15,6 +15,8 @@ object AuthMapper {
         displayId = displayId,
         profileImageUrl = profileImageUrl,
         introduce = introduce,
+        isActive = isActive,
+        lastLoginAt = lastLoginAt,
     )
 
     fun FindUserResult.toDto(): FindUserResultDto = FindUserResultDto(isExist)

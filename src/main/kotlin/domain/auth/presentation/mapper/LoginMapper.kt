@@ -10,6 +10,7 @@ import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
+import java.time.Instant
 
 fun LoginRequest.toDto(): LoginDto = LoginDto(
     provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
@@ -24,6 +25,10 @@ fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
     name = name,
     profileImageUrl = profileImageUrl,
     introduce = introduce,
+    isActive = isActive,
+    lastLoginAt = lastLoginAt?.let {
+        Instant.ofEpochMilli(lastLoginAt)
+    },
 )
 
 fun JWTTokenDto.toResponse(): JWTTokenResponse = JWTTokenResponse(accessToken, refreshToken)

@@ -6,6 +6,9 @@ import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
+import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.AppLoggerFactory.debug
+import com.peekr.common.util.AppLoggerFactory.error
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
@@ -26,7 +29,10 @@ class AuthServiceImpl(
     ): LoginResult? {
         val authUser = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
 
-        if (authUser == null) return null
+        if (authUser == null) {
+            LOGGER.debug("authUser is failed, provider: $provider, providerId: $providerId")
+            return null
+        }
 
         val payload = JWTTokenPayload(
             userId = authUser.id.toString(),
@@ -36,6 +42,7 @@ class AuthServiceImpl(
         val jwtToken = jwtTokenService.generate(payload)
 
         val loginResult = LoginResult(jwtToken, authUser)
+        LOGGER.debug("AuthService(login()) successful")
         return loginResult
     }
 
@@ -56,15 +63,15 @@ class AuthServiceImpl(
     override suspend fun refresh(token: String): JWTToken? = try {
         val decodedRefreshToken = verifyRefreshToken(token)
 
-        val displayId = refreshTokenRepository.findDisplayIdByRefreshToken(token)
-        val authUser: AuthUser? = displayId?.let {
-            authRepository.findUserByDisplayId(it)
+        val userId = refreshTokenRepository.findUserIDByRefreshToken(token)
+        val authUser: AuthUser? = userId?.let {
+            authRepository.findUserByUserId(it)
         }
 
         if (decodedRefreshToken != null &&
-            displayId != null &&
+            userId != null &&
             authUser != null &&
-            displayId == authUser.displayId
+            userId == authUser.id
         ) {
             val payload = JWTTokenPayload(
                 userId = authUser.id.toString(),
@@ -77,6 +84,7 @@ class AuthServiceImpl(
             null
         }
     } catch (e: Exception) {
+        LOGGER.error(e)
         null
     }
 
@@ -92,6 +100,9 @@ class AuthServiceImpl(
         val verifier = jwtTokenService.createVerifier(JWTTokenType.Refresh)
         verifier.verify(token)
     } catch (e: Exception) {
+        LOGGER.error(e)
         null
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger("AuthServiceImpl")

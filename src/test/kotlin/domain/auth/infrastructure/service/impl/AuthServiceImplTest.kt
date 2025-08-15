@@ -117,10 +117,10 @@ class AuthServiceImplTest {
     fun `refresh 성공 테스트`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findDisplayIdByRefreshToken(any())
-        } returns MockAuthUser.displayId
+            refreshTokenRepository.findUserIDByRefreshToken(any())
+        } returns MockAuthUser.id
         coEvery {
-            authRepository.findUserByDisplayId(any())
+            authRepository.findUserByUserId(any())
         } returns MockAuthUser
 
         // when
@@ -136,10 +136,10 @@ class AuthServiceImplTest {
     fun `refresh 실패 테스트 - 토큰으로 사용자 ID를 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findDisplayIdByRefreshToken(any())
+            refreshTokenRepository.findUserIDByRefreshToken(any())
         } returns null
         coEvery {
-            authRepository.findUserByDisplayId(any())
+            authRepository.findUserByUserId(any())
         } returns MockAuthUser
 
         // when
@@ -153,10 +153,10 @@ class AuthServiceImplTest {
     fun `refresh 실패 테스트 - 사용자 ID로 사용자를 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findDisplayIdByRefreshToken(any())
-        } returns MockAuthUser.displayId
+            refreshTokenRepository.findUserIDByRefreshToken(any())
+        } returns MockAuthUser.id
         coEvery {
-            authRepository.findUserByDisplayId(any())
+            authRepository.findUserByUserId(any())
         } returns null
 
         // when
@@ -171,10 +171,10 @@ class AuthServiceImplTest {
         // given
         val expectedException = NullPointerException()
         coEvery {
-            refreshTokenRepository.findDisplayIdByRefreshToken(any())
-        } returns MockAuthUser.displayId
+            refreshTokenRepository.findUserIDByRefreshToken(any())
+        } returns MockAuthUser.id
         coEvery {
-            authRepository.findUserByDisplayId(any())
+            authRepository.findUserByUserId(any())
         } throws expectedException
 
         // when

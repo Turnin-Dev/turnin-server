@@ -19,6 +19,8 @@ object AuthMapper {
             name = row[Users.name],
             profileImageUrl = row[Users.profileImageUrl],
             introduce = row[Users.introduce],
+            isActive = row[Users.isActive],
+            lastLoginAt = row[Users.lastLoginAt],
         )
 }
 

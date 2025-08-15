@@ -19,6 +19,8 @@ object AuthTestDoubles {
         name = "honggd",
         profileImageUrl = "http://example.com/profile.jpg",
         introduce = "Hello!",
+        isActive = true,
+        lastLoginAt = null,
     )
 
     val MockValidLoginRequest = LoginRequest(

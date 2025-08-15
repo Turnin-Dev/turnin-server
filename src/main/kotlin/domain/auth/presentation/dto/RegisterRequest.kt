@@ -14,6 +14,8 @@ data class RegisterRequest(
     val name: String,
     val profileImageUrl: String? = null,
     val introduce: String? = null,
+    val isActive: Boolean = true,
+    val lastLoginAt: Long? = null,
 ) {
     companion object {
         val sample = RegisterRequest(
@@ -24,6 +26,7 @@ data class RegisterRequest(
             name = "honggd",
             profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
             introduce = "Hello!",
+            isActive = true,
         )
     }
 }
