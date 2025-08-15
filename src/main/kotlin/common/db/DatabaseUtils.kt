@@ -68,12 +68,14 @@ object DatabaseUtils {
 
     /**
      * [timestampWithTimeZone] 간소화 버전
+     *
+     * `Postgres`일 때만 `timestampWithTimeZone`사용하고 이 외에는 대체 타입 사용
      */
-    fun Table.timestamptz(name: String): Column<OffsetDateTime> =
-        when (currentDialect) {
-            is PostgreSQLDialect -> timestampWithTimeZone(name).defaultExpression(timestampExpression)
-            else -> error("timestamptz is supported only on PostgreSQL (current: ${currentDialect::class.simpleName})")
-        }
+    fun Table.timestamptz(name: String): Column<OffsetDateTime> = if (currentDialect is PostgreSQLDialect) {
+        timestampWithTimeZone(name).defaultExpression(timestampExpression)
+    } else {
+        registerColumn(name, JavaOffsetDateTimeColumnType()).defaultExpression(timestampExpression)
+    }
 }
 
 /**

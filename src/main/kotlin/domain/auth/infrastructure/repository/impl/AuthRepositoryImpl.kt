@@ -4,6 +4,7 @@ import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
@@ -29,12 +30,10 @@ class AuthRepositoryImpl : AuthRepository {
             }.singleOrNull()
     }
 
-    override suspend fun findUserByDisplayId(displayId: String): AuthUser? = dbQuery {
-        UserEntity
-            .find((Users.displayId eq displayId))
-            .map {
-                AuthMapper.toDomain(it.readValues)
-            }.singleOrNull()
+    override suspend fun findUserByUserId(userId: Long): AuthUser? = dbQuery {
+        UserEntity.findById(userId)?.let {
+            AuthMapper.toDomain(it.readValues)
+        }
     }
 
     override suspend fun save(authUser: AuthUser): AuthUser = dbQuery {
@@ -47,6 +46,8 @@ class AuthRepositoryImpl : AuthRepository {
                 this.displayId = authUser.displayId
                 this.profileImageUrl = authUser.profileImageUrl
                 this.introduce = authUser.introduce
+                this.isActive = authUser.isActive
+                this.lastLoginAt = authUser.lastLoginAt
             }
 
             authUser.copy(id = savedUserEntity.id.value)
@@ -62,8 +63,11 @@ class AuthRepositoryImpl : AuthRepository {
                 e.message?.contains("primary key violation") == true ||
                 e.message?.contains("already exists") == true
             ) {
+                LOGGER.debug("Duplicate user detected while saving authUser.", e)
                 throw AuthException.DuplicateUserException(e.message)
             }
         }
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger("AuthRepositoryImpl")

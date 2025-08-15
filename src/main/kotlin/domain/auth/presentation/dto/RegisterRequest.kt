@@ -5,25 +5,30 @@ import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.validator.PeekrValidator.validation
 import kotlinx.serialization.Serializable
 
+/** 회원가입 요청 바디 */
 @Serializable
 data class RegisterRequest(
-    val role: String,
-    val provider: String,
+    val role: Role,
+    val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: String,
     val name: String,
     val profileImageUrl: String? = null,
     val introduce: String? = null,
+    val isActive: Boolean = true,
+    val lastLoginAt: Long? = null,
 ) {
     companion object {
         val sample = RegisterRequest(
-            role = Role.USER.name,
-            provider = SocialLoginProvider.GOOGLE.name,
+            role = Role.USER,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "providerIDDDDD",
             displayId = "hong_gd_123",
             name = "honggd",
             profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
             introduce = "Hello!",
+            isActive = true,
+            lastLoginAt = null,
         )
     }
 }

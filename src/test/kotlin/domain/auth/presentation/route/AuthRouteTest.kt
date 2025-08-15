@@ -41,8 +41,8 @@ class AuthRouteTest {
     @Before
     fun setup() {
         mockkObject(CommonValidator)
-        every { userIdValidatorAndReturn(any()) } returns 1L
-        coEvery { authUseCase.extractUserId(any()) } returns ""
+        every { userIdValidatorAndReturn(any<Long>()) } returns 1L
+        coEvery { authUseCase.extractUserId(any()) } returns 0L
     }
 
     @After

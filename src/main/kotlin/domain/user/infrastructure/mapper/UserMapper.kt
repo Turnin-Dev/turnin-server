@@ -3,6 +3,7 @@ package com.peekr.domain.user.infrastructure.mapper
 import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User
@@ -18,12 +19,19 @@ object UserMapper {
         name = entity.name,
         profileImageUrl = entity.profileImageUrl,
         introduce = entity.introduce,
+        isActive = entity.isActive,
+        lastLoginAt = entity.lastLoginAt,
     )
 }
 
 fun Role.toRoleForUser(): RoleForUser = when (this) {
     Role.USER -> RoleForUser.USER
     Role.ADMIN -> RoleForUser.ADMIN
+}
+
+fun Role.toRoleForAuth(): RoleForAuth = when (this) {
+    Role.USER -> RoleForAuth.USER
+    Role.ADMIN -> RoleForAuth.ADMIN
 }
 
 fun SocialLoginProvider.toSocialLoginProviderForUser(): SocialLoginProviderForUser = when (this) {

@@ -58,9 +58,9 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             val refreshTokenParam = call.request.headers["Authorization"]
             refreshTokenParam?.let {
                 JWTValidator.validate(refreshTokenParam)
-                val extractedUserId = authUseCase.extractUserId(refreshTokenParam)
-                val userId = userIdValidatorAndReturn(extractedUserId)
                 val refreshToken = refreshTokenParam.removeBearerHeader()
+                val extractedUserId = authUseCase.extractUserId(refreshToken)
+                val userId = userIdValidatorAndReturn(extractedUserId)
                 val token = authUseCase.refresh(userId, refreshToken)
                 if (token == null) {
                     call.respond(
@@ -233,7 +233,7 @@ private fun RouteConfig.findUserDocs() {
                 example("FindUserResultResponse") {
                     value = """
                         {
-                            "isExist": true
+                            "exists": true
                         }
                     """.trimIndent()
                 }

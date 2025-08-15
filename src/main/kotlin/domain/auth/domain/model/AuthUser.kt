@@ -1,5 +1,7 @@
 package com.peekr.domain.auth.domain.model
 
+import java.time.Instant
+
 /**
  * 인증에 필요한 User 모델
  *
@@ -11,6 +13,8 @@ package com.peekr.domain.auth.domain.model
  * @param name 사용자 이름
  * @param profileImageUrl 사용자 프로필 이미지 url
  * @param introduce 사용자 소개 글
+ * @param isActive 사용자 활성 여부
+ * @param lastLoginAt 마지막 로그인 일시
  */
 data class AuthUser(
     val id: Long,
@@ -21,6 +25,8 @@ data class AuthUser(
     val name: String,
     val profileImageUrl: String?,
     val introduce: String?,
+    val isActive: Boolean,
+    val lastLoginAt: Instant?,
 ) {
     companion object {
         val sample: AuthUser = AuthUser(
@@ -32,6 +38,8 @@ data class AuthUser(
             name = "honggd",
             profileImageUrl = "https://example.com/image.jpg",
             introduce = "hello world!",
+            isActive = true,
+            lastLoginAt = Instant.ofEpochMilli(1697875200000L),
         )
     }
 }

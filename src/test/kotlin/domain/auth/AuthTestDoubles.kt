@@ -19,21 +19,23 @@ object AuthTestDoubles {
         name = "honggd",
         profileImageUrl = "http://example.com/profile.jpg",
         introduce = "Hello!",
+        isActive = true,
+        lastLoginAt = null,
     )
 
     val MockValidLoginRequest = LoginRequest(
-        provider = SocialLoginProvider.GOOGLE.name,
+        provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
     )
 
     val MockInvalidLoginRequest = LoginRequest(
-        provider = SocialLoginProvider.GOOGLE.name,
+        provider = SocialLoginProvider.GOOGLE,
         providerId = "",
     )
 
     val MockValidRegisterRequest = RegisterRequest(
-        role = Role.USER.name,
-        provider = SocialLoginProvider.GOOGLE.name,
+        role = Role.USER,
+        provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
         displayId = "hong_gd_123",
         name = "honggd",
@@ -42,8 +44,8 @@ object AuthTestDoubles {
     )
 
     val MockInvalidRegisterRequest = RegisterRequest(
-        role = Role.USER.name,
-        provider = SocialLoginProvider.GOOGLE.name,
+        role = Role.USER,
+        provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
         displayId = "",
         name = "",

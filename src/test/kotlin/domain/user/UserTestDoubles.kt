@@ -27,5 +27,7 @@ object UserTestDoubles {
         name = "honggd",
         profileImageUrl = "https://example.com/image.jpg",
         introduce = "hello world!",
+        isActive = true,
+        lastLoginAt = null,
     )
 }
