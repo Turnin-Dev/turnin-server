@@ -233,7 +233,7 @@ private fun RouteConfig.findUserDocs() {
                 example("FindUserResultResponse") {
                     value = """
                         {
-                            "isExist": true
+                            "exists": true
                         }
                     """.trimIndent()
                 }

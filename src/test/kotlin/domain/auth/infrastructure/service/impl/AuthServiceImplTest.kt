@@ -117,7 +117,7 @@ class AuthServiceImplTest {
     fun `refresh 성공 테스트`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findUserIDByRefreshToken(any())
+            refreshTokenRepository.findUserIdByRefreshToken(any())
         } returns MockAuthUser.id
         coEvery {
             authRepository.findUserByUserId(any())
@@ -136,7 +136,7 @@ class AuthServiceImplTest {
     fun `refresh 실패 테스트 - 토큰으로 사용자 ID를 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findUserIDByRefreshToken(any())
+            refreshTokenRepository.findUserIdByRefreshToken(any())
         } returns null
         coEvery {
             authRepository.findUserByUserId(any())
@@ -153,7 +153,7 @@ class AuthServiceImplTest {
     fun `refresh 실패 테스트 - 사용자 ID로 사용자를 찾지 못하는 경우`() = runTest {
         // given
         coEvery {
-            refreshTokenRepository.findUserIDByRefreshToken(any())
+            refreshTokenRepository.findUserIdByRefreshToken(any())
         } returns MockAuthUser.id
         coEvery {
             authRepository.findUserByUserId(any())
@@ -171,7 +171,7 @@ class AuthServiceImplTest {
         // given
         val expectedException = NullPointerException()
         coEvery {
-            refreshTokenRepository.findUserIDByRefreshToken(any())
+            refreshTokenRepository.findUserIdByRefreshToken(any())
         } returns MockAuthUser.id
         coEvery {
             authRepository.findUserByUserId(any())

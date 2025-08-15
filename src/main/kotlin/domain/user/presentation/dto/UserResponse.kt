@@ -30,7 +30,7 @@ data class UserResponse(
             profileImageUrl = "https://www.example.com/image.jpg",
             introduce = "hello world!",
             isActive = true,
-            lastLoginAt = 1697875200000,
+            lastLoginAt = 1697875200000L,
         )
     }
 }

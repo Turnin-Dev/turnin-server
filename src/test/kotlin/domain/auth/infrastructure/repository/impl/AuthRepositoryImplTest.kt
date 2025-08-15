@@ -23,7 +23,6 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `save & findByProviderAndProviderId 성공 테스트`() = runTest {
-        TestDatabaseFactory.init()
         val savedUser = repository.save(MockAuthUser)
         assertTrue(savedUser.id > 0L)
 
@@ -66,19 +65,19 @@ class AuthRepositoryImplTest {
         assertTrue(savedUser.id > 0L)
 
         // when
-        val foundedUser = repository.findUserByUserId(savedUser.id)
+        val foundUser = repository.findUserByUserId(savedUser.id)
 
         // then
-        assertNotNull(foundedUser)
-        assertEquals(savedUser, foundedUser)
+        assertNotNull(foundUser)
+        assertEquals(savedUser, foundUser)
     }
 
     @Test
     fun `findUserByUserId 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
         // when
-        val foundedUser = repository.findUserByUserId(100)
+        val foundUser = repository.findUserByUserId(100)
 
         // then
-        assertNull(foundedUser)
+        assertNull(foundUser)
     }
 }

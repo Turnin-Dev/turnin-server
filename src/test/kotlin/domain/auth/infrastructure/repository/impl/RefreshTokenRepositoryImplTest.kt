@@ -27,7 +27,7 @@ class RefreshTokenRepositoryImplTest {
     @Test
     fun `findUserIdByRefreshToken 성공 테스트`() = runTest {
         // given
-        TestDatabaseFactory.dbQuery {
+        val expectedUserId = TestDatabaseFactory.dbQuery {
             val savedUserEntity = UserEntity.new {
                 this.role = MockUser.role.toRole()
                 this.provider = MockUser.provider.toSocialLoginProvider()
@@ -37,25 +37,27 @@ class RefreshTokenRepositoryImplTest {
                 this.profileImageUrl = MockUser.profileImageUrl
                 this.introduce = MockUser.introduce
             }
-            val userId = savedUserEntity.id
+
             RefreshTokens.upsert {
-                it[user] = userId
+                it[user] = savedUserEntity.id
                 it[refreshToken] = MOCK_REFRESH_TOKEN
             }
+
+            savedUserEntity.id.value
         }
 
         // when
-        val userId = refreshTokenRepository.findUserIDByRefreshToken(MOCK_REFRESH_TOKEN)
+        val userId = refreshTokenRepository.findUserIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
         assertNotNull(userId)
-        assertEquals(MockUser.id, userId)
+        assertEquals(expectedUserId, userId)
     }
 
     @Test
     fun `findUserIdByRefreshToken 실패 테스트 - 유효하지 않은 토큰으로 조회했을 경우`() = runTest {
         // when
-        val userId = refreshTokenRepository.findUserIDByRefreshToken(MOCK_REFRESH_TOKEN)
+        val userId = refreshTokenRepository.findUserIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
         assertNull(userId)
@@ -84,12 +86,12 @@ class RefreshTokenRepositoryImplTest {
 
         // when
         val result = refreshTokenRepository.save(userId, MOCK_REFRESH_TOKEN)
-        val foundUserId = refreshTokenRepository.findUserIDByRefreshToken(MOCK_REFRESH_TOKEN)
+        val foundUserId = refreshTokenRepository.findUserIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
         assertTrue(result)
         assertNotNull(foundUserId)
-        assertEquals(MockUser.id, foundUserId)
+        assertEquals(userId, foundUserId)
     }
 
     @Test

@@ -3,6 +3,11 @@ package com.peekr.common.validator
 import com.peekr.common.validator.PeekrValidator.validation
 
 object CommonValidator {
+    fun userIdValidatorAndReturn(userId: Long?): Long {
+        validation(userId != null) { "사용자 ID가 필요합니다." }
+        return userId!!
+    }
+
     fun userIdValidatorAndReturn(userId: String?): Long {
         validation(userId != null) { "사용자 ID가 필요합니다." }
         userId?.let {

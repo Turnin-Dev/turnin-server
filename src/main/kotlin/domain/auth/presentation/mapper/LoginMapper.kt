@@ -4,31 +4,29 @@ import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.RegisterDto
-import com.peekr.domain.auth.domain.model.RoleForAuth
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProviderForAuth
 import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
+import com.peekr.domain.user.infrastructure.mapper.toRoleForAuth
 import java.time.Instant
 
 fun LoginRequest.toDto(): LoginDto = LoginDto(
-    provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
+    provider = provider.toSocialLoginProviderForAuth(),
     providerId = providerId,
 )
 
 fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
-    role = RoleForAuth.valueOf(role.trim().uppercase()),
-    provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
+    role = role.toRoleForAuth(),
+    provider = provider.toSocialLoginProviderForAuth(),
     providerId = providerId,
     displayId = displayId,
     name = name,
     profileImageUrl = profileImageUrl,
     introduce = introduce,
     isActive = isActive,
-    lastLoginAt = lastLoginAt?.let {
-        Instant.ofEpochMilli(lastLoginAt)
-    },
+    lastLoginAt = lastLoginAt?.let(Instant::ofEpochMilli),
 )
 
 fun JWTTokenDto.toResponse(): JWTTokenResponse = JWTTokenResponse(accessToken, refreshToken)

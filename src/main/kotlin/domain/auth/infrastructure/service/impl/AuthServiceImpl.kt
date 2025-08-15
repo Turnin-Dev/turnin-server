@@ -7,8 +7,9 @@ import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.AppLoggerFactory.debug
-import com.peekr.common.util.AppLoggerFactory.error
+import com.peekr.common.util.debug
+import com.peekr.common.util.error
+import com.peekr.common.util.masking
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
@@ -30,7 +31,7 @@ class AuthServiceImpl(
         val authUser = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
 
         if (authUser == null) {
-            LOGGER.debug("authUser is failed, provider: $provider, providerId: $providerId")
+            LOGGER.debug("authUser not found, provider: $provider, providerId: ${providerId.masking()}")
             return null
         }
 
@@ -63,13 +64,16 @@ class AuthServiceImpl(
     override suspend fun refresh(token: String): JWTToken? = try {
         val decodedRefreshToken = verifyRefreshToken(token)
 
-        val userId = refreshTokenRepository.findUserIDByRefreshToken(token)
+        if (decodedRefreshToken == null) {
+            null
+        }
+
+        val userId = refreshTokenRepository.findUserIdByRefreshToken(token)
         val authUser: AuthUser? = userId?.let {
             authRepository.findUserByUserId(it)
         }
 
-        if (decodedRefreshToken != null &&
-            userId != null &&
+        if (userId != null &&
             authUser != null &&
             userId == authUser.id
         ) {

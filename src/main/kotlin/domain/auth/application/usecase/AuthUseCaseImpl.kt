@@ -3,7 +3,8 @@ package com.peekr.domain.auth.application.usecase
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.application.dto.toDto
 import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.AppLoggerFactory.debug
+import com.peekr.common.util.debug
+import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.RegisterDto
@@ -22,7 +23,7 @@ class AuthUseCaseImpl(
         val loginResult = authService.login(loginDto.provider, loginDto.providerId)
         if (loginResult == null) {
             LOGGER.debug(
-                "login failed, provider: ${loginDto.provider}, providerId: ${loginDto.providerId}",
+                "login failed, provider: ${loginDto.provider}, providerId: ${loginDto.providerId.masking()}",
             )
             return null
         }
@@ -45,7 +46,8 @@ class AuthUseCaseImpl(
     override suspend fun refresh(userId: Long, token: String): JWTTokenDto? {
         val newToken = authService.refresh(token)
         return newToken?.let {
-            saveRefreshToken(userId, it.refreshToken)
+            val extractedUserId = extractUserId(token) ?: userId
+            saveRefreshToken(extractedUserId, it.refreshToken)
             newToken.toDto()
         }
     }
@@ -62,7 +64,7 @@ class AuthUseCaseImpl(
         refreshTokenService.save(userId, token)
     }
 
-    override suspend fun extractUserId(token: String): String? =
+    override suspend fun extractUserId(token: String): Long? =
         refreshTokenService.extractUserId(token)
 }
 

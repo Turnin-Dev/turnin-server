@@ -5,7 +5,10 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <!-- 로그 레벨 순서 -->
+    <!-- TRACE < DEBUG < INFO < WARN < ERROR -->
+    <!-- TODO: 실제 배포 시 로그 레벨 INFO로 격상 필수 -->
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="org.eclipse.jetty" level="INFO"/>

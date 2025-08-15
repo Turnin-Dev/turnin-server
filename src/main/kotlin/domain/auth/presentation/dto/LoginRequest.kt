@@ -12,18 +12,17 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class LoginRequest(
-    val provider: String,
+    val provider: SocialLoginProvider,
     val providerId: String,
 ) {
     companion object {
         val sample = LoginRequest(
-            provider = SocialLoginProvider.GOOGLE.name,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "1231312312312",
         )
     }
 }
 
 fun LoginRequest.validate() {
-    validation(provider.isNotBlank()) { "provider가 존재하지 않습니다." }
     validation(providerId.isNotBlank()) { "providerId가 존재하지 않습니다." }
 }

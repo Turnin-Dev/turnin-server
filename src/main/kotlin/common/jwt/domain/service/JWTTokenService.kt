@@ -37,5 +37,5 @@ interface JWTTokenService {
      * @return [Long] UserID, UserID 형식이 아니거나 추출하지 못한다면 null
      * @throws TokenException.CannotDecodedException 토큰이 정상적으로 디코딩 할 수 없는 형식인 경우 예외 발생
      */
-    fun extractUserId(token: String): String?
+    fun extractUserId(token: String): Long?
 }

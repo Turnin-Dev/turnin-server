@@ -114,8 +114,8 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         return JWTChecksum("checksum", randomValue)
     }
 
-    override fun extractUserId(token: String): String? = try {
-        JWT.decode(token).subject
+    override fun extractUserId(token: String): Long? = try {
+        JWT.decode(token).subject.toLongOrNull()
     } catch (e: JWTDecodeException) {
         throw TokenException.CannotDecodedException(e.message)
     }

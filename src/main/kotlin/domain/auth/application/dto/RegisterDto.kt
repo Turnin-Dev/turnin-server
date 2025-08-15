@@ -4,7 +4,7 @@ import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import java.time.Instant
 
-/** 애플리케이션 계층에서 사용하는 RegisterDto */
+/** 애플리케이션 계층에서 사용하는 Register */
 data class RegisterDto(
     val role: RoleForAuth,
     val provider: SocialLoginProviderForAuth,

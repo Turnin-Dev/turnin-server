@@ -13,6 +13,8 @@ import java.time.Instant
  * @param name 사용자 이름
  * @param profileImageUrl 사용자 프로필 이미지 url
  * @param introduce 사용자 소개 글
+ * @param isActive 사용자 활성 여부
+ * @param lastLoginAt 마지막 로그인 일시
  */
 data class AuthUser(
     val id: Long,
@@ -37,7 +39,7 @@ data class AuthUser(
             profileImageUrl = "https://example.com/image.jpg",
             introduce = "hello world!",
             isActive = true,
-            lastLoginAt = Instant.ofEpochMilli(1697875200000),
+            lastLoginAt = Instant.ofEpochMilli(1697875200000L),
         )
     }
 }

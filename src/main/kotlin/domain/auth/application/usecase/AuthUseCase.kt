@@ -45,7 +45,7 @@ interface AuthUseCase {
      * @return [Long] UserID, UserID 형식이 아니거나 추출하지 못한다면 null
      * @throws TokenException.CannotDecodedException 토큰이 정상적으로 디코딩 할 수 없는 형식인 경우 예외 발생
      */
-    suspend fun extractUserId(token: String): String?
+    suspend fun extractUserId(token: String): Long?
 
     /**
      * 로그인을 수행하기 전에 이미 가입되어 있는 사용자인지 찾는다.
