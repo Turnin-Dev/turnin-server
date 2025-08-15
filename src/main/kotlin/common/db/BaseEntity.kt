@@ -97,9 +97,17 @@ abstract class BaseEntityClass<E : BaseEntity>(table: BaseLongIdTable) : LongEnt
         EntityHook.subscribe { action ->
             if (action.changeType == EntityChangeType.Updated) {
                 try {
-                    action.toEntity(this)?.updatedAt = PeekrDateTime.now().toOffsetDateTime()
+                    val entity = action.toEntity(this)
+                    if (entity != null) {
+                        entity.updatedAt = PeekrDateTime.now().toOffsetDateTime()
+                    } else {
+                        LOGGER.warn(
+                            "Failed to update updatedAt: " +
+                                "entity resolution failed for ${table.tableName} (action=$action)",
+                        )
+                    }
                 } catch (e: Exception) {
-                    LOGGER.warn("Failed to update entity $this updatedAt:\n${e.message}")
+                    LOGGER.warn("Failed to update updatedAt for ${table.tableName} (action=$action): ${e.message}")
                 }
             }
         }
