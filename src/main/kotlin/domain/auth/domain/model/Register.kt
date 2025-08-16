@@ -1,9 +1,7 @@
-package com.peekr.domain.auth.application.dto
-
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+package com.peekr.domain.auth.domain.model
 
 /**
- * 애플리케이션 계층에서 사용하는 Register
+ * 회원가입 정보
  *
  * @property provider 소셜로그인 제공자
  * @property providerId 소셜로그인 제공자에서 제공한 ID
@@ -12,7 +10,7 @@ import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
  * @property profileImageUrl 사용자 프로필 사진 url
  * @property introduce 사용자 소개 글
  */
-data class RegisterDto(
+data class Register(
     val provider: SocialLoginProviderForAuth,
     val providerId: String,
     val displayId: String,

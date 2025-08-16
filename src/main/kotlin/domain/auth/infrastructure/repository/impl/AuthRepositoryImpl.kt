@@ -5,7 +5,11 @@ import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.PeekrDateTime
+import com.peekr.domain.auth.application.mapper.AuthMapper.toAuthUser
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.Register
+import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.exception.AuthException
@@ -36,21 +40,30 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 
-    override suspend fun save(authUser: AuthUser): AuthUser = dbQuery {
+    override suspend fun save(register: Register): AuthUser = dbQuery {
         try {
+            val role = RoleForAuth.USER
+            val isActive = true
+            val lastLoginAt = PeekrDateTime.now()
+
             val savedUserEntity = UserEntity.new {
-                this.role = authUser.role.toRole()
-                this.provider = authUser.provider.toSocialLoginProvider()
-                this.providerId = authUser.providerId
-                this.name = authUser.name
-                this.displayId = authUser.displayId
-                this.profileImageUrl = authUser.profileImageUrl
-                this.introduce = authUser.introduce
-                this.isActive = authUser.isActive
-                this.lastLoginAt = authUser.lastLoginAt
+                this.role = role.toRole()
+                this.provider = register.provider.toSocialLoginProvider()
+                this.providerId = register.providerId
+                this.name = register.name
+                this.displayId = register.displayId
+                this.profileImageUrl = register.profileImageUrl
+                this.introduce = register.introduce
+                this.isActive = isActive
+                this.lastLoginAt = lastLoginAt
             }
 
-            authUser.copy(id = savedUserEntity.id.value)
+            register.toAuthUser(
+                id = savedUserEntity.id.value,
+                role = role,
+                isActive = isActive,
+                lastLoginAt = savedUserEntity.lastLoginAt,
+            )
         } catch (e: Exception) {
             processSQLException(e)
             throw e

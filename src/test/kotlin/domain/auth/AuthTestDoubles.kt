@@ -1,9 +1,9 @@
 package com.peekr.domain.auth
 
-import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.presentation.dto.LoginRequest
@@ -23,6 +23,15 @@ object AuthTestDoubles {
         lastLoginAt = null,
     )
 
+    val MockRegister = Register(
+        provider = SocialLoginProviderForAuth.GOOGLE,
+        providerId = "providerIDDDDD",
+        displayId = "hong_gd_123",
+        name = "honggd",
+        profileImageUrl = "http://example.com/profile.jpg",
+        introduce = "Hello!",
+    )
+
     val MockValidLoginRequest = LoginRequest(
         provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
@@ -34,7 +43,6 @@ object AuthTestDoubles {
     )
 
     val MockValidRegisterRequest = RegisterRequest(
-        role = Role.USER,
         provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
         displayId = "hong_gd_123",
@@ -44,7 +52,6 @@ object AuthTestDoubles {
     )
 
     val MockInvalidRegisterRequest = RegisterRequest(
-        role = Role.USER,
         provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
         displayId = "",

@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
-import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
+import com.peekr.domain.auth.AuthTestDoubles.MockRegister
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
@@ -23,12 +23,12 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `save & findByProviderAndProviderId 성공 테스트`() = runTest {
-        val savedUser = repository.save(MockAuthUser)
+        val savedUser = repository.save(MockRegister)
         assertTrue(savedUser.id > 0L)
 
         val foundUser = repository.findAuthUserByProviderAndProviderId(
-            provider = MockAuthUser.provider,
-            providerId = MockAuthUser.providerId,
+            provider = MockRegister.provider,
+            providerId = MockRegister.providerId,
         )
 
         assertNotNull(foundUser)
@@ -47,12 +47,12 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `save 실패 테스트 - 중복된 providerId 저장 시도`() = runTest {
-        val savedUser = repository.save(MockAuthUser)
+        val savedUser = repository.save(MockRegister)
 
         assertTrue(savedUser.id > 0L)
 
         val exception = assertFailsWith<AuthException.DuplicateUserException> {
-            repository.save(MockAuthUser) // 동일한 providerId 삽입 시도
+            repository.save(MockRegister) // 동일한 providerId 삽입 시도
         }
 
         println("발생한 예외: ${exception.message}")
@@ -61,7 +61,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findUserByUserId 성공 테스트`() = runTest {
         // given
-        val savedUser = repository.save(MockAuthUser)
+        val savedUser = repository.save(MockRegister)
         assertTrue(savedUser.id > 0L)
 
         // when

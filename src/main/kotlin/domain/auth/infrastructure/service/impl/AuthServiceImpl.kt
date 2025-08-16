@@ -11,6 +11,7 @@ import com.peekr.common.util.masking
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
+import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
@@ -45,8 +46,8 @@ class AuthServiceImpl(
         return loginResult
     }
 
-    override suspend fun register(authUser: AuthUser): RegisterResult {
-        val savedAuthUser = authRepository.save(authUser)
+    override suspend fun register(register: Register): RegisterResult {
+        val savedAuthUser = authRepository.save(register)
 
         val payload = JWTTokenPayload(
             userId = savedAuthUser.id.toString(),

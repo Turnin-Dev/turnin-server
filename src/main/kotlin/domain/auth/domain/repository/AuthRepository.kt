@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.domain.repository
 
 import com.peekr.domain.auth.domain.model.AuthUser
+import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthException
 
@@ -28,9 +29,13 @@ interface AuthRepository {
     suspend fun findUserByUserId(userId: Long): AuthUser?
 
     /**
-     * [AuthUser]로 회원가입(저장)을 한다.
+     * [Register]로 회원가입(저장)을 한다.
+     *
+     * 기본적으로 활성화된 사용자로 저장된다.
+     *
+     * - 활성화된 사용자: `role: Role.User`, `isActive: true`
      *
      * @exception AuthException.DuplicateUserException - 이미 존재하는 사용자 저장 시 예외 발생
      */
-    suspend fun save(authUser: AuthUser): AuthUser
+    suspend fun save(register: Register): AuthUser
 }
