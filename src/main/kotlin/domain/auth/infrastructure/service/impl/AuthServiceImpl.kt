@@ -29,7 +29,6 @@ class AuthServiceImpl(
     ): LoginResult? {
         LOGGER.debug("login service attempt, provider: $provider, providerId: ${providerId.masking()}")
         val authUser = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
-
         if (authUser == null) {
             LOGGER.debug("AuthUser not found, provider: $provider, providerId: ${providerId.masking()}")
             return null
@@ -41,8 +40,10 @@ class AuthServiceImpl(
             claim = authUser.displayId,
         )
         val jwtToken = jwtTokenService.generate(payload)
-
         val loginResult = LoginResult(jwtToken, authUser)
+
+        authRepository.updateLastLoginAt(authUser.id)
+
         LOGGER.debug("login service successful")
         return loginResult
     }

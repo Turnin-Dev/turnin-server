@@ -20,6 +20,7 @@ import java.sql.SQLException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.update
 
 class AuthRepositoryImpl : AuthRepository {
     override suspend fun findAuthUserByProviderAndProviderId(
@@ -67,6 +68,12 @@ class AuthRepositoryImpl : AuthRepository {
         } catch (e: Exception) {
             processSQLException(e)
             throw e
+        }
+    }
+
+    override suspend fun updateLastLoginAt(userId: Long) = dbQuery<Unit> {
+        Users.update({ Users.id eq userId }) {
+            it[lastLoginAt] = PeekrDateTime.now()
         }
     }
 

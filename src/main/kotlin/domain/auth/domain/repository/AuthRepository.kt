@@ -38,4 +38,11 @@ interface AuthRepository {
      * @exception AuthException.DuplicateUserException - 이미 존재하는 사용자 저장 시 예외 발생
      */
     suspend fun save(register: Register): AuthUser
+
+    /**
+     * 사용자의 마지막 로그인 시점을 업데이트 한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun updateLastLoginAt(userId: Long)
 }

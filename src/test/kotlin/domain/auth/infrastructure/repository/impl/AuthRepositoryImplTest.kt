@@ -1,9 +1,11 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
+import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.auth.AuthTestDoubles.MockRegister
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
+import junit.framework.TestCase.assertFalse
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -79,5 +81,39 @@ class AuthRepositoryImplTest {
 
         // then
         assertNull(foundUser)
+    }
+
+    @Test
+    fun `updateLastLoginAt 성공 테스트`() = runTest {
+        // given
+        val savedUser = repository.save(MockRegister)
+        val userId = savedUser.id
+
+        // when
+        val before = PeekrDateTime.now()
+        repository.updateLastLoginAt(userId)
+        val after = PeekrDateTime.now()
+
+        // then
+        val updatedUser = repository.findUserByUserId(userId)
+        assertNotNull(updatedUser?.lastLoginAt)
+        assertTrue(updatedUser.lastLoginAt in before..after)
+    }
+
+    @Test
+    fun `updateLastLoginAt 실패 테스트 - 2초 뒤에 시간과 비교`() = runTest {
+        // given
+        val savedUser = repository.save(MockRegister)
+        val userId = savedUser.id
+
+        // when
+        repository.updateLastLoginAt(userId)
+        val before = PeekrDateTime.now().plusSeconds(1)
+        val after = PeekrDateTime.now().plusSeconds(2)
+
+        // then
+        val updatedUser = repository.findUserByUserId(userId)
+        assertNotNull(updatedUser?.lastLoginAt)
+        assertFalse(updatedUser.lastLoginAt in before..after)
     }
 }
