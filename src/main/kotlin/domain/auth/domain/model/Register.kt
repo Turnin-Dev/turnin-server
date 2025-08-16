@@ -1,5 +1,7 @@
 package com.peekr.domain.auth.domain.model
 
+import java.time.Instant
+
 /**
  * 회원가입 정보
  *
@@ -17,4 +19,22 @@ data class Register(
     val name: String,
     val profileImageUrl: String?,
     val introduce: String?,
+)
+
+fun Register.toAuthUser(
+    id: Long,
+    role: RoleForAuth,
+    isActive: Boolean,
+    lastLoginAt: Instant?,
+): AuthUser = AuthUser(
+    id = id,
+    role = role,
+    provider = provider,
+    providerId = providerId,
+    name = name,
+    displayId = displayId,
+    profileImageUrl = profileImageUrl,
+    introduce = introduce,
+    isActive = isActive,
+    lastLoginAt = lastLoginAt,
 )

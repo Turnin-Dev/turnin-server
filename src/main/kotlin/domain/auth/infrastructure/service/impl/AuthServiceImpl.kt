@@ -27,10 +27,11 @@ class AuthServiceImpl(
         provider: SocialLoginProviderForAuth,
         providerId: String,
     ): LoginResult? {
+        LOGGER.debug("login service attempt, provider: $provider, providerId: ${providerId.masking()}")
         val authUser = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
 
         if (authUser == null) {
-            LOGGER.debug("authUser not found, provider: $provider, providerId: ${providerId.masking()}")
+            LOGGER.debug("AuthUser not found, provider: $provider, providerId: ${providerId.masking()}")
             return null
         }
 
@@ -42,11 +43,12 @@ class AuthServiceImpl(
         val jwtToken = jwtTokenService.generate(payload)
 
         val loginResult = LoginResult(jwtToken, authUser)
-        LOGGER.debug("AuthService(login()) successful")
+        LOGGER.debug("login service successful")
         return loginResult
     }
 
     override suspend fun register(register: Register): RegisterResult {
+        LOGGER.debug("register service attempt, displayId: ${register.displayId.masking()}")
         val savedAuthUser = authRepository.save(register)
 
         val payload = JWTTokenPayload(
@@ -56,8 +58,11 @@ class AuthServiceImpl(
         )
 
         val jwtToken = jwtTokenService.generate(payload)
+        val result = RegisterResult(jwtToken, savedAuthUser)
 
-        return RegisterResult(jwtToken, savedAuthUser)
+        LOGGER.debug("register service successful, username: ${savedAuthUser.name}")
+
+        return result
     }
 
     override suspend fun refresh(token: String): JWTToken? = try {

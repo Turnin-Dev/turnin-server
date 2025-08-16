@@ -6,11 +6,11 @@ import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.PeekrDateTime
-import com.peekr.domain.auth.application.mapper.AuthMapper.toAuthUser
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.auth.domain.model.toAuthUser
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper

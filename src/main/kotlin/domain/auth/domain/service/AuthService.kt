@@ -28,6 +28,7 @@ interface AuthService {
      * 단, 회원가입은 기존 회원이 존재하지 않는다는 가정하에 진행된다.
      *
      * @param register 회원가입 정보 [Register]
+     * @throws com.peekr.domain.auth.exception.AuthException.DuplicateUserException 이미 동일한 provider/providerId로 가입된 사용자가 존재하는 경우
      */
     suspend fun register(register: Register): RegisterResult
 
