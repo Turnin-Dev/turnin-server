@@ -1,9 +1,9 @@
 package com.peekr.domain.auth.domain.service
 
 import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
+import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 
@@ -27,9 +27,10 @@ interface AuthService {
      *
      * 단, 회원가입은 기존 회원이 존재하지 않는다는 가정하에 진행된다.
      *
-     * @param authUser [AuthUser]
+     * @param register 회원가입 정보 [Register]
+     * @throws com.peekr.domain.auth.exception.AuthException.DuplicateUserException 이미 동일한 provider/providerId로 가입된 사용자가 존재하는 경우
      */
-    suspend fun register(authUser: AuthUser): RegisterResult
+    suspend fun register(register: Register): RegisterResult
 
     /**
      * 리프레쉬 토큰 갱신

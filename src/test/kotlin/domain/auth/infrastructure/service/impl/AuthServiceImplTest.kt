@@ -9,6 +9,7 @@ import com.peekr.common.jwt.JWTTestDoubles.getMockJWTToken
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
+import com.peekr.domain.auth.AuthTestDoubles.MockRegister
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
@@ -93,7 +94,7 @@ class AuthServiceImplTest {
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()
 
         // when
-        val token = authService.register(MockAuthUser).jwtToken
+        val token = authService.register(MockRegister).jwtToken
 
         // then
         assertEquals(token, getMockJWTToken())
@@ -109,7 +110,7 @@ class AuthServiceImplTest {
 
         // when & then
         assertFailsWith<AuthException.DuplicateUserException> {
-            authService.register(MockAuthUser)
+            authService.register(MockRegister)
         }
     }
 
