@@ -76,7 +76,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             )
         }
 
-        get(route.EXIST_USER.byId("provider", "providerId"), { findUserDocs() }) {
+        get(route.EXISTS_USER.byId("provider", "providerId"), { findUserDocs() }) {
             val provider = call.request.pathVariables["provider"]
             val providerId = call.request.pathVariables["providerId"]
 
@@ -100,6 +100,23 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
                     AuthErrorCode.ProviderValueInvalid.toErrorResponse(HttpStatusCode.BadRequest),
                 )
             }
+        }
+
+        get(route.EXISTS_DISPLAY_ID.byId("displayId"), { existsDisplayIdDocs() }) {
+            val displayId = call.request.pathVariables["displayId"]
+            if (displayId.isNullOrBlank()) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest),
+                )
+                return@get
+            }
+
+            val existsDisplayId = authUseCase.existsDisplayId(displayId.trim())
+            call.respond(
+                HttpStatusCode.OK,
+                mapOf("exists" to existsDisplayId),
+            )
         }
     }
 }
@@ -231,6 +248,41 @@ private fun RouteConfig.findUserDocs() {
         code(HttpStatusCode.OK) {
             body<FindUserResultResponse> {
                 example("FindUserResultResponse") {
+                    value = """
+                        {
+                            "exists": true
+                        }
+                    """.trimIndent()
+                }
+            }
+        }
+
+        code(HttpStatusCode.BadRequest) {
+            body<ErrorResponse> {
+                example("ErrorResponse") {
+                    value = AuthErrorCode.ProviderValueInvalid.toErrorResponse(HttpStatusCode.BadRequest)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.existsDisplayIdDocs() {
+    summary = "사용자 표시 ID 존재 여부 확인"
+    description = "사용자 표시 ID 존재 여부 확인"
+    request {
+        pathParameter<String>("displayId") {
+            description = "사용자 표시 ID"
+            example("sample") {
+                value = "honggd"
+            }
+        }
+    }
+
+    response {
+        code(HttpStatusCode.OK) {
+            body<FindUserResultResponse> {
+                example("ExistsDisplayIdResponse") {
                     value = """
                         {
                             "exists": true

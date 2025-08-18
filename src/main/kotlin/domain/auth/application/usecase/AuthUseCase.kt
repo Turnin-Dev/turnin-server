@@ -55,4 +55,12 @@ interface AuthUseCase {
      * @return [FindUserResultDto] 가입 여부(`exists`)
      */
     suspend fun findUser(provider: SocialLoginProviderForAuth, providerId: String): FindUserResultDto
+
+    /**
+     * 사용자 표시 ID의 존재 여부를 확인한다.
+     *
+     * @param displayId 사용자 표시 ID
+     * @return 존재하면 `true`, 존재하지 않으면 `false`
+     */
+    suspend fun existsDisplayId(displayId: String): Boolean
 }

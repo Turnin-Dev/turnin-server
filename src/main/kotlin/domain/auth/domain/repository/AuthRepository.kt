@@ -29,6 +29,15 @@ interface AuthRepository {
     suspend fun findUserByUserId(userId: Long): AuthUser?
 
     /**
+     * 사용자 표시 ID를 통해 사용자를 조회한다.
+     *
+     * @param displayId 사용자 표시 ID
+     *
+     * @return [AuthUser] - 사용자를 찾을 수 없으면 **`null`** 반환
+     */
+    suspend fun findUserByDisplayId(displayId: String): AuthUser?
+
+    /**
      * [Register]로 회원가입(저장)을 한다.
      *
      * 기본적으로 활성화된 사용자로 저장된다.

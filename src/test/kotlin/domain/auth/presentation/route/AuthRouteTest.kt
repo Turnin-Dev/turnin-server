@@ -356,7 +356,7 @@ class AuthRouteTest {
         )
 
         // when
-        val existUserEndPoint = "${route.ROUTE}${route.EXIST_USER}/GOOGLE/123123"
+        val existUserEndPoint = "${route.ROUTE}${route.EXISTS_USER}/GOOGLE/123123"
         val response = client.get(existUserEndPoint)
         val responseBody = response.bodyAsText()
 
@@ -376,7 +376,7 @@ class AuthRouteTest {
         )
 
         // when
-        val existUserEndPoint = "${route.ROUTE}${route.EXIST_USER}/a/a"
+        val existUserEndPoint = "${route.ROUTE}${route.EXISTS_USER}/a/a"
         val response = client.get(existUserEndPoint)
         val responseBody = response.bodyAsText()
 

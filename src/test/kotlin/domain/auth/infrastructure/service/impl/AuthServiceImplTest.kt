@@ -212,4 +212,28 @@ class AuthServiceImplTest {
         // then
         assertFalse(findUserResult.exists)
     }
+
+    @Test
+    fun `existsDisplayId 성공 테스트 - 사용자 표시 ID가 존재하는 경우`() = runTest {
+        // given
+        coEvery { authRepository.findUserByDisplayId(any()) } returns MockAuthUser
+
+        // when
+        val existsDisplayId = authService.existsDisplayId(MockRegister.displayId)
+
+        // then
+        assertTrue(existsDisplayId)
+    }
+
+    @Test
+    fun `existsDisplayId 성공 테스트 - 사용자 표시 ID가 존재하지 않는 경우`() = runTest {
+        // given
+        coEvery { authRepository.findUserByDisplayId(any()) } returns null
+
+        // when
+        val existsDisplayId = authService.existsDisplayId("weird_display_id")
+
+        // then
+        assertFalse(existsDisplayId)
+    }
 }

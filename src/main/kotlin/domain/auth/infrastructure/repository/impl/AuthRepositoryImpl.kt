@@ -88,6 +88,14 @@ class AuthRepositoryImpl : AuthRepository {
             }
         }
     }
+
+    override suspend fun findUserByDisplayId(displayId: String): AuthUser? = dbQuery {
+        UserEntity
+            .find((Users.displayId eq displayId))
+            .map {
+                AuthMapper.toDomain(it.readValues)
+            }.singleOrNull()
+    }
 }
 
 private val LOGGER = AppLoggerFactory.createLogger("AuthRepositoryImpl")
