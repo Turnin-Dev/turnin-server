@@ -59,12 +59,15 @@ class AuthUseCaseImpl(
         return findUserResult.toDto()
     }
 
+    override suspend fun extractUserId(token: String): Long? =
+        refreshTokenService.extractUserId(token)
+
+    override suspend fun existsDisplayId(displayId: String): Boolean =
+        authService.existsDisplayId(displayId)
+
     private suspend fun saveRefreshToken(userId: Long, token: String) {
         refreshTokenService.save(userId, token)
     }
-
-    override suspend fun extractUserId(token: String): Long? =
-        refreshTokenService.extractUserId(token)
 }
 
 private val LOGGER = AppLoggerFactory.createLogger("AuthUseCaseImpl")

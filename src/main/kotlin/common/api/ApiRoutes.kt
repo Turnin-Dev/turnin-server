@@ -21,7 +21,8 @@ object Api {
             const val LOGIN = "/login"
             const val REGISTER = "/register"
             const val REFRESH = "/refresh"
-            const val EXIST_USER = "/exist"
+            const val EXISTS_USER = "/exists/provider"
+            const val EXISTS_DISPLAY_ID = "/exists/displayId"
         }
 
         object User {

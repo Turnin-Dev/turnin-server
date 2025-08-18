@@ -11,7 +11,7 @@ import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
-import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
+import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
@@ -76,7 +76,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             )
         }
 
-        get(route.EXIST_USER.byId("provider", "providerId"), { findUserDocs() }) {
+        get(route.EXISTS_USER.byId("provider", "providerId"), { findUserDocs() }) {
             val provider = call.request.pathVariables["provider"]
             val providerId = call.request.pathVariables["providerId"]
 
@@ -97,9 +97,28 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             } catch (e: IllegalArgumentException) {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    AuthErrorCode.ProviderValueInvalid.toErrorResponse(HttpStatusCode.BadRequest),
+                    AuthErrorCode
+                        .PathParameterInvalid("provider")
+                        .toErrorResponse(HttpStatusCode.BadRequest),
                 )
             }
+        }
+
+        get(route.EXISTS_DISPLAY_ID.byId("displayId"), { existsDisplayIdDocs() }) {
+            val displayId = call.request.pathVariables["displayId"]
+            if (displayId.isNullOrBlank()) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest),
+                )
+                return@get
+            }
+
+            val existsDisplayId = authUseCase.existsDisplayId(displayId.trim())
+            call.respond(
+                HttpStatusCode.OK,
+                ExistsResultResponse(exists = existsDisplayId),
+            )
         }
     }
 }
@@ -229,7 +248,7 @@ private fun RouteConfig.findUserDocs() {
 
     response {
         code(HttpStatusCode.OK) {
-            body<FindUserResultResponse> {
+            body<ExistsResultResponse> {
                 example("FindUserResultResponse") {
                     value = """
                         {
@@ -242,8 +261,48 @@ private fun RouteConfig.findUserDocs() {
 
         code(HttpStatusCode.BadRequest) {
             body<ErrorResponse> {
+                example("PathParameterInvalid") {
+                    value = AuthErrorCode
+                        .PathParameterInvalid("provider")
+                        .toErrorResponse(HttpStatusCode.BadRequest)
+                }
+                example("ValidationError") {
+                    value = CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.existsDisplayIdDocs() {
+    summary = "사용자 표시 ID 존재 여부 확인"
+    description = "사용자 표시 ID 존재 여부 확인"
+    request {
+        pathParameter<String>("displayId") {
+            description = "사용자 표시 ID"
+            example("sample") {
+                value = "honggd"
+            }
+        }
+    }
+
+    response {
+        code(HttpStatusCode.OK) {
+            body<ExistsResultResponse> {
+                example("ExistsResultResponse") {
+                    value = """
+                        {
+                            "exists": true
+                        }
+                    """.trimIndent()
+                }
+            }
+        }
+
+        code(HttpStatusCode.BadRequest) {
+            body<ErrorResponse> {
                 example("ErrorResponse") {
-                    value = AuthErrorCode.ProviderValueInvalid.toErrorResponse(HttpStatusCode.BadRequest)
+                    value = CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }

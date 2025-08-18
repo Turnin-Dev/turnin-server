@@ -88,6 +88,14 @@ class AuthRepositoryImpl : AuthRepository {
             }
         }
     }
+
+    override suspend fun existsByDisplayId(displayId: String): Boolean = dbQuery {
+        Users
+            .select((Users.displayId eq displayId))
+            .limit(1)
+            .empty()
+            .not()
+    }
 }
 
 private val LOGGER = AppLoggerFactory.createLogger("AuthRepositoryImpl")

@@ -5,7 +5,7 @@ import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProviderForAuth
-import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
+import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
@@ -26,4 +26,4 @@ fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
 
 fun JWTTokenDto.toResponse(): JWTTokenResponse = JWTTokenResponse(accessToken, refreshToken)
 
-fun FindUserResultDto.toResponse(): FindUserResultResponse = FindUserResultResponse(exists)
+fun FindUserResultDto.toResponse(): ExistsResultResponse = ExistsResultResponse(exists)

@@ -116,4 +116,26 @@ class AuthRepositoryImplTest {
         assertNotNull(updatedUser?.lastLoginAt)
         assertFalse(updatedUser.lastLoginAt in before..after)
     }
+
+    @Test
+    fun `existsByDisplayId 성공 테스트`() = runTest {
+        // given
+        val savedUser = repository.save(MockRegister)
+        val displayId = savedUser.displayId
+
+        // when
+        val result = repository.existsByDisplayId(displayId)
+
+        // then
+        assertTrue(result)
+    }
+
+    @Test
+    fun `existsByDisplayId 실패 테스트 - 사용자 표시 ID로 찾지 못할 때`() = runTest {
+        // when
+        val result = repository.existsByDisplayId("a123")
+
+        // then
+        assertFalse(result)
+    }
 }
