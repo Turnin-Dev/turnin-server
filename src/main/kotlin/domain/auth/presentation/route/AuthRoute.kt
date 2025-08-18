@@ -11,7 +11,7 @@ import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
-import com.peekr.domain.auth.presentation.dto.FindUserResultResponse
+import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
@@ -117,7 +117,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             val existsDisplayId = authUseCase.existsDisplayId(displayId.trim())
             call.respond(
                 HttpStatusCode.OK,
-                mapOf("exists" to existsDisplayId),
+                ExistsResultResponse(exists = existsDisplayId),
             )
         }
     }
@@ -248,7 +248,7 @@ private fun RouteConfig.findUserDocs() {
 
     response {
         code(HttpStatusCode.OK) {
-            body<FindUserResultResponse> {
+            body<ExistsResultResponse> {
                 example("FindUserResultResponse") {
                     value = """
                         {
@@ -261,10 +261,13 @@ private fun RouteConfig.findUserDocs() {
 
         code(HttpStatusCode.BadRequest) {
             body<ErrorResponse> {
-                example("ErrorResponse") {
+                example("PathParameterInvalid") {
                     value = AuthErrorCode
                         .PathParameterInvalid("provider")
                         .toErrorResponse(HttpStatusCode.BadRequest)
+                }
+                example("ValidationError") {
+                    value = CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }
@@ -285,8 +288,8 @@ private fun RouteConfig.existsDisplayIdDocs() {
 
     response {
         code(HttpStatusCode.OK) {
-            body<FindUserResultResponse> {
-                example("response") {
+            body<ExistsResultResponse> {
+                example("ExistsResultResponse") {
                     value = """
                         {
                             "exists": true
@@ -299,9 +302,7 @@ private fun RouteConfig.existsDisplayIdDocs() {
         code(HttpStatusCode.BadRequest) {
             body<ErrorResponse> {
                 example("ErrorResponse") {
-                    value = AuthErrorCode
-                        .PathParameterInvalid("displayId")
-                        .toErrorResponse(HttpStatusCode.BadRequest)
+                    value = CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }
