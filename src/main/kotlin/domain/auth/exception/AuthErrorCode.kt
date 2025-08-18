@@ -22,8 +22,9 @@ sealed class AuthErrorCode(
     data object CannotSaveRefreshToken :
         AuthErrorCode(A004, "해당 사용자의 새로고침 토큰을 저장할 수 없습니다.")
 
-    data object ProviderValueInvalid :
-        AuthErrorCode(A005, "provider의 입력 값 형식이 잘못되었습니다.")
+    /** 잘못된 형식의 PathParameter 에러 */
+    data class PathParameterInvalid(val parameter: String) :
+        AuthErrorCode(A005, "${parameter}의 입력 값 형식이 잘못되었습니다.")
 }
 
 private const val A001 = "A001"

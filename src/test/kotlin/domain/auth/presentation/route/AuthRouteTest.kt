@@ -384,7 +384,7 @@ class AuthRouteTest {
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertTrue(
             responseBody.contains(
-                AuthErrorCode.ProviderValueInvalid.description,
+                AuthErrorCode.PathParameterInvalid("provider").description,
             ),
         )
     }

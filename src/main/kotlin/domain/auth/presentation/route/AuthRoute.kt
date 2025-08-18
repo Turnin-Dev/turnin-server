@@ -97,7 +97,9 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             } catch (e: IllegalArgumentException) {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    AuthErrorCode.ProviderValueInvalid.toErrorResponse(HttpStatusCode.BadRequest),
+                    AuthErrorCode
+                        .PathParameterInvalid("provider")
+                        .toErrorResponse(HttpStatusCode.BadRequest),
                 )
             }
         }
@@ -260,7 +262,9 @@ private fun RouteConfig.findUserDocs() {
         code(HttpStatusCode.BadRequest) {
             body<ErrorResponse> {
                 example("ErrorResponse") {
-                    value = AuthErrorCode.ProviderValueInvalid.toErrorResponse(HttpStatusCode.BadRequest)
+                    value = AuthErrorCode
+                        .PathParameterInvalid("provider")
+                        .toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }
@@ -282,7 +286,7 @@ private fun RouteConfig.existsDisplayIdDocs() {
     response {
         code(HttpStatusCode.OK) {
             body<FindUserResultResponse> {
-                example("ExistsDisplayIdResponse") {
+                example("response") {
                     value = """
                         {
                             "exists": true
@@ -295,7 +299,9 @@ private fun RouteConfig.existsDisplayIdDocs() {
         code(HttpStatusCode.BadRequest) {
             body<ErrorResponse> {
                 example("ErrorResponse") {
-                    value = AuthErrorCode.ProviderValueInvalid.toErrorResponse(HttpStatusCode.BadRequest)
+                    value = AuthErrorCode
+                        .PathParameterInvalid("displayId")
+                        .toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }

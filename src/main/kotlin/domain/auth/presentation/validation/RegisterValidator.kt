@@ -5,14 +5,14 @@ import com.peekr.common.validator.PeekrValidator.validation
 internal fun String.validateDisplayId() {
     validation(this.isNotBlank() && this.length in 1..30) { "ID는 1~30자 이내여야 합니다." }
     validation(this.matches(Regex("^[a-zA-Z0-9_]+$"))) {
-        "ID는 영문/숫자/밑줄만 허용되며 1~30자여야 합니다."
+        "ID는 영문/숫자/밑줄(_)만 허용됩니다."
     }
 }
 
 internal fun String.validateName() {
     validation(this.isNotBlank() && this.length in 1..30) { "이름은 1~30자 이내여야 합니다." }
     validation(this.matches(Regex("^[a-zA-Z0-9가-힣]+$"))) {
-        "이름은 영문/숫자/한글만 허용되며 1~30자여야 합니다."
+        "이름은 영문/숫자/한글만 허용됩니다."
     }
 }
 

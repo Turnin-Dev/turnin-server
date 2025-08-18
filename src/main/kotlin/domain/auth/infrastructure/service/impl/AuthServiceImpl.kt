@@ -105,10 +105,8 @@ class AuthServiceImpl(
         return FindUserResult(result != null)
     }
 
-    override suspend fun existsDisplayId(displayId: String): Boolean {
-        val result = authRepository.findUserByDisplayId(displayId)
-        return result != null
-    }
+    override suspend fun existsDisplayId(displayId: String): Boolean =
+        authRepository.existsByDisplayId(displayId)
 
     private fun verifyRefreshToken(token: String): DecodedJWT? = try {
         val verifier = jwtTokenService.createVerifier(JWTTokenType.Refresh)

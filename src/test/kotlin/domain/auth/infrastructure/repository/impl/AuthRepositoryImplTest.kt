@@ -124,19 +124,18 @@ class AuthRepositoryImplTest {
         val displayId = savedUser.displayId
 
         // when
-        val foundUser = repository.findUserByDisplayId(displayId)
+        val result = repository.existsByDisplayId(displayId)
 
         // then
-        assertNotNull(foundUser)
-        assertEquals(savedUser.displayId, foundUser.displayId)
+        assertTrue(result)
     }
 
     @Test
     fun `findUserByDisplayId 실패 테스트 - 사용자 표시 ID로 찾지 못할 때`() = runTest {
         // when
-        val foundUser = repository.findUserByDisplayId("a123")
+        val result = repository.existsByDisplayId("a123")
 
         // then
-        assertNull(foundUser)
+        assertFalse(result)
     }
 }

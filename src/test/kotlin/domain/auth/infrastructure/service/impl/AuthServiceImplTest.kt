@@ -14,8 +14,10 @@ import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -52,6 +54,8 @@ class AuthServiceImplTest {
         coEvery {
             authRepository.findAuthUserByProviderAndProviderId(any(), any())
         } returns MockAuthUser
+
+        coEvery { authRepository.updateLastLoginAt(any()) } just Runs
 
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()
 
@@ -216,7 +220,7 @@ class AuthServiceImplTest {
     @Test
     fun `existsDisplayId 성공 테스트 - 사용자 표시 ID가 존재하는 경우`() = runTest {
         // given
-        coEvery { authRepository.findUserByDisplayId(any()) } returns MockAuthUser
+        coEvery { authRepository.existsByDisplayId(any()) } returns true
 
         // when
         val existsDisplayId = authService.existsDisplayId(MockRegister.displayId)
@@ -228,7 +232,7 @@ class AuthServiceImplTest {
     @Test
     fun `existsDisplayId 성공 테스트 - 사용자 표시 ID가 존재하지 않는 경우`() = runTest {
         // given
-        coEvery { authRepository.findUserByDisplayId(any()) } returns null
+        coEvery { authRepository.existsByDisplayId(any()) } returns false
 
         // when
         val existsDisplayId = authService.existsDisplayId("weird_display_id")

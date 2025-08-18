@@ -89,12 +89,12 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 
-    override suspend fun findUserByDisplayId(displayId: String): AuthUser? = dbQuery {
-        UserEntity
-            .find((Users.displayId eq displayId))
-            .map {
-                AuthMapper.toDomain(it.readValues)
-            }.singleOrNull()
+    override suspend fun existsByDisplayId(displayId: String): Boolean = dbQuery {
+        Users
+            .select((Users.displayId eq displayId))
+            .limit(1)
+            .empty()
+            .not()
     }
 }
 
