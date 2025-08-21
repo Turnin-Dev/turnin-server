@@ -18,6 +18,7 @@ import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
+import com.peekr.domain.auth.presentation.validation.validateDisplayId
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -106,6 +107,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
 
         get(route.EXISTS_DISPLAY_ID.byId("displayId"), { existsDisplayIdDocs() }) {
             val displayId = call.request.pathVariables["displayId"]
+            displayId?.validateDisplayId()
             if (displayId.isNullOrBlank()) {
                 call.respond(
                     HttpStatusCode.BadRequest,
