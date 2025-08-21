@@ -16,6 +16,7 @@ ksp = "2.1.10-1.0.30"
 mockk-version = "1.14.2"
 swagger-codegen-version = "1.0.56"
 smiley-openapi-version = "5.0.2"
+aws-s3 = "2.32.26"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -70,6 +71,8 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-ve
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-version" }
 # CORS
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor-version" }
+# AWS S3
+amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-s3" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
