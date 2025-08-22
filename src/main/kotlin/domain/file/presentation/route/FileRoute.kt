@@ -1,10 +1,13 @@
-package com.peekr.domain.file.presentation
+package com.peekr.domain.file.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.domain.file.application.usecase.FileUseCase
+import com.peekr.domain.file.presentation.dto.UploadFileResponse
+import com.peekr.domain.file.presentation.dto.toResponse
+import com.peekr.domain.file.presentation.validation.validateFileNameAndReturn
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
@@ -18,15 +21,8 @@ fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
         description = "File API"
     }) {
         get(route.UPLOAD, { uploadFileDocs() }) {
-            val fileName = call.request.queryParameters["fileName"]
-            if (fileName.isNullOrBlank()) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest),
-                )
-                return@get
-            }
-
+            val fileNameRaw = call.request.queryParameters["fileName"]
+            val fileName = fileNameRaw?.trim().validateFileNameAndReturn()
             val uploadFileInfoDto = try {
                 fileUseCase.createPresignedUrl(fileName)
             } catch (e: IllegalArgumentException) {
@@ -49,7 +45,7 @@ private fun RouteConfig.uploadFileDocs() {
     description = "클라이언트가 업로드에 사용할 Presigned URL 발급"
     request {
         queryParameter<String>("fileName") {
-            description = "파일 이름"
+            description = "파일 이름 (영문/숫자/._- 만 허용, 1~255자)"
             example("fileName") {
                 value = "asdasd1231221.jpg"
             }

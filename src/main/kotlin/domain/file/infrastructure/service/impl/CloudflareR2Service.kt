@@ -40,8 +40,8 @@ class CloudflareR2Service(
         appConfig.getOrDefault("ktor.security.cloudflare.s3BucketName", "")
     }
 
-    // 10분
-    val signatureDuration = Duration.ofMinutes(10)
+    // 5분
+    val signatureDuration = Duration.ofMinutes(5)
 
     private fun createPutObjectRequest(fileName: String): PutObjectRequest =
         PutObjectRequest
@@ -71,7 +71,7 @@ class CloudflareR2Service(
                 PutObjectPresignRequest
                     .builder()
                     .putObjectRequest(putObjectRequest)
-                    .signatureDuration(signatureDuration) // 10분 동안 유효한 URL
+                    .signatureDuration(signatureDuration) // 5분 동안 유효한 URL
                     .build(),
             )
             s3Presigner.close()

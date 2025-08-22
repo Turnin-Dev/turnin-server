@@ -5,7 +5,9 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 
-class S3PresignerFactory {
+class S3PresignerFactory : AutoCloseable {
+    private var s3Presigner: S3Presigner? = null
+
     /**
      * Presign URL을 생성하기 위한 객체를 생성한다.
      *
@@ -16,10 +18,18 @@ class S3PresignerFactory {
         secretKey: String,
         region: Region,
         endpoint: URI,
-    ): S3Presigner = S3Presigner
-        .builder()
-        .credentialsProvider { AwsBasicCredentials.create(accessKey, secretKey) }
-        .region(region)
-        .endpointOverride(endpoint)
-        .build()
+    ): S3Presigner {
+        s3Presigner?.let { return it }
+        s3Presigner = S3Presigner
+            .builder()
+            .credentialsProvider { AwsBasicCredentials.create(accessKey, secretKey) }
+            .region(region)
+            .endpointOverride(endpoint)
+            .build()
+        return s3Presigner!!
+    }
+
+    override fun close() {
+        s3Presigner?.close()
+    }
 }

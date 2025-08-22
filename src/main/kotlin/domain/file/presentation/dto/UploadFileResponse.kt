@@ -1,4 +1,4 @@
-package com.peekr.domain.file.presentation
+package com.peekr.domain.file.presentation.dto
 
 import com.peekr.domain.file.application.dto.UploadFileInfoDto
 import kotlinx.serialization.Serializable

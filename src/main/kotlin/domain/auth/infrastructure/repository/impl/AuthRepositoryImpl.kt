@@ -66,8 +66,7 @@ class AuthRepositoryImpl : AuthRepository {
                 lastLoginAt = savedUserEntity.lastLoginAt,
             )
         } catch (e: Exception) {
-            processSQLException(e)
-            throw e
+            throw processSQLException(e)
         }
     }
 
@@ -77,21 +76,23 @@ class AuthRepositoryImpl : AuthRepository {
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.masking()}")
     }
 
-    private fun processSQLException(e: Throwable) {
-        if (e is ExposedSQLException || e is SQLException) {
-            val sqlState: String? = when (e) {
-                is ExposedSQLException -> e.sqlState
-                else -> e.sqlState
-            }
-            if (sqlState == "23505" ||
-                // PostgreSQL unique_violation
-                e.message?.contains("unique", ignoreCase = true) == true ||
-                e.message?.contains("already exists", ignoreCase = true) == true ||
-                e.message?.contains("primary key violation", ignoreCase = true) == true
-            ) {
-                LOGGER.debug("Duplicate user detected while saving authUser.", e)
-                throw AuthException.DuplicateUserException(e.message)
-            }
+    private fun processSQLException(e: Throwable): Throwable {
+        val sqlState: String? = when (e) {
+            is ExposedSQLException -> e.sqlState
+            is SQLException -> e.sqlState
+            else -> null
+        }
+        if (sqlState == null) return e
+        return if (sqlState == "23505" ||
+            // PostgreSQL unique_violation
+            e.message?.contains("unique", ignoreCase = true) == true ||
+            e.message?.contains("already exists", ignoreCase = true) == true ||
+            e.message?.contains("primary key violation", ignoreCase = true) == true
+        ) {
+            LOGGER.debug("Duplicate user detected while saving authUser.", e)
+            throw AuthException.DuplicateUserException(e.message)
+        } else {
+            e
         }
     }
 

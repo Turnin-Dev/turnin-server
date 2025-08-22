@@ -9,14 +9,14 @@ import com.peekr.domain.file.infrastructure.service.impl.S3PresignerFactory
 import org.koin.dsl.module
 
 val fileModule = module {
-    // Repository
+    // Service
     single<FileService> { FileServiceImpl(get()) }
 
     // UseCase
     single<FileUseCase> { FileUseCaseImpl(get()) }
 
     // Third-Party
-    single(createdAtStart = true) { S3PresignerFactory() }
+    single { S3PresignerFactory() }
 
     // Infra
     single { CloudflareR2Service(get(), get()) }

@@ -9,7 +9,9 @@ class FileServiceImpl(private val r2Service: CloudflareR2Service) : FileService 
         val uploadFileInfo = UploadFileInfo(
             presignedUrl = presignedRequest.url().toString(),
             method = presignedRequest.httpRequest().method().name,
-            headers = presignedRequest.httpRequest().headers().mapValues { it.value.first() },
+            headers = presignedRequest.httpRequest().headers().mapValues { (_, v) ->
+                v.joinToString(",")
+            },
             expiresInSeconds = r2Service.signatureDuration.seconds,
         )
         return uploadFileInfo

@@ -4,7 +4,7 @@ import com.peekr.common.api.Api
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.presentation.route.authRoutes
 import com.peekr.domain.file.application.usecase.FileUseCase
-import com.peekr.domain.file.presentation.fileRoutes
+import com.peekr.domain.file.presentation.route.fileRoutes
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.domain.user.presentation.route.userRoutes
 import io.github.smiley4.ktoropenapi.openApi
