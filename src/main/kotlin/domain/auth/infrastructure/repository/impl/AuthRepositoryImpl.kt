@@ -6,6 +6,7 @@ import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.PeekrDateTime
+import com.peekr.common.util.masking
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RoleForAuth
@@ -20,7 +21,6 @@ import java.sql.SQLException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.update
 
 class AuthRepositoryImpl : AuthRepository {
     override suspend fun findAuthUserByProviderAndProviderId(
@@ -66,32 +66,39 @@ class AuthRepositoryImpl : AuthRepository {
                 lastLoginAt = savedUserEntity.lastLoginAt,
             )
         } catch (e: Exception) {
-            processSQLException(e)
-            throw e
+            throw processSQLException(e)
         }
     }
 
     override suspend fun updateLastLoginAt(userId: Long) = dbQuery<Unit> {
-        Users.update({ Users.id eq userId }) {
-            it[lastLoginAt] = PeekrDateTime.now()
-        }
+        UserEntity.findByIdAndUpdate(userId) {
+            it.lastLoginAt = PeekrDateTime.now()
+        } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.masking()}")
     }
 
-    private fun processSQLException(e: Throwable) {
-        if (e is ExposedSQLException || e is SQLException) {
-            if (e.message?.contains("Unique index") == true ||
-                e.message?.contains("primary key violation") == true ||
-                e.message?.contains("already exists") == true
-            ) {
-                LOGGER.debug("Duplicate user detected while saving authUser.", e)
-                throw AuthException.DuplicateUserException(e.message)
-            }
+    private fun processSQLException(e: Throwable): Throwable {
+        val sqlState: String? = when (e) {
+            is ExposedSQLException -> e.sqlState
+            is SQLException -> e.sqlState
+            else -> null
+        }
+        if (sqlState == null) return e
+        return if (sqlState == "23505" ||
+            // PostgreSQL unique_violation
+            e.message?.contains("unique", ignoreCase = true) == true ||
+            e.message?.contains("already exists", ignoreCase = true) == true ||
+            e.message?.contains("primary key violation", ignoreCase = true) == true
+        ) {
+            LOGGER.debug("Duplicate user detected while saving authUser.", e)
+            throw AuthException.DuplicateUserException(e.message)
+        } else {
+            e
         }
     }
 
     override suspend fun existsByDisplayId(displayId: String): Boolean = dbQuery {
-        Users
-            .select((Users.displayId eq displayId))
+        UserEntity
+            .find((Users.displayId eq displayId))
             .limit(1)
             .empty()
             .not()

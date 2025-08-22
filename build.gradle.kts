@@ -153,4 +153,7 @@ dependencies {
 
     // Flyway
     implementation(libs.flyway.core)
+
+    // AWS S3
+    implementation(libs.amazon.awssdk.s3)
 }
