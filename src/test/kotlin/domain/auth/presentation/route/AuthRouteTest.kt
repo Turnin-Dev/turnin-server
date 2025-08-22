@@ -4,7 +4,7 @@ import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.validator.CommonValidator
-import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
+import com.peekr.common.validator.CommonValidator.validationUserIdAndReturn
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
@@ -41,7 +41,7 @@ class AuthRouteTest {
     @Before
     fun setup() {
         mockkObject(CommonValidator)
-        every { userIdValidatorAndReturn(any<Long>()) } returns 1L
+        every { validationUserIdAndReturn(any<Long>()) } returns 1L
         coEvery { authUseCase.extractUserId(any()) } returns 0L
     }
 

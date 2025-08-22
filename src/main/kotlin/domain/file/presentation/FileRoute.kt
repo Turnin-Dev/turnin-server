@@ -20,15 +20,7 @@ fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
         description = "File API"
     }) {
         get(route.UPLOAD.byPathParam("fileName"), { uploadFileDocs() }) {
-            val fileName = call.request.pathVariables["fileName"]
-            if (fileName.isNullOrBlank()) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest),
-                )
-                return@get
-            }
-
+            val fileName = call.request.pathVariables["fileName"] ?: return@get
             val presignedUrl = fileUseCase.createPresignedUrl(fileName)
             call.respond(
                 HttpStatusCode.OK,
