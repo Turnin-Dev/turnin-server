@@ -29,6 +29,12 @@ object Api {
             const val ROUTE = "/user"
             const val TAG = "User"
         }
+
+        object File {
+            const val ROUTE = "/file"
+            const val TAG = "File"
+            const val UPLOAD = "/upload"
+        }
     }
 
     /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */
