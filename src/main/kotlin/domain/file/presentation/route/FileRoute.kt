@@ -11,6 +11,7 @@ import com.peekr.domain.file.presentation.validation.validateFileNameAndReturn
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -32,6 +33,7 @@ fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
                 )
                 return@get
             }
+            call.response.headers.append(HttpHeaders.CacheControl, "no-store")
             call.respond(
                 HttpStatusCode.OK,
                 uploadFileInfoDto.toResponse(),
