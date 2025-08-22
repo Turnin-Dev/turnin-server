@@ -1,11 +1,13 @@
 package com.peekr.domain.file.domain.service
 
+import com.peekr.domain.file.domain.model.UploadFileInfo
+
 /**
  * 파일 서비스
  */
 interface FileService {
     /**
-     * `Presigned URL`을 생성한다.
+     * `Presigned URL`와 클라이언트가 필요한 정보를 제공한다.
      *
      * `Presigned URL`을 통해 클라이언트가 직접 파일을 업로드해서 서버의 부하를 줄인다.
      *
@@ -13,5 +15,5 @@ interface FileService {
      *
      * @param fileName 파일 이름
      */
-    fun createPresignedUrl(fileName: String): String
+    fun createPresignedUrlWithInfo(fileName: String): UploadFileInfo
 }

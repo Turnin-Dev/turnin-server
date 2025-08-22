@@ -5,8 +5,6 @@ import com.peekr.common.util.config.AppConfig
 import com.peekr.common.util.masking
 import java.net.URI
 import java.time.Duration
-import org.koin.java.KoinJavaComponent.inject
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
@@ -16,9 +14,10 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 /**
  * Cloudflare R2 서비스 클래스
  */
-class CloudflareR2Service {
-    private val appConfig: AppConfig by inject(AppConfig::class.java)
-
+class CloudflareR2Service(
+    private val appConfig: AppConfig,
+    private val s3PresignerFactory: S3PresignerFactory,
+) {
     private val accessKey by lazy {
         appConfig.getOrDefault("ktor.security.cloudflare.s3AccessKey", "")
     }
@@ -31,25 +30,18 @@ class CloudflareR2Service {
     private val endpointValue by lazy {
         appConfig.getOrDefault("ktor.security.cloudflare.s3Endpoint", "")
     }
-    private val bucketName by lazy {
-        appConfig.getOrDefault("ktor.security.cloudflare.s3BucketName", "")
-    }
     private val region by lazy {
         Region.of(regionValue)
     }
     private val endpoint by lazy {
         URI.create(endpointValue)
     }
-
-    // Presign URL을 생성하기 위한 객체
-    private val s3Presigner by lazy {
-        S3Presigner
-            .builder()
-            .credentialsProvider { AwsBasicCredentials.create(accessKey, secretKey) }
-            .region(region)
-            .endpointOverride(endpoint)
-            .build()
+    private val bucketName by lazy {
+        appConfig.getOrDefault("ktor.security.cloudflare.s3BucketName", "")
     }
+
+    // 10분
+    val signatureDuration = Duration.ofMinutes(10)
 
     private fun createPutObjectRequest(fileName: String): PutObjectRequest =
         PutObjectRequest
@@ -57,6 +49,14 @@ class CloudflareR2Service {
             .bucket(bucketName)
             .key(fileName)
             .build()
+
+    private fun getS3Presigner(): S3Presigner =
+        s3PresignerFactory.createS3Presigner(
+            accessKey,
+            secretKey,
+            region,
+            endpoint,
+        )
 
     /**
      * Presigned URL 요청 객체를 생성한다.
@@ -66,15 +66,21 @@ class CloudflareR2Service {
     fun createPresignedRequest(fileName: String): PresignedPutObjectRequest {
         try {
             val putObjectRequest = createPutObjectRequest(fileName)
-            return s3Presigner.presignPutObject(
+            val s3Presigner = getS3Presigner()
+            val presignedPutObjectRequest = s3Presigner.presignPutObject(
                 PutObjectPresignRequest
                     .builder()
                     .putObjectRequest(putObjectRequest)
-                    .signatureDuration(Duration.ofMinutes(10)) // 10분 동안 유효한 URL
+                    .signatureDuration(signatureDuration) // 10분 동안 유효한 URL
                     .build(),
             )
+            s3Presigner.close()
+            return presignedPutObjectRequest
         } catch (e: Exception) {
-            LOGGER.debug("Can't create presigned request(bucketName: ${bucketName.masking()}): ${e.message}\n")
+            LOGGER.error(
+                e,
+                "Failed to create presigned request(bucket=${bucketName.masking()}, key=${fileName.masking()})",
+            )
             throw e
         }
     }
