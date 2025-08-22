@@ -1,7 +1,7 @@
 package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.api.Api
-import com.peekr.common.api.Api.byId
+import com.peekr.common.api.Api.byPathParam
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.validator.CommonValidator.userIdValidatorAndReturn
@@ -22,7 +22,7 @@ fun Route.userRoutes(route: Api.V1.User, userUseCase: UserUseCase) {
         tags = setOf(route.TAG)
         description = "User API"
     }) {
-        get(route.ROUTE.byId("id"), { getUserByIdDocs() }) {
+        get(route.ROUTE.byPathParam("id"), { getUserByIdDocs() }) {
             val userIdParam = call.pathParameters["id"]
             val userId = userIdValidatorAndReturn(userIdParam)
             val user = userUseCase.getUserById(userId)

@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.api.Api
-import com.peekr.common.api.Api.byId
+import com.peekr.common.api.Api.byPathParam
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
@@ -77,7 +77,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             )
         }
 
-        get(route.EXISTS_USER.byId("provider", "providerId"), { findUserDocs() }) {
+        get(route.EXISTS_USER.byPathParam("provider", "providerId"), { findUserDocs() }) {
             val provider = call.request.pathVariables["provider"]
             val providerId = call.request.pathVariables["providerId"]
 
@@ -105,7 +105,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             }
         }
 
-        get(route.EXISTS_DISPLAY_ID.byId("displayId"), { existsDisplayIdDocs() }) {
+        get(route.EXISTS_DISPLAY_ID.byPathParam("displayId"), { existsDisplayIdDocs() }) {
             val displayId = call.request.pathVariables["displayId"]
             displayId?.validateDisplayId()
             if (displayId.isNullOrBlank()) {

@@ -1,7 +1,7 @@
 package com.peekr.domain.file.presentation
 
 import com.peekr.common.api.Api
-import com.peekr.common.api.Api.byId
+import com.peekr.common.api.Api.byPathParam
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
@@ -19,7 +19,7 @@ fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
         tags = setOf(route.TAG)
         description = "File API"
     }) {
-        get(route.UPLOAD.byId("fileName"), { uploadFileDocs() }) {
+        get(route.UPLOAD.byPathParam("fileName"), { uploadFileDocs() }) {
             val fileName = call.request.pathVariables["fileName"]
             if (fileName.isNullOrBlank()) {
                 call.respond(
