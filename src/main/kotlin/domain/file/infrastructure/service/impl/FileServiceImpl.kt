@@ -4,14 +4,11 @@ import com.peekr.domain.file.domain.model.UploadFileInfo
 import com.peekr.domain.file.domain.service.FileService
 
 class FileServiceImpl(private val r2Service: CloudflareR2Service) : FileService {
-    override fun createPresignedUrlWithInfo(fileName: String): UploadFileInfo {
-        val presignedRequest = r2Service.createPresignedRequest(fileName)
+    override fun createPresignedUrlWithInfo(fileName: String, mimeType: String): UploadFileInfo {
+        val presignedRequest = r2Service.createPresignedRequest(fileName, mimeType)
         val uploadFileInfo = UploadFileInfo(
             presignedUrl = presignedRequest.url().toString(),
             method = presignedRequest.httpRequest().method().name,
-            headers = presignedRequest.httpRequest().headers().mapValues { (_, v) ->
-                v.joinToString(",")
-            },
             expiresInSeconds = r2Service.signatureDuration.seconds,
         )
         return uploadFileInfo

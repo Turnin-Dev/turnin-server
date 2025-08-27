@@ -41,13 +41,14 @@ class CloudflareR2Service(
     }
 
     // 5분
-    val signatureDuration = Duration.ofMinutes(5)
+    val signatureDuration: Duration = Duration.ofMinutes(5)
 
-    private fun createPutObjectRequest(fileName: String): PutObjectRequest =
+    private fun createPutObjectRequest(fileName: String, mimeType: String): PutObjectRequest =
         PutObjectRequest
             .builder()
             .bucket(bucketName)
             .key(fileName)
+            .contentType(mimeType)
             .build()
 
     private fun getS3Presigner(): S3Presigner =
@@ -63,23 +64,23 @@ class CloudflareR2Service(
      *
      * @param fileName 파일 이름
      */
-    fun createPresignedRequest(fileName: String): PresignedPutObjectRequest {
+    fun createPresignedRequest(fileName: String, mimeType: String): PresignedPutObjectRequest {
         try {
-            val putObjectRequest = createPutObjectRequest(fileName)
-            val s3Presigner = getS3Presigner()
-            val presignedPutObjectRequest = s3Presigner.presignPutObject(
-                PutObjectPresignRequest
-                    .builder()
-                    .putObjectRequest(putObjectRequest)
-                    .signatureDuration(signatureDuration) // 5분 동안 유효한 URL
-                    .build(),
-            )
-            s3Presigner.close()
-            return presignedPutObjectRequest
+            val putObjectRequest = createPutObjectRequest(fileName, mimeType)
+            return getS3Presigner().use { presigner ->
+                presigner.presignPutObject(
+                    PutObjectPresignRequest
+                        .builder()
+                        .putObjectRequest(putObjectRequest)
+                        .signatureDuration(signatureDuration) // 5분 동안 유효한 URL
+                        .build(),
+                )
+            }
         } catch (e: Exception) {
             LOGGER.error(
                 e,
-                "Failed to create presigned request(bucket=${bucketName.masking()}, key=${fileName.masking()})",
+                "Failed to create presigned request" +
+                    "(bucket=${bucketName.masking()}, key=${fileName.masking()}, contentType=$mimeType)",
             )
             throw e
         }

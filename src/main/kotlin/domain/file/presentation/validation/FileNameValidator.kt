@@ -11,3 +11,16 @@ internal fun String?.validateFileNameAndReturn(): String {
     }
     return this
 }
+
+internal fun String?.validateImageMimeAndReturn(): String {
+    validation(!this.isNullOrBlank()) { "MIME 타입이 비어있습니다." }
+    val normalized = this!!.trim().lowercase()
+    validation(this.isImageType()) {
+        "파일이 이미지 타입이 아닙니다."
+    }
+    return normalized
+}
+
+private fun String.isImageType(): Boolean = IMAGE_MIME_REGEX.matches(this)
+
+private val IMAGE_MIME_REGEX = Regex("^image/[a-z0-9][a-z0-9.+-]{0,127}$")

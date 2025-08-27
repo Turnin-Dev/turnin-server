@@ -5,12 +5,10 @@ package com.peekr.domain.file.domain.model
  *
  * @property presignedUrl 사전 정의된 URL
  * @property method HTTP 메서드 (Ex. PUT)
- * @property headers HTTP 헤더
  * @property expiresInSeconds 만료 시간 (초 기준)
  */
 data class UploadFileInfo(
     val presignedUrl: String,
     val method: String,
-    val headers: Map<String, String>,
     val expiresInSeconds: Long,
 )
