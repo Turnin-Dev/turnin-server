@@ -21,6 +21,6 @@ internal fun String?.validateImageMimeAndReturn(): String {
     return normalized
 }
 
-private fun String.isImageType(): Boolean =
-    this.startsWith("image/") &&
-        this.split("/").size == 2
+private fun String.isImageType(): Boolean = IMAGE_MIME_REGEX.matches(this)
+
+private val IMAGE_MIME_REGEX = Regex("^image/[a-z0-9][a-z0-9.+-]{0,127}$")

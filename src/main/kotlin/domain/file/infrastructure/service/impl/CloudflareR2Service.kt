@@ -67,22 +67,20 @@ class CloudflareR2Service(
     fun createPresignedRequest(fileName: String, mimeType: String): PresignedPutObjectRequest {
         try {
             val putObjectRequest = createPutObjectRequest(fileName, mimeType)
-            val s3Presigner = getS3Presigner()
-            try {
-                return s3Presigner.presignPutObject(
+            return getS3Presigner().use { presigner ->
+                presigner.presignPutObject(
                     PutObjectPresignRequest
                         .builder()
                         .putObjectRequest(putObjectRequest)
                         .signatureDuration(signatureDuration) // 5분 동안 유효한 URL
                         .build(),
                 )
-            } finally {
-                s3Presigner.close()
             }
         } catch (e: Exception) {
             LOGGER.error(
                 e,
-                "Failed to create presigned request(bucket=${bucketName.masking()}, key=${fileName.masking()})",
+                "Failed to create presigned request" +
+                    "(bucket=${bucketName.masking()}, key=${fileName.masking()}, contentType=$mimeType)",
             )
             throw e
         }
