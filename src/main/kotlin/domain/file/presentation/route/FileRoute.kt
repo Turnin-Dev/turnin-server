@@ -8,6 +8,7 @@ import com.peekr.domain.file.application.usecase.FileUseCase
 import com.peekr.domain.file.presentation.dto.UploadFileResponse
 import com.peekr.domain.file.presentation.dto.toResponse
 import com.peekr.domain.file.presentation.validation.validateFileNameAndReturn
+import com.peekr.domain.file.presentation.validation.validateImageMimeAndReturn
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
@@ -23,9 +24,11 @@ fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
     }) {
         get(route.UPLOAD, { uploadFileDocs() }) {
             val fileNameRaw = call.request.queryParameters["fileName"]
+            val mimeRaw = call.request.queryParameters["mime"]
             val fileName = fileNameRaw?.trim().validateFileNameAndReturn()
+            val mime = mimeRaw?.trim().validateImageMimeAndReturn()
             val uploadFileInfoDto = try {
-                fileUseCase.createPresignedUrl(fileName)
+                fileUseCase.createPresignedUrl(fileName, mime)
             } catch (e: IllegalArgumentException) {
                 call.respond(
                     HttpStatusCode.BadRequest,
@@ -50,6 +53,12 @@ private fun RouteConfig.uploadFileDocs() {
             description = "파일 이름 (영문/숫자/._- 만 허용, 1~255자)"
             example("fileName") {
                 value = "asdasd1231221.jpg"
+            }
+        }
+        queryParameter<String>("mime") {
+            description = "파일 MIME 타입"
+            example("mime") {
+                value = "image/jpeg"
             }
         }
     }

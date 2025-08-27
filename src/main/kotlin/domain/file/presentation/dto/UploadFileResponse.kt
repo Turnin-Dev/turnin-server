@@ -8,21 +8,18 @@ import kotlinx.serialization.Serializable
  *
  * @property presignedUrl 사전 정의된 URL
  * @property method HTTP 메서드 (Ex. PUT)
- * @property headers HTTP 헤더
  * @property expiresInSeconds 만료 시간 (초 기준)
  */
 @Serializable
 data class UploadFileResponse(
     val presignedUrl: String,
     val method: String,
-    val headers: Map<String, String>,
     val expiresInSeconds: Long,
 ) {
     companion object {
         val sample = UploadFileResponse(
             presignedUrl = "https://example-storage.com/objects/my-image.jpg",
             method = "PUT",
-            headers = mapOf("Content-Type" to "image/jpeg"),
             expiresInSeconds = 600,
         )
     }
@@ -31,6 +28,5 @@ data class UploadFileResponse(
 fun UploadFileInfoDto.toResponse() = UploadFileResponse(
     presignedUrl = presignedUrl,
     method = method,
-    headers = headers,
     expiresInSeconds = expiresInSeconds,
 )

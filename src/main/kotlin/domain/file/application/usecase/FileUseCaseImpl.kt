@@ -5,6 +5,6 @@ import com.peekr.domain.file.application.dto.toDto
 import com.peekr.domain.file.domain.service.FileService
 
 class FileUseCaseImpl(private val fileService: FileService) : FileUseCase {
-    override fun createPresignedUrl(fileName: String): UploadFileInfoDto =
-        fileService.createPresignedUrlWithInfo(fileName).toDto()
+    override fun createPresignedUrl(fileName: String, mimetype: String): UploadFileInfoDto =
+        fileService.createPresignedUrlWithInfo(fileName, mimetype).toDto()
 }

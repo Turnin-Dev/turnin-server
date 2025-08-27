@@ -7,19 +7,16 @@ import com.peekr.domain.file.domain.model.UploadFileInfo
  *
  * @property presignedUrl 사전 정의된 URL
  * @property method HTTP 메서드 (Ex. PUT)
- * @property headers HTTP 헤더
  * @property expiresInSeconds 만료 시간 (초 기준)
  */
 data class UploadFileInfoDto(
     val presignedUrl: String,
     val method: String,
-    val headers: Map<String, String>,
     val expiresInSeconds: Long,
 )
 
 fun UploadFileInfo.toDto(): UploadFileInfoDto = UploadFileInfoDto(
     presignedUrl = presignedUrl,
     method = method,
-    headers = headers,
     expiresInSeconds = expiresInSeconds,
 )

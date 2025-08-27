@@ -11,3 +11,13 @@ internal fun String?.validateFileNameAndReturn(): String {
     }
     return this
 }
+
+internal fun String?.validateImageMimeAndReturn(): String {
+    validation(!this.isNullOrBlank()) {
+        "MIME 타입이 비어있습니다."
+    }
+    validation(this!!.startsWith("image/")) {
+        "파일이 이미지 타입이 아닙니다."
+    }
+    return this
+}
