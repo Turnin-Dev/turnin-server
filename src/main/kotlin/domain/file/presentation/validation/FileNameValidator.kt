@@ -13,11 +13,14 @@ internal fun String?.validateFileNameAndReturn(): String {
 }
 
 internal fun String?.validateImageMimeAndReturn(): String {
-    validation(!this.isNullOrBlank()) {
-        "MIME 타입이 비어있습니다."
-    }
-    validation(this!!.startsWith("image/")) {
+    validation(!this.isNullOrBlank()) { "MIME 타입이 비어있습니다." }
+    val normalized = this!!.trim().lowercase()
+    validation(this.isImageType()) {
         "파일이 이미지 타입이 아닙니다."
     }
-    return this
+    return normalized
 }
+
+private fun String.isImageType(): Boolean =
+    this.startsWith("image/") &&
+        this.split("/").size == 2

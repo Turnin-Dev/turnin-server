@@ -14,10 +14,10 @@ interface FileService {
      * - `Presigned URL`: 토큰 비밀번호를 공개하지 않고 버킷에 직접 액세스할 수 있도록 하는 S3 개념
      *
      * @param fileName 파일 이름
-     * @param mimetype MIME 타입 (파일이나 데이터의 형식을 지정하는 2부분으로 이루어진 식별자)
+     * @param mimeType MIME 타입 (파일이나 데이터의 형식을 지정하는 2부분으로 이루어진 식별자)
      */
     fun createPresignedUrlWithInfo(
         fileName: String,
-        mimetype: String,
+        mimeType: String,
     ): UploadFileInfo
 }

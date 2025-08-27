@@ -68,15 +68,17 @@ class CloudflareR2Service(
         try {
             val putObjectRequest = createPutObjectRequest(fileName, mimeType)
             val s3Presigner = getS3Presigner()
-            val presignedPutObjectRequest = s3Presigner.presignPutObject(
-                PutObjectPresignRequest
-                    .builder()
-                    .putObjectRequest(putObjectRequest)
-                    .signatureDuration(signatureDuration) // 5분 동안 유효한 URL
-                    .build(),
-            )
-            s3Presigner.close()
-            return presignedPutObjectRequest
+            try {
+                return s3Presigner.presignPutObject(
+                    PutObjectPresignRequest
+                        .builder()
+                        .putObjectRequest(putObjectRequest)
+                        .signatureDuration(signatureDuration) // 5분 동안 유효한 URL
+                        .build(),
+                )
+            } finally {
+                s3Presigner.close()
+            }
         } catch (e: Exception) {
             LOGGER.error(
                 e,

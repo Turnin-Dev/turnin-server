@@ -56,7 +56,7 @@ private fun RouteConfig.uploadFileDocs() {
             }
         }
         queryParameter<String>("mime") {
-            description = "파일 MIME 타입"
+            description = "파일 MIME 타입 (일단은 이미지 파일만 허용)"
             example("mime") {
                 value = "image/jpeg"
             }
