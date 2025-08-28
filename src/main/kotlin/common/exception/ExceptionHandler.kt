@@ -1,5 +1,6 @@
 package com.peekr.common.exception
 
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.validator.ValidatorException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -11,11 +12,12 @@ import io.ktor.server.response.respond
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
         exception<ApiException> { call, cause ->
+            warnLogging(cause)
             call.respond(
                 status = cause.status,
                 message = ErrorResponse(
                     code = cause.errorCode.code,
-                    message = errorMessageForm(title = cause.errorCode.description, message = cause.message),
+                    message = cause.errorCode.description,
                     status = cause.status.value,
                 ),
             )
@@ -36,14 +38,12 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<BadRequestException> { call, cause ->
+            LOGGER.warn("[BadRequestException] ${cause.message}", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
                     code = CommonErrorCode.MalformedRequest.code,
-                    message = errorMessageForm(
-                        title = CommonErrorCode.MalformedRequest.description,
-                        cause.message,
-                    ),
+                    message = CommonErrorCode.MalformedRequest.description,
                     status = HttpStatusCode.BadRequest.value,
                 ),
             )
@@ -51,14 +51,12 @@ fun Application.configureExceptionHandler() {
 
         exception<Throwable> { call, cause ->
             val statusCode = call.response.status() ?: HttpStatusCode.InternalServerError
+            errorLogging(statusCode, cause)
             call.respond(
                 status = statusCode,
                 message = ErrorResponse(
                     code = UNKNOWN_ERROR_CODE,
-                    message = errorMessageForm(
-                        title = UNKNOWN_ERROR_MESSAGE,
-                        message = cause.message,
-                    ),
+                    message = UNKNOWN_ERROR_MESSAGE,
                     status = statusCode.value,
                 ),
             )
@@ -71,3 +69,25 @@ private const val UNKNOWN_ERROR_CODE = "UEC001"
 
 private fun errorMessageForm(title: String, message: String?) =
     "[$title]: $message"
+
+private val LOGGER = AppLoggerFactory.createLogger("ExceptionHandler")
+
+private fun warnLogging(cause: ApiException) {
+    LOGGER.warn(
+        "[ApiException] " +
+            "code=${cause.errorCode.code}, " +
+            "status=${cause.status.value}, " +
+            "message=${cause.message}",
+        cause.cause,
+    )
+}
+
+private fun errorLogging(statusCode: HttpStatusCode, cause: Throwable) {
+    LOGGER.error(
+        cause,
+        "[Unhandled Throwable] " +
+            "status=${statusCode.value}, " +
+            "code=${UNKNOWN_ERROR_CODE}, " +
+            "message=${UNKNOWN_ERROR_MESSAGE}",
+    )
+}

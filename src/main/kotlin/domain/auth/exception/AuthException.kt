@@ -7,25 +7,29 @@ import io.ktor.http.HttpStatusCode
 /**
  * Auth Exception
  *
- * @param detail 에러 설명 (자세히)
+ * @property code [ApiErrorCode]
+ * @property status HTTP 상태코드
+ * @property message 에러 메시지
+ * @property cause [Throwable]
  */
 sealed class AuthException(
-    val detail: String,
     code: ApiErrorCode,
     status: HttpStatusCode,
-) : ApiException(code, detail, status) {
+    message: String = code.description,
+    cause: Throwable? = null,
+) : ApiException(code, status, message, cause) {
     /** 중복된 사용자 예외 (보통 저장할 때 중복된 사용자가 있을 때 예외 처리) */
-    class DuplicateUserException(detail: String? = null) :
+    class DuplicateUserException(cause: Throwable? = null) :
         AuthException(
             code = AuthErrorCode.UserDuplicated,
-            detail = detail ?: AuthErrorCode.UserDuplicated.description,
             status = HttpStatusCode.Conflict,
+            cause = cause,
         )
 
-    class CannotSaveRefreshTokenException(detail: String? = null) :
+    class CannotSaveRefreshTokenException(cause: Throwable? = null) :
         AuthException(
             code = AuthErrorCode.CannotSaveRefreshToken,
-            detail = detail ?: AuthErrorCode.CannotSaveRefreshToken.description,
-            status = HttpStatusCode.Unauthorized,
+            status = HttpStatusCode.Conflict,
+            cause = cause,
         )
 }

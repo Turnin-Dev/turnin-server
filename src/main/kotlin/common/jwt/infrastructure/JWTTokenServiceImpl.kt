@@ -3,6 +3,7 @@ package com.peekr.common.jwt.infrastructure
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.exceptions.JWTDecodeException
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
@@ -11,6 +12,7 @@ import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.config.AppConfig
+import java.util.UUID
 
 private typealias JWTChecksum = Pair<String, String>
 
@@ -47,8 +49,10 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
             val refreshToken = createRefreshToken(payload.userId, refreshTokenExpiresIn)
 
             return JWTToken(accessToken, refreshToken)
-        } catch (e: Exception) {
-            throw TokenException.CannotCreateToken(e.message)
+        } catch (e: JWTCreationException) {
+            throw TokenException.CannotCreateToken(e)
+        } catch (e: IllegalArgumentException) {
+            throw TokenException.CannotCreateToken(e)
         }
     }
 
@@ -68,8 +72,8 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
                     .build()
             }
         }
-    } catch (e: Exception) {
-        throw TokenException.CannotCreateTokenVerifier(e.message)
+    } catch (e: IllegalArgumentException) {
+        throw TokenException.CannotCreateTokenVerifier(e)
     }
 
     private fun createAccessToken(
@@ -110,13 +114,13 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
     }
 
     private fun createRandomChecksum(): JWTChecksum {
-        val randomValue = PeekrDateTime.now().toEpochMilli().toString()
+        val randomValue = UUID.randomUUID().toString()
         return JWTChecksum("checksum", randomValue)
     }
 
     override fun extractUserId(token: String): Long? = try {
         JWT.decode(token).subject.toLongOrNull()
     } catch (e: JWTDecodeException) {
-        throw TokenException.CannotDecodedException(e.message)
+        throw TokenException.CannotDecodedException(e)
     }
 }

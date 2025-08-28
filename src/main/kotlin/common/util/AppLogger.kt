@@ -11,6 +11,7 @@ class AppLogger(private val logger: Logger) {
      * 디버깅 로그
      *
      * @param message 로그 메시지
+     * @param e [Throwable]
      */
     fun debug(message: String, e: Throwable? = null) {
         if (e != null) logger.debug(message, e) else logger.debug(message)
@@ -30,9 +31,10 @@ class AppLogger(private val logger: Logger) {
      * 경고 로그
      *
      * @param message 로그 메시지
+     * @param e [Throwable]
      */
-    fun warn(message: String) {
-        logger.warn(message)
+    fun warn(message: String, e: Throwable? = null) {
+        logger.warn(message, e)
     }
 }
 

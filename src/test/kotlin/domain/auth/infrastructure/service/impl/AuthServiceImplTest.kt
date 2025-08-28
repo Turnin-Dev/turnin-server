@@ -109,7 +109,7 @@ class AuthServiceImplTest {
         // given
         coEvery {
             authRepository.save(any())
-        } throws AuthException.DuplicateUserException("")
+        } throws AuthException.DuplicateUserException()
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()
 
         // when & then

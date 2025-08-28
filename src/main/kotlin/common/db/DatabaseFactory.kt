@@ -10,7 +10,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.FlywayException
-import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -47,10 +46,8 @@ object DatabaseFactory {
     suspend fun <T> dbQuery(block: () -> T): T = newSuspendedTransaction(ioContext) {
         try {
             block()
-        } catch (e: ExposedSQLException) {
-            throw DatabaseException.DBQueryException(e.message)
         } catch (e: SQLException) {
-            throw DatabaseException.DBQueryException(e.message)
+            throw DatabaseException.DBQueryException(e)
         } catch (e: Exception) {
             throw e
         }

@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.schema.UserEntity
@@ -76,21 +77,26 @@ class AuthRepositoryImpl : AuthRepository {
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.masking()}")
     }
 
-    private fun processSQLException(e: Throwable): Throwable {
+    private fun processSQLException(e: Exception): Throwable {
         val sqlState: String? = when (e) {
             is ExposedSQLException -> e.sqlState
             is SQLException -> e.sqlState
+            is DatabaseException.DBQueryException -> e.throwable?.sqlState
             else -> null
         }
-        if (sqlState == null) return e
-        return if (sqlState == "23505" ||
-            // PostgreSQL unique_violation
-            e.message?.contains("unique", ignoreCase = true) == true ||
-            e.message?.contains("already exists", ignoreCase = true) == true ||
-            e.message?.contains("primary key violation", ignoreCase = true) == true
-        ) {
+        val causeMsg = when (e) {
+            is DatabaseException.DBQueryException -> e.throwable?.message
+            is ExposedSQLException -> e.cause?.message
+            else -> null
+        }
+        val isDuplicateByMsg = sequenceOf(e.message, causeMsg).any {
+            it?.contains("unique", ignoreCase = true) == true ||
+                it?.contains("already exists", ignoreCase = true) == true ||
+                it?.contains("primary key violation", ignoreCase = true) == true
+        }
+        return if (sqlState == "23505" || isDuplicateByMsg) {
             LOGGER.debug("Duplicate user detected while saving authUser.", e)
-            throw AuthException.DuplicateUserException(e.message)
+            AuthException.DuplicateUserException(e)
         } else {
             e
         }

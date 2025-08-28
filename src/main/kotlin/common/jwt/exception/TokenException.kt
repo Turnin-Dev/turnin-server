@@ -4,32 +4,46 @@ import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
 import io.ktor.http.HttpStatusCode
 
+/**
+ * 토큰 커스텀 예외
+ *
+ * @property code [ApiErrorCode]
+ * @property status HTTP 상태코드
+ * @property message 에러 메시지
+ * @property cause [Throwable]
+ */
 sealed class TokenException(
-    val detail: String,
     code: ApiErrorCode,
     status: HttpStatusCode = HttpStatusCode.Unauthorized,
-) : ApiException(errorCode = code, message = detail, status = status) {
-    class InvalidTokenException(detail: String? = null) :
+    message: String,
+    cause: Throwable? = null,
+) : ApiException(errorCode = code, message = message, status = status, cause = cause) {
+    class InvalidTokenException(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.InvalidToken,
-            detail = detail ?: TokenErrorCode.InvalidToken.description,
+            message = TokenErrorCode.InvalidToken.description,
+            cause = cause,
         )
 
-    class CannotCreateTokenVerifier(detail: String? = null) :
+    class CannotCreateTokenVerifier(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.InvalidVerifier,
-            detail = detail ?: TokenErrorCode.InvalidVerifier.description,
+            status = HttpStatusCode.InternalServerError,
+            message = TokenErrorCode.InvalidVerifier.description,
+            cause = cause,
         )
 
-    class CannotCreateToken(detail: String? = null) :
+    class CannotCreateToken(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.GenerateTokenError,
-            detail = detail ?: TokenErrorCode.GenerateTokenError.description,
+            message = TokenErrorCode.GenerateTokenError.description,
+            cause = cause,
         )
 
-    class CannotDecodedException(detail: String? = null) :
+    class CannotDecodedException(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.DecodeTokenError,
-            detail = detail ?: TokenErrorCode.DecodeTokenError.description,
+            message = TokenErrorCode.DecodeTokenError.description,
+            cause = cause,
         )
 }

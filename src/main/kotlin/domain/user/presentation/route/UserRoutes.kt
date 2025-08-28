@@ -18,7 +18,7 @@ import io.ktor.server.routing.Route
 
 // ------------------------------ Route ------------------------------
 fun Route.userRoutes(route: Api.V1.User, userUseCase: UserUseCase) {
-    route(route.ROUTE, {
+    route({
         tags = setOf(route.TAG)
         description = "User API"
     }) {
