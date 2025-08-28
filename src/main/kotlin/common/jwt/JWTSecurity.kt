@@ -29,7 +29,7 @@ fun Application.configureJwtSecurity() {
                 }
             }
             challenge { e1, e2 ->
-                throw TokenException.InvalidTokenException("$e1, $e2")
+                throw TokenException.InvalidTokenException()
             }
         }
     }

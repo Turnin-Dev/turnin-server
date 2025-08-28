@@ -7,7 +7,7 @@ internal fun String?.validateFileNameAndReturn(): String {
         "파일명이 비어있습니다."
     }
     validation(this!!.matches(FILE_NAME_REGEX)) {
-        "파일명은 최대 255자 이내의 영문/숫자/특수기호(., _, -)만 허용됩니다."
+        "파일명은 최대 255자 이내의 한글/영문/숫자/특수기호(., _, -)만 허용됩니다."
     }
     return this
 }
@@ -15,7 +15,7 @@ internal fun String?.validateFileNameAndReturn(): String {
 internal fun String?.validateImageMimeAndReturn(): String {
     validation(!this.isNullOrBlank()) { "MIME 타입이 비어있습니다." }
     val normalized = this!!.trim().lowercase()
-    validation(this.isImageType()) {
+    validation(normalized.isImageType()) {
         "파일이 이미지 타입이 아닙니다."
     }
     return normalized

@@ -15,14 +15,13 @@ import io.ktor.http.HttpStatusCode
 sealed class AuthException(
     code: ApiErrorCode,
     status: HttpStatusCode,
-    message: String,
+    message: String = code.description,
     throwable: Throwable? = null,
 ) : ApiException(code, status, message, throwable) {
     /** 중복된 사용자 예외 (보통 저장할 때 중복된 사용자가 있을 때 예외 처리) */
     class DuplicateUserException(throwable: Throwable? = null) :
         AuthException(
             code = AuthErrorCode.UserDuplicated,
-            message = AuthErrorCode.UserDuplicated.description,
             status = HttpStatusCode.Conflict,
             throwable = throwable,
         )
@@ -30,8 +29,7 @@ sealed class AuthException(
     class CannotSaveRefreshTokenException(throwable: Throwable? = null) :
         AuthException(
             code = AuthErrorCode.CannotSaveRefreshToken,
-            message = AuthErrorCode.CannotSaveRefreshToken.description,
-            status = HttpStatusCode.Unauthorized,
+            status = HttpStatusCode.Conflict,
             throwable = throwable,
         )
 }

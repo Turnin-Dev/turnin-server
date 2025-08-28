@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.schema.UserEntity
@@ -76,10 +77,11 @@ class AuthRepositoryImpl : AuthRepository {
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.masking()}")
     }
 
-    private fun processSQLException(e: Throwable): Throwable {
+    private fun processSQLException(e: Exception): Throwable {
         val sqlState: String? = when (e) {
             is ExposedSQLException -> e.sqlState
             is SQLException -> e.sqlState
+            is DatabaseException.DBQueryException -> e.throwable?.sqlState
             else -> null
         }
         if (sqlState == null) return e
@@ -90,7 +92,7 @@ class AuthRepositoryImpl : AuthRepository {
             e.message?.contains("primary key violation", ignoreCase = true) == true
         ) {
             LOGGER.debug("Duplicate user detected while saving authUser.", e)
-            throw AuthException.DuplicateUserException(e)
+            AuthException.DuplicateUserException(e)
         } else {
             e
         }

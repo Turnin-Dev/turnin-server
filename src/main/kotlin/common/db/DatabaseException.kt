@@ -3,6 +3,7 @@ package com.peekr.common.db
 import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
 import io.ktor.http.HttpStatusCode
+import java.sql.SQLException
 
 /**
  * 데이터베이스 커스텀 예외
@@ -15,16 +16,15 @@ import io.ktor.http.HttpStatusCode
 sealed class DatabaseException(
     code: ApiErrorCode,
     status: HttpStatusCode,
-    message: String,
+    message: String = code.description,
     throwable: Throwable? = null,
 ) : ApiException(code, status, message, throwable) {
     /**
      * DB 쿼리 관련 예외
      */
-    class DBQueryException(throwable: Throwable? = null) :
+    class DBQueryException(val throwable: SQLException? = null) :
         DatabaseException(
             code = DatabaseErrorCode.DBQueryError,
-            message = DatabaseErrorCode.DBQueryError.description,
             status = HttpStatusCode.InternalServerError,
             throwable = throwable,
         )

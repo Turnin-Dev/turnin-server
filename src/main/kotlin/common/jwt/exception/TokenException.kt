@@ -17,13 +17,11 @@ sealed class TokenException(
     status: HttpStatusCode = HttpStatusCode.Unauthorized,
     message: String,
     throwable: Throwable? = null,
-) : ApiException(errorCode = code, message = message, status = status, throwable = throwable) {
-    class InvalidTokenException(
-        cause: String,
-        throwable: Throwable? = null,
-    ) : TokenException(
+) : ApiException(errorCode = code, message = message, status = status, cause = throwable) {
+    class InvalidTokenException(throwable: Throwable? = null) :
+        TokenException(
             code = TokenErrorCode.InvalidToken,
-            message = "${TokenErrorCode.InvalidToken.description}(cause: $cause)",
+            message = TokenErrorCode.InvalidToken.description,
             throwable = throwable,
         )
 

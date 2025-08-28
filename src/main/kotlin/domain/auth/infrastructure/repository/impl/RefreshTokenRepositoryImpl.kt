@@ -7,7 +7,6 @@ import com.peekr.common.db.schema.Users
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
-import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.upsert
 
@@ -40,9 +39,14 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
                 }
                 true
             }
-        } catch (e: JdbcSQLIntegrityConstraintViolationException) {
-            // 거의 불가능한 상황이긴 하다.
-            throw AuthException.CannotSaveRefreshTokenException(e)
+        } catch (e: java.sql.SQLException) {
+            // 23505: ANSI/PG에서 주로 사용되는 unique_violation
+            if (e.sqlState == "23505") {
+                LOGGER.warn("Unique violation while upserting RefreshTokens. userId=$userId", e)
+                throw AuthException.CannotSaveRefreshTokenException(e)
+            } else {
+                throw e
+            }
         } catch (e: Exception) {
             LOGGER.error(e, "Failed to save refresh token. userId=$userId, tokenLength=${token.length}")
             false
