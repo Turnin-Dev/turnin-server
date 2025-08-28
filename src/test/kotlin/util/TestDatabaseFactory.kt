@@ -29,7 +29,7 @@ object TestDatabaseFactory {
         try {
             block()
         } catch (e: ExposedSQLException) {
-            throw DatabaseException.DBQueryException(e.message)
+            throw DatabaseException.DBQueryException(e)
         } catch (e: Exception) {
             throw e
         }

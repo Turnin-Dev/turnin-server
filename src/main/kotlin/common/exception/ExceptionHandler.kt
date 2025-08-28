@@ -15,7 +15,7 @@ fun Application.configureExceptionHandler() {
                 status = cause.status,
                 message = ErrorResponse(
                     code = cause.errorCode.code,
-                    message = errorMessageForm(title = cause.errorCode.description, message = cause.message),
+                    message = cause.errorCode.description,
                     status = cause.status.value,
                 ),
             )
@@ -40,10 +40,7 @@ fun Application.configureExceptionHandler() {
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
                     code = CommonErrorCode.MalformedRequest.code,
-                    message = errorMessageForm(
-                        title = CommonErrorCode.MalformedRequest.description,
-                        cause.message,
-                    ),
+                    message = CommonErrorCode.MalformedRequest.description,
                     status = HttpStatusCode.BadRequest.value,
                 ),
             )
@@ -55,10 +52,7 @@ fun Application.configureExceptionHandler() {
                 status = statusCode,
                 message = ErrorResponse(
                     code = UNKNOWN_ERROR_CODE,
-                    message = errorMessageForm(
-                        title = UNKNOWN_ERROR_MESSAGE,
-                        message = cause.message,
-                    ),
+                    message = UNKNOWN_ERROR_MESSAGE,
                     status = statusCode.value,
                 ),
             )

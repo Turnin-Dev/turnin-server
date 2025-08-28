@@ -48,7 +48,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
 
             return JWTToken(accessToken, refreshToken)
         } catch (e: Exception) {
-            throw TokenException.CannotCreateToken(e.message)
+            throw TokenException.CannotCreateToken(e)
         }
     }
 
@@ -69,7 +69,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
             }
         }
     } catch (e: Exception) {
-        throw TokenException.CannotCreateTokenVerifier(e.message)
+        throw TokenException.CannotCreateTokenVerifier(e)
     }
 
     private fun createAccessToken(
@@ -117,6 +117,6 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
     override fun extractUserId(token: String): Long? = try {
         JWT.decode(token).subject.toLongOrNull()
     } catch (e: JWTDecodeException) {
-        throw TokenException.CannotDecodedException(e.message)
+        throw TokenException.CannotDecodedException(e)
     }
 }

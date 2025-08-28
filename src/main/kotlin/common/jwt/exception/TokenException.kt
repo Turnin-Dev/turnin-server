@@ -4,32 +4,47 @@ import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
 import io.ktor.http.HttpStatusCode
 
+/**
+ * 토큰 커스텀 예외
+ *
+ * @property code [ApiErrorCode]
+ * @property status HTTP 상태코드
+ * @property message 에러 메시지
+ * @property throwable [Throwable]
+ */
 sealed class TokenException(
-    val detail: String,
     code: ApiErrorCode,
     status: HttpStatusCode = HttpStatusCode.Unauthorized,
-) : ApiException(errorCode = code, message = detail, status = status) {
-    class InvalidTokenException(detail: String? = null) :
-        TokenException(
+    message: String,
+    throwable: Throwable? = null,
+) : ApiException(errorCode = code, message = message, status = status, throwable = throwable) {
+    class InvalidTokenException(
+        cause: String,
+        throwable: Throwable? = null,
+    ) : TokenException(
             code = TokenErrorCode.InvalidToken,
-            detail = detail ?: TokenErrorCode.InvalidToken.description,
+            message = "${TokenErrorCode.InvalidToken.description}(cause: $cause)",
+            throwable = throwable,
         )
 
-    class CannotCreateTokenVerifier(detail: String? = null) :
+    class CannotCreateTokenVerifier(throwable: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.InvalidVerifier,
-            detail = detail ?: TokenErrorCode.InvalidVerifier.description,
+            message = TokenErrorCode.InvalidVerifier.description,
+            throwable = throwable,
         )
 
-    class CannotCreateToken(detail: String? = null) :
+    class CannotCreateToken(throwable: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.GenerateTokenError,
-            detail = detail ?: TokenErrorCode.GenerateTokenError.description,
+            message = TokenErrorCode.GenerateTokenError.description,
+            throwable = throwable,
         )
 
-    class CannotDecodedException(detail: String? = null) :
+    class CannotDecodedException(throwable: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.DecodeTokenError,
-            detail = detail ?: TokenErrorCode.DecodeTokenError.description,
+            message = TokenErrorCode.DecodeTokenError.description,
+            throwable = throwable,
         )
 }

@@ -48,9 +48,9 @@ object DatabaseFactory {
         try {
             block()
         } catch (e: ExposedSQLException) {
-            throw DatabaseException.DBQueryException(e.message)
+            throw DatabaseException.DBQueryException(e)
         } catch (e: SQLException) {
-            throw DatabaseException.DBQueryException(e.message)
+            throw DatabaseException.DBQueryException(e)
         } catch (e: Exception) {
             throw e
         }

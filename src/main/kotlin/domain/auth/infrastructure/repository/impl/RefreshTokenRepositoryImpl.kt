@@ -42,7 +42,7 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
             }
         } catch (e: JdbcSQLIntegrityConstraintViolationException) {
             // 거의 불가능한 상황이긴 하다.
-            throw AuthException.CannotSaveRefreshTokenException(e.message)
+            throw AuthException.CannotSaveRefreshTokenException(e)
         } catch (e: Exception) {
             LOGGER.error(e, "Failed to save refresh token. userId=$userId, tokenLength=${token.length}")
             false

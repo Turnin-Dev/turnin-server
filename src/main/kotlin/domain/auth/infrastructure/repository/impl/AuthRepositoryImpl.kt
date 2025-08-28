@@ -90,7 +90,7 @@ class AuthRepositoryImpl : AuthRepository {
             e.message?.contains("primary key violation", ignoreCase = true) == true
         ) {
             LOGGER.debug("Duplicate user detected while saving authUser.", e)
-            throw AuthException.DuplicateUserException(e.message)
+            throw AuthException.DuplicateUserException(e)
         } else {
             e
         }
