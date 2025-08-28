@@ -84,13 +84,17 @@ class AuthRepositoryImpl : AuthRepository {
             is DatabaseException.DBQueryException -> e.throwable?.sqlState
             else -> null
         }
-        if (sqlState == null) return e
-        return if (sqlState == "23505" ||
-            // PostgreSQL unique_violation
-            e.message?.contains("unique", ignoreCase = true) == true ||
-            e.message?.contains("already exists", ignoreCase = true) == true ||
-            e.message?.contains("primary key violation", ignoreCase = true) == true
-        ) {
+        val causeMsg = when (e) {
+            is DatabaseException.DBQueryException -> e.throwable?.message
+            is ExposedSQLException -> e.cause?.message
+            else -> null
+        }
+        val isDuplicateByMsg = sequenceOf(e.message, causeMsg).any {
+            it?.contains("unique", ignoreCase = true) == true ||
+                it?.contains("already exists", ignoreCase = true) == true ||
+                it?.contains("primary key violation", ignoreCase = true) == true
+        }
+        return if (sqlState == "23505" || isDuplicateByMsg) {
             LOGGER.debug("Duplicate user detected while saving authUser.", e)
             AuthException.DuplicateUserException(e)
         } else {

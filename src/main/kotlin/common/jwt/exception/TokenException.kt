@@ -10,39 +10,40 @@ import io.ktor.http.HttpStatusCode
  * @property code [ApiErrorCode]
  * @property status HTTP 상태코드
  * @property message 에러 메시지
- * @property throwable [Throwable]
+ * @property cause [Throwable]
  */
 sealed class TokenException(
     code: ApiErrorCode,
     status: HttpStatusCode = HttpStatusCode.Unauthorized,
     message: String,
-    throwable: Throwable? = null,
-) : ApiException(errorCode = code, message = message, status = status, cause = throwable) {
-    class InvalidTokenException(throwable: Throwable? = null) :
+    cause: Throwable? = null,
+) : ApiException(errorCode = code, message = message, status = status, cause = cause) {
+    class InvalidTokenException(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.InvalidToken,
             message = TokenErrorCode.InvalidToken.description,
-            throwable = throwable,
+            cause = cause,
         )
 
-    class CannotCreateTokenVerifier(throwable: Throwable? = null) :
+    class CannotCreateTokenVerifier(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.InvalidVerifier,
+            status = HttpStatusCode.InternalServerError,
             message = TokenErrorCode.InvalidVerifier.description,
-            throwable = throwable,
+            cause = cause,
         )
 
-    class CannotCreateToken(throwable: Throwable? = null) :
+    class CannotCreateToken(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.GenerateTokenError,
             message = TokenErrorCode.GenerateTokenError.description,
-            throwable = throwable,
+            cause = cause,
         )
 
-    class CannotDecodedException(throwable: Throwable? = null) :
+    class CannotDecodedException(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.DecodeTokenError,
             message = TokenErrorCode.DecodeTokenError.description,
-            throwable = throwable,
+            cause = cause,
         )
 }

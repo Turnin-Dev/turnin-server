@@ -11,14 +11,14 @@ import java.sql.SQLException
  * @property code [ApiErrorCode]
  * @property status HTTP 상태코드
  * @property message 에러 메시지
- * @property throwable [Throwable]
+ * @property cause [Throwable]
  */
 sealed class DatabaseException(
     code: ApiErrorCode,
     status: HttpStatusCode,
     message: String = code.description,
-    throwable: Throwable? = null,
-) : ApiException(code, status, message, throwable) {
+    cause: Throwable? = null,
+) : ApiException(code, status, message, cause) {
     /**
      * DB 쿼리 관련 예외
      */
@@ -26,6 +26,6 @@ sealed class DatabaseException(
         DatabaseException(
             code = DatabaseErrorCode.DBQueryError,
             status = HttpStatusCode.InternalServerError,
-            throwable = throwable,
+            cause = throwable,
         )
 }

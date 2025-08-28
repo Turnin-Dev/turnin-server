@@ -101,6 +101,6 @@ class JWTSecurityTest {
     companion object {
         private const val TEST_ENDPOINT = "/protected"
         private const val TEST_RESPONSE = "Access Granted"
-        private val TEST_ERROR_CODE = TokenException.InvalidTokenException("").errorCode.code
+        private val TEST_ERROR_CODE = TokenException.InvalidTokenException().errorCode.code
     }
 }
