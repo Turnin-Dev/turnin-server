@@ -90,8 +90,7 @@ class AuthRepositoryImpl : AuthRepository {
             else -> null
         }
         val isDuplicateByMsg = sequenceOf(e.message, causeMsg).any {
-            it?.contains("unique", ignoreCase = true) == true ||
-                it?.contains("already exists", ignoreCase = true) == true ||
+            it?.contains("already exists", ignoreCase = true) == true ||
                 it?.contains("primary key violation", ignoreCase = true) == true
         }
         return if (sqlState == "23505" || isDuplicateByMsg) {

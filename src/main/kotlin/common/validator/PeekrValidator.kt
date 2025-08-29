@@ -13,8 +13,8 @@ object PeekrValidator {
      *
      * @param value 유효성 검사 조건 ([require]의 value)
      * @param lazyMessage 유효성 검사 조건 실패 시 ([require]의 lazyMessage)
-     * @exception ValidatorException 일반적으로 유효성 검사 실패 시 해당 예외를 반환한다.
-     * @exception ApiException 예상치 못한 예외 발생 시 해당 예외를 반환한다.
+     * @throws ValidatorException 일반적으로 유효성 검사 실패 시 해당 예외를 반환한다.
+     * @throws ApiException 예상치 못한 예외 발생 시 해당 예외를 반환한다.
      */
     fun validation(
         value: Boolean,

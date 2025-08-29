@@ -28,10 +28,7 @@ fun Application.configureExceptionHandler() {
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
                     code = CommonErrorCode.Validation.code,
-                    message = errorMessageForm(
-                        title = CommonErrorCode.Validation.description,
-                        message = cause.message,
-                    ),
+                    message = cause.message ?: CommonErrorCode.Validation.description,
                     status = HttpStatusCode.BadRequest.value,
                 ),
             )
@@ -64,11 +61,8 @@ fun Application.configureExceptionHandler() {
     }
 }
 
-private const val UNKNOWN_ERROR_MESSAGE = "Unknown error occurred"
+private const val UNKNOWN_ERROR_MESSAGE = "서버에서 알 수 없는 에러가 발생했습니다."
 private const val UNKNOWN_ERROR_CODE = "UEC001"
-
-private fun errorMessageForm(title: String, message: String?) =
-    "[$title]: $message"
 
 private val LOGGER = AppLoggerFactory.createLogger("ExceptionHandler")
 

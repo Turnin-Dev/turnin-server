@@ -43,13 +43,16 @@ object DatabaseFactory {
         }
     }
 
+    /**
+     * DB 작업을 수행할 때 항상 이 범위 내에서 수행한다.
+     *
+     * @throws
+     */
     suspend fun <T> dbQuery(block: () -> T): T = newSuspendedTransaction(ioContext) {
         try {
             block()
         } catch (e: SQLException) {
             throw DatabaseException.DBQueryException(e)
-        } catch (e: Exception) {
-            throw e
         }
     }
 
