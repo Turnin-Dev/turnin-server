@@ -16,6 +16,8 @@ class FileServiceImpl(private val r2Service: CloudflareR2Service) : FileService 
             return uploadFileInfo
         } catch (e: IllegalArgumentException) {
             throw FileException.InvalidS3PresignerArgument(e)
+        } catch (e: IllegalStateException) {
+            throw FileException.InvalidS3PresignerArgument(e)
         }
     }
 }

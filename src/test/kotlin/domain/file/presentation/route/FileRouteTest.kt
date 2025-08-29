@@ -31,9 +31,12 @@ class FileRouteTest {
         )
 
         // when
-        val uploadFileEndPoint =
-            "${route.ROUTE}${route.UPLOAD}?fileName=$MOCK_VALID_FILE_NAME&mime=$MOCK_VALID_MIME"
-        val response = client.get(uploadFileEndPoint)
+        val response = client.get("${route.ROUTE}${route.UPLOAD}") {
+            url {
+                parameters.append("fileName", MOCK_VALID_FILE_NAME)
+                parameters.append("mime", MOCK_VALID_MIME)
+            }
+        }
         val responseBody = response.bodyAsText()
 
         // then
@@ -57,9 +60,12 @@ class FileRouteTest {
         )
 
         // when
-        val uploadFileEndPoint =
-            "${route.ROUTE}${route.UPLOAD}?fileName=$MOCK_VALID_FILE_NAME&mime=$MOCK_VALID_MIME"
-        val response = client.get(uploadFileEndPoint)
+        val response = client.get("${route.ROUTE}${route.UPLOAD}") {
+            url {
+                parameters.append("fileName", MOCK_VALID_FILE_NAME)
+                parameters.append("mime", MOCK_VALID_MIME)
+            }
+        }
         val responseBody = response.bodyAsText()
 
         // then
@@ -78,9 +84,12 @@ class FileRouteTest {
         )
 
         // when
-        val uploadFileEndPoint =
-            "${route.ROUTE}${route.UPLOAD}?fileName=$MOCK_INVALID_FILE_NAME&mime=$MOCK_VALID_MIME"
-        val response = client.get(uploadFileEndPoint)
+        val response = client.get("${route.ROUTE}${route.UPLOAD}") {
+            url {
+                parameters.append("fileName", MOCK_INVALID_FILE_NAME)
+                parameters.append("mime", MOCK_VALID_MIME)
+            }
+        }
 
         // then
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -97,9 +106,12 @@ class FileRouteTest {
         )
 
         // when
-        val uploadFileEndPoint =
-            "${route.ROUTE}${route.UPLOAD}?fileName=$MOCK_VALID_FILE_NAME&mime=$MOCK_INVALID_MIME"
-        val response = client.get(uploadFileEndPoint)
+        val response = client.get("${route.ROUTE}${route.UPLOAD}") {
+            url {
+                parameters.append("fileName", MOCK_VALID_FILE_NAME)
+                parameters.append("mime", MOCK_INVALID_MIME)
+            }
+        }
 
         // then
         assertEquals(HttpStatusCode.BadRequest, response.status)

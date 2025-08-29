@@ -69,6 +69,10 @@ private fun RouteConfig.uploadFileDocs() {
                 example("ValidationError") {
                     value = CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest)
                 }
+                example("InvalidS3PresignerArgument") {
+                    value = com.peekr.domain.file.exception.FileErrorCode.InvalidS3PresignerArgument
+                        .toErrorResponse(HttpStatusCode.BadRequest)
+                }
             }
         }
     }

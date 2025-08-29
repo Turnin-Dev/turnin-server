@@ -91,8 +91,11 @@ class AuthRepositoryImpl : AuthRepository {
             else -> null
         }
         val isDuplicateByMsg = sequenceOf(e.message, causeMsg).any {
-            it?.contains("already exists", ignoreCase = true) == true ||
-                it?.contains("primary key violation", ignoreCase = true) == true
+            val msg = it?.lowercase() ?: return@any false
+            "already exists" in msg ||
+                "duplicate key" in msg ||
+                "unique constraint" in msg ||
+                "primary key violation" in msg
         }
         return if (sqlState == "23505" || isDuplicateByMsg) {
             LOGGER.debug("Duplicate user detected while saving authUser.", e)

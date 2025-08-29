@@ -7,7 +7,7 @@ sealed class FileErrorCode(
     description: String,
 ) : ApiErrorCode(code, description) {
     data object InvalidS3PresignerArgument :
-        FileErrorCode(F001, "서버 내부에서 파일을 저장하는 과정에서 에러가 발생했습니다.")
+        FileErrorCode(F001, "잘못된 요청 값으로 인해 업로드 URL을 생성할 수 없습니다.")
 }
 
 private const val F001 = "F001"

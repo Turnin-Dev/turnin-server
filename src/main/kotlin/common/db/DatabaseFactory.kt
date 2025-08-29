@@ -10,6 +10,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.FlywayException
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -37,9 +38,10 @@ object DatabaseFactory {
             LOGGER.info("Database connection successfully: $dbUrl")
         } catch (e: FlywayException) {
             LOGGER.error(e, "Database migration failed: ${e.message}")
-            throw e // 마이그레이션 실패 시에는 앱이 동작하지 않게끔 설정
+            throw e
         } catch (e: Exception) {
-            LOGGER.error(e, "Database connection failed: ${e.message}")
+            LOGGER.error(e, "Database connected failed: ${e.message}")
+            throw e
         }
     }
 
@@ -48,10 +50,13 @@ object DatabaseFactory {
      *
      * @throws
      */
-    suspend fun <T> dbQuery(block: () -> T): T = newSuspendedTransaction(ioContext) {
+    suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(ioContext) {
         try {
             block()
         } catch (e: SQLException) {
+            LOGGER.error(e, "Database query failed: ${e.message}")
+            throw DatabaseException.DBQueryException(e)
+        } catch (e: ExposedSQLException) {
             LOGGER.error(e, "Database query failed: ${e.message}")
             throw DatabaseException.DBQueryException(e)
         }
@@ -82,6 +87,7 @@ object DatabaseFactory {
 
         val flyway = when (env) {
             RunEnvironment.Dev -> {
+                LOGGER.warn("Dev 환경에서 Flyway.clean()을 수행합니다. 모든 스키마가 초기화됩니다.")
                 flywayBuilder.cleanDisabled(false).load().also { it.clean() }
             }
 
