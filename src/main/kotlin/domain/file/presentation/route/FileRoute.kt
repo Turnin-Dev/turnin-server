@@ -27,15 +27,7 @@ fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
             val mimeRaw = call.request.queryParameters["mime"]
             val fileName = fileNameRaw?.trim().validateFileNameAndReturn()
             val mime = mimeRaw?.trim().validateImageMimeAndReturn()
-            val uploadFileInfoDto = try {
-                fileUseCase.createPresignedUrl(fileName, mime)
-            } catch (e: IllegalArgumentException) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest),
-                )
-                return@get
-            }
+            val uploadFileInfoDto = fileUseCase.createPresignedUrl(fileName, mime)
             call.response.headers.append(HttpHeaders.CacheControl, "no-store")
             call.respond(
                 HttpStatusCode.OK,
