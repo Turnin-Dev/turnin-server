@@ -43,18 +43,28 @@ class AuthUseCaseImpl(
     }
 
     override suspend fun refresh(userId: Long, token: String): JWTTokenDto? {
+        LOGGER.debug("refresh called, userId: $userId, token: ${token.masking()}")
         val newToken = authService.refresh(token)
-        return newToken?.let {
-            val extractedUserId = extractUserId(token) ?: userId
-            saveRefreshToken(extractedUserId, it.refreshToken)
-            newToken.toDto()
+        if (newToken == null) {
+            LOGGER.debug("refresh failed, userId: $userId, token: ${token.masking()}")
+            return null
         }
+        LOGGER.debug("refresh successful")
+        val extractedUserId = extractUserId(token)
+        if (extractedUserId == null) {
+            LOGGER.debug("UserId extracted from token failed, userId: $userId, token: ${token.masking()}")
+            return null
+        }
+        LOGGER.debug("UserId extracted from token: $extractedUserId, token: ${token.masking()}")
+        saveRefreshToken(extractedUserId, newToken.refreshToken)
+        return newToken.toDto()
     }
 
     override suspend fun findUser(
         provider: SocialLoginProviderForAuth,
         providerId: String,
     ): FindUserResultDto {
+        LOGGER.debug("findUser called, provider: $provider, providerId: ${providerId.masking()}")
         val findUserResult = authService.findUser(provider, providerId)
         return findUserResult.toDto()
     }

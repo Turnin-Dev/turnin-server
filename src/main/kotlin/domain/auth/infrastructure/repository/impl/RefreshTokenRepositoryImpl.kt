@@ -49,7 +49,7 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
             }
         } catch (e: Exception) {
             LOGGER.error(e, "Failed to save refresh token. userId=$userId, tokenLength=${token.length}")
-            false
+            throw e
         }
     }
 }

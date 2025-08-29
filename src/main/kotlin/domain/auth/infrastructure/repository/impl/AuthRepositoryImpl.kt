@@ -77,6 +77,7 @@ class AuthRepositoryImpl : AuthRepository {
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.masking()}")
     }
 
+    // 커스텀 예외를 던지거나 발생한 예외를 그대로 전파한다.
     private fun processSQLException(e: Exception): Throwable {
         val sqlState: String? = when (e) {
             is ExposedSQLException -> e.sqlState
