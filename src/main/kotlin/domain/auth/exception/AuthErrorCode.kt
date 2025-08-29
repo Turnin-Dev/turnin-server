@@ -16,11 +16,11 @@ sealed class AuthErrorCode(
 
     /** 리프레쉬 토큰 만료 에러 */
     data object RefreshTokenExpired :
-        AuthErrorCode(A003, "새로고침 토큰이 만료되었습니다.")
+        AuthErrorCode(A003, "토큰이 만료되었습니다.")
 
     /** 리프레쉬 토큰을 저장할 수 없는 에러 */
     data object CannotSaveRefreshToken :
-        AuthErrorCode(A004, "해당 사용자의 새로고침 토큰을 저장할 수 없습니다.")
+        AuthErrorCode(A004, "토큰을 저장하지 못했습니다.")
 
     /** 잘못된 형식의 PathParameter 에러 */
     data class PathParameterInvalid(val parameter: String) :

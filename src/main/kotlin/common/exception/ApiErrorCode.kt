@@ -18,7 +18,7 @@ import io.ktor.http.HttpStatusCode
  * ```
  *
  * @param code 에러 코드 문자열 값
- * @param description 에러 코드 설명 (디버깅, 로그 용)
+ * @param description 에러 코드 설명 (클라이언트 노출 용)
  */
 open class ApiErrorCode(
     val code: String,

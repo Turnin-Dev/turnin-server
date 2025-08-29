@@ -28,13 +28,32 @@ class AppLogger(private val logger: Logger) {
     }
 
     /**
+     * 오류 로그 (호환용 오버로드 메서드)
+     *
+     * @param message 로그 메시지
+     */
+    fun error(message: String) {
+        logger.error(message)
+    }
+
+    /**
      * 경고 로그
      *
      * @param message 로그 메시지
      * @param e [Throwable]
      */
     fun warn(message: String, e: Throwable? = null) {
-        logger.warn(message, e)
+        if (e != null) logger.warn(message, e) else logger.warn(message)
+    }
+
+    /**
+     * 정보 로그
+     *
+     * @param message 로그 메시지
+     * @param e [Throwable]
+     */
+    fun info(message: String, e: Throwable? = null) {
+        if (e != null) logger.info(message, e) else logger.info(message)
     }
 }
 

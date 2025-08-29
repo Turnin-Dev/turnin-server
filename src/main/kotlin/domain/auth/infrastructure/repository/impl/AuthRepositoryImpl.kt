@@ -77,6 +77,7 @@ class AuthRepositoryImpl : AuthRepository {
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.masking()}")
     }
 
+    // 커스텀 예외를 던지거나 발생한 예외를 그대로 전파한다.
     private fun processSQLException(e: Exception): Throwable {
         val sqlState: String? = when (e) {
             is ExposedSQLException -> e.sqlState
@@ -90,9 +91,11 @@ class AuthRepositoryImpl : AuthRepository {
             else -> null
         }
         val isDuplicateByMsg = sequenceOf(e.message, causeMsg).any {
-            it?.contains("unique", ignoreCase = true) == true ||
-                it?.contains("already exists", ignoreCase = true) == true ||
-                it?.contains("primary key violation", ignoreCase = true) == true
+            val msg = it?.lowercase() ?: return@any false
+            "already exists" in msg ||
+                "duplicate key" in msg ||
+                "unique constraint" in msg ||
+                "primary key violation" in msg
         }
         return if (sqlState == "23505" || isDuplicateByMsg) {
             LOGGER.debug("Duplicate user detected while saving authUser.", e)

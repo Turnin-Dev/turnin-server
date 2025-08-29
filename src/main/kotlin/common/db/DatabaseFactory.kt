@@ -1,15 +1,16 @@
 package com.peekr.common.db
 
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.config.RunEnvironment
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.util.logging.KtorSimpleLogger
 import java.sql.SQLException
 import javax.sql.DataSource
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.FlywayException
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -34,22 +35,30 @@ object DatabaseFactory {
             val dataSource = hikariDataSource(dbUrl, dbUser, dbPassword)
             migrate(environment, dataSource)
             Database.connect(dataSource)
-            LOGGER.info("Database connection successfully: $dbUrl")
+            LOGGER.info("Database connection successful: ${redactJdbcUrl(dbUrl)}")
         } catch (e: FlywayException) {
-            LOGGER.error("Database migration failed: ${e.message}")
-            throw e // 마이그레이션 실패 시에는 앱이 동작하지 않게끔 설정
+            LOGGER.error(e, "Database connection failed: ${e.message}")
+            throw e
         } catch (e: Exception) {
-            LOGGER.error("Database connection failed: ${e.message}")
+            LOGGER.error(e, "Database connection failed: ${e.message}")
+            throw e
         }
     }
 
-    suspend fun <T> dbQuery(block: () -> T): T = newSuspendedTransaction(ioContext) {
+    /**
+     * DB 작업을 수행할 때 항상 이 범위 내에서 수행한다.
+     *
+     * @throws
+     */
+    suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(ioContext) {
         try {
             block()
         } catch (e: SQLException) {
+            LOGGER.error("Database query failed: ${e.message}")
             throw DatabaseException.DBQueryException(e)
-        } catch (e: Exception) {
-            throw e
+        } catch (e: ExposedSQLException) {
+            LOGGER.error("Database query failed: ${e.message}")
+            throw DatabaseException.DBQueryException(e)
         }
     }
 
@@ -78,6 +87,7 @@ object DatabaseFactory {
 
         val flyway = when (env) {
             RunEnvironment.Dev -> {
+                LOGGER.warn("Dev 환경에서 Flyway.clean()을 수행합니다. 모든 스키마가 초기화됩니다.")
                 flywayBuilder.cleanDisabled(false).load().also { it.clean() }
             }
 
@@ -90,4 +100,9 @@ object DatabaseFactory {
     }
 }
 
-private val LOGGER = KtorSimpleLogger("Database")
+private val LOGGER = AppLoggerFactory.createLogger("DatabaseFactory")
+
+private fun redactJdbcUrl(url: String): String =
+    url
+        .replace(Regex("(?i)(password|pwd|pass)=([^&;]+)"), "$1=***")
+        .replace(Regex("(?i)://([^:/@]+):([^@]+)@"), "://$1:***@")
