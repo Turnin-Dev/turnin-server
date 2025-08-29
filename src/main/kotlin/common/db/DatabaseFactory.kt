@@ -35,12 +35,12 @@ object DatabaseFactory {
             val dataSource = hikariDataSource(dbUrl, dbUser, dbPassword)
             migrate(environment, dataSource)
             Database.connect(dataSource)
-            LOGGER.info("Database connection successfully: $dbUrl")
+            LOGGER.info("Database connection successful: ${redactJdbcUrl(dbUrl)}")
         } catch (e: FlywayException) {
-            LOGGER.error(e, "Database migration failed: ${e.message}")
+            LOGGER.error(e, "Database connection failed: ${e.message}")
             throw e
         } catch (e: Exception) {
-            LOGGER.error(e, "Database connected failed: ${e.message}")
+            LOGGER.error(e, "Database connection failed: ${e.message}")
             throw e
         }
     }
@@ -101,3 +101,8 @@ object DatabaseFactory {
 }
 
 private val LOGGER = AppLoggerFactory.createLogger("DatabaseFactory")
+
+private fun redactJdbcUrl(url: String): String =
+    url
+        .replace(Regex("(?i)(password|pwd|pass)=([^&;]+)"), "$1=***")
+        .replace(Regex("(?i)://([^:/@]+):([^@]+)@"), "://$1:***@")
