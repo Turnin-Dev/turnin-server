@@ -28,6 +28,15 @@ class AppLogger(private val logger: Logger) {
     }
 
     /**
+     * 오류 로그 (호환용 오버로드 메서드)
+     *
+     * @param message 로그 메시지
+     */
+    fun error(message: String) {
+        logger.error(message)
+    }
+
+    /**
      * 경고 로그
      *
      * @param message 로그 메시지

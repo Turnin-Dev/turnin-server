@@ -54,10 +54,10 @@ object DatabaseFactory {
         try {
             block()
         } catch (e: SQLException) {
-            LOGGER.error(e, "Database query failed: ${e.message}")
+            LOGGER.error("Database query failed: ${e.message}")
             throw DatabaseException.DBQueryException(e)
         } catch (e: ExposedSQLException) {
-            LOGGER.error(e, "Database query failed: ${e.message}")
+            LOGGER.error("Database query failed: ${e.message}")
             throw DatabaseException.DBQueryException(e)
         }
     }
