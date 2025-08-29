@@ -15,17 +15,18 @@ import java.sql.SQLException
  */
 sealed class DatabaseException(
     code: ApiErrorCode,
-    status: HttpStatusCode,
+    status: HttpStatusCode = HttpStatusCode.InternalServerError,
     message: String = code.description,
     cause: Throwable? = null,
 ) : ApiException(code, status, message, cause) {
     /**
      * DB 쿼리 관련 예외
+     *
+     * @param throwable [SQLException]
      */
     class DBQueryException(val throwable: SQLException? = null) :
         DatabaseException(
             code = DatabaseErrorCode.DBQueryError,
-            status = HttpStatusCode.InternalServerError,
             cause = throwable,
         )
 }

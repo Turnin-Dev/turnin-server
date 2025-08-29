@@ -1,9 +1,9 @@
 package com.peekr.common.db
 
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.config.RunEnvironment
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.util.logging.KtorSimpleLogger
 import java.sql.SQLException
 import javax.sql.DataSource
 import kotlin.coroutines.CoroutineContext
@@ -36,10 +36,10 @@ object DatabaseFactory {
             Database.connect(dataSource)
             LOGGER.info("Database connection successfully: $dbUrl")
         } catch (e: FlywayException) {
-            LOGGER.error("Database migration failed: ${e.message}")
+            LOGGER.error(e, "Database migration failed: ${e.message}")
             throw e // 마이그레이션 실패 시에는 앱이 동작하지 않게끔 설정
         } catch (e: Exception) {
-            LOGGER.error("Database connection failed: ${e.message}")
+            LOGGER.error(e, "Database connection failed: ${e.message}")
         }
     }
 
@@ -52,6 +52,7 @@ object DatabaseFactory {
         try {
             block()
         } catch (e: SQLException) {
+            LOGGER.error(e, "Database query failed: ${e.message}")
             throw DatabaseException.DBQueryException(e)
         }
     }
@@ -93,4 +94,4 @@ object DatabaseFactory {
     }
 }
 
-private val LOGGER = KtorSimpleLogger("Database")
+private val LOGGER = AppLoggerFactory.createLogger("DatabaseFactory")

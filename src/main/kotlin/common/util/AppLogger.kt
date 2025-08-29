@@ -36,6 +36,15 @@ class AppLogger(private val logger: Logger) {
     fun warn(message: String, e: Throwable? = null) {
         logger.warn(message, e)
     }
+
+    /**
+     * 정보 로그
+     *
+     * @param message 로그 메시지
+     */
+    fun info(message: String) {
+        logger.info(message)
+    }
 }
 
 /**

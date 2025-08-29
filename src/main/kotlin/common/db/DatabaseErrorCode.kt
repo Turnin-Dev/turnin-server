@@ -17,7 +17,7 @@ sealed class DatabaseErrorCode(
     description: String,
 ) : ApiErrorCode(code, description) {
     data object DBQueryError :
-        DatabaseErrorCode(DB001, "DB 쿼리에서 오류가 발생했습니다.")
+        DatabaseErrorCode(DB001, "데이터를 처리하는 과정에서 오류가 발생했습니다.")
 }
 
 private const val DB001 = "DB001"
