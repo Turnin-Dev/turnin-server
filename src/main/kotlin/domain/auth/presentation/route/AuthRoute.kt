@@ -180,14 +180,11 @@ private fun RouteConfig.registerDocs() {
                 }
             }
         }
-        default {
+        code(HttpStatusCode.Conflict) {
             body<ErrorResponse> {
-                example("ErrorResponse") {
-                    value = ErrorResponse(
-                        code = AuthErrorCode.UserDuplicated.code,
-                        message = "Register failed",
-                        status = HttpStatusCode.Conflict.value,
-                    )
+                description = "DisplayID 중복"
+                example("UserDuplicated") {
+                    value = AuthErrorCode.UserDuplicated.toErrorResponse(HttpStatusCode.Conflict)
                 }
             }
         }
