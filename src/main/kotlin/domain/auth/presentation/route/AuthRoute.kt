@@ -51,8 +51,16 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         post(route.REGISTER, { registerDocs() }) {
             val request = call.receive<RegisterRequest>()
             request.validate()
-            val token = authUseCase.register(request.toDto())
-            call.respond(HttpStatusCode.Created, token.toResponse())
+            val existsByDisplayId = authUseCase.existsDisplayId(request.displayId)
+            if (!existsByDisplayId) {
+                val token = authUseCase.register(request.toDto())
+                call.respond(HttpStatusCode.Created, token.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.Conflict,
+                    AuthErrorCode.UserDuplicated.toErrorResponse(HttpStatusCode.Conflict),
+                )
+            }
         }
 
         get(route.REFRESH, { refreshDocs() }) {
