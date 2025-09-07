@@ -1,7 +1,5 @@
 package com.peekr.domain.keyword.domain
 
-import com.peekr.domain.common.model.KeywordId
-
 /**
  * 키워드
  *

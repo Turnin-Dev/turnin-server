@@ -1,6 +1,6 @@
 package com.peekr.domain.keyword.domain
 
-import com.peekr.domain.common.model.KeywordId
+import com.peekr.domain.common.model.UserId
 
 /**
  * 사용자별 키워드
@@ -15,9 +15,9 @@ import com.peekr.domain.common.model.KeywordId
  * @property updatedAt 수정 일자
  */
 data class UserKeyword(
-    val id: Long,
+    val id: UserKeywordId,
     val keywordId: KeywordId,
-    val userId: Long,
+    val userId: UserId,
     val offsetX: Float,
     val offsetY: Float,
     val description: String?,
