@@ -1,5 +1,7 @@
 package com.peekr.domain.keyword.domain.model
 
+import com.peekr.domain.common.model.UserId
+
 /**
  * 키워드
  *
@@ -12,7 +14,7 @@ package com.peekr.domain.keyword.domain.model
 data class Keyword(
     val id: KeywordId,
     val keyword: String,
-    val createdBy: Long,
+    val createdBy: UserId,
     val createdAt: Long,
     val updatedAt: Long,
 )

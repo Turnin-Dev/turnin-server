@@ -4,6 +4,7 @@ import com.peekr.domain.common.model.UserId
 import com.peekr.domain.keyword.domain.model.KeywordId
 import com.peekr.domain.keyword.domain.model.UserKeyword
 import com.peekr.domain.keyword.domain.model.UserKeywordId
+import com.peekr.domain.keyword.domain.model.UserKeywordPatch
 
 interface KeywordService {
     /**
@@ -38,13 +39,13 @@ interface KeywordService {
      * 사용자별 키워드를 업데이트한다.
      *
      * @param userKeywordId 사용자별 키워드 ID
-     * @param updates [Map]타입으로 key는 업데이트할 필드명이고, value는 업데이트할 값이다.
+     * @param patch [UserKeywordPatch]
      *
      * @return [Boolean] 업데이트 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
     suspend fun updateUserKeyword(
         userKeywordId: UserKeywordId,
-        updates: Map<String, String>,
+        patch: UserKeywordPatch,
     ): Boolean
 
     /**
@@ -52,7 +53,7 @@ interface KeywordService {
      *
      * @param userKeywordId 사용자별 키워드 ID
      *
-     * @return 삭제 성공 시 `ture`, 실패 시 `false`를 반환한다.
+     * @return 삭제 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
     suspend fun delete(userKeywordId: UserKeywordId): Boolean
 }
