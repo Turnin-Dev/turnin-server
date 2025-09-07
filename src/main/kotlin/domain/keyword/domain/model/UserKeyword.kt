@@ -1,4 +1,4 @@
-package com.peekr.domain.keyword.domain
+package com.peekr.domain.keyword.domain.model
 
 import com.peekr.domain.common.model.UserId
 
