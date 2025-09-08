@@ -8,6 +8,13 @@ import com.peekr.domain.keyword.domain.model.UserKeywordPatch
 
 interface UserKeywordRepository {
     /**
+     * 사용자 ID를 통해 사용자별 키워드를 찾는다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun findByUserId(userId: UserId): List<UserKeyword>
+
+    /**
      * 키워드 ID와 사용자 ID를 통해 사용자별 키워드를 찾는다.
      *
      * @param keywordId 키워드 ID

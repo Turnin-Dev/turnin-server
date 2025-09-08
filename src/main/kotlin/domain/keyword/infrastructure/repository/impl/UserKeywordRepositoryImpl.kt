@@ -19,6 +19,12 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
+    override suspend fun findByUserId(userId: UserId): List<UserKeyword> = dbQuery {
+        UserKeywordEntity
+            .find(UserKeywords.userId eq userId.id)
+            .map { it.toDomain() }
+    }
+
     override suspend fun findByKeywordIdAndUserId(
         keywordId: KeywordId,
         userId: UserId,
