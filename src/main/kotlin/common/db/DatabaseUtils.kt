@@ -1,8 +1,6 @@
 package com.peekr.common.db
 
-import java.sql.SQLException
 import java.time.OffsetDateTime
-import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Expression
 import org.jetbrains.exposed.sql.Function
@@ -77,41 +75,6 @@ object DatabaseUtils {
         timestampWithTimeZone(name).defaultExpression(timestampExpression)
     } else {
         registerColumn(name, JavaOffsetDateTimeColumnType()).defaultExpression(timestampExpression)
-    }
-
-    /**
-     * 저장 시 중복되는 값이 있을 때 [onExists] 람다에서 커스텀 예외를 던져 발생시키거나 [e]예외를 그대로 전파한다.
-     *
-     * @param e 잡을 예외
-     * @param onExists 중복되는 값이 있을 때 커스텀 예외 발생
-     */
-    inline fun processExceptionForSave(
-        e: Exception,
-        onExists: () -> Throwable,
-    ): Throwable {
-        val sqlState: String? = when (e) {
-            is ExposedSQLException -> e.sqlState
-            is SQLException -> e.sqlState
-            is DatabaseException.DBQueryException -> e.throwable?.sqlState
-            else -> null
-        }
-        val causeMsg = when (e) {
-            is DatabaseException.DBQueryException -> e.throwable?.message
-            is ExposedSQLException -> e.cause?.message
-            else -> null
-        }
-        val isDuplicateByMsg = sequenceOf(e.message, causeMsg).any {
-            val msg = it?.lowercase() ?: return@any false
-            "already exists" in msg ||
-                "duplicate key" in msg ||
-                "unique constraint" in msg ||
-                "primary key violation" in msg
-        }
-        return if (sqlState == "23505" || isDuplicateByMsg) {
-            onExists()
-        } else {
-            e
-        }
     }
 }
 

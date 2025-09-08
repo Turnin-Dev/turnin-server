@@ -18,11 +18,10 @@ sealed class KeywordException(
     message: String = code.description,
     cause: Throwable? = null,
 ) : ApiException(code, status, message, cause) {
-    /** 키워드 중복 예외 */
-    class KeywordDuplicatedException(cause: Throwable? = null) :
+    /** 키워드를 저장하려는 사용자를 찾지 못할 때 */
+    class UserNotFoundForSave :
         KeywordException(
-            code = KeywordErrorCode.KeywordDuplicated,
-            status = HttpStatusCode.Conflict,
-            cause = cause,
+            code = KeywordErrorCode.UserNotFoundForSave,
+            status = HttpStatusCode.NotFound,
         )
 }

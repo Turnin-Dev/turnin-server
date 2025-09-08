@@ -1,5 +1,7 @@
 package com.peekr.common.exception
 
+import com.peekr.common.db.DatabaseErrorMessage
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.validator.ValidatorException
 import io.ktor.http.HttpStatusCode
@@ -7,10 +9,22 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.plugins.statuspages.exception
 import io.ktor.server.response.respond
 
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
+        exception<DatabaseException> { call, cause ->
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                message = ErrorResponse(
+                    code = DatabaseErrorMessage.CLIENT_COMMON_CODE,
+                    message = DatabaseErrorMessage.CLIENT_COMMON_MESSAGE,
+                    status = HttpStatusCode.InternalServerError.value,
+                ),
+            )
+        }
+
         exception<ApiException> { call, cause ->
             warnLogging(cause)
             call.respond(

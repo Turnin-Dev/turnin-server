@@ -1,32 +1,21 @@
 package com.peekr.common.db
 
-import com.peekr.common.exception.ApiErrorCode
-import com.peekr.common.exception.ApiException
-import io.ktor.http.HttpStatusCode
-import java.sql.SQLException
-
 /**
  * 데이터베이스 커스텀 예외
  *
- * @property code [ApiErrorCode]
- * @property status HTTP 상태코드
  * @property message 에러 메시지
  * @property cause [Throwable]
  */
 sealed class DatabaseException(
-    code: ApiErrorCode,
-    status: HttpStatusCode = HttpStatusCode.InternalServerError,
-    message: String = code.description,
-    cause: Throwable? = null,
-) : ApiException(code, status, message, cause) {
-    /**
-     * DB 쿼리 관련 예외
-     *
-     * @param throwable [SQLException]
-     */
-    class DBQueryException(val throwable: SQLException? = null) :
-        DatabaseException(
-            code = DatabaseErrorCode.DBQueryError,
-            cause = throwable,
-        )
+    message: String,
+    cause: Throwable,
+) : Exception(message, cause) {
+    /** DB 쿼리 관련 예외 */
+    class DBQueryException(cause: Throwable) : DatabaseException("Database query failed", cause)
+
+    /** 보통 저장 시 중복되는 데이터를 저장할 때 발생하는 예외 */
+    class DuplicatedDataException(cause: Throwable) : DatabaseException("Duplicated data detected", cause)
+
+    /** 외래키 제약 위반 예외 */
+    class ForeignKeyViolationException(cause: Throwable) : DatabaseException("Foreign key constraint violation", cause)
 }

@@ -34,7 +34,7 @@ interface UserKeywordRepository {
         offsetX: Float,
         offsetY: Float,
         description: String?,
-    ): UserKeywordId
+    ): UserKeyword
 
     /**
      * 사용자별 키워드를 업데이트한다.

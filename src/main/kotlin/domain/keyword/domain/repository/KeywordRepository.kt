@@ -2,7 +2,6 @@ package com.peekr.domain.keyword.domain.repository
 
 import com.peekr.domain.common.model.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
-import com.peekr.domain.keyword.domain.model.KeywordId
 
 interface KeywordRepository {
     /**
@@ -20,7 +19,7 @@ interface KeywordRepository {
      * @param keyword 키워드명
      * @param createdBy 키워드 최초 등록자
      *
-     * @return [KeywordId] 키워드 ID를 반환한다.
+     * @return [Keyword] 키워드를 반환한다.
      */
-    suspend fun save(keyword: String, createdBy: UserId): KeywordId
+    suspend fun save(keyword: String, createdBy: UserId): Keyword
 }
