@@ -5,7 +5,7 @@ import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
-import com.peekr.domain.common.model.UserId
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.domain.model.KeywordId
 import com.peekr.domain.keyword.domain.model.UserKeyword
 import com.peekr.domain.keyword.domain.model.UserKeywordId
@@ -19,7 +19,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
-    override suspend fun findByUserId(userId: UserId): List<UserKeyword> = dbQuery {
+    override suspend fun getListById(userId: UserId): List<UserKeyword> = dbQuery {
         UserKeywordEntity
             .find(UserKeywords.userId eq userId.id)
             .map { it.toDomain() }

@@ -1,10 +1,10 @@
-package com.peekr.domain.keyword.application.dto
+package com.peekr.domain.keyword.presentation.dto
 
-import com.peekr.domain.keyword.domain.model.UserKeyword
+import com.peekr.domain.keyword.application.dto.UserKeywordDto
 import kotlinx.serialization.Serializable
 
 /**
- * 사용자별 키워드 DTO
+ * 사용자별 키워드 응답 바디
  *
  * @property id 사용자별 키워드 ID
  * @property keywordId 키워드 ID
@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
  * @property updatedAt 수정 일자
  */
 @Serializable
-data class UserKeywordDto(
+data class UserKeywordResponse(
     val id: Long,
     val keywordId: Long,
     val userId: Long,
@@ -27,15 +27,13 @@ data class UserKeywordDto(
     val updatedAt: Long,
 )
 
-fun UserKeyword.toDto(): UserKeywordDto = UserKeywordDto(
-    id = id.id,
-    keywordId = keywordId.id,
-    userId = userId.id,
+fun UserKeywordDto.toResponse() = UserKeywordResponse(
+    id = id,
+    keywordId = keywordId,
+    userId = userId,
     offsetX = offsetX,
     offsetY = offsetY,
     description = description,
     createdAt = createdAt,
     updatedAt = updatedAt,
 )
-
-fun List<UserKeyword>.toDto(): List<UserKeywordDto> = map { it.toDto() }

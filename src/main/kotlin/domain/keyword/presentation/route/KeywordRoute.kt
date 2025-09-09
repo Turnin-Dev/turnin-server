@@ -1,16 +1,25 @@
 package com.peekr.domain.keyword.presentation.route
 
 import com.peekr.common.api.Api
+import com.peekr.common.api.Api.byPathParam
+import com.peekr.domain.core.model.UserId
+import com.peekr.domain.keyword.application.usecase.UserKeywordUseCase
+import com.peekr.domain.keyword.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
+import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 
-fun Route.keywordRoutes(route: Api.V1.Keyword) {
+fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUseCase) {
     route({
         tags = setOf(route.TAG)
         description = "Keyword API"
     }) {
-        get(route.ROUTE, { }) {
+        get(route.ROUTE.byPathParam("userId"), { }) {
+            val userIdParam = call.request.pathVariables["userId"]
+            val userId = UserId.from(userIdParam)
+            val userKeywords = userKeywordUseCase.getListById(userId)
+            call.respond(userKeywords.toResponse())
         }
     }
 }

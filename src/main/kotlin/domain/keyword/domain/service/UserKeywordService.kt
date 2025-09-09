@@ -1,19 +1,19 @@
 package com.peekr.domain.keyword.domain.service
 
-import com.peekr.domain.common.model.UserId
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.domain.model.UserKeyword
 import com.peekr.domain.keyword.domain.model.UserKeywordId
 import com.peekr.domain.keyword.domain.model.UserKeywordPatch
 
 interface UserKeywordService {
     /**
-     * 사용자 ID를 통해 사용자별 키워드를 찾는다.
+     * 사용자 ID를 통해 사용자별 키워드 리스트를 조회한다.
      *
      * @param userId 사용자 ID
      *
      * @return 사용자별 키워드를 찾으면 [UserKeyword]리스트를 반환하고 만약 없다면 `빈 리스트`를 반환한다.
      */
-    suspend fun findUserKeywordById(userId: UserId): List<UserKeyword>
+    suspend fun getListById(userId: UserId): List<UserKeyword>
 
     /**
      * 사용자별 키워드를 추가한다.

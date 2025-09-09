@@ -1,6 +1,6 @@
 package com.peekr.domain.keyword.domain.repository
 
-import com.peekr.domain.common.model.UserId
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.domain.model.KeywordId
 import com.peekr.domain.keyword.domain.model.UserKeyword
 import com.peekr.domain.keyword.domain.model.UserKeywordId
@@ -8,11 +8,11 @@ import com.peekr.domain.keyword.domain.model.UserKeywordPatch
 
 interface UserKeywordRepository {
     /**
-     * 사용자 ID를 통해 사용자별 키워드를 찾는다.
+     * 사용자 ID를 통해 사용자별 키워드 리스트를 조회한다.
      *
      * @param userId 사용자 ID
      */
-    suspend fun findByUserId(userId: UserId): List<UserKeyword>
+    suspend fun getListById(userId: UserId): List<UserKeyword>
 
     /**
      * 키워드 ID와 사용자 ID를 통해 사용자별 키워드를 찾는다.
