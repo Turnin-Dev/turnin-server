@@ -46,4 +46,10 @@ sealed class TokenException(
             message = TokenErrorCode.DecodeTokenError.description,
             cause = cause,
         )
+
+    class UnauthorizedUserException(cause: Throwable? = null) :
+        TokenException(
+            code = TokenErrorCode.UnauthorizedUser,
+            message = TokenErrorCode.UnauthorizedUser.description,
+        )
 }
