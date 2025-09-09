@@ -10,7 +10,7 @@ data class UserId(val id: Long) {
             require(value != null) { "사용자 ID는 비어있을 수 없습니다." }
             require(value.isNotEmpty()) { "사용자 ID가 비어있습니다." }
             require(value.toLongOrNull() != null) { "사용자 ID는 숫자형식만 허용됩니다." }
-            require((value.toLong()) > 0) { "사용자 ID는 양수여야 합니다." }
+            require((value.toLong()) >= 0) { "사용자 ID는 양수여야 합니다." }
             return UserId(value.toLong())
         }
 
@@ -19,7 +19,7 @@ data class UserId(val id: Long) {
          */
         fun from(value: Long?): UserId {
             require(value != null) { "사용자 ID는 비어있을 수 없습니다." }
-            require((value) > 0) { "사용자 ID는 양수여야 합니다." }
+            require((value) >= 0) { "사용자 ID는 양수여야 합니다." }
             return UserId(value)
         }
     }
