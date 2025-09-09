@@ -2,6 +2,8 @@ package com.peekr.common.jwt
 
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.validator.PeekrValidator.validation
+import com.peekr.common.validator.ValidatorException
+import com.peekr.domain.core.model.UserId
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal
 import io.ktor.server.routing.RoutingContext
@@ -18,18 +20,34 @@ object JWTValidator {
     }
 
     /**
-     * JWT 토큰 내 사용자 ID가 올바른 형식으로 포함되어있는지 확인하고 반환한다.
+     * 사용자 ID와 JWT 토큰 내에 있는 사용자 ID를 비교하고 유효성 검사를 한다.
      *
-     * (필요시 사용자 ID 추가 검증)
+     * (JWT 토큰 내에 있는 사용자 ID는 `Subject`에 있다.)
      *
-     * @return 문자열 타입의 사용자 ID
+     * 유효성 검사에 문제가 없다면 사용자 ID를 반환한다.
      *
+     * @param userIdParam 요청으로 들어온 사용자 ID
+     *
+     * @return [UserId] 사용자 ID
+     *
+     * @throws TokenException.UnauthorizedUserException 입력으로 들어온 사용자 ID와 토큰 내 사용자 ID가 일치하지 않는 경우 예외 발생
      * @throws TokenException.InvalidTokenException 토큰에서 사용자 ID를 찾지못하거나 올바른 형식이 아닌 경우 예외 발생
+     * @throws ValidatorException 사용자 ID가 올바른 형식이 아닌 경우 예외 발생
      */
-    fun RoutingContext.getTokenUserId(): String {
+    fun RoutingContext.getValidatedMyUserId(userIdParam: String?): UserId {
         val principal = call.principal<JWTPrincipal>() ?: throw TokenException.InvalidTokenException()
         val authUserIdParam = principal.payload.subject ?: throw TokenException.InvalidTokenException()
-        return authUserIdParam
+        val authUserId = UserId.from(authUserIdParam)
+        val userId = try {
+            UserId.from(userIdParam)
+        } catch (e: IllegalArgumentException) {
+            throw ValidatorException(e.message)
+        }
+        if (authUserId.id != userId.id) {
+            throw TokenException.UnauthorizedUserException()
+        }
+
+        return userId
     }
 
     private const val COMMON_TOKEN_ERROR = "JWT 토큰 형식이 올바르지 않습니다."
