@@ -1,6 +1,7 @@
 package com.peekr.domain.keyword.application.dto
 
 import com.peekr.domain.keyword.domain.model.UserKeyword
+import com.peekr.domain.keyword.presentation.dto.UserKeywordResponse
 import kotlinx.serialization.Serializable
 
 /**
@@ -39,3 +40,14 @@ fun UserKeyword.toDto(): UserKeywordDto = UserKeywordDto(
 )
 
 fun List<UserKeyword>.toDto(): List<UserKeywordDto> = map { it.toDto() }
+
+fun UserKeywordDto.toResponse(): UserKeywordResponse = UserKeywordResponse(
+    id = this.id,
+    keywordId = this.keywordId,
+    userId = this.userId,
+    offsetX = this.offsetX,
+    offsetY = this.offsetY,
+    description = this.description,
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt,
+)
