@@ -26,7 +26,7 @@ object JWTValidator {
      *
      * @throws TokenException.InvalidTokenException 토큰에서 사용자 ID를 찾지못하거나 올바른 형식이 아닌 경우 예외 발생
      */
-    fun RoutingContext.getTokenUserID(): String {
+    fun RoutingContext.getTokenUserId(): String {
         val principal = call.principal<JWTPrincipal>() ?: throw TokenException.InvalidTokenException()
         val authUserIdParam = principal.payload.subject ?: throw TokenException.InvalidTokenException()
         return authUserIdParam

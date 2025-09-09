@@ -2,7 +2,7 @@ package com.peekr.domain.keyword.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
-import com.peekr.common.jwt.JWTValidator.getTokenUserID
+import com.peekr.common.jwt.JWTValidator.getTokenUserId
 import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.core.model.UserId
@@ -19,7 +19,7 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
         description = "Keyword API"
     }) {
         get(route.ROUTE.byPathParam("userId"), { }) {
-            val authUserIdParam = getTokenUserID()
+            val authUserIdParam = getTokenUserId()
             val authUserId = UserId.from(authUserIdParam)
             val userIdParam = call.pathParameters["userId"]
             val userId = try {
