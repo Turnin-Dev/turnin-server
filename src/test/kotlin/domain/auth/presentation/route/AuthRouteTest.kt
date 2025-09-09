@@ -3,8 +3,6 @@ package com.peekr.domain.auth.presentation.route
 import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
-import com.peekr.common.validator.CommonValidator
-import com.peekr.common.validator.CommonValidator.validationUserIdAndReturn
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
@@ -25,13 +23,9 @@ import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkObject
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -40,15 +34,7 @@ class AuthRouteTest {
 
     @Before
     fun setup() {
-        mockkObject(CommonValidator)
-        every { validationUserIdAndReturn(any<Long>()) } returns 1L
-        every { validationUserIdAndReturn(any<String>()) } returns 1L
         coEvery { authUseCase.extractUserId(any()) } returns 0L
-    }
-
-    @After
-    fun teardown() {
-        unmockkObject(CommonValidator)
     }
 
     @Test
@@ -192,6 +178,7 @@ class AuthRouteTest {
         val route = Api.V1.Auth
         val client = createTestClient()
         coEvery { authUseCase.register(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.existsDisplayId(any()) } returns false
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )

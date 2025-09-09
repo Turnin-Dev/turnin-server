@@ -1,7 +1,6 @@
 package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.api.Api
-import com.peekr.common.exception.CommonErrorCode
 import com.peekr.domain.user.UserTestDoubles.MockUserDto
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.util.TestClientFactory.createTestClient
@@ -60,7 +59,6 @@ class UserRoutesTest {
 
             // then
             assertEquals(HttpStatusCode.BadRequest, response.status)
-            assertTrue(responseBody.contains(CommonErrorCode.Validation.description))
         }
     }
 

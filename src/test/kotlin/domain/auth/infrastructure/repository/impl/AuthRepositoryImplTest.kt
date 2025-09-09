@@ -1,9 +1,9 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.auth.AuthTestDoubles.MockRegister
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
-import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
 import junit.framework.TestCase.assertFalse
 import kotlin.test.Test
@@ -53,7 +53,7 @@ class AuthRepositoryImplTest {
 
         assertTrue(savedUser.id > 0L)
 
-        val exception = assertFailsWith<AuthException.DuplicateUserException> {
+        val exception = assertFailsWith<DatabaseException.DuplicatedDataException> {
             repository.save(MockRegister) // 동일한 providerId 삽입 시도
         }
 
