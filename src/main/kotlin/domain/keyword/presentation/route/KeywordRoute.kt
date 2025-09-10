@@ -2,7 +2,10 @@ package com.peekr.domain.keyword.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
-import com.peekr.common.jwt.JWTValidator.getValidatedMyUserId
+import com.peekr.common.exception.CommonErrorCode
+import com.peekr.common.jwt.JWTValidator.compareAuthUserIdAndMyUserId
+import com.peekr.common.validator.ValidatorException
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.application.dto.UserKeywordIdDto
 import com.peekr.domain.keyword.application.usecase.UserKeywordUseCase
 import com.peekr.domain.keyword.presentation.dto.AddUserKeywordRequest
@@ -10,7 +13,6 @@ import com.peekr.domain.keyword.presentation.dto.PatchUserKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.toDto
 import com.peekr.domain.keyword.presentation.dto.toResponse
 import com.peekr.domain.keyword.presentation.validation.validate
-import com.peekr.domain.keyword.presentation.validation.validateUserKeywordIdAndReturn
 import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.patch
@@ -27,8 +29,10 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
         description = "Keyword API"
     }) {
         get(route.ROUTE.byPathParam("userId"), { }) {
-            val userIdParam = call.pathParameters["userId"]
-            val userId = getValidatedMyUserId(userIdParam)
+            val userIdParam = call.pathParameters["userId"]?.toLongOrNull()
+                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val userId = UserId(userIdParam)
+            compareAuthUserIdAndMyUserId(userId)
             val userKeywords = userKeywordUseCase.getListById(userId)
             call.respond(userKeywords.toResponse())
         }
@@ -36,18 +40,21 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
         post(route.ROUTE, { }) {
             val addUserKeywordRequest = call.receive<AddUserKeywordRequest>()
             addUserKeywordRequest.validate()
-            val ownerId = getValidatedMyUserId(addUserKeywordRequest.userId)
+            val ownerId = UserId(addUserKeywordRequest.userId)
+            compareAuthUserIdAndMyUserId(ownerId)
             val addUserKeywordRequestDto = addUserKeywordRequest.toDto().copy(userId = ownerId)
             val userKeywordDto = userKeywordUseCase.add(addUserKeywordRequestDto)
             call.respond(userKeywordDto.toResponse())
         }
 
         patch(route.ROUTE, { }) {
-            val ownerIdParam = call.queryParameters["ownerId"]
-            val userKeywordIdParam = call.queryParameters["userKeywordId"]
-            val ownerId = getValidatedMyUserId(ownerIdParam)
-            val userKeywordId = userKeywordIdParam.validateUserKeywordIdAndReturn()
-            val userKeywordIdDto = UserKeywordIdDto(userKeywordId)
+            val ownerIdParam = call.queryParameters["ownerId"]?.toLongOrNull()
+                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]?.toLongOrNull()
+                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val ownerId = UserId(ownerIdParam)
+            compareAuthUserIdAndMyUserId(ownerId)
+            val userKeywordIdDto = UserKeywordIdDto(userKeywordIdParam)
             val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
             val result = userKeywordUseCase.update(
                 ownerId = ownerId,
@@ -58,11 +65,13 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
         }
 
         delete(route.ROUTE, { }) {
-            val ownerIdParam = call.queryParameters["ownerId"]
-            val userKeywordIdParam = call.queryParameters["userKeywordId"]
-            val ownerId = getValidatedMyUserId(ownerIdParam)
-            val userKeywordId = userKeywordIdParam.validateUserKeywordIdAndReturn()
-            val userKeywordIdDto = UserKeywordIdDto(userKeywordId)
+            val ownerIdParam = call.queryParameters["ownerId"]?.toLongOrNull()
+                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]?.toLongOrNull()
+                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val ownerId = UserId(ownerIdParam)
+            compareAuthUserIdAndMyUserId(ownerId)
+            val userKeywordIdDto = UserKeywordIdDto(userKeywordIdParam)
             val result = userKeywordUseCase.delete(ownerId, userKeywordIdDto)
             call.respond(HttpStatusCode.OK, result)
         }

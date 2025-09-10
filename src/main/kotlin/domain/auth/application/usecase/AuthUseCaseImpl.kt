@@ -50,13 +50,7 @@ class AuthUseCaseImpl(
             return null
         }
         LOGGER.debug("refresh successful")
-        val extractedUserId = extractUserId(token)
-        if (extractedUserId == null) {
-            LOGGER.debug("UserId extracted from token failed, userId: $userId, token: ${token.masking()}")
-            return null
-        }
-        LOGGER.debug("UserId extracted from token: $extractedUserId, token: ${token.masking()}")
-        saveRefreshToken(extractedUserId, newToken.refreshToken)
+        saveRefreshToken(userId, newToken.refreshToken)
         return newToken.toDto()
     }
 
@@ -68,9 +62,6 @@ class AuthUseCaseImpl(
         val findUserResult = authService.findUser(provider, providerId)
         return findUserResult.toDto()
     }
-
-    override suspend fun extractUserId(token: String): Long? =
-        refreshTokenService.extractUserId(token)
 
     override suspend fun existsDisplayId(displayId: String): Boolean =
         authService.existsDisplayId(displayId)

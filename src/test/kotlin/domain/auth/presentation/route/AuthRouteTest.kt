@@ -26,16 +26,10 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.Before
 import org.junit.Test
 
 class AuthRouteTest {
     private val authUseCase: AuthUseCase = mockk()
-
-    @Before
-    fun setup() {
-        coEvery { authUseCase.extractUserId(any()) } returns 0L
-    }
 
     @Test
     fun `login 성공 테스트`() = testApplication {

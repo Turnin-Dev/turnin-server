@@ -1,6 +1,5 @@
 package com.peekr.domain.auth.domain.service
 
-import com.peekr.common.jwt.exception.TokenException
 import com.peekr.domain.auth.exception.AuthException
 
 interface RefreshTokenService {
@@ -17,13 +16,4 @@ interface RefreshTokenService {
         userId: Long,
         token: String,
     ): Boolean
-
-    /**
-     * JWT 형식의 토큰에서 Long 타입의 UserId를 추출한다.
-     *
-     * @param token JWT 형식의 토큰
-     * @return [Long] UserID, UserID 형식이 아니거나 추출하지 못한다면 null
-     * @throws TokenException.CannotDecodedException 토큰이 정상적으로 디코딩 할 수 없는 형식인 경우 예외 발생
-     */
-    suspend fun extractUserId(token: String): Long?
 }

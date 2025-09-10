@@ -27,15 +27,4 @@ interface JWTTokenService {
      * @throws TokenException.CannotCreateTokenVerifier Token Verifier 를 생성하는 과정에서 예외 발생 시
      */
     fun createVerifier(type: JWTTokenType): JWTVerifier
-
-    /**
-     * JWT 형식의 토큰에서 String 타입의 UserId를 추출한다.
-     *
-     * 반드시, JWT 토큰의 Subject 부분의 UserId가 있어야 한다.
-     *
-     * @param token JWT 형식의 토큰
-     * @return [Long] UserID, UserID 형식이 아니거나 추출하지 못한다면 null
-     * @throws TokenException.CannotDecodedException 토큰이 정상적으로 디코딩 할 수 없는 형식인 경우 예외 발생
-     */
-    fun extractUserId(token: String): Long?
 }

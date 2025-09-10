@@ -2,6 +2,7 @@ package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
+import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.validator.ValidatorException
@@ -24,13 +25,10 @@ fun Route.userRoutes(route: Api.V1.User, userUseCase: UserUseCase) {
         description = "User API"
     }) {
         get(route.ROUTE.byPathParam("id"), { getUserByIdDocs() }) {
-            val userIdParam = call.pathParameters["id"]
-            val userId = try {
-                UserId.from(userIdParam).id
-            } catch (e: IllegalArgumentException) {
-                throw ValidatorException(e.message)
-            }
-            val user = userUseCase.getUserById(userId)
+            val userIdParam = call.pathParameters["id"]?.toLongOrNull()
+                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val userId = UserId(userIdParam)
+            val user = userUseCase.getUserById(userId.value)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {

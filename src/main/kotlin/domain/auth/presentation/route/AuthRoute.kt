@@ -6,6 +6,7 @@ import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.JWTValidator
+import com.peekr.common.jwt.JWTValidator.extractUserIdUseToken
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.auth.application.usecase.AuthUseCase
@@ -19,7 +20,6 @@ import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import com.peekr.domain.auth.presentation.validation.validateDisplayId
-import com.peekr.domain.core.model.UserId
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -66,28 +66,19 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
 
         get(route.REFRESH, { refreshDocs() }) {
             val refreshTokenParam = call.request.headers["Authorization"]
-            refreshTokenParam?.let {
-                JWTValidator.validate(refreshTokenParam)
-                val refreshToken = refreshTokenParam.removeBearerHeader()
-                val extractedUserId = authUseCase.extractUserId(refreshToken)
-                val userId = try {
-                    UserId.from(extractedUserId).id
-                } catch (e: IllegalArgumentException) {
-                    throw ValidatorException(e.message)
-                }
-                val token = authUseCase.refresh(userId, refreshToken)
-                if (token == null) {
-                    call.respond(
-                        HttpStatusCode.Unauthorized,
-                        AuthErrorCode.RefreshTokenExpired.toErrorResponse(HttpStatusCode.Unauthorized),
-                    )
-                } else {
-                    call.respond(token.toResponse())
-                }
-            } ?: call.respond(
-                HttpStatusCode.BadRequest,
-                CommonErrorCode.EmptyRequestHeader.toErrorResponse(HttpStatusCode.BadRequest),
-            )
+                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            JWTValidator.validate(refreshTokenParam)
+            val refreshToken = refreshTokenParam.removeBearerHeader()
+            val userId = extractUserIdUseToken()
+            val token = authUseCase.refresh(userId.value, refreshToken)
+            if (token == null) {
+                call.respond(
+                    HttpStatusCode.Unauthorized,
+                    AuthErrorCode.RefreshTokenExpired.toErrorResponse(HttpStatusCode.Unauthorized),
+                )
+            } else {
+                call.respond(token.toResponse())
+            }
         }
 
         get(route.EXISTS_USER.byPathParam("provider", "providerId"), { findUserDocs() }) {

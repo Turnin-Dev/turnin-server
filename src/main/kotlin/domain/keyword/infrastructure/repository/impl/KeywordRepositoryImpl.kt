@@ -25,7 +25,7 @@ class KeywordRepositoryImpl : KeywordRepository {
     ): Keyword = dbQuery {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keyword
-            this.createdBy = EntityID(createdBy.id, Users)
+            this.createdBy = EntityID(createdBy.value, Users)
         }
         savedKeyword.toDomain()
     }

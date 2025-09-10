@@ -21,7 +21,7 @@ import org.jetbrains.exposed.sql.update
 class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun getListById(userId: UserId): List<UserKeyword> = dbQuery {
         UserKeywordEntity
-            .find(UserKeywords.userId eq userId.id)
+            .find(UserKeywords.userId eq userId.value)
             .map { it.toDomain() }
     }
 
@@ -32,7 +32,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         UserKeywordEntity
             .find(
                 (UserKeywords.keywordId eq keywordId.id) and
-                    (UserKeywords.userId eq userId.id),
+                    (UserKeywords.userId eq userId.value),
             ).map { it.toDomain() }
             .singleOrNull()
     }
@@ -46,7 +46,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     ): UserKeyword = dbQuery {
         val savedUserKeywordEntity = UserKeywordEntity.new {
             this.keywordId = EntityID(keywordId.id, Keywords)
-            this.userId = EntityID(userId.id, Users)
+            this.userId = EntityID(userId.value, Users)
             this.offsetX = offsetX.toDouble()
             this.offsetY = offsetY.toDouble()
             this.description = description
@@ -60,7 +60,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
     ): Boolean = dbQuery {
-        UserKeywords.update({ (UserKeywords.id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.id) }) {
+        UserKeywords.update({ (UserKeywords.id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.value) }) {
             it[offsetX] = patch.offsetX.toDouble()
             it[offsetY] = patch.offsetY.toDouble()
             it[description] = patch.description
@@ -71,6 +71,6 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
     ): Boolean = dbQuery {
-        UserKeywords.deleteWhere { (id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.id) } > 0
+        UserKeywords.deleteWhere { (id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.value) } > 0
     }
 }

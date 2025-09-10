@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class AddUserKeywordRequest(
-    val userId: String,
+    val userId: Long,
     val keyword: String,
     val offsetX: Float,
     val offsetY: Float,
@@ -23,7 +23,7 @@ data class AddUserKeywordRequest(
 )
 
 fun AddUserKeywordRequest.toDto(): AddUserKeywordDto = AddUserKeywordDto(
-    userId = UserId.from(this.userId),
+    userId = UserId(this.userId),
     keyword = keyword,
     offsetX = offsetX,
     offsetY = offsetY,

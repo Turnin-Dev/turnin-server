@@ -10,7 +10,4 @@ class RefreshTokenServiceImpl(
 ) : RefreshTokenService {
     override suspend fun save(userId: Long, token: String): Boolean =
         refreshTokenRepository.save(userId, token)
-
-    override suspend fun extractUserId(token: String): Long? =
-        jwtTokenService.extractUserId(token)
 }
