@@ -1,6 +1,5 @@
 package com.peekr.domain.keyword.presentation.validation
 
-import com.peekr.common.validator.PeekrValidator.validation
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.presentation.dto.AddUserKeywordRequest
 
