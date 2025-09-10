@@ -1,11 +1,11 @@
 package com.peekr.domain.keyword.presentation.dto
 
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.application.dto.AddUserKeywordDto
+import com.peekr.domain.keyword.application.dto.CreateUserKeywordDto
 import kotlinx.serialization.Serializable
 
 /**
- * 사용자별 키워드 추가 요청 바디
+ * 사용자별 키워드 생성 요청 바디
  *
  * @property userId 사용자 ID
  * @property keyword 키워드명
@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
  * @property description 키워드 개인 설명
  */
 @Serializable
-data class AddUserKeywordRequest(
+data class CreateUserKeywordRequest(
     val userId: Long,
     val keyword: String,
     val offsetX: Float,
@@ -22,7 +22,7 @@ data class AddUserKeywordRequest(
     val description: String?,
 )
 
-fun AddUserKeywordRequest.toDto(): AddUserKeywordDto = AddUserKeywordDto(
+fun CreateUserKeywordRequest.toDto(): CreateUserKeywordDto = CreateUserKeywordDto(
     userId = UserId(this.userId),
     keyword = keyword,
     offsetX = offsetX,

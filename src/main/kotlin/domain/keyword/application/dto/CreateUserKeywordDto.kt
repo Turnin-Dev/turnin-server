@@ -11,7 +11,7 @@ import com.peekr.domain.core.model.UserId
  * @property offsetY UI 좌표 상에서의 Y 위치
  * @property description 키워드 개인 설명
  */
-data class AddUserKeywordDto(
+data class CreateUserKeywordDto(
     val userId: UserId,
     val keyword: String,
     val offsetX: Float,

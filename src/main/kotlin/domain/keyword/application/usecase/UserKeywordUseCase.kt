@@ -1,7 +1,7 @@
 package com.peekr.domain.keyword.application.usecase
 
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.application.dto.AddUserKeywordDto
+import com.peekr.domain.keyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.keyword.application.dto.UserKeywordDto
 import com.peekr.domain.keyword.application.dto.UserKeywordIdDto
 import com.peekr.domain.keyword.application.dto.UserKeywordPatchDto
@@ -10,11 +10,11 @@ interface UserKeywordUseCase {
     /**
      * 사용자별 키워드를 추가한다.
      *
-     * @param addUserKeywordDto [AddUserKeywordDto] 사용자별 키워드 DTO
+     * @param createUserKeywordDto [CreateUserKeywordDto] 사용자별 키워드 DTO
      *
      * @return [UserKeywordDto] 사용자별 키워드 DTO
      */
-    suspend fun add(addUserKeywordDto: AddUserKeywordDto): UserKeywordDto
+    suspend fun create(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto
 
     /**
      * 사용자 ID로 사용자별 키워드 리스트를 조회한다.

@@ -1,7 +1,7 @@
 package com.peekr.domain.keyword.application.usecase
 
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.application.dto.AddUserKeywordDto
+import com.peekr.domain.keyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.keyword.application.dto.UserKeywordDto
 import com.peekr.domain.keyword.application.dto.UserKeywordIdDto
 import com.peekr.domain.keyword.application.dto.UserKeywordPatchDto
@@ -10,13 +10,13 @@ import com.peekr.domain.keyword.application.dto.toDto
 import com.peekr.domain.keyword.domain.service.UserKeywordService
 
 class UserKeywordUseCaseImpl(private val userKeywordService: UserKeywordService) : UserKeywordUseCase {
-    override suspend fun add(addUserKeywordDto: AddUserKeywordDto): UserKeywordDto = userKeywordService
+    override suspend fun create(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto = userKeywordService
         .addUserKeyword(
-            addUserKeywordDto.keyword,
-            addUserKeywordDto.userId,
-            addUserKeywordDto.offsetX,
-            addUserKeywordDto.offsetY,
-            addUserKeywordDto.description,
+            createUserKeywordDto.keyword,
+            createUserKeywordDto.userId,
+            createUserKeywordDto.offsetX,
+            createUserKeywordDto.offsetY,
+            createUserKeywordDto.description,
         ).toDto()
 
     override suspend fun getListById(userId: UserId): List<UserKeywordDto> =

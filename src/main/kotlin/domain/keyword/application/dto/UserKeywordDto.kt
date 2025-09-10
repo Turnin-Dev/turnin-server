@@ -29,8 +29,8 @@ data class UserKeywordDto(
 )
 
 fun UserKeyword.toDto(): UserKeywordDto = UserKeywordDto(
-    id = id.id,
-    keywordId = keywordId.id,
+    id = id.value,
+    keywordId = keywordId.value,
     userId = userId.value,
     offsetX = offsetX,
     offsetY = offsetY,

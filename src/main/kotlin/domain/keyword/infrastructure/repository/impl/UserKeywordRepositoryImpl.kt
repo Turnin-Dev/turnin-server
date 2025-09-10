@@ -31,7 +31,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     ): UserKeyword? = dbQuery {
         UserKeywordEntity
             .find(
-                (UserKeywords.keywordId eq keywordId.id) and
+                (UserKeywords.keywordId eq keywordId.value) and
                     (UserKeywords.userId eq userId.value),
             ).map { it.toDomain() }
             .singleOrNull()
@@ -45,7 +45,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         description: String?,
     ): UserKeyword = dbQuery {
         val savedUserKeywordEntity = UserKeywordEntity.new {
-            this.keywordId = EntityID(keywordId.id, Keywords)
+            this.keywordId = EntityID(keywordId.value, Keywords)
             this.userId = EntityID(userId.value, Users)
             this.offsetX = offsetX.toDouble()
             this.offsetY = offsetY.toDouble()
@@ -60,7 +60,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
     ): Boolean = dbQuery {
-        UserKeywords.update({ (UserKeywords.id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.value) }) {
+        UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
             it[offsetX] = patch.offsetX.toDouble()
             it[offsetY] = patch.offsetY.toDouble()
             it[description] = patch.description
@@ -71,6 +71,6 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
     ): Boolean = dbQuery {
-        UserKeywords.deleteWhere { (id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.value) } > 0
+        UserKeywords.deleteWhere { (id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) } > 0
     }
 }
