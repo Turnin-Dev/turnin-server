@@ -14,12 +14,12 @@ interface KeywordRepository {
     suspend fun findByKeyword(keyword: String): Keyword?
 
     /**
-     * 키워드를 저장하고 성공 시 키워드를 반환한다.
+     * 키워드를 생성하고 성공 시 키워드를 반환한다.
      *
      * @param keyword 키워드명
      * @param createdBy 키워드 최초 등록자
      *
-     * @return 저장된 [Keyword] 키워드를 반환한다.
+     * @return 생성된 [Keyword] 키워드를 반환한다.
      */
-    suspend fun save(keyword: String, createdBy: UserId): Keyword
+    suspend fun create(keyword: String, createdBy: UserId): Keyword
 }

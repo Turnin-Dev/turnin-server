@@ -1,7 +1,7 @@
 package com.peekr.domain.keyword.presentation.dto
 
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.application.dto.CreateUserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import kotlinx.serialization.Serializable
 
 /**

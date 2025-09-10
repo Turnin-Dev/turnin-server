@@ -1,17 +1,17 @@
-package com.peekr.domain.keyword.infrastructure.repository.impl
+package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseFactory.dbQuery
+import com.peekr.common.db.DatabaseFactory
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
+import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.domain.model.KeywordId
-import com.peekr.domain.keyword.domain.model.UserKeyword
-import com.peekr.domain.keyword.domain.model.UserKeywordId
-import com.peekr.domain.keyword.domain.model.UserKeywordPatch
-import com.peekr.domain.keyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.core.model.UserKeywordId
 import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
+import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
+import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
@@ -19,8 +19,8 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
-    override suspend fun getListById(userId: UserId): List<UserKeyword> = dbQuery {
-        UserKeywordEntity
+    override suspend fun getListById(userId: UserId): List<UserKeyword> = DatabaseFactory.dbQuery {
+        UserKeywordEntity.Companion
             .find(UserKeywords.userId eq userId.value)
             .map { it.toDomain() }
     }
@@ -28,8 +28,8 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun findByKeywordIdAndUserId(
         keywordId: KeywordId,
         userId: UserId,
-    ): UserKeyword? = dbQuery {
-        UserKeywordEntity
+    ): UserKeyword? = DatabaseFactory.dbQuery {
+        UserKeywordEntity.Companion
             .find(
                 (UserKeywords.keywordId eq keywordId.value) and
                     (UserKeywords.userId eq userId.value),
@@ -43,8 +43,8 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         offsetX: Float,
         offsetY: Float,
         description: String?,
-    ): UserKeyword = dbQuery {
-        val savedUserKeywordEntity = UserKeywordEntity.new {
+    ): UserKeyword = DatabaseFactory.dbQuery {
+        val savedUserKeywordEntity = UserKeywordEntity.Companion.new {
             this.keywordId = EntityID(keywordId.value, Keywords)
             this.userId = EntityID(userId.value, Users)
             this.offsetX = offsetX.toDouble()
@@ -59,7 +59,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
-    ): Boolean = dbQuery {
+    ): Boolean = DatabaseFactory.dbQuery {
         UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
             it[offsetX] = patch.offsetX.toDouble()
             it[offsetY] = patch.offsetY.toDouble()
@@ -70,7 +70,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun delete(
         ownerId: UserId,
         userKeywordId: UserKeywordId,
-    ): Boolean = dbQuery {
+    ): Boolean = DatabaseFactory.dbQuery {
         UserKeywords.deleteWhere { (id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) } > 0
     }
 }

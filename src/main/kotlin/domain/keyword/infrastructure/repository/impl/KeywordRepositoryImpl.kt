@@ -19,7 +19,7 @@ class KeywordRepositoryImpl : KeywordRepository {
             .singleOrNull()
     }
 
-    override suspend fun save(
+    override suspend fun create(
         keyword: String,
         createdBy: UserId,
     ): Keyword = dbQuery {

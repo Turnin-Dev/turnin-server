@@ -1,6 +1,6 @@
 package com.peekr.domain.keyword.presentation.dto
 
-import com.peekr.domain.keyword.application.dto.UserKeywordPatchDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
 import kotlinx.serialization.Serializable
 
 /**

@@ -1,6 +1,6 @@
-package com.peekr.domain.keyword.application.dto
+package com.peekr.domain.userKeyword.application.dto
 
-import com.peekr.domain.keyword.domain.model.UserKeywordId
+import com.peekr.domain.core.model.UserKeywordId
 
 /** 사용자별 키워드 ID 래퍼 클래스 DTO */
 data class UserKeywordIdDto(val id: Long)

@@ -1,17 +1,17 @@
-package com.peekr.domain.keyword.application.usecase
+package com.peekr.domain.userKeyword.application.usecase
 
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.application.dto.CreateUserKeywordDto
-import com.peekr.domain.keyword.application.dto.UserKeywordDto
-import com.peekr.domain.keyword.application.dto.UserKeywordIdDto
-import com.peekr.domain.keyword.application.dto.UserKeywordPatchDto
-import com.peekr.domain.keyword.application.dto.toDomain
-import com.peekr.domain.keyword.application.dto.toDto
-import com.peekr.domain.keyword.domain.service.UserKeywordService
+import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordIdDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
+import com.peekr.domain.userKeyword.application.dto.toDomain
+import com.peekr.domain.userKeyword.application.dto.toDto
+import com.peekr.domain.userKeyword.domain.service.UserKeywordService
 
 class UserKeywordUseCaseImpl(private val userKeywordService: UserKeywordService) : UserKeywordUseCase {
     override suspend fun create(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto = userKeywordService
-        .addUserKeyword(
+        .create(
             createUserKeywordDto.keyword,
             createUserKeywordDto.userId,
             createUserKeywordDto.offsetX,
@@ -20,13 +20,13 @@ class UserKeywordUseCaseImpl(private val userKeywordService: UserKeywordService)
         ).toDto()
 
     override suspend fun getListById(userId: UserId): List<UserKeywordDto> =
-        userKeywordService.getListById(userId).toDto()
+        userKeywordService.findByUserId(userId).toDto()
 
     override suspend fun update(
         ownerId: UserId,
         userKeywordId: UserKeywordIdDto,
         patch: UserKeywordPatchDto,
-    ): Boolean = userKeywordService.updateUserKeyword(
+    ): Boolean = userKeywordService.update(
         ownerId,
         userKeywordId.toDomain(),
         patch.toDomain(),

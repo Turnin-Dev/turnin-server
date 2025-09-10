@@ -1,5 +1,6 @@
 package com.peekr.domain.keyword.domain.model
 
+import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
 
 /**
@@ -17,17 +18,4 @@ data class Keyword(
     val createdBy: UserId,
     val createdAt: Long,
     val updatedAt: Long,
-) {
-    init {
-        validateKeyword()
-    }
-
-    private fun validateKeyword() {
-        require(this.keyword.length in KEYWORD_MIN_LENGTH..KEYWORD_MAX_LENGTH) {
-            "키워드 길이 제한은 1~15자 이내 입니다."
-        }
-    }
-}
-
-private const val KEYWORD_MIN_LENGTH = 1
-private const val KEYWORD_MAX_LENGTH = 15
+)

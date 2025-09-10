@@ -1,4 +1,4 @@
-package com.peekr.domain.keyword.application.dto
+package com.peekr.domain.userKeyword.application.dto
 
 import com.peekr.domain.core.model.UserId
 

@@ -1,21 +1,21 @@
-package com.peekr.domain.keyword.infrastructure.service.impl
+package com.peekr.domain.userKeyword.infrastructure.service.impl
 
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.domain.model.UserKeyword
-import com.peekr.domain.keyword.domain.model.UserKeywordId
-import com.peekr.domain.keyword.domain.model.UserKeywordPatch
+import com.peekr.domain.core.model.UserKeywordId
 import com.peekr.domain.keyword.domain.repository.KeywordRepository
-import com.peekr.domain.keyword.domain.repository.UserKeywordRepository
-import com.peekr.domain.keyword.domain.service.UserKeywordService
+import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
+import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.userKeyword.domain.service.UserKeywordService
 
 class UserKeywordServiceImpl(
     private val keywordRepository: KeywordRepository,
     private val userKeywordRepository: UserKeywordRepository,
 ) : UserKeywordService {
-    override suspend fun getListById(userId: UserId): List<UserKeyword> =
+    override suspend fun findByUserId(userId: UserId): List<UserKeyword> =
         userKeywordRepository.getListById(userId)
 
-    override suspend fun addUserKeyword(
+    override suspend fun create(
         keyword: String,
         userId: UserId,
         offsetX: Float,
@@ -26,12 +26,12 @@ class UserKeywordServiceImpl(
         return if (currentKeyword != null) {
             userKeywordRepository.save(currentKeyword.id, userId, offsetX, offsetY, description)
         } else {
-            val newKeyword = keywordRepository.save(keyword, userId)
+            val newKeyword = keywordRepository.create(keyword, userId)
             userKeywordRepository.save(newKeyword.id, userId, offsetX, offsetY, description)
         }
     }
 
-    override suspend fun updateUserKeyword(
+    override suspend fun update(
         ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,

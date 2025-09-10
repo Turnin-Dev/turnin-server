@@ -5,6 +5,7 @@ import com.peekr.domain.auth.di.authModule
 import com.peekr.domain.file.di.fileModule
 import com.peekr.domain.keyword.di.keywordModule
 import com.peekr.domain.user.di.userModule
+import com.peekr.domain.userKeyword.di.userKeywordModule
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.koin.ksp.generated.defaultModule
@@ -22,6 +23,7 @@ fun Application.configureKoin() {
             userModule,
             fileModule,
             keywordModule,
+            userKeywordModule,
         )
     }
 }

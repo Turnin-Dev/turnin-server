@@ -5,10 +5,10 @@ import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.presentation.route.authRoutes
 import com.peekr.domain.file.application.usecase.FileUseCase
 import com.peekr.domain.file.presentation.route.fileRoutes
-import com.peekr.domain.keyword.application.usecase.UserKeywordUseCase
-import com.peekr.domain.keyword.presentation.route.keywordRoutes
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.domain.user.presentation.route.userRoutes
+import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCase
+import com.peekr.domain.userKeyword.route.userKeywordRoutes
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
 import io.github.smiley4.ktorswaggerui.swaggerUI
@@ -34,7 +34,7 @@ fun Application.configureRouting() {
                 fileRoutes(route = Api.V1.File, fileUseCase = fileUseCase)
                 authenticate {
                     userRoutes(route = Api.V1.User, userUseCase = userUseCase)
-                    keywordRoutes(route = Api.V1.Keyword, userKeywordUseCase = userKeywordUseCase)
+                    userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCase)
                 }
             }
         }

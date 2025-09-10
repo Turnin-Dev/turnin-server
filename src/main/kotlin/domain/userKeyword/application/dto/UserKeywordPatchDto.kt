@@ -1,6 +1,6 @@
-package com.peekr.domain.keyword.application.dto
+package com.peekr.domain.userKeyword.application.dto
 
-import com.peekr.domain.keyword.domain.model.UserKeywordPatch
+import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 
 /**
  * 업데이트 용 사용자별 키워드 DTO

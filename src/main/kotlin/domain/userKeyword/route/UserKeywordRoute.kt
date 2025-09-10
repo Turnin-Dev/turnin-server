@@ -1,4 +1,4 @@
-package com.peekr.domain.keyword.presentation.route
+package com.peekr.domain.userKeyword.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
@@ -6,12 +6,12 @@ import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.jwt.JWTValidator.verifyAuthUserId
 import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.application.dto.UserKeywordIdDto
-import com.peekr.domain.keyword.application.usecase.UserKeywordUseCase
 import com.peekr.domain.keyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.PatchUserKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.toDto
 import com.peekr.domain.keyword.presentation.dto.toResponse
+import com.peekr.domain.userKeyword.application.dto.UserKeywordIdDto
+import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCase
 import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.patch
@@ -22,17 +22,17 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 
-fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUseCase) {
+fun Route.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCase) {
     route({
         tags = setOf(route.TAG)
-        description = "Keyword API"
+        description = "User Keyword API"
     }) {
         get(route.ROUTE.byPathParam("userId"), { }) {
             val userIdParam = call.pathParameters["userId"]?.toLongOrNull()
                 ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
             val userId = UserId(userIdParam)
             verifyAuthUserId(userId)
-            val userKeywords = userKeywordUseCase.getListById(userId)
+            val userKeywords = usecase.getListById(userId)
             call.respond(userKeywords.toResponse())
         }
 
@@ -41,7 +41,7 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
             val ownerId = UserId(createUserKeywordRequest.userId)
             verifyAuthUserId(ownerId)
             val addUserKeywordRequestDto = createUserKeywordRequest.toDto().copy(userId = ownerId)
-            val userKeywordDto = userKeywordUseCase.create(addUserKeywordRequestDto)
+            val userKeywordDto = usecase.create(addUserKeywordRequestDto)
             call.respond(userKeywordDto.toResponse())
         }
 
@@ -54,7 +54,7 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
             verifyAuthUserId(ownerId)
             val userKeywordIdDto = UserKeywordIdDto(userKeywordIdParam)
             val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
-            val result = userKeywordUseCase.update(
+            val result = usecase.update(
                 ownerId = ownerId,
                 userKeywordId = userKeywordIdDto,
                 patch = patchUserKeywordRequest.toDto(),
@@ -70,7 +70,7 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
             val ownerId = UserId(ownerIdParam)
             verifyAuthUserId(ownerId)
             val userKeywordIdDto = UserKeywordIdDto(userKeywordIdParam)
-            val result = userKeywordUseCase.delete(ownerId, userKeywordIdDto)
+            val result = usecase.delete(ownerId, userKeywordIdDto)
             call.respond(HttpStatusCode.OK, result)
         }
     }

@@ -1,6 +1,8 @@
-package com.peekr.domain.keyword.domain.model
+package com.peekr.domain.userKeyword.domain.model
 
+import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
+import com.peekr.domain.core.model.UserKeywordId
 
 /**
  * 사용자별 키워드

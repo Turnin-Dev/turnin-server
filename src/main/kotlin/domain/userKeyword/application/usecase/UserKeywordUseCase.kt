@@ -1,10 +1,10 @@
-package com.peekr.domain.keyword.application.usecase
+package com.peekr.domain.userKeyword.application.usecase
 
 import com.peekr.domain.core.model.UserId
-import com.peekr.domain.keyword.application.dto.CreateUserKeywordDto
-import com.peekr.domain.keyword.application.dto.UserKeywordDto
-import com.peekr.domain.keyword.application.dto.UserKeywordIdDto
-import com.peekr.domain.keyword.application.dto.UserKeywordPatchDto
+import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordIdDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
 
 interface UserKeywordUseCase {
     /**

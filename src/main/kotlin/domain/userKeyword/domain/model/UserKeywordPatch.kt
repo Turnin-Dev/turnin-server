@@ -1,4 +1,4 @@
-package com.peekr.domain.keyword.domain.model
+package com.peekr.domain.userKeyword.domain.model
 
 /**
  * 업데이트 용 사용자별 키워드
