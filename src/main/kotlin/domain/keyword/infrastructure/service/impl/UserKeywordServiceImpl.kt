@@ -32,10 +32,11 @@ class UserKeywordServiceImpl(
     }
 
     override suspend fun updateUserKeyword(
+        ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
-    ): Boolean = userKeywordRepository.update(userKeywordId, patch)
+    ): Boolean = userKeywordRepository.update(ownerId, userKeywordId, patch)
 
-    override suspend fun delete(userKeywordId: UserKeywordId): Boolean =
-        userKeywordRepository.delete(userKeywordId)
+    override suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean =
+        userKeywordRepository.delete(ownerId, userKeywordId)
 }

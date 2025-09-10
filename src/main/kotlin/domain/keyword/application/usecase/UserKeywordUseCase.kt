@@ -28,12 +28,14 @@ interface UserKeywordUseCase {
     /**
      * 사용자별 키워드를 업데이트한다.
      *
+     * @param ownerId 사용자 ID
      * @param userKeywordId [UserKeywordIdDto] 사용자별 키워드 ID DTO
      * @param patch [UserKeywordPatchDto]
      *
      * @return 업데이트 성공 시 `true`를 반환하고 실패 시 `false`를 반환한다.
      */
     suspend fun update(
+        ownerId: UserId,
         userKeywordId: UserKeywordIdDto,
         patch: UserKeywordPatchDto,
     ): Boolean
@@ -41,9 +43,10 @@ interface UserKeywordUseCase {
     /**
      * 사용자별 키워드 ID로 사용자별 키워드를 삭제한다.
      *
-     * @param UserKeywordIdDto 사용자별 키워드 ID DTO
+     * @param ownerId 사용자 ID
+     * @param userKeywordId 사용자별 키워드 ID DTO
      *
      * @return 삭제 성공시 `true`를 반환하고 실패 시 `false`를 반환한다.
      */
-    suspend fun delete(userKeywordId: UserKeywordIdDto): Boolean
+    suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordIdDto): Boolean
 }

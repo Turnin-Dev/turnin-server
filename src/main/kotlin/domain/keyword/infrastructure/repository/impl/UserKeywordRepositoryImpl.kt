@@ -56,17 +56,21 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     }
 
     override suspend fun update(
+        ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
     ): Boolean = dbQuery {
-        UserKeywords.update({ UserKeywords.id eq userKeywordId.id }) {
+        UserKeywords.update({ (UserKeywords.id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.id) }) {
             it[offsetX] = patch.offsetX.toDouble()
             it[offsetY] = patch.offsetY.toDouble()
             it[description] = patch.description
         } > 0
     }
 
-    override suspend fun delete(userKeywordId: UserKeywordId): Boolean = dbQuery {
-        UserKeywords.deleteWhere { id eq userKeywordId.id } > 0
+    override suspend fun delete(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+    ): Boolean = dbQuery {
+        UserKeywords.deleteWhere { (id eq userKeywordId.id) and (UserKeywords.userId eq ownerId.id) } > 0
     }
 }

@@ -37,7 +37,11 @@ object JWTValidator {
     fun RoutingContext.getValidatedMyUserId(userIdParam: String?): UserId {
         val principal = call.principal<JWTPrincipal>() ?: throw TokenException.InvalidTokenException()
         val authUserIdParam = principal.payload.subject ?: throw TokenException.InvalidTokenException()
-        val authUserId = UserId.from(authUserIdParam)
+        val authUserId = try {
+            UserId.from(authUserIdParam)
+        } catch (e: IllegalArgumentException) {
+            throw ValidatorException(e.message)
+        }
         val userId = try {
             UserId.from(userIdParam)
         } catch (e: IllegalArgumentException) {

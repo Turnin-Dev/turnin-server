@@ -29,13 +29,3 @@ fun AddUserKeywordRequest.toDto(): AddUserKeywordDto = AddUserKeywordDto(
     offsetY = offsetY,
     description = description,
 )
-
-fun AddUserKeywordRequest.validate() {
-    UserId.from(this.userId)
-    require(this.keyword.length in KEYWORD_MIN_LENGTH..KEYWORD_MAX_LENGTH) {
-        "키워드 길이 제한: 1~15자 이내"
-    }
-}
-
-private const val KEYWORD_MIN_LENGTH = 15
-private const val KEYWORD_MAX_LENGTH = 15

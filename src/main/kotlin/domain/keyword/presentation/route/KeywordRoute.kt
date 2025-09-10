@@ -9,7 +9,7 @@ import com.peekr.domain.keyword.presentation.dto.AddUserKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.PatchUserKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.toDto
 import com.peekr.domain.keyword.presentation.dto.toResponse
-import com.peekr.domain.keyword.presentation.dto.validate
+import com.peekr.domain.keyword.presentation.validation.validate
 import com.peekr.domain.keyword.presentation.validation.validateUserKeywordIdAndReturn
 import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
@@ -36,27 +36,34 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, userKeywordUseCase: UserKeywordUs
         post(route.ROUTE, { }) {
             val addUserKeywordRequest = call.receive<AddUserKeywordRequest>()
             addUserKeywordRequest.validate()
-            val userKeywordDto = userKeywordUseCase.add(addUserKeywordRequest.toDto())
+            val ownerId = getValidatedMyUserId(addUserKeywordRequest.userId)
+            val addUserKeywordRequestDto = addUserKeywordRequest.toDto().copy(userId = ownerId)
+            val userKeywordDto = userKeywordUseCase.add(addUserKeywordRequestDto)
             call.respond(userKeywordDto.toResponse())
         }
 
-        patch(route.ROUTE.byPathParam("userKeywordId"), { }) {
-            val userKeywordIdParam = call.pathParameters["userKeywordId"]
+        patch(route.ROUTE, { }) {
+            val ownerIdParam = call.queryParameters["ownerId"]
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]
+            val ownerId = getValidatedMyUserId(ownerIdParam)
             val userKeywordId = userKeywordIdParam.validateUserKeywordIdAndReturn()
             val userKeywordIdDto = UserKeywordIdDto(userKeywordId)
             val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
             val result = userKeywordUseCase.update(
+                ownerId = ownerId,
                 userKeywordId = userKeywordIdDto,
                 patch = patchUserKeywordRequest.toDto(),
             )
             call.respond(HttpStatusCode.OK, result)
         }
 
-        delete(route.ROUTE.byPathParam("userKeywordId"), { }) {
-            val userKeywordIdParam = call.pathParameters["userKeywordId"]
+        delete(route.ROUTE, { }) {
+            val ownerIdParam = call.queryParameters["ownerId"]
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]
+            val ownerId = getValidatedMyUserId(ownerIdParam)
             val userKeywordId = userKeywordIdParam.validateUserKeywordIdAndReturn()
             val userKeywordIdDto = UserKeywordIdDto(userKeywordId)
-            val result = userKeywordUseCase.delete(userKeywordIdDto)
+            val result = userKeywordUseCase.delete(ownerId, userKeywordIdDto)
             call.respond(HttpStatusCode.OK, result)
         }
     }

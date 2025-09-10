@@ -50,6 +50,8 @@ sealed class TokenException(
     class UnauthorizedUserException(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.UnauthorizedUser,
+            status = HttpStatusCode.Forbidden,
             message = TokenErrorCode.UnauthorizedUser.description,
+            cause = cause,
         )
 }

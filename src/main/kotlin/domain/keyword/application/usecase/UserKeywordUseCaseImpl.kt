@@ -23,13 +23,15 @@ class UserKeywordUseCaseImpl(private val userKeywordService: UserKeywordService)
         userKeywordService.getListById(userId).toDto()
 
     override suspend fun update(
+        ownerId: UserId,
         userKeywordId: UserKeywordIdDto,
         patch: UserKeywordPatchDto,
     ): Boolean = userKeywordService.updateUserKeyword(
+        ownerId,
         userKeywordId.toDomain(),
         patch.toDomain(),
     )
 
-    override suspend fun delete(userKeywordId: UserKeywordIdDto): Boolean =
-        userKeywordService.delete(userKeywordId.toDomain())
+    override suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordIdDto): Boolean =
+        userKeywordService.delete(ownerId, userKeywordId.toDomain())
 }

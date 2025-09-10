@@ -118,15 +118,17 @@ private fun redactJdbcUrl(url: String): String =
  *
  * @param e 변환할 SQL 예외
  */
-private fun handleSqlException(e: SQLException): DatabaseException {
+private fun handleSqlException(e: Throwable): DatabaseException {
     val sqlState: String? = when (e) {
         is ExposedSQLException -> e.sqlState
-        else -> e.sqlState
+        is SQLException -> e.sqlState
+        else -> null
     }
 
     val message = e.message?.lowercase() ?: ""
     val causeMsg = when (e) {
         is ExposedSQLException -> e.cause?.message?.lowercase()
+        is SQLException -> e.cause?.message?.lowercase()
         else -> null
     } ?: ""
 

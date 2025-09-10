@@ -33,7 +33,7 @@ interface UserKeywordRepository {
      * @param offsetY UI 좌표 상에서의 Y 위치
      * @param description 키워드 개인 설명
      *
-     * @return [UserKeywordId] 사용자별 키워드 ID를 반환한다.
+     * @return [UserKeyword] 사용자별 키워드 ID를 반환한다.
      */
     suspend fun save(
         keywordId: KeywordId,
@@ -46,12 +46,14 @@ interface UserKeywordRepository {
     /**
      * 사용자별 키워드를 업데이트한다.
      *
+     * @param ownerId 사용자 ID
      * @param userKeywordId 사용자별 키워드 ID
      * @param patch [UserKeywordPatch]
      *
      * @return [Boolean] 업데이트 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
     suspend fun update(
+        ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
     ): Boolean
@@ -59,9 +61,10 @@ interface UserKeywordRepository {
     /**
      * 사용자별 키워드를 삭제한다.
      *
+     * @param ownerId 사용자 ID
      * @param userKeywordId 사용자별 키워드 ID
      *
      * @return 삭제 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
-    suspend fun delete(userKeywordId: UserKeywordId): Boolean
+    suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
 }
