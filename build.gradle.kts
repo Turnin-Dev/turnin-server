@@ -78,11 +78,10 @@ tasks.register<JavaExec>("runProd") {
     envProd.forEach { (key, value) -> environment(key, value) }
 }
 
-// 테스트 설정 파일 추가 시 활성화
-// tasks.test {
-//    systemProperty("config.file", "application-test.conf")
-//    useJUnitPlatform()
-// }
+tasks.test {
+    systemProperty("config.file", "application-test.conf")
+    useJUnitPlatform()
+}
 
 dependencies {
     implementation(libs.ktor.server.core)

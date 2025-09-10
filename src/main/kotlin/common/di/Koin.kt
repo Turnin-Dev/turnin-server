@@ -3,6 +3,7 @@ package com.peekr.common.di
 import com.peekr.common.jwt.di.jwtModule
 import com.peekr.domain.auth.di.authModule
 import com.peekr.domain.file.di.fileModule
+import com.peekr.domain.keyword.di.keywordModule
 import com.peekr.domain.user.di.userModule
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -20,6 +21,7 @@ fun Application.configureKoin() {
             authModule,
             userModule,
             fileModule,
+            keywordModule,
         )
     }
 }

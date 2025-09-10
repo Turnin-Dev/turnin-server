@@ -1,0 +1,42 @@
+package com.peekr.domain.keyword.infrastructure.service.impl
+
+import com.peekr.domain.core.model.UserId
+import com.peekr.domain.keyword.domain.model.UserKeyword
+import com.peekr.domain.keyword.domain.model.UserKeywordId
+import com.peekr.domain.keyword.domain.model.UserKeywordPatch
+import com.peekr.domain.keyword.domain.repository.KeywordRepository
+import com.peekr.domain.keyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.keyword.domain.service.UserKeywordService
+
+class UserKeywordServiceImpl(
+    private val keywordRepository: KeywordRepository,
+    private val userKeywordRepository: UserKeywordRepository,
+) : UserKeywordService {
+    override suspend fun getListById(userId: UserId): List<UserKeyword> =
+        userKeywordRepository.getListById(userId)
+
+    override suspend fun addUserKeyword(
+        keyword: String,
+        userId: UserId,
+        offsetX: Float,
+        offsetY: Float,
+        description: String?,
+    ): UserKeyword {
+        val currentKeyword = keywordRepository.findByKeyword(keyword)
+        return if (currentKeyword != null) {
+            userKeywordRepository.save(currentKeyword.id, userId, offsetX, offsetY, description)
+        } else {
+            val newKeyword = keywordRepository.save(keyword, userId)
+            userKeywordRepository.save(newKeyword.id, userId, offsetX, offsetY, description)
+        }
+    }
+
+    override suspend fun updateUserKeyword(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+        patch: UserKeywordPatch,
+    ): Boolean = userKeywordRepository.update(ownerId, userKeywordId, patch)
+
+    override suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean =
+        userKeywordRepository.delete(ownerId, userKeywordId)
+}

@@ -1,12 +1,19 @@
 package com.peekr.domain.keyword.domain.repository
 
-import com.peekr.domain.common.model.UserId
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.domain.model.KeywordId
 import com.peekr.domain.keyword.domain.model.UserKeyword
 import com.peekr.domain.keyword.domain.model.UserKeywordId
 import com.peekr.domain.keyword.domain.model.UserKeywordPatch
 
 interface UserKeywordRepository {
+    /**
+     * 사용자 ID를 통해 사용자별 키워드 리스트를 조회한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun getListById(userId: UserId): List<UserKeyword>
+
     /**
      * 키워드 ID와 사용자 ID를 통해 사용자별 키워드를 찾는다.
      *
@@ -26,7 +33,7 @@ interface UserKeywordRepository {
      * @param offsetY UI 좌표 상에서의 Y 위치
      * @param description 키워드 개인 설명
      *
-     * @return [UserKeywordId] 사용자별 키워드 ID를 반환한다.
+     * @return [UserKeyword] 사용자별 키워드 ID를 반환한다.
      */
     suspend fun save(
         keywordId: KeywordId,
@@ -34,17 +41,19 @@ interface UserKeywordRepository {
         offsetX: Float,
         offsetY: Float,
         description: String?,
-    ): UserKeywordId
+    ): UserKeyword
 
     /**
      * 사용자별 키워드를 업데이트한다.
      *
+     * @param ownerId 사용자 ID
      * @param userKeywordId 사용자별 키워드 ID
      * @param patch [UserKeywordPatch]
      *
      * @return [Boolean] 업데이트 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
     suspend fun update(
+        ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
     ): Boolean
@@ -52,9 +61,10 @@ interface UserKeywordRepository {
     /**
      * 사용자별 키워드를 삭제한다.
      *
+     * @param ownerId 사용자 ID
      * @param userKeywordId 사용자별 키워드 ID
      *
      * @return 삭제 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
-    suspend fun delete(userKeywordId: UserKeywordId): Boolean
+    suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
 }

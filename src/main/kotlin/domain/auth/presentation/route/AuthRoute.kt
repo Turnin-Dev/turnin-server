@@ -7,7 +7,7 @@ import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.JWTValidator
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
-import com.peekr.common.validator.CommonValidator.validationUserIdAndReturn
+import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
@@ -19,6 +19,7 @@ import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import com.peekr.domain.auth.presentation.validation.validateDisplayId
+import com.peekr.domain.core.model.UserId
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -69,7 +70,11 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
                 JWTValidator.validate(refreshTokenParam)
                 val refreshToken = refreshTokenParam.removeBearerHeader()
                 val extractedUserId = authUseCase.extractUserId(refreshToken)
-                val userId = validationUserIdAndReturn(extractedUserId)
+                val userId = try {
+                    UserId.from(extractedUserId).id
+                } catch (e: IllegalArgumentException) {
+                    throw ValidatorException(e.message)
+                }
                 val token = authUseCase.refresh(userId, refreshToken)
                 if (token == null) {
                     call.respond(

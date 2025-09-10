@@ -3,7 +3,6 @@ package com.peekr.domain.auth.domain.repository
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
-import com.peekr.domain.auth.exception.AuthException
 
 interface AuthRepository {
     /**
@@ -46,7 +45,7 @@ interface AuthRepository {
      *
      * - 활성화된 사용자: `role: Role.User`, `isActive: true`
      *
-     * @exception AuthException.DuplicateUserException - 이미 존재하는 사용자 저장 시 예외 발생
+     * @exception com.peekr.common.db.DatabaseException.DuplicatedDataException - 이미 존재하는 사용자 저장 시 예외 발생
      */
     suspend fun save(register: Register): AuthUser
 
