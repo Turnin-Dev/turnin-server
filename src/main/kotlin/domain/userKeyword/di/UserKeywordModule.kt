@@ -1,7 +1,10 @@
 package com.peekr.domain.userKeyword.di
 
-import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCase
-import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCaseImpl
+import com.peekr.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
+import com.peekr.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
+import com.peekr.domain.userKeyword.application.usecase.GetUserKeywordsUseCase
+import com.peekr.domain.userKeyword.application.usecase.UpdateUserKeywordUseCasse
+import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.domain.service.UserKeywordService
 import com.peekr.domain.userKeyword.infrastructure.repository.impl.UserKeywordRepositoryImpl
@@ -14,6 +17,10 @@ val userKeywordModule = module {
     // Service
     single<UserKeywordService> { UserKeywordServiceImpl(get(), get()) }
 
-    // UseCase
-    single<UserKeywordUseCase> { UserKeywordUseCaseImpl(get()) }
+    // UseCases
+    factory { CreateUserKeywordUseCase(get()) }
+    factory { GetUserKeywordsUseCase(get()) }
+    factory { UpdateUserKeywordUseCasse(get()) }
+    factory { DeleteUserKeywordUseCase(get()) }
+    single<UserKeywordUseCases> { UserKeywordUseCases(get(), get(), get(), get()) }
 }

@@ -13,10 +13,10 @@ interface UserKeywordService {
      *
      * @return 사용자별 키워드를 찾으면 [UserKeyword]리스트를 반환하고 만약 없다면 `빈 리스트`를 반환한다.
      */
-    suspend fun findByUserId(userId: UserId): List<UserKeyword>
+    suspend fun getKeywords(userId: UserId): List<UserKeyword>
 
     /**
-     * 사용자별 키워드를 추가한다.
+     * 사용자별 키워드를 생성한다.
      *
      * [keyword]가 기존에 존재하는지 확인하고 존재한다면 해당 키워드의 ID를 사용하고
      * 만약 없다면 새롭게 키워드를 등록한 후 등록한 키워드의 ID를 사용한다.

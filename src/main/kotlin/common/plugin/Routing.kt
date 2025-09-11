@@ -7,7 +7,7 @@ import com.peekr.domain.file.application.usecase.FileUseCase
 import com.peekr.domain.file.presentation.route.fileRoutes
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.domain.user.presentation.route.userRoutes
-import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCase
+import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.route.userKeywordRoutes
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
@@ -22,7 +22,7 @@ fun Application.configureRouting() {
     val authUseCase by inject<AuthUseCase>()
     val userUseCase by inject<UserUseCase>()
     val fileUseCase by inject<FileUseCase>()
-    val userKeywordUseCase by inject<UserKeywordUseCase>()
+    val userKeywordUseCases by inject<UserKeywordUseCases>()
 
     routing {
         customRoutingOption()
@@ -34,7 +34,7 @@ fun Application.configureRouting() {
                 fileRoutes(route = Api.V1.File, fileUseCase = fileUseCase)
                 authenticate {
                     userRoutes(route = Api.V1.User, userUseCase = userUseCase)
-                    userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCase)
+                    userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
                 }
             }
         }

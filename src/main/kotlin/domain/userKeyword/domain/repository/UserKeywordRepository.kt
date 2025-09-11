@@ -12,7 +12,7 @@ interface UserKeywordRepository {
      *
      * @param userId 사용자 ID
      */
-    suspend fun getListById(userId: UserId): List<UserKeyword>
+    suspend fun findByUserId(userId: UserId): List<UserKeyword>
 
     /**
      * 키워드 ID와 사용자 ID를 통해 사용자별 키워드를 찾는다.
@@ -25,7 +25,7 @@ interface UserKeywordRepository {
     suspend fun findByKeywordIdAndUserId(keywordId: KeywordId, userId: UserId): UserKeyword?
 
     /**
-     * 사용자별 키워드를 저장한다.
+     * 사용자별 키워드를 생성한다.
      *
      * @param keywordId 키워드 ID
      * @param userId 사용자 ID
@@ -35,7 +35,7 @@ interface UserKeywordRepository {
      *
      * @return [UserKeyword] 사용자별 키워드 ID를 반환한다.
      */
-    suspend fun save(
+    suspend fun create(
         keywordId: KeywordId,
         userId: UserId,
         offsetX: Float,

@@ -12,8 +12,8 @@ class UserKeywordServiceImpl(
     private val keywordRepository: KeywordRepository,
     private val userKeywordRepository: UserKeywordRepository,
 ) : UserKeywordService {
-    override suspend fun findByUserId(userId: UserId): List<UserKeyword> =
-        userKeywordRepository.getListById(userId)
+    override suspend fun getKeywords(userId: UserId): List<UserKeyword> =
+        userKeywordRepository.findByUserId(userId)
 
     override suspend fun create(
         keyword: String,
@@ -24,10 +24,10 @@ class UserKeywordServiceImpl(
     ): UserKeyword {
         val currentKeyword = keywordRepository.findByKeyword(keyword)
         return if (currentKeyword != null) {
-            userKeywordRepository.save(currentKeyword.id, userId, offsetX, offsetY, description)
+            userKeywordRepository.create(currentKeyword.id, userId, offsetX, offsetY, description)
         } else {
             val newKeyword = keywordRepository.create(keyword, userId)
-            userKeywordRepository.save(newKeyword.id, userId, offsetX, offsetY, description)
+            userKeywordRepository.create(newKeyword.id, userId, offsetX, offsetY, description)
         }
     }
 
