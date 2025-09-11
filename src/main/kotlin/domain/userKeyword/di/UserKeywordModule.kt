@@ -15,7 +15,7 @@ val userKeywordModule = module {
     single<UserKeywordRepository> { UserKeywordRepositoryImpl() }
 
     // Service
-    single<UserKeywordService> { UserKeywordServiceImpl(get(), get()) }
+    single<UserKeywordService> { UserKeywordServiceImpl(get()) }
 
     // UseCases
     factory { CreateUserKeywordUseCase(get()) }

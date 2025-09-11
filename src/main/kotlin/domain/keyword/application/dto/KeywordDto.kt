@@ -1,10 +1,11 @@
-package com.peekr.domain.keyword.domain.model
+package com.peekr.domain.keyword.application.dto
 
 import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
+import com.peekr.domain.keyword.domain.model.Keyword
 
 /**
- * 키워드
+ * 키워드 DTO
  *
  * @property id 키워드 ID
  * @property keyword 키워드명
@@ -12,7 +13,7 @@ import com.peekr.domain.core.model.UserId
  * @property createdAt 키워드 등록 일자
  * @property updatedAt 키워드 수정 일자
  */
-data class Keyword(
+data class KeywordDto(
     val id: KeywordId,
     val keyword: String,
     val createdBy: UserId,
@@ -20,17 +21,10 @@ data class Keyword(
     val updatedAt: Long,
 )
 
-/**
- * 키워드 스펙 (비즈니스 규칙)
- */
-object KeywordSpec {
-    /** 키워드 최대 길이 */
-    const val MAX_LENGTH = 15
-
-    /** 키워드 최소 길이 */
-    const val MIN_LENGTH = 1
-
-    /** 키워드 null 혹은 공백 체크 */
-    fun isNotNullAndNotBlank(keyword: String?): Boolean =
-        keyword != null && keyword.isNotBlank()
-}
+fun Keyword.toDto(): KeywordDto = KeywordDto(
+    id = this.id,
+    keyword = this.keyword,
+    createdBy = this.createdBy,
+    createdAt = this.createdAt,
+    updatedAt = this.updatedAt,
+)

@@ -1,5 +1,6 @@
 package com.peekr.domain.userKeyword.domain.service
 
+import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.core.model.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
@@ -18,10 +19,10 @@ interface UserKeywordService {
     /**
      * 사용자별 키워드를 생성한다.
      *
-     * [keyword]가 기존에 존재하는지 확인하고 존재한다면 해당 키워드의 ID를 사용하고
+     * 키워드가 기존에 존재하는지 확인하고 존재한다면 해당 키워드의 ID를 사용하고
      * 만약 없다면 새롭게 키워드를 등록한 후 등록한 키워드의 ID를 사용한다.
      *
-     * @param keyword 키워드명
+     * @param keywordId 키워드 ID
      * @param userId 사용자 ID
      * @param offsetX UI 좌표 상에서의 X 위치
      * @param offsetY UI 좌표 상에서의 Y 위치
@@ -30,7 +31,7 @@ interface UserKeywordService {
      * @return [UserKeyword] 사용자별 키워드를 반환한다.
      */
     suspend fun create(
-        keyword: String,
+        keywordId: KeywordId,
         userId: UserId,
         offsetX: Float,
         offsetY: Float,

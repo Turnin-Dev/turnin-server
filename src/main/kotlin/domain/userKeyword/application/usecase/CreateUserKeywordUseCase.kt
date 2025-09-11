@@ -16,7 +16,7 @@ class CreateUserKeywordUseCase(private val userKeywordService: UserKeywordServic
      */
     suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto = userKeywordService
         .create(
-            createUserKeywordDto.keyword,
+            createUserKeywordDto.keywordId,
             createUserKeywordDto.userId,
             createUserKeywordDto.offsetX,
             createUserKeywordDto.offsetY,

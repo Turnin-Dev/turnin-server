@@ -5,6 +5,8 @@ import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.presentation.route.authRoutes
 import com.peekr.domain.file.application.usecase.FileUseCase
 import com.peekr.domain.file.presentation.route.fileRoutes
+import com.peekr.domain.keyword.application.usecase.KeywordUseCases
+import com.peekr.domain.keyword.presentation.route.keywordRoutes
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.domain.user.presentation.route.userRoutes
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
@@ -22,6 +24,7 @@ fun Application.configureRouting() {
     val authUseCase by inject<AuthUseCase>()
     val userUseCase by inject<UserUseCase>()
     val fileUseCase by inject<FileUseCase>()
+    val keywordUseCases by inject<KeywordUseCases>()
     val userKeywordUseCases by inject<UserKeywordUseCases>()
 
     routing {
@@ -34,6 +37,7 @@ fun Application.configureRouting() {
                 fileRoutes(route = Api.V1.File, fileUseCase = fileUseCase)
                 authenticate {
                     userRoutes(route = Api.V1.User, userUseCase = userUseCase)
+                    keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
                     userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
                 }
             }

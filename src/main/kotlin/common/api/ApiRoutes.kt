@@ -36,6 +36,11 @@ object Api {
             const val UPLOAD = "/upload"
         }
 
+        object Keyword {
+            const val ROUTE = "/keyword"
+            const val TAG = "Keyword"
+        }
+
         object UserKeyword {
             const val ROUTE = "/user-keyword"
             const val TAG = "UserKeyword"

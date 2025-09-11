@@ -12,7 +12,7 @@ import com.peekr.domain.userKeyword.domain.service.UserKeywordService
 class UpdateUserKeywordUseCasse(private val userKeywordService: UserKeywordService) {
     /**
      * @param ownerId 사용자 ID
-     * @param userKeywordId [UserKeywordIdDto] 사용자별 키워드 ID DTO
+     * @param userKeywordId [UserKeywordId] 사용자별 키워드 ID DTO
      * @param patch [UserKeywordPatchDto]
      *
      * @return 업데이트 성공 시 `true`를 반환하고 실패 시 `false`를 반환한다.
