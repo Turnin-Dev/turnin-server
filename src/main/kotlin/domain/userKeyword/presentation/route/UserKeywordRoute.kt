@@ -6,11 +6,11 @@ import com.peekr.common.jwt.JWTValidator.verifyAuthUserId
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.core.model.UserKeywordId
 import com.peekr.domain.core.validator.inputValidationAndReturn
-import com.peekr.domain.keyword.presentation.dto.CreateUserKeywordRequest
-import com.peekr.domain.keyword.presentation.dto.PatchUserKeywordRequest
-import com.peekr.domain.keyword.presentation.dto.toDto
-import com.peekr.domain.keyword.presentation.dto.toResponse
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
+import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
+import com.peekr.domain.userKeyword.presentation.dto.PatchUserKeywordRequest
+import com.peekr.domain.userKeyword.presentation.dto.toDto
+import com.peekr.domain.userKeyword.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.patch
