@@ -8,7 +8,7 @@ import com.peekr.domain.file.presentation.route.fileRoutes
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.domain.user.presentation.route.userRoutes
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
-import com.peekr.domain.userKeyword.route.userKeywordRoutes
+import com.peekr.domain.userKeyword.presentation.route.userKeywordRoutes
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
 import io.github.smiley4.ktorswaggerui.swaggerUI

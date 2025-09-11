@@ -41,7 +41,7 @@ fun Application.configureExceptionHandler() {
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
                     code = CommonErrorCode.MalformedRequest.code,
-                    message = CommonErrorCode.MalformedRequest.description,
+                    message = cause.message ?: CommonErrorCode.MalformedRequest.description,
                     status = HttpStatusCode.BadRequest.value,
                 ),
             )

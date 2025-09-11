@@ -1,12 +1,11 @@
-package com.peekr.domain.userKeyword.route
+package com.peekr.domain.userKeyword.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
-import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.jwt.JWTValidator.verifyAuthUserId
-import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.core.model.UserKeywordId
+import com.peekr.domain.core.validator.inputValidationAndReturn
 import com.peekr.domain.keyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.PatchUserKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.toDto
@@ -28,8 +27,9 @@ fun Route.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCa
         description = "User Keyword API"
     }) {
         get(route.ROUTE.byPathParam("userId"), { }) {
-            val userIdParam = call.pathParameters["userId"]?.toLongOrNull()
-                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val userIdParam = call.pathParameters["userId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 ID")
             val userId = UserId(userIdParam)
             verifyAuthUserId(userId)
             val userKeywords = usecase.get(userId)
@@ -46,10 +46,12 @@ fun Route.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCa
         }
 
         patch(route.ROUTE, { }) {
-            val ownerIdParam = call.queryParameters["ownerId"]?.toLongOrNull()
-                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
-            val userKeywordIdParam = call.queryParameters["userKeywordId"]?.toLongOrNull()
-                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val ownerIdParam = call.queryParameters["ownerId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("소유자 ID")
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 키워드 ID")
             val ownerId = UserId(ownerIdParam)
             verifyAuthUserId(ownerId)
             val userKeywordId = UserKeywordId(userKeywordIdParam)
@@ -63,10 +65,12 @@ fun Route.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCa
         }
 
         delete(route.ROUTE, { }) {
-            val ownerIdParam = call.queryParameters["ownerId"]?.toLongOrNull()
-                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
-            val userKeywordIdParam = call.queryParameters["userKeywordId"]?.toLongOrNull()
-                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val ownerIdParam = call.queryParameters["ownerId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("소유자 ID")
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 키워드 ID")
             val ownerId = UserId(ownerIdParam)
             verifyAuthUserId(ownerId)
             val userKeywordId = UserKeywordId(userKeywordIdParam)
