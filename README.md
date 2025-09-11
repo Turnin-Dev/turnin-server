@@ -7,11 +7,8 @@ project/
 │
 ├── common/                     # 공통 계층 (모든 곳에서 참조 가능)
 │   ├── di/                      # 공통 의존성 주입 계층
-│   ├── presentation/            # 공통 프레젠테이션 계층
-│   ├── application/             # 공통 애플리케이션 계층
-│   ├── domain/                  # 공통 도메인 계층
-│   ├── infrastructure/          # 공통 인프라스트럭처 계층
-│   └── util/                    # 유틸
+│   ├── jwt/                     # 공통 기능
+│   ├── .../
 │
 ├── domain/                     # 도메인 모듈들
 │   ├── auth/                     # 각 도메인 모듈
