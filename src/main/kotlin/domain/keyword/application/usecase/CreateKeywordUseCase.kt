@@ -15,6 +15,8 @@ class CreateKeywordUseCase(private val keywordService: KeywordService) {
      *
      * @return [KeywordDto]
      */
-    suspend operator fun invoke(keyword: String, createdBy: UserId): KeywordDto =
-        keywordService.create(keyword, createdBy).toDto()
+    suspend operator fun invoke(
+        keyword: String,
+        createdBy: UserId,
+    ): KeywordDto = keywordService.create(keyword, createdBy).toDto()
 }

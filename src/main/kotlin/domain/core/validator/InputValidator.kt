@@ -7,6 +7,7 @@ package com.peekr.domain.core.validator
  */
 fun String?.inputValidationAndReturn(label: String = ""): String {
     require(this != null) { "요청 파라미터 '$label'가 필요합니다." }
+    require(this.isNotBlank()) { "요청 파라미터 '$label'가 비어있습니다." }
     return this
 }
 

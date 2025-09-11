@@ -1,12 +1,12 @@
 package com.peekr.domain.core.model
 
-/** 키워드 ID 래퍼 클래스 */
+/** 키워드 ID VO */
 @JvmInline
 value class KeywordId private constructor(val value: Long) {
     companion object {
         fun from(value: Long): KeywordId = KeywordId(value)
 
-        operator fun invoke(value: Long): KeywordId = KeywordId(value)
+        operator fun invoke(value: Long): KeywordId = from(value)
     }
 
     init {

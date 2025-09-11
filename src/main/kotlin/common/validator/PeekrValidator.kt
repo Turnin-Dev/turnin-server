@@ -33,7 +33,7 @@ object PeekrValidator {
             throw ApiException(
                 errorCode = CommonErrorCode.Unexpected,
                 message = e.message ?: CommonErrorCode.Unexpected.description,
-                status = HttpStatusCode.InternalServerError,
+                status = HttpStatusCode.BadRequest,
             )
         }
     }

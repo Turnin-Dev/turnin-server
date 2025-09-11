@@ -6,7 +6,7 @@ value class UserKeywordId(val value: Long) {
     companion object {
         fun from(value: Long): UserKeywordId = UserKeywordId(value)
 
-        operator fun invoke(value: Long): UserKeywordId = UserKeywordId(value)
+        operator fun invoke(value: Long): UserKeywordId = from(value)
     }
 
     init {
