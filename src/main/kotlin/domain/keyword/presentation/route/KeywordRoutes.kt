@@ -7,7 +7,9 @@ import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.validator.inputValidationAndReturn
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
+import com.peekr.domain.keyword.presentation.dto.KeywordResponse
 import com.peekr.domain.keyword.presentation.dto.toResponse
+import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
@@ -20,7 +22,7 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
         tags = setOf(route.TAG)
         description = "Keyword API"
     }) {
-        get(route.ROUTE.byPathParam("keywordId"), {}) {
+        get(route.ROUTE.byPathParam("keywordId"), { getKeywordByIdDocs() }) {
             val keywordIdParam = call.pathParameters["keywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("키워드 ID")
@@ -33,7 +35,7 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
             }
         }
 
-        post(route.ROUTE, {}) {
+        post(route.ROUTE, { createKeywordDocs() }) {
             val createKeywordRequest = call.receive<CreateKeywordRequest>()
             val createById = extractUserIdWithToken()
             val keywordResult = usecase.create(
@@ -41,6 +43,55 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
                 createdBy = createById,
             )
             call.respond(HttpStatusCode.Created, keywordResult.toResponse())
+        }
+    }
+}
+
+private fun RouteConfig.getKeywordByIdDocs() {
+    summary = "키워드 조회"
+    description = "키워드 ID로 키워드를 조회한다."
+    request {
+        pathParameter<Long>("keywordId") {
+            description = "키워드 ID"
+            example("Example") {
+                value = 1
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<KeywordResponse> {
+                description = "키워드"
+                example("KeywordResponse") {
+                    value = KeywordResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            description = "키워드가 존재하지 않는 경우"
+        }
+    }
+}
+
+private fun RouteConfig.createKeywordDocs() {
+    summary = "키워드 생성"
+    description = "키워드를 생성한다."
+    request {
+        body<CreateKeywordRequest> {
+            description = "키워드 생성 요청 바디"
+            example("CreateKeywordRequest") {
+                value = CreateKeywordRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.Created) {
+            body<KeywordResponse> {
+                description = "키워드 생성 응답 바디"
+                example("KeywordResponse") {
+                    value = KeywordResponse.sample
+                }
+            }
         }
     }
 }

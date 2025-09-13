@@ -8,4 +8,8 @@ import kotlinx.serialization.Serializable
  * @property keyword 키워드명
  */
 @Serializable
-data class CreateKeywordRequest(val keyword: String)
+data class CreateKeywordRequest(val keyword: String) {
+    companion object {
+        val sample = CreateKeywordRequest("sample")
+    }
+}

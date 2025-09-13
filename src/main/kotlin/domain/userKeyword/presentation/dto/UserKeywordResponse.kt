@@ -25,7 +25,20 @@ data class UserKeywordResponse(
     val description: String?,
     val createdAt: Long,
     val updatedAt: Long,
-)
+) {
+    companion object {
+        val sample = UserKeywordResponse(
+            id = 1,
+            keywordId = 1,
+            userId = 1,
+            offsetX = 0.25f,
+            offsetY = 0.25f,
+            description = "",
+            createdAt = 0,
+            updatedAt = 0,
+        )
+    }
+}
 
 fun UserKeywordDto.toResponse() = UserKeywordResponse(
     id = id,

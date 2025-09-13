@@ -15,7 +15,15 @@ data class PatchUserKeywordRequest(
     val offsetX: Float,
     val offsetY: Float,
     val description: String?,
-)
+) {
+    companion object {
+        val sample = PatchUserKeywordRequest(
+            offsetX = 0f,
+            offsetY = 0f,
+            description = "수정 샘플 키워드 설명",
+        )
+    }
+}
 
 fun PatchUserKeywordRequest.toDto(): UserKeywordPatchDto =
     UserKeywordPatchDto(offsetX, offsetY, description)

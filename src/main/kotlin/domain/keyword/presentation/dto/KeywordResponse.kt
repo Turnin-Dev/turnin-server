@@ -19,7 +19,17 @@ data class KeywordResponse(
     val createdBy: Long,
     val createdAt: Long,
     val updatedAt: Long,
-)
+) {
+    companion object {
+        val sample = KeywordResponse(
+            id = 1,
+            keyword = "sample",
+            createdBy = 1,
+            createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis(),
+        )
+    }
+}
 
 fun KeywordDto.toResponse(): KeywordResponse = KeywordResponse(
     id = id.value,
