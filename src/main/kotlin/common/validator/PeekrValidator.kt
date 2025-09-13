@@ -28,11 +28,11 @@ object PeekrValidator {
                 lazyMessage = lazyMessage,
             )
         } catch (e: IllegalArgumentException) {
-            throw ValidatorException(e.message ?: CommonErrorCode.Validation.description)
+            throw ValidatorException(e.message ?: CommonErrorCode.ValidationDefault.description)
         } catch (e: Exception) {
             throw ApiException(
-                errorCode = CommonErrorCode.Validation,
-                message = e.message ?: CommonErrorCode.Validation.description,
+                errorCode = CommonErrorCode.ValidationDefault,
+                message = e.message ?: CommonErrorCode.ValidationDefault.description,
                 status = HttpStatusCode.BadRequest,
             )
         }

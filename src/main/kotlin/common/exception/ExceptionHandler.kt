@@ -51,8 +51,8 @@ fun Application.configureExceptionHandler() {
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
-                    code = CommonErrorCode.Validation.code,
-                    message = cause.message ?: CommonErrorCode.Validation.description,
+                    code = CommonErrorCode.ValidationDefault.code,
+                    message = cause.message ?: CommonErrorCode.ValidationDefault.description,
                     status = HttpStatusCode.BadRequest.value,
                 ),
             )

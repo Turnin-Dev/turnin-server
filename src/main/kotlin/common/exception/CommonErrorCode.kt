@@ -10,7 +10,7 @@ sealed class CommonErrorCode(
             ErrorCodes.Malformed.Request.description,
         )
 
-    data object Validation :
+    data object ValidationDefault :
         CommonErrorCode(
             ErrorCodes.Validation.Default.code,
             ErrorCodes.Validation.Default.description,

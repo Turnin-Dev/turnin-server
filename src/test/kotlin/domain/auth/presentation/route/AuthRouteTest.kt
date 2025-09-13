@@ -77,7 +77,7 @@ class AuthRouteTest {
 
         // then
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(responseBody.contains(CommonErrorCode.Validation.code))
+        assertTrue(responseBody.contains(CommonErrorCode.ValidationDefault.code))
     }
 
     @Test
@@ -211,7 +211,7 @@ class AuthRouteTest {
 
         // then
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(responseBody.contains(CommonErrorCode.Validation.code))
+        assertTrue(responseBody.contains(CommonErrorCode.ValidationDefault.code))
     }
 
     @Test
@@ -299,7 +299,7 @@ class AuthRouteTest {
 
         // then
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(responseBody.contains(CommonErrorCode.Validation.code))
+        assertTrue(responseBody.contains(CommonErrorCode.ValidationDefault.code))
     }
 
     @Test

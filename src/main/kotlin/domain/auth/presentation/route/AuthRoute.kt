@@ -104,7 +104,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             if (displayId.isNullOrBlank()) {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest),
+                    CommonErrorCode.ValidationDefault.toErrorResponse(HttpStatusCode.BadRequest),
                 )
                 return@get
             }
@@ -259,7 +259,7 @@ private fun RouteConfig.findUserDocs() {
                         .toErrorResponse(HttpStatusCode.BadRequest)
                 }
                 example("ValidationError") {
-                    value = CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest)
+                    value = CommonErrorCode.ValidationDefault.toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }
@@ -294,7 +294,7 @@ private fun RouteConfig.existsDisplayIdDocs() {
         code(HttpStatusCode.BadRequest) {
             body<ErrorResponse> {
                 example("ErrorResponse") {
-                    value = CommonErrorCode.Validation.toErrorResponse(HttpStatusCode.BadRequest)
+                    value = CommonErrorCode.ValidationDefault.toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
         }
