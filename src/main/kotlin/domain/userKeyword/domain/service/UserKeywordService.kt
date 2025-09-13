@@ -19,8 +19,8 @@ interface UserKeywordService {
     /**
      * 사용자별 키워드를 생성한다.
      *
-     * 키워드가 기존에 존재하는지 확인하고 존재한다면 해당 키워드의 ID를 사용하고
-     * 만약 없다면 새롭게 키워드를 등록한 후 등록한 키워드의 ID를 사용한다.
+     * 주어진 [keywordId]를 사용하여 사용자별 키워드를 생성한다.
+     * 키워드 존재 검증/생성은 Keyword 도메인(또는 상위 UseCase) 책임이다.
      *
      * @param keywordId 키워드 ID
      * @param userId 사용자 ID

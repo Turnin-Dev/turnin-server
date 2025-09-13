@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
+import com.auth0.jwt.exceptions.JWTDecodeException
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
@@ -110,6 +111,12 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
             .withIssuedAt(issuedAt)
             .withExpiresAt(expiresAt)
             .sign(algorithm)
+    }
+
+    override fun extractSubjectWithToken(token: String): String? = try {
+        JWT.decode(token).subject
+    } catch (e: JWTDecodeException) {
+        throw TokenException.CannotDecodedException(e)
     }
 
     private fun createRandomChecksum(): JWTChecksum {

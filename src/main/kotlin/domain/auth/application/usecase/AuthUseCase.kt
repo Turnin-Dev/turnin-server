@@ -29,13 +29,12 @@ interface AuthUseCase {
     /**
      * 리프레쉬 토큰 갱신
      *
-     * @param userId 사용자 ID
      * @param token 리프레쉬 토큰
      *
      * @return [JWTTokenDto] 정상적으로 리프레쉬 토큰이 갱신된 경우
      * (만약 리프레쉬 토큰 만료시 **`null`** 반환)
      */
-    suspend fun refresh(userId: Long, token: String): JWTTokenDto?
+    suspend fun refresh(token: String): JWTTokenDto?
 
     /**
      * 로그인을 수행하기 전에 이미 가입되어 있는 사용자인지 찾는다.

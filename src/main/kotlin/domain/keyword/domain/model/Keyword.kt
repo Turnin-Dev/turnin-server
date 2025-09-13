@@ -21,8 +21,8 @@ data class Keyword(
     val updatedAt: Long,
 ) {
     init {
-        validation(isValidKeywordLength(keyword)) { "키워드 길이 제한은 1~15자 이내입니다." }
         validation(isNotNullAndNotBlank(keyword)) { "키워드가 비어있습니다." }
+        validation(isValidKeywordLength(keyword)) { "키워드 길이 제한은 1~15자 이내입니다." }
     }
 
     companion object {

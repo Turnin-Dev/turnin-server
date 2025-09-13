@@ -2,8 +2,8 @@ package com.peekr.domain.keyword.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
+import com.peekr.common.jwt.JWTValidator.extractUserIdWithToken
 import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
 import com.peekr.domain.core.validator.inputValidationAndReturn
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
@@ -36,7 +36,7 @@ fun Route.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseCases) {
 
         post(route.ROUTE, {}) {
             val createKeywordRequest = call.receive<CreateKeywordRequest>()
-            val createById = UserId(createKeywordRequest.createdBy)
+            val createById = extractUserIdWithToken()
             val keywordResult = usecase.create(
                 keyword = createKeywordRequest.keyword,
                 createdBy = createById,

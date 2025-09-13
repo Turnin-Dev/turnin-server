@@ -6,9 +6,7 @@ import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.JWTValidator
-import com.peekr.common.jwt.JWTValidator.extractUserIdUseToken
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
-import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
@@ -20,6 +18,7 @@ import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import com.peekr.domain.auth.presentation.validation.validateDisplayId
+import com.peekr.domain.core.validator.inputValidationAndReturn
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -65,12 +64,10 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         }
 
         get(route.REFRESH, { refreshDocs() }) {
-            val refreshTokenParam = call.request.headers["Authorization"]
-                ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
+            val refreshTokenParam = call.request.headers["Authorization"].inputValidationAndReturn("인증 토큰")
             JWTValidator.validate(refreshTokenParam)
             val refreshToken = refreshTokenParam.removeBearerHeader()
-            val userId = extractUserIdUseToken()
-            val token = authUseCase.refresh(userId.value, refreshToken)
+            val token = authUseCase.refresh(refreshToken)
             if (token == null) {
                 call.respond(
                     HttpStatusCode.Unauthorized,

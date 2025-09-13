@@ -20,6 +20,8 @@ object JWTValidator {
     }
 
     /**
+     * ##### 해당 함수는 반드시 인증 요청에서만 사용해야 한다.
+     *
      * 사용자 ID와 JWT 토큰 내에 있는 사용자 ID를 비교하고 유효성 검사를 한다.
      *
      * 유효성 검사에 문제가 없다면 사용자 ID를 반환한다.
@@ -31,18 +33,20 @@ object JWTValidator {
      * @throws ValidatorException 사용자 ID가 올바른 형식이 아닌 경우 예외 발생
      */
     fun RoutingContext.verifyAuthUserId(userIdRequest: UserId) {
-        val authUserId = extractUserIdUseToken()
+        val authUserId = extractUserIdWithToken()
         if (authUserId.value != userIdRequest.value) {
             throw TokenException.UnauthorizedUserException()
         }
     }
 
     /**
+     * ##### 해당 함수는 반드시 인증 요청에서만 사용해야 한다.
+     *
      * 인증 토큰에서 사용자 ID를 추출한다.
      *
      * @param [UserId] 사용자 ID
      */
-    fun RoutingContext.extractUserIdUseToken(): UserId {
+    fun RoutingContext.extractUserIdWithToken(): UserId {
         val principal = call.principal<JWTPrincipal>() ?: throw TokenException.InvalidTokenException()
         val authUserIdParam = principal.payload.subject ?: throw TokenException.InvalidTokenException()
         return try {

@@ -9,7 +9,7 @@ import com.peekr.domain.userKeyword.domain.service.UserKeywordService
 /**
  * 사용자별 키워드를 업데이트한다.
  */
-class UpdateUserKeywordUseCasse(private val userKeywordService: UserKeywordService) {
+class UpdateUserKeywordUseCase(private val userKeywordService: UserKeywordService) {
     /**
      * @param ownerId 사용자 ID
      * @param userKeywordId [UserKeywordId] 사용자별 키워드 ID DTO

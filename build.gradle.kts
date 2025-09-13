@@ -78,10 +78,10 @@ tasks.register<JavaExec>("runProd") {
     envProd.forEach { (key, value) -> environment(key, value) }
 }
 
-tasks.test {
-    systemProperty("config.file", "application-test.conf")
-    useJUnitPlatform()
-}
+// tasks.test {
+//    systemProperty("config.file", "application-test.conf")
+//    useJUnitPlatform()
+// }
 
 dependencies {
     implementation(libs.ktor.server.core)

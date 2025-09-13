@@ -2,6 +2,7 @@ package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.application.dto.toDto
+import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.FindUserResultDto
@@ -16,6 +17,7 @@ import com.peekr.domain.auth.domain.service.RefreshTokenService
 class AuthUseCaseImpl(
     private val authService: AuthService,
     private val refreshTokenService: RefreshTokenService,
+    private val jwtTokenService: JWTTokenService,
 ) : AuthUseCase {
     override suspend fun login(loginDto: LoginDto): JWTTokenDto? {
         LOGGER.debug("login called: $loginDto")
@@ -42,7 +44,12 @@ class AuthUseCaseImpl(
         return jwtTokenDto
     }
 
-    override suspend fun refresh(userId: Long, token: String): JWTTokenDto? {
+    override suspend fun refresh(token: String): JWTTokenDto? {
+        val userId = jwtTokenService.extractSubjectWithToken(token)?.toLongOrNull()
+        if (userId == null) {
+            LOGGER.debug("refresh is Null, token: ${token.masking()}")
+            return null
+        }
         LOGGER.debug("refresh called, userId: $userId, token: ${token.masking()}")
         val newToken = authService.refresh(token)
         if (newToken == null) {

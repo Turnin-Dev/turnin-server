@@ -27,4 +27,13 @@ interface JWTTokenService {
      * @throws TokenException.CannotCreateTokenVerifier Token Verifier 를 생성하는 과정에서 예외 발생 시
      */
     fun createVerifier(type: JWTTokenType): JWTVerifier
+
+    /**
+     * JWT Token 에서 Token의 Subject를 추출한다.
+     *
+     * @param token JWT Token
+     *
+     * @return 토큰의 Subject
+     */
+    fun extractSubjectWithToken(token: String): String?
 }
