@@ -28,7 +28,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
         tags = setOf(route.TAG)
         description = "User Keyword API"
     }) {
-        get(route.ROUTE.byPathParam("userId"), { getUserKeywordByIdDocs() }) {
+        get(route.ROUTE.byPathParam("userId"), { getUserKeywordByUserIdDocs() }) {
             val userIdParam = call.pathParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
@@ -70,7 +70,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        delete(route.ROUTE, { }) {
+        delete(route.ROUTE, { deleteUserKeywordDocs() }) {
             val ownerIdParam = call.queryParameters["ownerId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("소유자 ID")
@@ -90,12 +90,12 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
     }
 }
 
-private fun RouteConfig.getUserKeywordByIdDocs() {
-    summary = "사용자 키워드 조회"
-    description = "사용자 키워드 ID로 사용자 키워드를 조회한다."
+private fun RouteConfig.getUserKeywordByUserIdDocs() {
+    summary = "사용자 키워드 목록 조회"
+    description = "사용자 ID로 사용자 키워드 목록을 조회한다."
     request {
-        pathParameter<Long>("UserKeywordId") {
-            description = "사용자 키워드 ID"
+        pathParameter<Long>("userId") {
+            description = "사용자 ID"
             example("Example") {
                 value = 1
             }
@@ -104,18 +104,9 @@ private fun RouteConfig.getUserKeywordByIdDocs() {
     response {
         code(HttpStatusCode.OK) {
             body<GetUserKeywordResponse> {
-                description = "사용자 키워드 응답 바디"
-                example("GetUserKeywordResponse") {
-                    value = GetUserKeywordResponse.sample
-                }
-            }
-        }
-        code(HttpStatusCode.OK) {
-            body<List<UserKeywordResponse>> {
-                description = "사용자 키워드가 존재하지 않는 경우"
-                example("Empty List") {
-                    value = emptyList<UserKeywordResponse>()
-                }
+                description = "사용자 키워드 목록"
+                example("NonEmpty") { value = GetUserKeywordResponse.sample }
+                example("Empty") { value = GetUserKeywordResponse.sample.copy(emptyList()) }
             }
         }
     }
@@ -133,9 +124,9 @@ private fun RouteConfig.createUserKeywordDocs() {
         }
     }
     response {
-        code(HttpStatusCode.OK) {
+        code(HttpStatusCode.Created) {
             body<UserKeywordResponse> {
-                description = "사용자 키워드 응답 바디"
+                description = "사용자 키워드 생성 응답 바디"
                 example("UserKeywordResponse") {
                     value = UserKeywordResponse.sample
                 }
@@ -148,13 +139,13 @@ private fun RouteConfig.patchUserKeywordDocs() {
     summary = "사용자 키워드 수정"
     description = "사용자 키워드를 수정한다."
     request {
-        queryParameter<String>("ownerId") {
+        queryParameter<Long>("ownerId") {
             description = "소유자(사용자) ID"
             example("ownerId") {
                 value = 1
             }
         }
-        queryParameter<String>("userKeywordId") {
+        queryParameter<Long>("userKeywordId") {
             description = "사용자 키워드 ID"
             example("userKeywordId") {
                 value = 1
@@ -169,14 +160,10 @@ private fun RouteConfig.patchUserKeywordDocs() {
     }
     response {
         code(HttpStatusCode.NoContent) {
-            body<Boolean> {
-                description = "사용자 키워드 수정 응답 결과 (성공)"
-            }
+            description = "사용자 키워드 수정 응답 결과 (성공)"
         }
         code(HttpStatusCode.NotFound) {
-            body<Unit> {
-                description = "사용자 키워드 수정 응답 결과 (실패)"
-            }
+            description = "사용자 키워드 수정 응답 결과 (실패)"
         }
     }
 }
@@ -185,13 +172,13 @@ private fun RouteConfig.deleteUserKeywordDocs() {
     summary = "사용자 키워드 삭제"
     description = "사용자 키워드를 삭제한다."
     request {
-        queryParameter<String>("ownerId") {
+        queryParameter<Long>("ownerId") {
             description = "소유자(사용자) ID"
             example("ownerId") {
                 value = 1
             }
         }
-        queryParameter<String>("userKeywordId") {
+        queryParameter<Long>("userKeywordId") {
             description = "사용자 키워드 ID"
             example("userKeywordId") {
                 value = 1
@@ -200,14 +187,10 @@ private fun RouteConfig.deleteUserKeywordDocs() {
     }
     response {
         code(HttpStatusCode.NoContent) {
-            body<Boolean> {
-                description = "사용자 키워드 삭제 응답 결과 (성공)"
-            }
+            description = "사용자 키워드 삭제 응답 결과 (성공)"
         }
         code(HttpStatusCode.NotFound) {
-            body<Unit> {
-                description = "사용자 키워드 삭제 응답 결과 (실패)"
-            }
+            description = "사용자 키워드 삭제 응답 결과 (실패)"
         }
     }
 }

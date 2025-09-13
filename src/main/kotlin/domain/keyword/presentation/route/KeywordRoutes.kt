@@ -2,7 +2,6 @@ package com.peekr.domain.keyword.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
-import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.validator.inputValidationAndReturn
@@ -10,7 +9,6 @@ import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.KeywordResponse
 import com.peekr.domain.keyword.presentation.dto.toResponse
-import com.peekr.domain.user.presentation.dto.UserResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -62,7 +60,7 @@ private fun RouteConfig.getKeywordByIdDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            body<UserResponse> {
+            body<KeywordResponse> {
                 description = "키워드"
                 example("KeywordResponse") {
                     value = KeywordResponse.sample
@@ -70,12 +68,7 @@ private fun RouteConfig.getKeywordByIdDocs() {
             }
         }
         code(HttpStatusCode.NotFound) {
-            body<ErrorResponse> {
-                description = "키워드가 존재하지 않는 경우"
-                example("NotFound") {
-                    value = 404
-                }
-            }
+            description = "키워드가 존재하지 않는 경우"
         }
     }
 }
@@ -93,7 +86,7 @@ private fun RouteConfig.createKeywordDocs() {
     }
     response {
         code(HttpStatusCode.Created) {
-            body<UserResponse> {
+            body<KeywordResponse> {
                 description = "키워드 생성 응답 바디"
                 example("KeywordResponse") {
                     value = KeywordResponse.sample

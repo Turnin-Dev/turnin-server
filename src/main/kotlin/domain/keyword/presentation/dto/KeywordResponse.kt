@@ -24,7 +24,7 @@ data class KeywordResponse(
         val sample = KeywordResponse(
             id = 1,
             keyword = "sample",
-            createdBy = System.currentTimeMillis(),
+            createdBy = 1,
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis(),
         )
