@@ -21,7 +21,17 @@ data class CreateUserKeywordRequest(
     val offsetX: Float,
     val offsetY: Float,
     val description: String?,
-)
+) {
+    companion object {
+        val sample = CreateUserKeywordRequest(
+            userId = 1,
+            keywordId = 1,
+            offsetX = 0f,
+            offsetY = 0f,
+            description = "샘플 키워드",
+        )
+    }
+}
 
 fun CreateUserKeywordRequest.toDto(): CreateUserKeywordDto = CreateUserKeywordDto(
     userId = UserId(this.userId),
