@@ -22,7 +22,7 @@ val authModule = module {
         )
     }
     single<RefreshTokenService> {
-        RefreshTokenServiceImpl(get(), get())
+        RefreshTokenServiceImpl(get())
     }
 
     // Repository
@@ -30,5 +30,5 @@ val authModule = module {
     single<RefreshTokenRepository> { RefreshTokenRepositoryImpl() }
 
     // UseCase
-    single<AuthUseCase> { AuthUseCaseImpl(get(), get()) }
+    single<AuthUseCase> { AuthUseCaseImpl(get(), get(), get()) }
 }

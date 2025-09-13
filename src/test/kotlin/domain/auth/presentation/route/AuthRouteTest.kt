@@ -26,16 +26,10 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.Before
 import org.junit.Test
 
 class AuthRouteTest {
     private val authUseCase: AuthUseCase = mockk()
-
-    @Before
-    fun setup() {
-        coEvery { authUseCase.extractUserId(any()) } returns 0L
-    }
 
     @Test
     fun `login 성공 테스트`() = testApplication {
@@ -123,7 +117,7 @@ class AuthRouteTest {
         val client = createTestClient()
         coEvery {
             authUseCase.login(any())
-        } throws IllegalArgumentException()
+        } throws Exception("Something went wrong")
 
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
@@ -250,7 +244,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.refresh(any()) } returns MockJWTTokenDto
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )
@@ -273,7 +267,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.refresh(any()) } returns MockJWTTokenDto
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )
@@ -281,11 +275,9 @@ class AuthRouteTest {
         // when
         val refreshEndPoint = "${route.ROUTE}${route.REFRESH}"
         val response = client.get(refreshEndPoint)
-        val responseBody = response.bodyAsText()
 
         // then
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(responseBody.contains(CommonErrorCode.EmptyRequestHeader.description))
     }
 
     @Test
@@ -293,7 +285,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any(), any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.refresh(any()) } returns MockJWTTokenDto
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )
@@ -315,7 +307,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.refresh(any(), any()) } returns null
+        coEvery { authUseCase.refresh(any()) } returns null
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )

@@ -4,9 +4,7 @@ import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
-import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
-import com.peekr.domain.auth.exception.AuthException
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.upsert
 
@@ -28,30 +26,15 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
     }
 
     override suspend fun save(userId: Long, token: String): Boolean = dbQuery {
-        try {
-            val userEntity = UserEntity.findById(userId)
-            if (userEntity == null) {
-                false
-            } else {
-                RefreshTokens.upsert {
-                    it[user] = userEntity.id
-                    it[refreshToken] = token
-                }
-                true
+        val userEntity = UserEntity.findById(userId)
+        if (userEntity == null) {
+            false
+        } else {
+            RefreshTokens.upsert {
+                it[user] = userEntity.id
+                it[refreshToken] = token
             }
-        } catch (e: java.sql.SQLException) {
-            // 23505: ANSI/PG에서 주로 사용되는 unique_violation
-            if (e.sqlState == "23505") {
-                LOGGER.warn("Unique violation while upserting RefreshTokens. userId=$userId", e)
-                throw AuthException.CannotSaveRefreshTokenException(e)
-            } else {
-                throw e
-            }
-        } catch (e: Exception) {
-            LOGGER.error(e, "Failed to save refresh token. userId=$userId, tokenLength=${token.length}")
-            throw e
+            true
         }
     }
 }
-
-private val LOGGER = AppLoggerFactory.createLogger("RefreshTokenRepositoryImpl")

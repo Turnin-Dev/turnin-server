@@ -22,6 +22,12 @@ sealed class CommonErrorCode(
             ErrorCodes.EmptyRequest.Header.description,
         )
 
+    data object EmptyRequestParam :
+        CommonErrorCode(
+            ErrorCodes.EmptyRequest.Parameter.code,
+            ErrorCodes.EmptyRequest.Parameter.description,
+        )
+
     object Unexpected : CommonErrorCode("UN001", "예상하지 못한 오류입니다.")
 }
 
@@ -30,7 +36,7 @@ private object ErrorCodes {
         val code: String,
         val description: String,
     ) {
-        Request("MAL001", "잘못된 형식의 요청 바디입니다."),
+        Request("MAL001", "잘못된 형식의 요청입니다."),
     }
 
     enum class Validation(
@@ -45,5 +51,6 @@ private object ErrorCodes {
         val description: String,
     ) {
         Header("EMP001", "요청 헤더 값이 비어있습니다."),
+        Parameter("EMP002", "요청 파라미터 값이 비어있습니다."),
     }
 }

@@ -113,14 +113,16 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
             .sign(algorithm)
     }
 
+    override fun extractSubjectWithToken(token: String, type: JWTTokenType): String? = try {
+        createVerifier(type)
+            .verify(token)
+            .subject
+    } catch (e: JWTDecodeException) {
+        throw TokenException.CannotDecodedException(e)
+    }
+
     private fun createRandomChecksum(): JWTChecksum {
         val randomValue = UUID.randomUUID().toString()
         return JWTChecksum("checksum", randomValue)
-    }
-
-    override fun extractUserId(token: String): Long? = try {
-        JWT.decode(token).subject.toLongOrNull()
-    } catch (e: JWTDecodeException) {
-        throw TokenException.CannotDecodedException(e)
     }
 }

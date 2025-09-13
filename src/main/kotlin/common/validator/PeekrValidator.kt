@@ -31,9 +31,9 @@ object PeekrValidator {
             throw ValidatorException(e.message ?: CommonErrorCode.Validation.description)
         } catch (e: Exception) {
             throw ApiException(
-                errorCode = CommonErrorCode.Unexpected,
-                message = e.message ?: CommonErrorCode.Unexpected.description,
-                status = HttpStatusCode.InternalServerError,
+                errorCode = CommonErrorCode.Validation,
+                message = e.message ?: CommonErrorCode.Validation.description,
+                status = HttpStatusCode.BadRequest,
             )
         }
     }

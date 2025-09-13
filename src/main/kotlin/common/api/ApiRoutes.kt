@@ -40,6 +40,11 @@ object Api {
             const val ROUTE = "/keyword"
             const val TAG = "Keyword"
         }
+
+        object UserKeyword {
+            const val ROUTE = "/user-keyword"
+            const val TAG = "UserKeyword"
+        }
     }
 
     /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */
