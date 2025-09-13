@@ -30,10 +30,10 @@ class KeywordRepositoryImplTest {
         val userId = insertUserAndReturnId()
 
         // when
-        val keyword = repository.create(KEYWORD, userId)
+        val keyword = repository.create(TEST_KEYWORD, userId)
 
         // then
-        assertEquals(keyword.keyword, KEYWORD)
+        assertEquals(keyword.keyword, TEST_KEYWORD)
         assertEquals(keyword.createdBy, userId)
     }
 
@@ -47,7 +47,7 @@ class KeywordRepositoryImplTest {
         // 키워드 테이블의 필드인 키워드 길이 제약이 설정되어있기 때문에
         // Keyword 객체로 만들어지기 이전에 exposed 내부에서 예외를 발생시킨다.
         assertThrows<IllegalArgumentException> {
-            repository.create(INVALID_KEYWORD, userId)
+            repository.create(INVALID_TEST_KEYWORD, userId)
         }
     }
 
@@ -55,7 +55,7 @@ class KeywordRepositoryImplTest {
     fun `findById 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val savedKeyword = repository.create(KEYWORD, userId)
+        val savedKeyword = repository.create(TEST_KEYWORD, userId)
 
         // when
         val keyword = repository.findById(savedKeyword.id)
@@ -94,7 +94,7 @@ class KeywordRepositoryImplTest {
     }
 
     companion object {
-        private val INVALID_KEYWORD = "keyword".repeat(1000)
-        private const val KEYWORD = "keyword"
+        private val INVALID_TEST_KEYWORD = "keyword".repeat(1000)
+        private const val TEST_KEYWORD = "keyword"
     }
 }
