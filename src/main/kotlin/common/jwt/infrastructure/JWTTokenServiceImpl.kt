@@ -113,8 +113,10 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
             .sign(algorithm)
     }
 
-    override fun extractSubjectWithToken(token: String): String? = try {
-        JWT.decode(token).subject
+    override fun extractSubjectWithToken(token: String, type: JWTTokenType): String? = try {
+        createVerifier(type)
+            .verify(token)
+            .subject
     } catch (e: JWTDecodeException) {
         throw TokenException.CannotDecodedException(e)
     }

@@ -1,6 +1,7 @@
 package com.peekr.util
 
 import com.peekr.common.exception.configureExceptionHandler
+import com.peekr.common.plugin.AuthenticatedRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -23,6 +24,7 @@ fun ApplicationTestBuilder.testPlugin(
     module: Module? = null,
     plugin: Application.() -> Unit = {},
     routing: Routing.() -> Unit = {},
+    authRouting: AuthenticatedRoute.() -> Unit = {},
     routingApplicationScope: Application.() -> Unit = {},
 ) {
     application {

@@ -26,7 +26,7 @@ class UserRoutesTest {
         coEvery { userUseCase.getUserById(any()) } returns MockUserDto
 
         testPlugin(
-            routing = { userRoutes(route, userUseCase) },
+            authRouting = { userRoutes(route, userUseCase) },
         )
 
         // when
@@ -48,14 +48,13 @@ class UserRoutesTest {
         coEvery { userUseCase.getUserById(any()) } returns MockUserDto
 
         testPlugin(
-            routing = { userRoutes(route, userUseCase) },
+            authRouting = { userRoutes(route, userUseCase) },
         )
 
         invalidUserIds.forEach { invalidUserId ->
             // when
             val getUserEndPoint = "${route.ROUTE}/$invalidUserId"
             val response = client.get(getUserEndPoint)
-            val responseBody = response.bodyAsText()
 
             // then
             assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -69,7 +68,7 @@ class UserRoutesTest {
         coEvery { userUseCase.getUserById(any()) } returns null
 
         testPlugin(
-            routing = { userRoutes(route, userUseCase) },
+            authRouting = { userRoutes(route, userUseCase) },
         )
 
         // when

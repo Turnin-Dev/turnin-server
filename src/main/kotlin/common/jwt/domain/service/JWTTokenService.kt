@@ -29,11 +29,12 @@ interface JWTTokenService {
     fun createVerifier(type: JWTTokenType): JWTVerifier
 
     /**
-     * JWT Token 에서 Token의 Subject를 추출한다.
+     * JWT Token 타입에 맞게 토큰에서 Subject를 추출한다.
      *
      * @param token JWT Token
+     * @param type JWT Token 타입
      *
      * @return 토큰의 Subject
      */
-    fun extractSubjectWithToken(token: String): String?
+    fun extractSubjectWithToken(token: String, type: JWTTokenType): String?
 }

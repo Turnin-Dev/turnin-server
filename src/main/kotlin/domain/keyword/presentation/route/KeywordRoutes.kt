@@ -2,7 +2,7 @@ package com.peekr.domain.keyword.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.api.Api.byPathParam
-import com.peekr.common.jwt.JWTValidator.extractUserIdWithToken
+import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.validator.inputValidationAndReturn
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
@@ -14,9 +14,8 @@ import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
 
-fun Route.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseCases) {
+fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseCases) {
     route({
         tags = setOf(route.TAG)
         description = "Keyword API"

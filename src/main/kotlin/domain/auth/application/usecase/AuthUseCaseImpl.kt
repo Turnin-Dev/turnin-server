@@ -2,6 +2,7 @@ package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.application.dto.toDto
+import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.masking
@@ -45,7 +46,7 @@ class AuthUseCaseImpl(
     }
 
     override suspend fun refresh(token: String): JWTTokenDto? {
-        val userId = jwtTokenService.extractSubjectWithToken(token)?.toLongOrNull()
+        val userId = jwtTokenService.extractSubjectWithToken(token, JWTTokenType.Refresh)?.toLongOrNull()
         if (userId == null) {
             LOGGER.debug("refresh is Null, token: ${token.masking()}")
             return null

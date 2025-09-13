@@ -15,7 +15,6 @@ import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
 import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.server.application.Application
-import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.routing
 import org.koin.ktor.ext.inject
@@ -35,7 +34,7 @@ fun Application.configureRouting() {
             route(Api.V1.ROUTE, { description = "Peekr API V1" }) {
                 authRoutes(route = Api.V1.Auth, authUseCase = authUseCase)
                 fileRoutes(route = Api.V1.File, fileUseCase = fileUseCase)
-                authenticate {
+                authenticatedRoute {
                     userRoutes(route = Api.V1.User, userUseCase = userUseCase)
                     keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
                     userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)

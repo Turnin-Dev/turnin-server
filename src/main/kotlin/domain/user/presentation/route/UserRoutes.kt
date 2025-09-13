@@ -5,6 +5,7 @@ import com.peekr.common.api.Api.byPathParam
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
+import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.application.usecase.UserUseCase
@@ -16,10 +17,9 @@ import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
 
 // ------------------------------ Route ------------------------------
-fun Route.userRoutes(route: Api.V1.User, userUseCase: UserUseCase) {
+fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCase: UserUseCase) {
     route({
         tags = setOf(route.TAG)
         description = "User API"
