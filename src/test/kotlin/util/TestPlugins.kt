@@ -36,6 +36,9 @@ fun ApplicationTestBuilder.testPlugin(
         plugin()
         routing {
             routing()
+            with(AuthenticatedRoute(this)) {
+                authRouting()
+            }
         }
         routingApplicationScope()
     }
