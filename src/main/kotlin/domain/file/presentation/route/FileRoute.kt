@@ -1,9 +1,9 @@
 package com.peekr.domain.file.presentation.route
 
-import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
+import com.peekr.common.route.Api
 import com.peekr.domain.file.application.usecase.FileUseCase
 import com.peekr.domain.file.presentation.dto.UploadFileResponse
 import com.peekr.domain.file.presentation.dto.toResponse

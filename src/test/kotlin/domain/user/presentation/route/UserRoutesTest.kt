@@ -1,7 +1,7 @@
 package com.peekr.domain.user.presentation.route
 
-import com.peekr.common.api.Api
 import com.peekr.common.jwt.JWTTestDoubles
+import com.peekr.common.route.Api
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.UserTestDoubles.MockUserDto
 import com.peekr.domain.user.application.usecase.UserUseCase

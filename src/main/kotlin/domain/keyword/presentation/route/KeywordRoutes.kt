@@ -1,8 +1,8 @@
 package com.peekr.domain.keyword.presentation.route
 
-import com.peekr.common.api.Api
-import com.peekr.common.api.Api.byPathParam
 import com.peekr.common.plugin.AuthenticatedRoute
+import com.peekr.common.route.Api
+import com.peekr.common.route.Api.byPathParam
 import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.validator.inputValidationAndReturn
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases

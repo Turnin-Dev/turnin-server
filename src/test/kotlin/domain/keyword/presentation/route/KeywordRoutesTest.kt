@@ -1,9 +1,9 @@
 package com.peekr.domain.keyword.presentation.route
 
-import com.peekr.common.api.Api
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.jwt.JWTTestDoubles
+import com.peekr.common.route.Api
 import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.application.dto.KeywordDto

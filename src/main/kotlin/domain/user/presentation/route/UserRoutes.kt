@@ -1,11 +1,11 @@
 package com.peekr.domain.user.presentation.route
 
-import com.peekr.common.api.Api
-import com.peekr.common.api.Api.byPathParam
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.plugin.AuthenticatedRoute
+import com.peekr.common.route.Api
+import com.peekr.common.route.Api.byPathParam
 import com.peekr.common.validator.ValidatorException
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.application.usecase.UserUseCase

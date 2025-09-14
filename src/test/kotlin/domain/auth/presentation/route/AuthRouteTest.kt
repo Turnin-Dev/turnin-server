@@ -1,8 +1,8 @@
 package com.peekr.domain.auth.presentation.route
 
-import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
+import com.peekr.common.route.Api
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto

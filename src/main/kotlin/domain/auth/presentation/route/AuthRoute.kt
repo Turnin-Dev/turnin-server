@@ -1,12 +1,12 @@
 package com.peekr.domain.auth.presentation.route
 
-import com.peekr.common.api.Api
-import com.peekr.common.api.Api.byPathParam
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.JWTValidator
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
+import com.peekr.common.route.Api
+import com.peekr.common.route.Api.byPathParam
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
