@@ -1,6 +1,5 @@
 package com.peekr.domain.keyword.application.usecase
 
-import com.peekr.common.db.schema.Keywords.keyword
 import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.keyword.application.dto.toDto

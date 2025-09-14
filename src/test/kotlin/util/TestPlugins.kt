@@ -1,10 +1,17 @@
 package com.peekr.util
 
 import com.peekr.common.exception.configureExceptionHandler
+import com.peekr.common.jwt.JWTTestDoubles
+import com.peekr.common.jwt.domain.model.JWTClaimName
+import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.plugin.AuthenticatedRoute
+import com.peekr.common.plugin.authenticatedRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.authentication
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.routing
@@ -33,14 +40,40 @@ fun ApplicationTestBuilder.testPlugin(
         }
         testContentNegotiation()
         testExceptionHandler()
+        testJwtSecurity()
         plugin()
         routing {
             routing()
-            with(AuthenticatedRoute(this)) {
+            authenticatedRoute {
                 authRouting()
             }
         }
         routingApplicationScope()
+    }
+}
+
+private fun Application.testJwtSecurity() {
+    val testVerifier = JWTTestDoubles.MockVerifier
+    val testRealm = JWTTestDoubles.REALM
+    val testAudience = JWTTestDoubles.AUDIENCE
+
+    authentication {
+        jwt {
+            verifier(testVerifier)
+            realm = testRealm
+            validate { credential ->
+                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
+                val hasAudience = credential.payload.audience.contains(testAudience)
+                if (displayIdClaim?.isNotEmpty() == true && hasAudience) {
+                    JWTPrincipal(credential.payload)
+                } else {
+                    null
+                }
+            }
+            challenge { e1, e2 ->
+                throw TokenException.InvalidTokenException()
+            }
+        }
     }
 }
 
