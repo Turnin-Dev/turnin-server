@@ -3,6 +3,7 @@ package com.peekr.domain.auth.domain.repository
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.UserId
 
 interface AuthRepository {
     /**
@@ -25,7 +26,7 @@ interface AuthRepository {
      *
      * @return [AuthUser] - 사용자를 찾을 수 없으면 **`null`** 반환
      */
-    suspend fun findUserByUserId(userId: Long): AuthUser?
+    suspend fun findUserByUserId(userId: UserId): AuthUser?
 
     /**
      * 사용자 표시 ID 존재 여부를 확인한다.
@@ -54,5 +55,5 @@ interface AuthRepository {
      *
      * @param userId 사용자 ID
      */
-    suspend fun updateLastLoginAt(userId: Long)
+    suspend fun updateLastLoginAt(userId: UserId)
 }

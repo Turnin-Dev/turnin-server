@@ -8,10 +8,11 @@ import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
+import com.peekr.domain.core.model.UserId
 
-object AuthTestDoubles {
+internal object AuthTestDoubles {
     val MockAuthUser = AuthUser(
-        id = 0L,
+        userId = UserId(1L),
         role = RoleForAuth.USER,
         provider = SocialLoginProviderForAuth.GOOGLE,
         providerId = "providerIDDDDD",

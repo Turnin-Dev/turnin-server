@@ -35,14 +35,14 @@ class AuthServiceImpl(
         }
 
         val payload = JWTTokenPayload(
-            userId = authUser.id.toString(),
+            userId = authUser.userId.value.toString(),
             claimName = JWTClaimName.DISPLAY_ID,
             claim = authUser.displayId,
         )
         val jwtToken = jwtTokenService.generate(payload)
         val loginResult = LoginResult(jwtToken, authUser)
 
-        authRepository.updateLastLoginAt(authUser.id)
+        authRepository.updateLastLoginAt(authUser.userId)
 
         LOGGER.debug("login service successful")
         return loginResult
@@ -53,7 +53,7 @@ class AuthServiceImpl(
         val savedAuthUser = authRepository.save(register)
 
         val payload = JWTTokenPayload(
-            userId = savedAuthUser.id.toString(),
+            userId = savedAuthUser.userId.value.toString(),
             claimName = JWTClaimName.DISPLAY_ID,
             claim = savedAuthUser.displayId,
         )
@@ -80,10 +80,10 @@ class AuthServiceImpl(
 
         if (userId != null &&
             authUser != null &&
-            userId == authUser.id
+            userId == authUser.userId
         ) {
             val payload = JWTTokenPayload(
-                userId = authUser.id.toString(),
+                userId = authUser.userId.toString(),
                 claimName = JWTClaimName.DISPLAY_ID,
                 claim = authUser.displayId,
             )

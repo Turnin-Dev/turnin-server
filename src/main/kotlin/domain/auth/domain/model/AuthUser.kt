@@ -1,11 +1,12 @@
 package com.peekr.domain.auth.domain.model
 
+import com.peekr.domain.core.model.UserId
 import java.time.Instant
 
 /**
  * 인증에 필요한 User 모델
  *
- * @param id 사용자 ID
+ * @param userId 사용자 ID
  * @param role 사용자 역할
  * @param provider 소셜로그인 플랫폼
  * @param providerId 소셜로그인 ID
@@ -17,7 +18,7 @@ import java.time.Instant
  * @param lastLoginAt 마지막 로그인 일시
  */
 data class AuthUser(
-    val id: Long,
+    val userId: UserId,
     val role: RoleForAuth,
     val provider: SocialLoginProviderForAuth,
     val providerId: String,
@@ -30,7 +31,7 @@ data class AuthUser(
 ) {
     companion object {
         val sample: AuthUser = AuthUser(
-            id = 1L,
+            userId = UserId(1L),
             role = RoleForAuth.USER,
             provider = SocialLoginProviderForAuth.GOOGLE,
             providerId = "123123123",

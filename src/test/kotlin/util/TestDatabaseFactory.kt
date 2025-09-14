@@ -8,6 +8,7 @@ import com.peekr.common.db.schema.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -20,12 +21,19 @@ object TestDatabaseFactory {
         )
         // 실제 테이블 모델 그대로 사용
         transaction {
-            SchemaUtils.drop(RefreshTokens)
-            SchemaUtils.drop(Users)
             SchemaUtils.create(Users)
             SchemaUtils.create(RefreshTokens)
             SchemaUtils.create(Keywords)
             SchemaUtils.create(UserKeywords)
+        }
+    }
+
+    fun cleanUp() {
+        transaction {
+            Users.deleteAll()
+            RefreshTokens.deleteAll()
+            Keywords.deleteAll()
+            UserKeywords.deleteAll()
         }
     }
 

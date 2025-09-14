@@ -55,7 +55,7 @@ class AuthServiceImplTest {
             authRepository.findAuthUserByProviderAndProviderId(any(), any())
         } returns MockAuthUser
 
-        coEvery { authRepository.updateLastLoginAt(any()) } just Runs
+        coEvery { authRepository.updateLastLoginAt(MockAuthUser.userId) } just Runs
 
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()
 
@@ -123,9 +123,9 @@ class AuthServiceImplTest {
         // given
         coEvery {
             refreshTokenRepository.findUserIdByRefreshToken(any())
-        } returns MockAuthUser.id
+        } returns MockAuthUser.userId
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } returns MockAuthUser
 
         // when
@@ -144,7 +144,7 @@ class AuthServiceImplTest {
             refreshTokenRepository.findUserIdByRefreshToken(any())
         } returns null
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } returns MockAuthUser
 
         // when
@@ -159,9 +159,9 @@ class AuthServiceImplTest {
         // given
         coEvery {
             refreshTokenRepository.findUserIdByRefreshToken(any())
-        } returns MockAuthUser.id
+        } returns MockAuthUser.userId
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } returns null
 
         // when
@@ -177,9 +177,9 @@ class AuthServiceImplTest {
         val expectedException = NullPointerException()
         coEvery {
             refreshTokenRepository.findUserIdByRefreshToken(any())
-        } returns MockAuthUser.id
+        } returns MockAuthUser.userId
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } throws expectedException
 
         // when

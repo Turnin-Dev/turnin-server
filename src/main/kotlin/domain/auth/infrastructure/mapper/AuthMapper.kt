@@ -6,12 +6,13 @@ import com.peekr.common.db.schema.Users
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.UserId
 import org.jetbrains.exposed.sql.ResultRow
 
 object AuthMapper {
     fun toDomain(row: ResultRow): AuthUser =
         AuthUser(
-            id = row[Users.id].value,
+            userId = UserId(row[Users.id].value),
             role = row[Users.role].toRoleForAuth(),
             provider = row[Users.provider].toSocialLoginProviderForAuth(),
             providerId = row[Users.providerId],

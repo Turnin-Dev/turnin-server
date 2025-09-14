@@ -14,6 +14,7 @@ import com.peekr.domain.auth.application.mapper.AuthMapper.toDto
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.service.AuthService
 import com.peekr.domain.auth.domain.service.RefreshTokenService
+import com.peekr.domain.core.model.UserId
 
 class AuthUseCaseImpl(
     private val authService: AuthService,
@@ -29,7 +30,7 @@ class AuthUseCaseImpl(
             )
             return null
         }
-        saveRefreshToken(loginResult.authUser.id, loginResult.jwtToken.refreshToken)
+        saveRefreshToken(loginResult.authUser.userId, loginResult.jwtToken.refreshToken)
         LOGGER.debug("login successful")
         return loginResult.jwtToken.toDto()
     }
@@ -40,17 +41,18 @@ class AuthUseCaseImpl(
         val registerResult = authService.register(authUser)
         val savedAuthUser = registerResult.authUser
         val jwtTokenDto = registerResult.jwtToken.toDto()
-        saveRefreshToken(savedAuthUser.id, jwtTokenDto.refreshToken)
+        saveRefreshToken(savedAuthUser.userId, jwtTokenDto.refreshToken)
         LOGGER.debug("register successful, username: ${savedAuthUser.name}")
         return jwtTokenDto
     }
 
     override suspend fun refresh(token: String): JWTTokenDto? {
-        val userId = jwtTokenService.extractSubjectWithToken(token, JWTTokenType.Refresh)?.toLongOrNull()
-        if (userId == null) {
+        val subject = jwtTokenService.extractSubjectWithToken(token, JWTTokenType.Refresh)?.toLongOrNull()
+        if (subject == null) {
             LOGGER.debug("refresh is Null, token: ${token.masking()}")
             return null
         }
+        val userId = UserId(subject)
         LOGGER.debug("refresh called, userId: $userId, token: ${token.masking()}")
         val newToken = authService.refresh(token)
         if (newToken == null) {
@@ -74,7 +76,7 @@ class AuthUseCaseImpl(
     override suspend fun existsDisplayId(displayId: String): Boolean =
         authService.existsDisplayId(displayId)
 
-    private suspend fun saveRefreshToken(userId: Long, token: String) {
+    private suspend fun saveRefreshToken(userId: UserId, token: String) {
         refreshTokenService.save(userId, token)
     }
 }

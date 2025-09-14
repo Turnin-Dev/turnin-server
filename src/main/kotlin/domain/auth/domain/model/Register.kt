@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.domain.model
 
+import com.peekr.domain.core.model.UserId
 import java.time.Instant
 
 /**
@@ -27,7 +28,7 @@ fun Register.toAuthUser(
     isActive: Boolean,
     lastLoginAt: Instant?,
 ): AuthUser = AuthUser(
-    id = id,
+    userId = UserId(id),
     role = role,
     provider = provider,
     providerId = providerId,
