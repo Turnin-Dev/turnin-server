@@ -1,7 +1,9 @@
 package com.peekr.util
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.RefreshTokens
+import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
@@ -22,6 +24,8 @@ object TestDatabaseFactory {
             SchemaUtils.drop(Users)
             SchemaUtils.create(Users)
             SchemaUtils.create(RefreshTokens)
+            SchemaUtils.create(Keywords)
+            SchemaUtils.create(UserKeywords)
         }
     }
 

@@ -41,6 +41,9 @@ internal object JWTTestDoubles {
     fun getMockJWTToken(
         payload: JWTTokenPayload = getJWTTokenPayload(),
     ): JWTToken = generateTestToken(payload)
+
+    fun getMockJWTToken(subject: String): JWTToken =
+        generateTestToken(getJWTTokenPayload(subject))
 }
 
 private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
