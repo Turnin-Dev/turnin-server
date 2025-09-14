@@ -85,7 +85,6 @@ class KeywordRoutesTest {
             contentType(ContentType.Application.Json)
             setBody(TestKeywordResponse)
         }
-        val responseBody = response.bodyAsText()
 
         // then
         coVerify(exactly = 1) { keywordUseCases.get(TestKeywordId) }
