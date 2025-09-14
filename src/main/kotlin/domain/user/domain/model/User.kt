@@ -1,5 +1,6 @@
 package com.peekr.domain.user.domain.model
 
+import com.peekr.domain.core.model.UserId
 import java.time.Instant
 
 /**
@@ -17,7 +18,7 @@ import java.time.Instant
  * @param lastLoginAt 마지막 로그인 일시
  */
 data class User(
-    val id: Long,
+    val id: UserId,
     val role: RoleForUser,
     val provider: SocialLoginProviderForUser,
     val providerId: String,

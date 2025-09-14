@@ -2,6 +2,7 @@ package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.api.Api
 import com.peekr.common.jwt.JWTTestDoubles
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.UserTestDoubles.MockUserDto
 import com.peekr.domain.user.application.usecase.UserUseCase
 import com.peekr.util.TestClientFactory.createTestClient
@@ -27,14 +28,15 @@ class UserRoutesTest {
         // given
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken("1")
-        coEvery { userUseCase.getUserById(any()) } returns MockUserDto
+        val userId = UserId(1L)
+        coEvery { userUseCase.getUserById(userId) } returns MockUserDto
 
         testPlugin(
             authRouting = { userRoutes(route, userUseCase) },
         )
 
         // when
-        val getUserEndPoint = "${route.ROUTE}/1"
+        val getUserEndPoint = "${route.ROUTE}/${userId.value}"
         val response = client.get(getUserEndPoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
         }
@@ -52,7 +54,7 @@ class UserRoutesTest {
         // given
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken("1")
-        coEvery { userUseCase.getUserById(any()) } returns MockUserDto
+        coEvery { userUseCase.getUserById(UserId(1L)) } returns MockUserDto
 
         testPlugin(
             authRouting = { userRoutes(route, userUseCase) },
@@ -75,14 +77,15 @@ class UserRoutesTest {
         // given
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken("1")
-        coEvery { userUseCase.getUserById(any()) } returns null
+        val userId = UserId(1L)
+        coEvery { userUseCase.getUserById(userId) } returns null
 
         testPlugin(
             authRouting = { userRoutes(route, userUseCase) },
         )
 
         // when
-        val getUserEndPoint = "${route.ROUTE}/1"
+        val getUserEndPoint = "${route.ROUTE}/${userId.value}"
         val response = client.get(getUserEndPoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
         }

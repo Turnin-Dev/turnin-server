@@ -28,7 +28,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCase: UserUseCase) 
             val userIdParam = call.pathParameters["id"]?.toLongOrNull()
                 ?: throw ValidatorException(CommonErrorCode.MalformedRequest.description)
             val userId = UserId(userIdParam)
-            val user = userUseCase.getUserById(userId.value)
+            val user = userUseCase.getUserById(userId)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {

@@ -1,5 +1,6 @@
 package com.peekr.domain.user.domain.service
 
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.domain.model.User
 
 interface UserService {
@@ -10,5 +11,5 @@ interface UserService {
      *
      * @return [User] - 사용자가 존재하지 않을 때는 **`null`** 반환
      */
-    suspend fun getUserById(id: Long): User?
+    suspend fun getUserById(id: UserId): User?
 }
