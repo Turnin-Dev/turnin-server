@@ -1,7 +1,6 @@
 package com.peekr.domain.userKeyword.application.usecase
 
 import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.KeywordId.Companion.invoke
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.core.model.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
