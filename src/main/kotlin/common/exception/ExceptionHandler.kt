@@ -96,7 +96,7 @@ private fun warnLogging(cause: ApiException) {
             "code=${cause.errorCode.code}, " +
             "status=${cause.status.value}, " +
             "message=${cause.message}",
-        cause.cause,
+        cause,
     )
 }
 
@@ -104,7 +104,7 @@ private fun warnLogging(tag: String, cause: Throwable) {
     LOGGER.warn(
         "[$tag] " +
             "message=${cause.message}",
-        cause.cause,
+        cause,
     )
 }
 
