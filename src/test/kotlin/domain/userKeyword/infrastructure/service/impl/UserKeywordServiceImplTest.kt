@@ -1,6 +1,5 @@
 package com.peekr.domain.userKeyword.infrastructure.service.impl
 
-import com.peekr.common.db.schema.UserKeywords.offsetX
 import com.peekr.domain.core.model.KeywordId
 import com.peekr.domain.core.model.UserId
 import com.peekr.domain.core.model.UserKeywordId
@@ -24,7 +23,7 @@ class UserKeywordServiceImplTest {
     }
 
     @Test
-    fun `키워드 조회 성공 테스트`() = runTest {
+    fun `사용자 키워드 조회 성공 테스트`() = runTest {
         // given
         val itemCount = 2
         coEvery {
@@ -39,7 +38,7 @@ class UserKeywordServiceImplTest {
     }
 
     @Test
-    fun `키워드 생성 성공 테스트`() = runTest {
+    fun `사용자 키워드 생성 성공 테스트`() = runTest {
         // given
         coEvery {
             userKeywordRepository.create(
@@ -65,7 +64,7 @@ class UserKeywordServiceImplTest {
     }
 
     @Test
-    fun `키워드 수정 성공 테스트`() = runTest {
+    fun `사용자 키워드 수정 성공 테스트`() = runTest {
         // given
         coEvery {
             userKeywordRepository.update(
@@ -87,7 +86,7 @@ class UserKeywordServiceImplTest {
     }
 
     @Test
-    fun `키워드 삭제 성공 테스트`() = runTest {
+    fun `사용자 키워드 삭제 성공 테스트`() = runTest {
         // given
         coEvery {
             userKeywordRepository.delete(
