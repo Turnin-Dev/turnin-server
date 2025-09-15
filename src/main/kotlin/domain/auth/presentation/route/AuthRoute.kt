@@ -18,6 +18,7 @@ import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
 import com.peekr.domain.auth.presentation.validation.validateDisplayId
+import com.peekr.domain.core.model.DisplayId
 import com.peekr.domain.core.validator.inputValidationAndReturn
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
@@ -51,7 +52,8 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         post(route.REGISTER, { registerDocs() }) {
             val request = call.receive<RegisterRequest>()
             request.validate()
-            val existsByDisplayId = authUseCase.existsDisplayId(request.displayId)
+            val displayId = DisplayId(request.displayId)
+            val existsByDisplayId = authUseCase.existsDisplayId(displayId)
             if (!existsByDisplayId) {
                 val token = authUseCase.register(request.toDto())
                 call.respond(HttpStatusCode.Created, token.toResponse())
@@ -99,9 +101,9 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         }
 
         get(route.EXISTS_DISPLAY_ID.byPathParam("displayId"), { existsDisplayIdDocs() }) {
-            val displayId = call.request.pathVariables["displayId"]
-            displayId?.validateDisplayId()
-            if (displayId.isNullOrBlank()) {
+            val displayIdParam = call.request.pathVariables["displayId"]
+            displayIdParam?.validateDisplayId()
+            if (displayIdParam.isNullOrBlank()) {
                 call.respond(
                     HttpStatusCode.BadRequest,
                     CommonErrorCode.ValidationDefault.toErrorResponse(HttpStatusCode.BadRequest),
@@ -109,7 +111,8 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
                 return@get
             }
 
-            val existsDisplayId = authUseCase.existsDisplayId(displayId.trim())
+            val displayId = DisplayId(displayIdParam.trim())
+            val existsDisplayId = authUseCase.existsDisplayId(displayId)
             call.respond(
                 HttpStatusCode.OK,
                 ExistsResultResponse(exists = existsDisplayId),

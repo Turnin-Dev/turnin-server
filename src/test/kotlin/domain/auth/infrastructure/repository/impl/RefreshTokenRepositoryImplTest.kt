@@ -39,8 +39,8 @@ class RefreshTokenRepositoryImplTest {
                 this.role = MockUser.role.toRole()
                 this.provider = MockUser.provider.toSocialLoginProvider()
                 this.providerId = MockUser.providerId
-                this.displayId = MockUser.displayId
-                this.name = MockUser.name
+                this.displayId = MockUser.displayId.value
+                this.name = MockUser.name.value
                 this.profileImageUrl = MockUser.profileImageUrl
                 this.introduce = MockUser.introduce
             }
@@ -83,8 +83,8 @@ class RefreshTokenRepositoryImplTest {
                 this.role = MockUser.role.toRole()
                 this.provider = MockUser.provider.toSocialLoginProvider()
                 this.providerId = MockUser.providerId
-                this.displayId = MockUser.displayId
-                this.name = MockUser.name
+                this.displayId = MockUser.displayId.value
+                this.name = MockUser.name.value
                 this.profileImageUrl = MockUser.profileImageUrl
                 this.introduce = MockUser.introduce
             }

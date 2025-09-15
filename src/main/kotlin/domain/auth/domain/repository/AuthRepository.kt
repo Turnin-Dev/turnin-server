@@ -3,6 +3,7 @@ package com.peekr.domain.auth.domain.repository
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.DisplayId
 import com.peekr.domain.core.model.UserId
 
 interface AuthRepository {
@@ -37,7 +38,7 @@ interface AuthRepository {
      *
      * @return [Boolean] - 사용자를 찾았다면 `true`, 찾지 못했다면 `false`
      */
-    suspend fun existsByDisplayId(displayId: String): Boolean
+    suspend fun existsByDisplayId(displayId: DisplayId): Boolean
 
     /**
      * [Register]로 회원가입(저장)을 한다.

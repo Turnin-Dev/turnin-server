@@ -14,6 +14,7 @@ import com.peekr.domain.auth.application.mapper.AuthMapper.toDto
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.service.AuthService
 import com.peekr.domain.auth.domain.service.RefreshTokenService
+import com.peekr.domain.core.model.DisplayId
 import com.peekr.domain.core.model.UserId
 
 class AuthUseCaseImpl(
@@ -73,7 +74,7 @@ class AuthUseCaseImpl(
         return findUserResult.toDto()
     }
 
-    override suspend fun existsDisplayId(displayId: String): Boolean =
+    override suspend fun existsDisplayId(displayId: DisplayId): Boolean =
         authService.existsDisplayId(displayId)
 
     private suspend fun saveRefreshToken(userId: UserId, token: String) {

@@ -17,6 +17,7 @@ import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.domain.service.AuthService
+import com.peekr.domain.core.model.DisplayId
 
 class AuthServiceImpl(
     private val authRepository: AuthRepository,
@@ -37,7 +38,7 @@ class AuthServiceImpl(
         val payload = JWTTokenPayload(
             userId = authUser.userId.value.toString(),
             claimName = JWTClaimName.DISPLAY_ID,
-            claim = authUser.displayId,
+            claim = authUser.displayId.value,
         )
         val jwtToken = jwtTokenService.generate(payload)
         val loginResult = LoginResult(jwtToken, authUser)
@@ -49,13 +50,13 @@ class AuthServiceImpl(
     }
 
     override suspend fun register(register: Register): RegisterResult {
-        LOGGER.debug("register service attempt, displayId: ${register.displayId.masking()}")
+        LOGGER.debug("register service attempt, displayId: ${register.displayId.value.masking()}")
         val savedAuthUser = authRepository.save(register)
 
         val payload = JWTTokenPayload(
             userId = savedAuthUser.userId.value.toString(),
             claimName = JWTClaimName.DISPLAY_ID,
-            claim = savedAuthUser.displayId,
+            claim = savedAuthUser.displayId.value,
         )
 
         val jwtToken = jwtTokenService.generate(payload)
@@ -85,7 +86,7 @@ class AuthServiceImpl(
             val payload = JWTTokenPayload(
                 userId = authUser.userId.toString(),
                 claimName = JWTClaimName.DISPLAY_ID,
-                claim = authUser.displayId,
+                claim = authUser.displayId.value,
             )
             val jwtToken = jwtTokenService.generate(payload)
             jwtToken
@@ -105,7 +106,7 @@ class AuthServiceImpl(
         return FindUserResult(result != null)
     }
 
-    override suspend fun existsDisplayId(displayId: String): Boolean =
+    override suspend fun existsDisplayId(displayId: DisplayId): Boolean =
         authRepository.existsByDisplayId(displayId)
 
     private fun verifyRefreshToken(token: String): DecodedJWT? = try {

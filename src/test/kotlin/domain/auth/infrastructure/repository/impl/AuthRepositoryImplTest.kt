@@ -4,6 +4,7 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.auth.AuthTestDoubles.MockRegister
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.DisplayId
 import com.peekr.domain.core.model.UserId
 import com.peekr.util.TestDatabaseFactory
 import junit.framework.TestCase.assertFalse
@@ -140,7 +141,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `existsByDisplayId 실패 테스트 - 사용자 표시 ID로 찾지 못할 때`() = runTest {
         // when
-        val result = repository.existsByDisplayId("a123")
+        val result = repository.existsByDisplayId(DisplayId("a123"))
 
         // then
         assertFalse(result)

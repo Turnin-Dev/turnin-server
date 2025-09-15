@@ -5,6 +5,7 @@ import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.DisplayId
 
 interface AuthUseCase {
     /**
@@ -51,5 +52,5 @@ interface AuthUseCase {
      * @param displayId 사용자 표시 ID
      * @return 존재하면 `true`, 존재하지 않으면 `false`
      */
-    suspend fun existsDisplayId(displayId: String): Boolean
+    suspend fun existsDisplayId(displayId: DisplayId): Boolean
 }

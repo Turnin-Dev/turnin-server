@@ -1,5 +1,7 @@
 package com.peekr.domain.auth.domain.model
 
+import com.peekr.domain.core.model.DisplayId
+import com.peekr.domain.core.model.Name
 import com.peekr.domain.core.model.UserId
 import java.time.Instant
 
@@ -22,8 +24,8 @@ data class AuthUser(
     val role: RoleForAuth,
     val provider: SocialLoginProviderForAuth,
     val providerId: String,
-    val displayId: String,
-    val name: String,
+    val displayId: DisplayId,
+    val name: Name,
     val profileImageUrl: String?,
     val introduce: String?,
     val isActive: Boolean,
@@ -35,8 +37,8 @@ data class AuthUser(
             role = RoleForAuth.USER,
             provider = SocialLoginProviderForAuth.GOOGLE,
             providerId = "123123123",
-            displayId = "hong_gd_123",
-            name = "honggd",
+            displayId = DisplayId("hong_gd_123"),
+            name = Name("honggd"),
             profileImageUrl = "https://example.com/image.jpg",
             introduce = "hello world!",
             isActive = true,

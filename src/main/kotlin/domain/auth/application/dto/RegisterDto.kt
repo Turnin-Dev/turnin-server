@@ -1,6 +1,8 @@
 package com.peekr.domain.auth.application.dto
 
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.DisplayId
+import com.peekr.domain.core.model.Name
 
 /**
  * 애플리케이션 계층에서 사용하는 Register
@@ -15,8 +17,8 @@ import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 data class RegisterDto(
     val provider: SocialLoginProviderForAuth,
     val providerId: String,
-    val displayId: String,
-    val name: String,
+    val displayId: DisplayId,
+    val name: Name,
     val profileImageUrl: String?,
     val introduce: String?,
 )

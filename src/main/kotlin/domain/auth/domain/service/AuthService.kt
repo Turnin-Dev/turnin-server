@@ -6,6 +6,7 @@ import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.DisplayId
 
 interface AuthService {
     /**
@@ -54,5 +55,5 @@ interface AuthService {
      * @param displayId 사용자 표시 ID
      * @return 존재하면 `true`, 존재하지 않으면 `false`
      */
-    suspend fun existsDisplayId(displayId: String): Boolean
+    suspend fun existsDisplayId(displayId: DisplayId): Boolean
 }
