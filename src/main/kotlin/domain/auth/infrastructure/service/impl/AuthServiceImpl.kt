@@ -84,7 +84,7 @@ class AuthServiceImpl(
             userId == authUser.userId
         ) {
             val payload = JWTTokenPayload(
-                userId = authUser.userId.toString(),
+                userId = authUser.userId.value.toString(),
                 claimName = JWTClaimName.DISPLAY_ID,
                 claim = authUser.displayId.value,
             )

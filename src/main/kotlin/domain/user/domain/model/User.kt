@@ -1,5 +1,7 @@
 package com.peekr.domain.user.domain.model
 
+import com.peekr.domain.core.model.DisplayId
+import com.peekr.domain.core.model.Name
 import com.peekr.domain.core.model.UserId
 import java.time.Instant
 
@@ -22,8 +24,8 @@ data class User(
     val role: RoleForUser,
     val provider: SocialLoginProviderForUser,
     val providerId: String,
-    val displayId: String,
-    val name: String,
+    val displayId: DisplayId,
+    val name: Name,
     val profileImageUrl: String?,
     val introduce: String?,
     val isActive: Boolean,

@@ -44,8 +44,8 @@ class UserRoutesTest {
 
         // then
         assertEquals(HttpStatusCode.OK, response.status)
-        assertTrue(responseBody.contains(MockUserDto.name))
-        assertTrue(responseBody.contains(MockUserDto.displayId))
+        assertTrue(responseBody.contains(MockUserDto.name.value))
+        assertTrue(responseBody.contains(MockUserDto.displayId.value))
         assertTrue(responseBody.contains(MockUserDto.role.name))
     }
 
