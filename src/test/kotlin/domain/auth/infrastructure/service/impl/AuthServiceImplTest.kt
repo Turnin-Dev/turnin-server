@@ -14,6 +14,7 @@ import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
+import com.peekr.domain.core.model.DisplayId
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
@@ -40,7 +41,7 @@ class AuthServiceImplTest {
     fun setup() {
         authService = AuthServiceImpl(authRepository, refreshTokenRepository, jwtTokenService)
 
-        mockJWTToken = getMockJWTToken(getJWTTokenPayload(claim = MockAuthUser.displayId))
+        mockJWTToken = getMockJWTToken(getJWTTokenPayload(claim = MockAuthUser.displayId.value))
         every { jwtTokenService.realm } returns REALM
         every { jwtTokenService.audience } returns AUDIENCE
         every { jwtTokenService.issuer } returns ISSUER
@@ -55,7 +56,7 @@ class AuthServiceImplTest {
             authRepository.findAuthUserByProviderAndProviderId(any(), any())
         } returns MockAuthUser
 
-        coEvery { authRepository.updateLastLoginAt(any()) } just Runs
+        coEvery { authRepository.updateLastLoginAt(MockAuthUser.userId) } just Runs
 
         every { jwtTokenService.generate(any()) } returns getMockJWTToken()
 
@@ -123,9 +124,9 @@ class AuthServiceImplTest {
         // given
         coEvery {
             refreshTokenRepository.findUserIdByRefreshToken(any())
-        } returns MockAuthUser.id
+        } returns MockAuthUser.userId
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } returns MockAuthUser
 
         // when
@@ -144,7 +145,7 @@ class AuthServiceImplTest {
             refreshTokenRepository.findUserIdByRefreshToken(any())
         } returns null
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } returns MockAuthUser
 
         // when
@@ -159,9 +160,9 @@ class AuthServiceImplTest {
         // given
         coEvery {
             refreshTokenRepository.findUserIdByRefreshToken(any())
-        } returns MockAuthUser.id
+        } returns MockAuthUser.userId
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } returns null
 
         // when
@@ -177,9 +178,9 @@ class AuthServiceImplTest {
         val expectedException = NullPointerException()
         coEvery {
             refreshTokenRepository.findUserIdByRefreshToken(any())
-        } returns MockAuthUser.id
+        } returns MockAuthUser.userId
         coEvery {
-            authRepository.findUserByUserId(any())
+            authRepository.findUserByUserId(MockAuthUser.userId)
         } throws expectedException
 
         // when
@@ -220,7 +221,7 @@ class AuthServiceImplTest {
     @Test
     fun `existsDisplayId 성공 테스트 - 사용자 표시 ID가 존재하는 경우`() = runTest {
         // given
-        coEvery { authRepository.existsByDisplayId(any()) } returns true
+        coEvery { authRepository.existsByDisplayId(MockRegister.displayId) } returns true
 
         // when
         val existsDisplayId = authService.existsDisplayId(MockRegister.displayId)
@@ -232,10 +233,11 @@ class AuthServiceImplTest {
     @Test
     fun `existsDisplayId 성공 테스트 - 사용자 표시 ID가 존재하지 않는 경우`() = runTest {
         // given
-        coEvery { authRepository.existsByDisplayId(any()) } returns false
+        val invalidDisplayId = DisplayId("weird_display_id")
+        coEvery { authRepository.existsByDisplayId(invalidDisplayId) } returns false
 
         // when
-        val existsDisplayId = authService.existsDisplayId("weird_display_id")
+        val existsDisplayId = authService.existsDisplayId(invalidDisplayId)
 
         // then
         assertFalse(existsDisplayId)

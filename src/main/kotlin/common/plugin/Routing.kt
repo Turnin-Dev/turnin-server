@@ -1,6 +1,6 @@
 package com.peekr.common.plugin
 
-import com.peekr.common.api.Api
+import com.peekr.common.route.Api
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.presentation.route.authRoutes
 import com.peekr.domain.file.application.usecase.FileUseCase

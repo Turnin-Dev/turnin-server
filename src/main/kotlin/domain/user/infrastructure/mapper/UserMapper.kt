@@ -4,6 +4,9 @@ import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.domain.auth.domain.model.RoleForAuth
+import com.peekr.domain.core.model.DisplayId
+import com.peekr.domain.core.model.Name
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User
@@ -11,12 +14,12 @@ import com.peekr.domain.user.domain.model.User
 object UserMapper {
     /** ##### 반드시 db transaction 범위 내에서 실행되어야 한다. */
     fun toDomain(entity: UserEntity): User = User(
-        id = entity.id.value,
+        id = UserId(entity.id.value),
         role = entity.role.toRoleForUser(),
         provider = entity.provider.toSocialLoginProviderForUser(),
         providerId = entity.providerId,
-        displayId = entity.displayId,
-        name = entity.name,
+        displayId = DisplayId(entity.displayId),
+        name = Name(entity.name),
         profileImageUrl = entity.profileImageUrl,
         introduce = entity.introduce,
         isActive = entity.isActive,

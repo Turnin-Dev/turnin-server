@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.domain.service
 
 import com.peekr.domain.auth.exception.AuthException
+import com.peekr.domain.core.model.UserId
 
 interface RefreshTokenService {
     /**
@@ -13,7 +14,7 @@ interface RefreshTokenService {
      * @throws AuthException.CannotSaveRefreshTokenException 존재하지 않는 사용자의 ID로 토큰 저장 시 예외 발생
      */
     suspend fun save(
-        userId: Long,
+        userId: UserId,
         token: String,
     ): Boolean
 }

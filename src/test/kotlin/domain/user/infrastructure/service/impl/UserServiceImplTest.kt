@@ -1,11 +1,13 @@
 package com.peekr.domain.user.infrastructure.service.impl
 
+import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.UserTestDoubles
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -22,6 +24,11 @@ class UserServiceImplTest {
         TestDatabaseFactory.init()
     }
 
+    @AfterTest
+    fun tearDown() {
+        TestDatabaseFactory.cleanUp()
+    }
+
     @Test
     fun `getUserById 성공 테스트`() = runBlocking {
         // given
@@ -29,7 +36,7 @@ class UserServiceImplTest {
             val userEntity = UserTestDoubles.getUserEntity()
             UserMapper.toDomain(userEntity)
         }
-        coEvery { repository.getUserById(any()) } returns mappedUser
+        coEvery { repository.getUserById(mappedUser.id) } returns mappedUser
 
         // when
         val user = service.getUserById(mappedUser.id)
@@ -42,10 +49,10 @@ class UserServiceImplTest {
     @Test
     fun `getUserById 실패 테스트 - 사용자가 존재하지 않는 경우`() = runBlocking {
         // given
-        coEvery { repository.getUserById(any()) } returns null
+        coEvery { repository.getUserById(UserId(1L)) } returns null
 
         // when
-        val user = service.getUserById(1L)
+        val user = service.getUserById(UserId(1L))
 
         // then
         assertNull(user)

@@ -9,6 +9,8 @@ import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
+import com.peekr.domain.core.model.DisplayId
+import com.peekr.domain.core.model.Name
 
 fun LoginRequest.toDto(): LoginDto = LoginDto(
     provider = provider.toSocialLoginProviderForAuth(),
@@ -18,8 +20,8 @@ fun LoginRequest.toDto(): LoginDto = LoginDto(
 fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
     provider = provider.toSocialLoginProviderForAuth(),
     providerId = providerId,
-    displayId = displayId,
-    name = name,
+    displayId = DisplayId(displayId),
+    name = Name(name),
     profileImageUrl = profileImageUrl,
     introduce = introduce,
 )

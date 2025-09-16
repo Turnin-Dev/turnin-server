@@ -36,12 +36,12 @@ data class UserResponse(
 }
 
 fun UserDto.toResponse(): UserResponse = UserResponse(
-    id = id,
+    id = id.value,
     role = role.name,
     provider = provider.name,
     providerId = providerId,
-    displayId = displayId,
-    name = name,
+    displayId = displayId.value,
+    name = name.value,
     profileImageUrl = profileImageUrl,
     introduce = introduce,
     isActive = isActive,

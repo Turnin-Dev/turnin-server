@@ -8,7 +8,6 @@ import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.masking
-import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.Register
@@ -17,6 +16,7 @@ import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.domain.service.AuthService
+import com.peekr.domain.core.model.DisplayId
 
 class AuthServiceImpl(
     private val authRepository: AuthRepository,
@@ -35,27 +35,27 @@ class AuthServiceImpl(
         }
 
         val payload = JWTTokenPayload(
-            userId = authUser.id.toString(),
+            userId = authUser.userId.value.toString(),
             claimName = JWTClaimName.DISPLAY_ID,
-            claim = authUser.displayId,
+            claim = authUser.displayId.value,
         )
         val jwtToken = jwtTokenService.generate(payload)
         val loginResult = LoginResult(jwtToken, authUser)
 
-        authRepository.updateLastLoginAt(authUser.id)
+        authRepository.updateLastLoginAt(authUser.userId)
 
         LOGGER.debug("login service successful")
         return loginResult
     }
 
     override suspend fun register(register: Register): RegisterResult {
-        LOGGER.debug("register service attempt, displayId: ${register.displayId.masking()}")
+        LOGGER.debug("register service attempt, displayId: ${register.displayId.value.masking()}")
         val savedAuthUser = authRepository.save(register)
 
         val payload = JWTTokenPayload(
-            userId = savedAuthUser.id.toString(),
+            userId = savedAuthUser.userId.value.toString(),
             claimName = JWTClaimName.DISPLAY_ID,
-            claim = savedAuthUser.displayId,
+            claim = savedAuthUser.displayId.value,
         )
 
         val jwtToken = jwtTokenService.generate(payload)
@@ -66,35 +66,26 @@ class AuthServiceImpl(
         return result
     }
 
-    override suspend fun refresh(token: String): JWTToken? = try {
-        val decodedRefreshToken = verifyRefreshToken(token)
+    override suspend fun refresh(token: String): JWTToken? {
+        return try {
+            // 1) 서명/만료 검증 실패 시 즉시 종료
+            verifyRefreshToken(token) ?: return null
 
-        if (decodedRefreshToken == null) {
-            null
-        }
+            // 2) 저장소 확인
+            val userId = refreshTokenRepository.findUserIdByRefreshToken(token) ?: return null
+            val authUser = authRepository.findUserByUserId(userId) ?: return null
 
-        val userId = refreshTokenRepository.findUserIdByRefreshToken(token)
-        val authUser: AuthUser? = userId?.let {
-            authRepository.findUserByUserId(it)
-        }
-
-        if (userId != null &&
-            authUser != null &&
-            userId == authUser.id
-        ) {
+            // 3) 액세스 토큰 재발급
             val payload = JWTTokenPayload(
-                userId = authUser.id.toString(),
+                userId = authUser.userId.value.toString(),
                 claimName = JWTClaimName.DISPLAY_ID,
-                claim = authUser.displayId,
+                claim = authUser.displayId.value,
             )
-            val jwtToken = jwtTokenService.generate(payload)
-            jwtToken
-        } else {
+            jwtTokenService.generate(payload)
+        } catch (e: Exception) {
+            LOGGER.error(e, e.message)
             null
         }
-    } catch (e: Exception) {
-        LOGGER.error(e, e.message)
-        null
     }
 
     override suspend fun findUser(
@@ -105,7 +96,7 @@ class AuthServiceImpl(
         return FindUserResult(result != null)
     }
 
-    override suspend fun existsDisplayId(displayId: String): Boolean =
+    override suspend fun existsDisplayId(displayId: DisplayId): Boolean =
         authRepository.existsByDisplayId(displayId)
 
     private fun verifyRefreshToken(token: String): DecodedJWT? = try {

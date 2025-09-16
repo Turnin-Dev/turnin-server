@@ -1,4 +1,4 @@
-package com.peekr.common.api
+package com.peekr.common.route
 
 /**
  * API 경로

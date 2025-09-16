@@ -16,6 +16,8 @@ import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
 import com.peekr.domain.auth.infrastructure.mapper.toRole
 import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
+import com.peekr.domain.core.model.DisplayId
+import com.peekr.domain.core.model.UserId
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 
@@ -32,8 +34,8 @@ class AuthRepositoryImpl : AuthRepository {
             }.singleOrNull()
     }
 
-    override suspend fun findUserByUserId(userId: Long): AuthUser? = dbQuery {
-        UserEntity.findById(userId)?.let {
+    override suspend fun findUserByUserId(userId: UserId): AuthUser? = dbQuery {
+        UserEntity.findById(userId.value)?.let {
             AuthMapper.toDomain(it.readValues)
         }
     }
@@ -47,8 +49,8 @@ class AuthRepositoryImpl : AuthRepository {
             this.role = role.toRole()
             this.provider = register.provider.toSocialLoginProvider()
             this.providerId = register.providerId
-            this.name = register.name
-            this.displayId = register.displayId
+            this.name = register.name.value
+            this.displayId = register.displayId.value
             this.profileImageUrl = register.profileImageUrl
             this.introduce = register.introduce
             this.isActive = isActive
@@ -63,15 +65,15 @@ class AuthRepositoryImpl : AuthRepository {
         )
     }
 
-    override suspend fun updateLastLoginAt(userId: Long) = dbQuery<Unit> {
-        UserEntity.findByIdAndUpdate(userId) {
+    override suspend fun updateLastLoginAt(userId: UserId) = dbQuery<Unit> {
+        UserEntity.findByIdAndUpdate(userId.value) {
             it.lastLoginAt = PeekrDateTime.now()
-        } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.masking()}")
+        } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.value.masking()}")
     }
 
-    override suspend fun existsByDisplayId(displayId: String): Boolean = dbQuery {
+    override suspend fun existsByDisplayId(displayId: DisplayId): Boolean = dbQuery {
         UserEntity
-            .find((Users.displayId eq displayId))
+            .find((Users.displayId eq displayId.value))
             .limit(1)
             .empty()
             .not()

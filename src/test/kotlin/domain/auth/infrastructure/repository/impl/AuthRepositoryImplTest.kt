@@ -4,8 +4,11 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.auth.AuthTestDoubles.MockRegister
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.core.model.DisplayId
+import com.peekr.domain.core.model.UserId
 import com.peekr.util.TestDatabaseFactory
 import junit.framework.TestCase.assertFalse
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -23,10 +26,15 @@ class AuthRepositoryImplTest {
         TestDatabaseFactory.init()
     }
 
+    @AfterTest
+    fun tearDown() {
+        TestDatabaseFactory.cleanUp()
+    }
+
     @Test
     fun `save & findByProviderAndProviderId 성공 테스트`() = runTest {
         val savedUser = repository.save(MockRegister)
-        assertTrue(savedUser.id > 0L)
+        assertTrue(savedUser.userId.value > 0L)
 
         val foundUser = repository.findAuthUserByProviderAndProviderId(
             provider = MockRegister.provider,
@@ -51,7 +59,7 @@ class AuthRepositoryImplTest {
     fun `save 실패 테스트 - 중복된 providerId 저장 시도`() = runTest {
         val savedUser = repository.save(MockRegister)
 
-        assertTrue(savedUser.id > 0L)
+        assertTrue(savedUser.userId.value > 0L)
 
         val exception = assertFailsWith<DatabaseException.DuplicatedDataException> {
             repository.save(MockRegister) // 동일한 providerId 삽입 시도
@@ -64,10 +72,10 @@ class AuthRepositoryImplTest {
     fun `findUserByUserId 성공 테스트`() = runTest {
         // given
         val savedUser = repository.save(MockRegister)
-        assertTrue(savedUser.id > 0L)
+        assertTrue(savedUser.userId.value > 0L)
 
         // when
-        val foundUser = repository.findUserByUserId(savedUser.id)
+        val foundUser = repository.findUserByUserId(savedUser.userId)
 
         // then
         assertNotNull(foundUser)
@@ -77,7 +85,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findUserByUserId 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
         // when
-        val foundUser = repository.findUserByUserId(100)
+        val foundUser = repository.findUserByUserId(UserId(100))
 
         // then
         assertNull(foundUser)
@@ -87,7 +95,7 @@ class AuthRepositoryImplTest {
     fun `updateLastLoginAt 성공 테스트`() = runTest {
         // given
         val savedUser = repository.save(MockRegister)
-        val userId = savedUser.id
+        val userId = savedUser.userId
 
         // when
         val before = PeekrDateTime.now()
@@ -104,7 +112,7 @@ class AuthRepositoryImplTest {
     fun `updateLastLoginAt 실패 테스트 - 2초 뒤에 시간과 비교`() = runTest {
         // given
         val savedUser = repository.save(MockRegister)
-        val userId = savedUser.id
+        val userId = savedUser.userId
 
         // when
         repository.updateLastLoginAt(userId)
@@ -133,7 +141,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `existsByDisplayId 실패 테스트 - 사용자 표시 ID로 찾지 못할 때`() = runTest {
         // when
-        val result = repository.existsByDisplayId("a123")
+        val result = repository.existsByDisplayId(DisplayId("a123"))
 
         // then
         assertFalse(result)

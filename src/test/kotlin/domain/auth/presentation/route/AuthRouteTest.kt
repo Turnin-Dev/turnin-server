@@ -1,8 +1,8 @@
 package com.peekr.domain.auth.presentation.route
 
-import com.peekr.common.api.Api
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
+import com.peekr.common.route.Api
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
@@ -11,6 +11,7 @@ import com.peekr.domain.auth.AuthTestDoubles.MockValidRegisterRequest
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
+import com.peekr.domain.core.model.DisplayId
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
 import io.ktor.client.request.get
@@ -67,7 +68,7 @@ class AuthRouteTest {
             routing = { authRoutes(route, authUseCase) },
         )
 
-        // when
+        // when`
         val loginEndPoint = "${route.ROUTE}${route.LOGIN}"
         val response = client.post(loginEndPoint) {
             contentType(ContentType.Application.Json)
@@ -171,8 +172,9 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
+        val displayId = DisplayId(MockValidRegisterRequest.displayId)
         coEvery { authUseCase.register(any()) } returns MockJWTTokenDto
-        coEvery { authUseCase.existsDisplayId(any()) } returns false
+        coEvery { authUseCase.existsDisplayId(displayId) } returns false
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )

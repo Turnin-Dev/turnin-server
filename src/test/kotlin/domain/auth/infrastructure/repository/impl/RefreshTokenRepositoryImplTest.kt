@@ -5,7 +5,9 @@ import com.peekr.common.db.schema.UserEntity
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.infrastructure.mapper.toRole
 import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
+import com.peekr.domain.core.model.UserId
 import com.peekr.util.TestDatabaseFactory
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -24,6 +26,11 @@ class RefreshTokenRepositoryImplTest {
         TestDatabaseFactory.init()
     }
 
+    @AfterTest
+    fun tearDown() {
+        TestDatabaseFactory.cleanUp()
+    }
+
     @Test
     fun `findUserIdByRefreshToken 성공 테스트`() = runTest {
         // given
@@ -32,8 +39,8 @@ class RefreshTokenRepositoryImplTest {
                 this.role = MockUser.role.toRole()
                 this.provider = MockUser.provider.toSocialLoginProvider()
                 this.providerId = MockUser.providerId
-                this.displayId = MockUser.displayId
-                this.name = MockUser.name
+                this.displayId = MockUser.displayId.value
+                this.name = MockUser.name.value
                 this.profileImageUrl = MockUser.profileImageUrl
                 this.introduce = MockUser.introduce
             }
@@ -51,7 +58,7 @@ class RefreshTokenRepositoryImplTest {
 
         // then
         assertNotNull(userId)
-        assertEquals(expectedUserId, userId)
+        assertEquals(UserId(expectedUserId), userId)
     }
 
     @Test
@@ -76,8 +83,8 @@ class RefreshTokenRepositoryImplTest {
                 this.role = MockUser.role.toRole()
                 this.provider = MockUser.provider.toSocialLoginProvider()
                 this.providerId = MockUser.providerId
-                this.displayId = MockUser.displayId
-                this.name = MockUser.name
+                this.displayId = MockUser.displayId.value
+                this.name = MockUser.name.value
                 this.profileImageUrl = MockUser.profileImageUrl
                 this.introduce = MockUser.introduce
             }
@@ -85,19 +92,19 @@ class RefreshTokenRepositoryImplTest {
         }
 
         // when
-        val result = refreshTokenRepository.save(userId, MOCK_REFRESH_TOKEN)
+        val result = refreshTokenRepository.save(UserId(userId), MOCK_REFRESH_TOKEN)
         val foundUserId = refreshTokenRepository.findUserIdByRefreshToken(MOCK_REFRESH_TOKEN)
 
         // then
         assertTrue(result)
         assertNotNull(foundUserId)
-        assertEquals(userId, foundUserId)
+        assertEquals(UserId(userId), foundUserId)
     }
 
     @Test
     fun `save 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
         assertFalse {
-            refreshTokenRepository.save(1L, MOCK_REFRESH_TOKEN)
+            refreshTokenRepository.save(UserId(1L), MOCK_REFRESH_TOKEN)
         }
     }
 }
