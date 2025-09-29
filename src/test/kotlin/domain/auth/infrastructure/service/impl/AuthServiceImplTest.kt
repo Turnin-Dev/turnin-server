@@ -8,13 +8,13 @@ import com.peekr.common.jwt.JWTTestDoubles.getJWTTokenPayload
 import com.peekr.common.jwt.JWTTestDoubles.getMockJWTToken
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
+import com.peekr.common.model.DisplayId
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
 import com.peekr.domain.auth.AuthTestDoubles.MockRegister
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
-import com.peekr.domain.core.model.DisplayId
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every

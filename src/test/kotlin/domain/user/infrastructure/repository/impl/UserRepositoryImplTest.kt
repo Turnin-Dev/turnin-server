@@ -1,6 +1,6 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.UserId
 import com.peekr.domain.user.UserTestDoubles
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.util.TestDatabaseFactory

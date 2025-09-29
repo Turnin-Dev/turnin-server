@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.domain.service
 
+import com.peekr.common.model.UserId
 import com.peekr.domain.auth.exception.AuthException
-import com.peekr.domain.core.model.UserId
 
 interface RefreshTokenService {
     /**

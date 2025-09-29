@@ -1,7 +1,7 @@
 package com.peekr.domain.keyword.infrastructure.service.impl
 
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
 import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import com.peekr.domain.keyword.domain.service.KeywordService
@@ -25,7 +25,7 @@ class KeywordServiceImplTest {
     @Test
     fun `키워드를 성공적으로 가져온다`() = runTest {
         // given
-        coEvery { keywordRepository.findById(any()) } returns TestKeyword
+        coEvery { keywordRepository.findById(TestKeyword.id) } returns TestKeyword
 
         // when
         val keyword = service.getKeyword(TestKeyword.id)

@@ -4,13 +4,14 @@ import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
@@ -22,6 +23,11 @@ class KeywordRepositoryImplTest {
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
+    }
+
+    @After
+    fun teardown() {
+        TestDatabaseFactory.cleanUp()
     }
 
     @Test

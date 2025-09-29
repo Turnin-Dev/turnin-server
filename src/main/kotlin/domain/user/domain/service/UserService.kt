@@ -1,6 +1,6 @@
 package com.peekr.domain.user.domain.service
 
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.User
 
 interface UserService {

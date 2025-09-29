@@ -108,8 +108,8 @@ class ExceptionHandlerTest {
         val responseBody = response.bodyAsText()
 
         // then
-        assertEquals(HttpStatusCode.InternalServerError, response.status)
-        assertTrue(responseBody.contains(CommonErrorCode.Unexpected.code))
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(responseBody.contains(CommonErrorCode.ValidationDefault.description))
     }
 
     companion object {

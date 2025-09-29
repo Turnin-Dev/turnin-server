@@ -3,10 +3,10 @@ package com.peekr.domain.user.infrastructure.mapper
 import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Name
+import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.model.RoleForAuth
-import com.peekr.domain.core.model.DisplayId
-import com.peekr.domain.core.model.Name
-import com.peekr.domain.core.model.UserId
 import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User

@@ -1,4 +1,4 @@
-package com.peekr.domain.core.model
+package com.peekr.common.model
 
 /** 사용자 ID 래퍼 클래스
  *

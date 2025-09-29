@@ -4,6 +4,8 @@ import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.UserId
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.masking
@@ -16,8 +18,6 @@ import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
 import com.peekr.domain.auth.infrastructure.mapper.toRole
 import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
-import com.peekr.domain.core.model.DisplayId
-import com.peekr.domain.core.model.UserId
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 

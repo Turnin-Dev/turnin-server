@@ -9,6 +9,7 @@ import com.peekr.common.plugin.authenticatedRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.application.pluginOrNull
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
@@ -31,21 +32,25 @@ fun ApplicationTestBuilder.testPlugin(
     module: Module? = null,
     plugin: Application.() -> Unit = {},
     routing: Routing.() -> Unit = {},
-    authRouting: AuthenticatedRoute.() -> Unit = {},
+    authRouting: (AuthenticatedRoute.() -> Unit)? = null,
     routingApplicationScope: Application.() -> Unit = {},
 ) {
     application {
         module?.let {
-            testKoinModule(module = module)
+            if (pluginOrNull(Koin) == null) {
+                testKoinModule(module = module)
+            }
         }
         testContentNegotiation()
         testExceptionHandler()
-        testJwtSecurity()
+        authRouting?.let { testJwtSecurity() }
         plugin()
         routing {
             routing()
-            authenticatedRoute {
-                authRouting()
+            authRouting?.let {
+                authenticatedRoute {
+                    authRouting()
+                }
             }
         }
         routingApplicationScope()

@@ -2,7 +2,7 @@ package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.UserEntity
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper

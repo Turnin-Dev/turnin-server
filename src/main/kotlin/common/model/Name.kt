@@ -1,4 +1,4 @@
-package com.peekr.domain.core.model
+package com.peekr.common.model
 
 @JvmInline
 value class Name private constructor(val value: String) {

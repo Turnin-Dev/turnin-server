@@ -3,12 +3,12 @@ package com.peekr.domain.auth.infrastructure.mapper
 import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.Users
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Name
+import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RoleForAuth
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
-import com.peekr.domain.core.model.DisplayId
-import com.peekr.domain.core.model.Name
-import com.peekr.domain.core.model.UserId
 import org.jetbrains.exposed.sql.ResultRow
 
 object AuthMapper {

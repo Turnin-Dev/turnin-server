@@ -2,10 +2,10 @@ package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.infrastructure.mapper.toRole
 import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
-import com.peekr.domain.core.model.UserId
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.AfterTest
 import kotlin.test.Test

@@ -5,9 +5,9 @@ import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
-import com.peekr.domain.core.model.UserKeywordId
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
+import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch

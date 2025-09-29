@@ -1,7 +1,7 @@
 package com.peekr.domain.keyword.domain.service
 
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
 
 interface KeywordService {

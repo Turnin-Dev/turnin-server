@@ -1,7 +1,7 @@
 package com.peekr.domain.userKeyword.application.dto
 
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
 
 /**
  * 사용자별 키워드 DTO
