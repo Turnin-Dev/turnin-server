@@ -79,7 +79,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    fun `updateUser 실패 테스트 - 사용자가 존재하지 않는 경우 null을 반환한다`() = runTest {
+    fun `updateUser 실패 테스트 - 사용자가 존재하지 않는 경우 false를 반환한다`() = runTest {
         // given
         coEvery {
             repository.update(TestUserId, TestUserPatch)

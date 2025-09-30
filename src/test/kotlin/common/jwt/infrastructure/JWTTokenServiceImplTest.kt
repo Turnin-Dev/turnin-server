@@ -2,6 +2,7 @@ package com.peekr.common.jwt.infrastructure
 
 import com.auth0.jwt.JWT
 import com.peekr.common.jwt.JWTTestDoubles
+import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.config.AppConfig
 import io.mockk.every
@@ -50,19 +51,23 @@ class JWTTokenServiceImplTest {
     fun `generate should create valid access and refresh tokens`() {
         // given
         val payload = JWTTestDoubles.getJWTTokenPayload()
+        val accessTokenVerifier = jwtTokenService.createVerifier(JWTTokenType.Access)
+        val refreshTokenVerifier = jwtTokenService.createVerifier(JWTTokenType.Refresh)
 
         // when
         val token = jwtTokenService.generate(payload)
 
         // then
+        accessTokenVerifier.verify(token.accessToken)
+        refreshTokenVerifier.verify(token.refreshToken)
+
         val decodedAccessToken = JWT.decode(token.accessToken)
         val decodedRefreshToken = JWT.decode(token.refreshToken)
 
-        assertEquals(decodedAccessToken.subject, payload.userId)
-        assertEquals(decodedAccessToken.getClaim(payload.claimName.name).asString(), payload.claim)
-        assertEquals(decodedAccessToken.issuer, JWTTestDoubles.ISSUER)
+        assertEquals(payload.userId, decodedAccessToken.subject)
+        assertEquals(payload.claim, decodedAccessToken.getClaim(payload.claimName.name).asString())
+        assertEquals(JWTTestDoubles.ISSUER, decodedAccessToken.issuer)
         assert(JWTTestDoubles.AUDIENCE in decodedAccessToken.audience)
-
-        assertEquals(decodedRefreshToken.subject, payload.userId)
+        assertEquals(payload.userId, decodedRefreshToken.subject)
     }
 }

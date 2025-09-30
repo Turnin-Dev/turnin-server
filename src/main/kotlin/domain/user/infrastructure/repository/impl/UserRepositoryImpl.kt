@@ -21,11 +21,12 @@ class UserRepositoryImpl : UserRepository {
         userId: UserId,
         patch: UserPatch,
     ): Boolean = dbQuery {
-        Users.update({ (Users.id eq userId.value) }) {
-            it[displayId] = patch.displayId.value
-            it[name] = patch.name.value
-            it[introduce] = patch.introduce
-            it[profileImageUrl] = patch.profileImageUrl
+        Users.update({ (Users.id eq userId.value) }) { row ->
+            row[displayId] = patch.displayId.value
+            row[name] = patch.name.value
+            row[profileImageUrl] = patch.profileImageUrl
+            patch.introduce?.let { row[introduce] = it }
+            patch.profileImageUrl?.let { row[profileImageUrl] = it }
         } > 0
     }
 }

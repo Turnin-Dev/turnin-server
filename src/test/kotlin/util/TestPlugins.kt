@@ -49,7 +49,7 @@ fun ApplicationTestBuilder.testPlugin(
             routing()
             authRouting?.let {
                 authenticatedRoute {
-                    authRouting()
+                    it()
                 }
             }
         }

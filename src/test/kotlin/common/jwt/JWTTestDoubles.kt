@@ -21,7 +21,7 @@ internal object JWTTestDoubles {
     const val ACCESS_TOKEN_EXPIRES_IN = 3600000L // 1 hour
     const val REFRESH_TOKEN_EXPIRES_IN = 86400000L // 1 day
 
-    val MockAlgorithm = Algorithm.HMAC256(SECRET)
+    val MockAlgorithm: Algorithm? = Algorithm.HMAC256(SECRET)
     val MockVerifier = JWT
         .require(MockAlgorithm)
         .withAudience(AUDIENCE)

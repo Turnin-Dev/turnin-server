@@ -32,10 +32,10 @@ object TestDatabaseFactory {
     fun cleanUp() {
         transaction {
             SchemaUtils.drop(
-                Users,
+                UserKeywords,
                 RefreshTokens,
                 Keywords,
-                UserKeywords,
+                Users,
             )
 
             SchemaUtils.create(
