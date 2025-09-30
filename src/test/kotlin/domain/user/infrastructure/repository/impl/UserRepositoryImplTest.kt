@@ -1,9 +1,7 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.model.DisplayId
-import com.peekr.common.model.DisplayId.Companion.invoke
 import com.peekr.common.model.Name
-import com.peekr.common.model.Name.Companion.invoke
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.UserTestDoubles
 import com.peekr.domain.user.domain.model.UserPatch
