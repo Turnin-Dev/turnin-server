@@ -4,7 +4,7 @@ import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.model.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.user.UserTestDoubles.MockUserDto
-import com.peekr.domain.user.application.usecase.UserUseCase
+import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
 import io.ktor.client.request.get
@@ -21,7 +21,7 @@ import org.junit.Test
 
 class UserRoutesTest {
     private val route = Api.V1.User
-    private val userUseCase = mockk<UserUseCase>()
+    private val userUseCases = mockk<UserUseCases>()
 
     @Test
     fun `사용자 조회 GET 요청 성공 테스트`() = testApplication {
@@ -29,10 +29,10 @@ class UserRoutesTest {
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken("1")
         val userId = UserId(1L)
-        coEvery { userUseCase.getUserById(userId) } returns MockUserDto
+        coEvery { userUseCases.get(userId) } returns MockUserDto
 
         testPlugin(
-            authRouting = { userRoutes(route, userUseCase) },
+            authRouting = { userRoutes(route, userUseCases) },
         )
 
         // when
@@ -54,10 +54,10 @@ class UserRoutesTest {
         // given
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken("1")
-        coEvery { userUseCase.getUserById(UserId(1L)) } returns MockUserDto
+        coEvery { userUseCases.get(UserId(1L)) } returns MockUserDto
 
         testPlugin(
-            authRouting = { userRoutes(route, userUseCase) },
+            authRouting = { userRoutes(route, userUseCases) },
         )
 
         invalidUserIds.forEach { invalidUserId ->
@@ -78,10 +78,10 @@ class UserRoutesTest {
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken("1")
         val userId = UserId(1L)
-        coEvery { userUseCase.getUserById(userId) } returns null
+        coEvery { userUseCases.get(userId) } returns null
 
         testPlugin(
-            authRouting = { userRoutes(route, userUseCase) },
+            authRouting = { userRoutes(route, userUseCases) },
         )
 
         // when

@@ -36,7 +36,7 @@ class UserServiceImplTest {
             val userEntity = UserTestDoubles.getUserEntity()
             UserMapper.toDomain(userEntity)
         }
-        coEvery { repository.getUserById(mappedUser.id) } returns mappedUser
+        coEvery { repository.findById(mappedUser.id) } returns mappedUser
 
         // when
         val user = service.getUserById(mappedUser.id)
@@ -49,7 +49,7 @@ class UserServiceImplTest {
     @Test
     fun `getUserById 실패 테스트 - 사용자가 존재하지 않는 경우`() = runBlocking {
         // given
-        coEvery { repository.getUserById(UserId(1L)) } returns null
+        coEvery { repository.findById(UserId(1L)) } returns null
 
         // when
         val user = service.getUserById(UserId(1L))

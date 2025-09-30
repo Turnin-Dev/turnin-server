@@ -16,9 +16,9 @@ import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 
-class UserUseCaseImplTest {
+class GetUserUseCaseTest {
     private val userService = mockk<UserService>()
-    private val usecase = UserUseCaseImpl(userService)
+    private val usecase = GetUserUseCase(userService)
 
     @Before
     fun setUp() {
@@ -40,7 +40,7 @@ class UserUseCaseImplTest {
         coEvery { userService.getUserById(expectedUser.id) } returns expectedUser
 
         // when
-        val userDto = usecase.getUserById(expectedUser.id)
+        val userDto = usecase(expectedUser.id)
 
         // then
         assertNotNull(userDto)
@@ -53,7 +53,7 @@ class UserUseCaseImplTest {
         coEvery { userService.getUserById(UserId(1L)) } returns null
 
         // when
-        val userDto = usecase.getUserById(UserId(1L))
+        val userDto = usecase(UserId(1L))
 
         // then
         assertNull(userDto)

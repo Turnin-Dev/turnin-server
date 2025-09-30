@@ -26,7 +26,7 @@ class UserRepositoryImplTest {
     }
 
     @Test
-    fun `getUserById 성공 테스트`() = runTest {
+    fun `findById 성공 테스트`() = runTest {
         // given
         val savedUserEntity = TestDatabaseFactory.dbQuery {
             UserTestDoubles.getUserEntity()
@@ -34,7 +34,7 @@ class UserRepositoryImplTest {
 
         // when
         val userId = UserId(savedUserEntity.id.value)
-        val user = repository.getUserById(userId)
+        val user = repository.findById(userId)
 
         // then
         assertNotNull(user)
@@ -42,9 +42,9 @@ class UserRepositoryImplTest {
     }
 
     @Test
-    fun `getUserById 실패 테스트 - 사용자를 찾지 못하는 경우`() = runTest {
+    fun `findById 실패 테스트 - 사용자를 찾지 못하는 경우`() = runTest {
         // when
-        val userEntity = repository.getUserById(UserId(1L))
+        val userEntity = repository.findById(UserId(1L))
 
         // then
         assertNull(userEntity)
