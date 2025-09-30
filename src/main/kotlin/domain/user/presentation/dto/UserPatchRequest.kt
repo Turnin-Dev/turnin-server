@@ -3,6 +3,7 @@ package com.peekr.domain.user.presentation.dto
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Name
 import com.peekr.domain.user.application.dto.UserPatchDto
+import kotlinx.serialization.Serializable
 
 /**
  * UserPatch 요청 바디
@@ -12,6 +13,7 @@ import com.peekr.domain.user.application.dto.UserPatchDto
  * @param profileImageUrl 사용자 프로필 이미지 url
  * @param introduce 사용자 소개 글
  */
+@Serializable
 data class UserPatchRequest(
     val displayId: String,
     val name: String,

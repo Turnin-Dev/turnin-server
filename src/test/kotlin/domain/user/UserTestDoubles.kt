@@ -11,7 +11,7 @@ import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 
 object UserTestDoubles {
-    fun getUserEntity() = UserEntity.new {
+    fun saveAndGetUserEntity() = UserEntity.new {
         this.role = Role.USER
         this.provider = SocialLoginProvider.GOOGLE
         this.providerId = "123901239"

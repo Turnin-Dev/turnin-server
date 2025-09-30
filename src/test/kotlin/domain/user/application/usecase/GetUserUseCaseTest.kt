@@ -1,13 +1,17 @@
 package com.peekr.domain.user.application.usecase
 
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
-import com.peekr.domain.user.UserTestDoubles
 import com.peekr.domain.user.application.dto.toDto
+import com.peekr.domain.user.domain.model.RoleForUser
+import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
+import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.service.UserService
-import com.peekr.domain.user.infrastructure.mapper.UserMapper
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
+import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,31 +35,43 @@ class GetUserUseCaseTest {
     }
 
     @Test
-    fun `getUserById 성공 테스트`() = runTest {
+    fun `성공 테스트`() = runTest {
         // given
-        val expectedUser = TestDatabaseFactory.dbQuery {
-            val entity = UserTestDoubles.getUserEntity()
-            UserMapper.toDomain(entity)
-        }
-        coEvery { userService.getUserById(expectedUser.id) } returns expectedUser
+        coEvery { userService.getUserById(TestUserId) } returns TestUser
 
         // when
-        val userDto = usecase(expectedUser.id)
+        val userDto = usecase(TestUserId)
 
         // then
         assertNotNull(userDto)
-        assertEquals(expectedUser.toDto(), userDto)
+        assertEquals(TestUser.toDto(), userDto)
     }
 
     @Test
-    fun `getUserById 실패 테스트 - 사용자가 존재하지 않을 때`() = runTest {
+    fun `사용자가 존재하지 않을 때 실패 테스트`() = runTest {
         // given
-        coEvery { userService.getUserById(UserId(1L)) } returns null
+        coEvery { userService.getUserById(TestUserId) } returns null
 
         // when
-        val userDto = usecase(UserId(1L))
+        val userDto = usecase(TestUserId)
 
         // then
         assertNull(userDto)
+    }
+
+    companion object {
+        private val TestUserId = UserId(1L)
+        private val TestUser = User(
+            id = TestUserId,
+            role = RoleForUser.USER,
+            provider = SocialLoginProviderForUser.GOOGLE,
+            providerId = "providerId",
+            displayId = DisplayId("displayId"),
+            name = Name("name"),
+            profileImageUrl = "profileImageUrl",
+            introduce = "introduce",
+            isActive = true,
+            lastLoginAt = Instant.now(),
+        )
     }
 }
