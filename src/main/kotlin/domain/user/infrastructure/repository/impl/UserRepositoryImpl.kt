@@ -8,7 +8,6 @@ import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {

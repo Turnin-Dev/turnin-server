@@ -20,7 +20,6 @@ import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.patch
 
 // ------------------------------ Route ------------------------------
 fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases) {
