@@ -43,7 +43,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
             }
         }
 
-        patch(route.ROUTE.byPathParam("id"), {}) {
+        patch(route.ROUTE.byPathParam("id"), { patchUserDocs() }) {
             val userIdParam = call.pathParameters["id"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
