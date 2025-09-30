@@ -1,11 +1,11 @@
 package com.peekr.domain.userKeyword.presentation.route
 
+import com.peekr.common.model.UserId
+import com.peekr.common.model.UserKeywordId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.common.route.Api.byPathParam
-import com.peekr.domain.core.model.UserId
-import com.peekr.domain.core.model.UserKeywordId
-import com.peekr.domain.core.validator.inputValidationAndReturn
+import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.GetUserKeywordResponse

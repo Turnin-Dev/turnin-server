@@ -1,8 +1,8 @@
 package com.peekr.domain.keyword.domain.model
 
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
 import com.peekr.common.validator.ValidatorException
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
 import kotlin.test.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows

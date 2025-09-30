@@ -28,7 +28,7 @@ sealed class CommonErrorCode(
             ErrorCodes.EmptyRequest.Parameter.description,
         )
 
-    object Unexpected : CommonErrorCode("UN001", "예상하지 못한 오류입니다.")
+    object Unexpected : CommonErrorCode("UN001", "알 수 없는 오류입니다.")
 }
 
 private object ErrorCodes {

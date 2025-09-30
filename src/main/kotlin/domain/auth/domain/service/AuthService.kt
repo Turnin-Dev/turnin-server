@@ -1,12 +1,12 @@
 package com.peekr.domain.auth.domain.service
 
 import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.model.DisplayId
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
-import com.peekr.domain.core.model.DisplayId
 
 interface AuthService {
     /**

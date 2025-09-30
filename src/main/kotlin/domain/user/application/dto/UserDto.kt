@@ -1,8 +1,8 @@
 package com.peekr.domain.user.application.dto
 
-import com.peekr.domain.core.model.DisplayId
-import com.peekr.domain.core.model.Name
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Name
+import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User

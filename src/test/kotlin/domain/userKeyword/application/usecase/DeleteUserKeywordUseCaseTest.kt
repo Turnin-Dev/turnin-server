@@ -1,7 +1,7 @@
 package com.peekr.domain.userKeyword.application.usecase
 
-import com.peekr.domain.core.model.UserId
-import com.peekr.domain.core.model.UserKeywordId
+import com.peekr.common.model.UserId
+import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.domain.service.UserKeywordService
 import io.mockk.coEvery
 import io.mockk.mockk

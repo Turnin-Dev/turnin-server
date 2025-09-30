@@ -1,4 +1,4 @@
-package com.peekr.domain.core.model
+package com.peekr.common.model
 
 /** 키워드 ID VO */
 @JvmInline

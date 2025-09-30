@@ -7,9 +7,9 @@ import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
-import com.peekr.domain.core.model.UserKeywordId
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
+import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
@@ -21,6 +21,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
+import org.junit.After
 import org.junit.Before
 import org.junit.jupiter.api.assertThrows
 
@@ -30,6 +31,11 @@ class UserKeywordRepositoryImplTest {
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
+    }
+
+    @After
+    fun teardown() {
+        TestDatabaseFactory.cleanUp()
     }
 
     @Test

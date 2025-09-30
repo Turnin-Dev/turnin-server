@@ -1,10 +1,10 @@
 package com.peekr.domain.auth.domain.repository
 
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
-import com.peekr.domain.core.model.DisplayId
-import com.peekr.domain.core.model.UserId
 
 interface AuthRepository {
     /**

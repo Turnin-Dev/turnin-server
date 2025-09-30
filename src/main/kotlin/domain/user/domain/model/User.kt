@@ -1,8 +1,8 @@
 package com.peekr.domain.user.domain.model
 
-import com.peekr.domain.core.model.DisplayId
-import com.peekr.domain.core.model.Name
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Name
+import com.peekr.common.model.UserId
 import java.time.Instant
 
 /**

@@ -4,8 +4,8 @@ import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
+import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
-import com.peekr.domain.core.model.UserId
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.upsert
 

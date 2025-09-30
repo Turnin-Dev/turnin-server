@@ -1,6 +1,6 @@
 package com.peekr.domain.userKeyword.application.usecase
 
-import com.peekr.domain.core.model.UserId
+import com.peekr.common.model.UserId
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.domain.service.UserKeywordService

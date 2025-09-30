@@ -4,6 +4,8 @@ import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.jwt.application.dto.toDto
 import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.UserId
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.FindUserResultDto
@@ -14,8 +16,6 @@ import com.peekr.domain.auth.application.mapper.AuthMapper.toDto
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.service.AuthService
 import com.peekr.domain.auth.domain.service.RefreshTokenService
-import com.peekr.domain.core.model.DisplayId
-import com.peekr.domain.core.model.UserId
 
 class AuthUseCaseImpl(
     private val authService: AuthService,

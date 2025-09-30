@@ -1,8 +1,8 @@
 package com.peekr.domain.userKeyword.infrastructure.service.impl
 
-import com.peekr.domain.core.model.KeywordId
-import com.peekr.domain.core.model.UserId
-import com.peekr.domain.core.model.UserKeywordId
+import com.peekr.common.model.KeywordId
+import com.peekr.common.model.UserId
+import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository

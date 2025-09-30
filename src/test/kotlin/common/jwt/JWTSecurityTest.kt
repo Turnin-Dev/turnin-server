@@ -15,7 +15,6 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -43,10 +42,11 @@ class JWTSecurityTest {
     @Test
     fun `인증이 필요한 엔드포인트 성공 테스트`() = testApplication {
         // Given
+        val testToken = JWTTestDoubles.getMockJWTToken()
+        every { jwtTokenService.generate(any()) } returns testToken
         testPlugin(
             module = testJwtModule,
-            plugin = { configureJwtSecurity() },
-            routing = { protectedRoute() },
+            authRouting = { protectedRoute() },
         )
         val token = jwtTokenService.generate(JWTTestDoubles.getJWTTokenPayload())
 
@@ -56,6 +56,7 @@ class JWTSecurityTest {
         }
 
         // Then
+        assertEquals(testToken, token)
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals(TEST_RESPONSE, response.bodyAsText())
     }
@@ -65,8 +66,7 @@ class JWTSecurityTest {
         // Given
         testPlugin(
             module = testJwtModule,
-            plugin = { configureJwtSecurity() },
-            routing = { protectedRoute() },
+            authRouting = { protectedRoute() },
         )
         val invalidToken = "Iam.invalid.token"
         val jwtToken = JWTToken(invalidToken, invalidToken)
@@ -91,10 +91,8 @@ class JWTSecurityTest {
     }
 
     private fun Route.protectedRoute() {
-        authenticate {
-            get(TEST_ENDPOINT) {
-                call.respondText(TEST_RESPONSE)
-            }
+        get(TEST_ENDPOINT) {
+            call.respondText(TEST_RESPONSE)
         }
     }
 
