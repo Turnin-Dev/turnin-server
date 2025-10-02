@@ -2,11 +2,8 @@ package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
-import com.peekr.common.model.UserId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
-import com.peekr.common.route.Api.byPathParam
-import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
@@ -27,11 +24,8 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
         tags = setOf(route.TAG)
         description = "User API"
     }) {
-        get(route.ROUTE.byPathParam("id"), { getUserByIdDocs() }) {
-            val userIdParam = call.pathParameters["id"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("사용자 ID")
-            val userId = UserId(userIdParam)
+        get(route.ROUTE, { getUserByIdDocs() }) {
+            val userId = extractUserIdWithToken()
             val user = userUseCases.get(userId)
             if (user != null) {
                 call.respond(user.toResponse())
@@ -43,12 +37,9 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
             }
         }
 
-        patch(route.ROUTE.byPathParam("id"), { patchUserDocs() }) {
-            val userIdParam = call.pathParameters["id"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("사용자 ID")
+        patch(route.ROUTE, { patchUserDocs() }) {
             val userPatchRequest = call.receive<UserPatchRequest>()
-            val userId = UserId(userIdParam)
+            val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
             val result = userUseCases.update(userId, userPatchRequest.toDto())
             if (result) {
@@ -67,14 +58,6 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
 fun RouteConfig.getUserByIdDocs() {
     summary = "사용자 조회"
     description = "사용자 ID로 사용자를 조회한다."
-    request {
-        pathParameter<Long>("id") {
-            description = "사용자 ID 파라미터"
-            example("Example") {
-                value = 1
-            }
-        }
-    }
     response {
         code(HttpStatusCode.OK) {
             body<UserResponse> {
@@ -99,12 +82,6 @@ fun RouteConfig.patchUserDocs() {
     summary = "사용자 정보 수정"
     description = "사용자 정보를 수정한다."
     request {
-        pathParameter<Long>("id") {
-            description = "사용자 ID 파라미터"
-            example("Example") {
-                value = 1
-            }
-        }
         body<UserPatchRequest> {
             description = "사용자 정보 수정 요청 바디"
             example("Example") {
