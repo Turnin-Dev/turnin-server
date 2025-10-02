@@ -47,8 +47,7 @@ class UserRoutesTest {
         )
 
         // when
-        val getUserEndPoint = "${route.ROUTE}/${TestUserId.value}"
-        val response = client.get(getUserEndPoint) {
+        val response = client.get(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
         }
         val responseBody = response.bodyAsText()
@@ -64,7 +63,7 @@ class UserRoutesTest {
     fun `사용자 조회 GET 요청 실패 테스트 -잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        val token = JWTTestDoubles.getMockJWTToken(INVALID_USER_ID)
         coEvery { userUseCases.get(TestUserId) } returns MockUserDto
 
         testPlugin(
@@ -73,8 +72,7 @@ class UserRoutesTest {
 
         invalidUserIds.forEach { invalidUserId ->
             // when
-            val getUserEndPoint = "${route.ROUTE}/$invalidUserId"
-            val response = client.get(getUserEndPoint) {
+            val response = client.get(route.ROUTE) {
                 header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             }
 
@@ -95,8 +93,7 @@ class UserRoutesTest {
         )
 
         // when
-        val getUserEndPoint = "${route.ROUTE}/${TestUserId.value}"
-        val response = client.get(getUserEndPoint) {
+        val response = client.get(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
         }
         val responseBody = response.bodyAsText()
@@ -118,11 +115,7 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.patch {
-            url {
-                path(route.ROUTE)
-                appendPathSegments(TestUserId.value.toString())
-            }
+        val response = client.patch(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)
@@ -136,7 +129,7 @@ class UserRoutesTest {
     fun `사용자 수정 UPDATE 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        val token = JWTTestDoubles.getMockJWTToken(INVALID_USER_ID)
         coEvery { userUseCases.update(TestUserId, TestUserPatchDto) } returns true
 
         testPlugin(
@@ -144,11 +137,7 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.patch {
-            url {
-                path(route.ROUTE)
-                appendPathSegments(INVALID_USER_ID)
-            }
+        val response = client.patch(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)
@@ -195,11 +184,7 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.patch {
-            url {
-                path(route.ROUTE)
-                appendPathSegments(TestUserId.value.toString())
-            }
+        val response = client.patch(route.ROUTE) {
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)
         }
@@ -227,11 +212,7 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.patch {
-            url {
-                path(route.ROUTE)
-                appendPathSegments(TestUserId.value.toString())
-            }
+        val response = client.patch(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)

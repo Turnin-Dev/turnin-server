@@ -24,7 +24,7 @@ class CreateKeywordUseCaseTest {
     @Test
     fun `성공적으로 키워드를 생성한다`() = runTest {
         // given
-        coEvery { keywordService.create(any(), any()) } returns TestKeyword
+        coEvery { keywordService.create(TEST_KEYWORD, TestUserId) } returns TestKeyword
 
         // when
         val keyword = usecase(TEST_KEYWORD, TestUserId)

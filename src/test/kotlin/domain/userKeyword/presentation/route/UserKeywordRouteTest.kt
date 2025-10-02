@@ -61,8 +61,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${TestUserId.value}"
-        val response = client.get(endpoint) {
+        val response = client.get(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
         }
@@ -90,8 +89,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${TestUserId.value}"
-        val response = client.get(endpoint) {
+        val response = client.get(route.ROUTE) {
             contentType(ContentType.Application.Json)
         }
 
@@ -114,8 +112,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${TestUserId.value}"
-        val response = client.get(endpoint) {
+        val response = client.get(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
         }
@@ -141,8 +138,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${TestUserId.value}"
-        val response = client.get(endpoint) {
+        val response = client.get(route.ROUTE) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
         }

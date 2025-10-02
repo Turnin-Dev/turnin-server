@@ -4,7 +4,6 @@ import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
-import com.peekr.common.route.Api.byPathParam
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
@@ -28,11 +27,8 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
         tags = setOf(route.TAG)
         description = "User Keyword API"
     }) {
-        get(route.ROUTE.byPathParam("userId"), { getUserKeywordByUserIdDocs() }) {
-            val userIdParam = call.pathParameters["userId"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("사용자 ID")
-            val userId = UserId(userIdParam)
+        get(route.ROUTE, { getUserKeywordByUserIdDocs() }) {
+            val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
             val userKeywords = usecase.get(userId)
             call.respond(userKeywords.toResponse())
@@ -48,13 +44,10 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
         }
 
         patch(route.ROUTE, { patchUserKeywordDocs() }) {
-            val ownerIdParam = call.queryParameters["ownerId"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("소유자 ID")
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
-            val ownerId = UserId(ownerIdParam)
+            val ownerId = extractUserIdWithToken()
             verifyAuthUserId(ownerId)
             val userKeywordId = UserKeywordId(userKeywordIdParam)
             val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
@@ -71,13 +64,10 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
         }
 
         delete(route.ROUTE, { deleteUserKeywordDocs() }) {
-            val ownerIdParam = call.queryParameters["ownerId"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("소유자 ID")
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
-            val ownerId = UserId(ownerIdParam)
+            val ownerId = extractUserIdWithToken()
             verifyAuthUserId(ownerId)
             val userKeywordId = UserKeywordId(userKeywordIdParam)
             val result = usecase.delete(ownerId, userKeywordId)
@@ -93,14 +83,6 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
 private fun RouteConfig.getUserKeywordByUserIdDocs() {
     summary = "사용자 키워드 목록 조회"
     description = "사용자 ID로 사용자 키워드 목록을 조회한다."
-    request {
-        pathParameter<Long>("userId") {
-            description = "사용자 ID"
-            example("Example") {
-                value = 1
-            }
-        }
-    }
     response {
         code(HttpStatusCode.OK) {
             body<GetUserKeywordResponse> {
@@ -139,12 +121,6 @@ private fun RouteConfig.patchUserKeywordDocs() {
     summary = "사용자 키워드 수정"
     description = "사용자 키워드를 수정한다."
     request {
-        queryParameter<Long>("ownerId") {
-            description = "소유자(사용자) ID"
-            example("ownerId") {
-                value = 1
-            }
-        }
         queryParameter<Long>("userKeywordId") {
             description = "사용자 키워드 ID"
             example("userKeywordId") {
@@ -172,12 +148,6 @@ private fun RouteConfig.deleteUserKeywordDocs() {
     summary = "사용자 키워드 삭제"
     description = "사용자 키워드를 삭제한다."
     request {
-        queryParameter<Long>("ownerId") {
-            description = "소유자(사용자) ID"
-            example("ownerId") {
-                value = 1
-            }
-        }
         queryParameter<Long>("userKeywordId") {
             description = "사용자 키워드 ID"
             example("userKeywordId") {

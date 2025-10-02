@@ -37,7 +37,7 @@ class KeywordServiceImplTest {
     @Test
     fun `키워드가 존재하지 않으면 null을 반환한다`() = runTest {
         // given
-        coEvery { keywordRepository.findById(any()) } returns null
+        coEvery { keywordRepository.findById(TestKeyword.id) } returns null
 
         // when
         val keyword = service.getKeyword(TestKeyword.id)
