@@ -4,7 +4,11 @@ import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.UserTestDoubles
+import com.peekr.domain.user.domain.model.RoleForUser
+import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
+import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
+import com.peekr.domain.user.domain.model.UserProfile
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper
 import com.peekr.util.TestDatabaseFactory
@@ -65,6 +69,36 @@ class UserServiceImplTest {
     }
 
     @Test
+    fun `getUserProfileById 성공 테스트`() = runTest {
+        // given
+        coEvery {
+            repository.findUserProfileById(TestUserId)
+        } returns TestUserProfile
+
+        // when
+        val result = service.getUserProfileById(TestUserId)
+
+        // then
+        assertNotNull(result)
+        assertEquals(TestUserProfile.user, result.user)
+        assertEquals(TestUserProfile.friendsCount, result.friendsCount)
+    }
+
+    @Test
+    fun `getUserProfileById 실패 테스트 - 사용자가 존재하지 않는 경우 null을 반환한다`() = runTest {
+        // given
+        coEvery {
+            repository.findUserProfileById(TestUserId)
+        } returns null
+
+        // when
+        val result = service.getUserProfileById(TestUserId)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
     fun `updateUser 성공 테스트`() = runTest {
         // given
         coEvery {
@@ -99,6 +133,21 @@ class UserServiceImplTest {
             name = Name("name"),
             profileImageUrl = null,
             introduce = "introduce",
+        )
+        private val TestUserProfile = UserProfile(
+            user = User(
+                id = UserId(1L),
+                role = RoleForUser.USER,
+                provider = SocialLoginProviderForUser.GOOGLE,
+                providerId = "123901239",
+                displayId = DisplayId("hong_gd_123"),
+                name = Name("honggd"),
+                profileImageUrl = "https://example.com/image.jpg",
+                introduce = "hello world!",
+                isActive = true,
+                lastLoginAt = null,
+            ),
+            friendsCount = 2,
         )
     }
 }
