@@ -94,8 +94,8 @@ fun RouteConfig.getUserByIdDocs() {
 
 fun RouteConfig.getUserProfileByIdDocs() {
     summary = "사용자 프로필 조회"
-    description = "사용자 ID로 사용자 프로필을 조회한다.\n" +
-        "사용자 조회와 다른점은 사용자 데이터에 추가 데이터가 포함된다."
+    description = "사용자 ID로 사용자 프로필을 조회한다." +
+        "(사용자 조회와 다른점은 사용자 데이터에 추가 데이터가 포함된다)"
     response {
         code(HttpStatusCode.OK) {
             body<UserResponse> {
