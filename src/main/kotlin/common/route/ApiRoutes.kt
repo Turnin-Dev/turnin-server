@@ -28,6 +28,7 @@ object Api {
         object User {
             const val ROUTE = "/user"
             const val TAG = "User"
+            const val PROFILE = "/user-profile"
         }
 
         object File {

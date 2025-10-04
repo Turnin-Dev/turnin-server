@@ -3,6 +3,7 @@ package com.peekr.domain.user.domain.service
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
+import com.peekr.domain.user.domain.model.UserProfile
 
 interface UserService {
     /**
@@ -13,6 +14,15 @@ interface UserService {
      * @return [User] - 사용자가 존재하지 않을 때는 **`null`** 반환
      */
     suspend fun getUserById(id: UserId): User?
+
+    /**
+     * ID를 통해 사용자 프로필을 조회한다.
+     *
+     * @param id 사용자 ID
+     *
+     * @return [UserProfile] - 사용자가 존재하지 않을 때는 **`null`** 반환
+     */
+    suspend fun getUserProfileById(id: UserId): UserProfile?
 
     /**
      * 사용자 정보를 수정한다.
