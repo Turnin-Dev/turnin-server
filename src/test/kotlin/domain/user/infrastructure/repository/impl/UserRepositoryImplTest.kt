@@ -105,7 +105,7 @@ class UserRepositoryImplTest {
 
         // then
         assertNotNull(userProfile)
-        assertEquals(1, userProfile.friendsCount)
+        assertEquals(1L, userProfile.friendsCount)
     }
 
     @Test
