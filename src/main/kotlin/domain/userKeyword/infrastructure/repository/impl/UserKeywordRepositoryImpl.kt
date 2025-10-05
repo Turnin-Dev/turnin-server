@@ -20,7 +20,7 @@ import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun findByUserId(userId: UserId): List<UserKeyword> = DatabaseFactory.dbQuery {
-        UserKeywordEntity.Companion
+        UserKeywordEntity
             .find(UserKeywords.userId eq userId.value)
             .map { it.toDomain() }
     }
@@ -29,7 +29,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         keywordId: KeywordId,
         userId: UserId,
     ): UserKeyword? = DatabaseFactory.dbQuery {
-        UserKeywordEntity.Companion
+        UserKeywordEntity
             .find(
                 (UserKeywords.keywordId eq keywordId.value) and
                     (UserKeywords.userId eq userId.value),
@@ -44,7 +44,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         offsetY: Float,
         description: String?,
     ): UserKeyword = DatabaseFactory.dbQuery {
-        val savedUserKeywordEntity = UserKeywordEntity.Companion.new {
+        val savedUserKeywordEntity = UserKeywordEntity.new {
             this.keywordId = EntityID(keywordId.value, Keywords)
             this.userId = EntityID(userId.value, Users)
             this.offsetX = offsetX.toDouble()
