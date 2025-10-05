@@ -1,5 +1,6 @@
 package com.peekr.domain.user.di
 
+import com.peekr.domain.user.application.usecase.GetUserProfileUseCase
 import com.peekr.domain.user.application.usecase.GetUserUseCase
 import com.peekr.domain.user.application.usecase.UpdateUserUseCase
 import com.peekr.domain.user.application.usecase.UserUseCases
@@ -18,6 +19,7 @@ val userModule = module {
 
     // UseCase
     factory { GetUserUseCase(get()) }
+    factory { GetUserProfileUseCase(get()) }
     factory { UpdateUserUseCase(get()) }
-    single<UserUseCases> { UserUseCases(get(), get()) }
+    single<UserUseCases> { UserUseCases(get(), get(), get()) }
 }

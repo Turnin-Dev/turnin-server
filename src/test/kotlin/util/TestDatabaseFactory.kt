@@ -1,6 +1,7 @@
 package com.peekr.util
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserKeywords
@@ -25,6 +26,7 @@ object TestDatabaseFactory {
                 RefreshTokens,
                 Keywords,
                 UserKeywords,
+                Friends,
             )
         }
     }
@@ -35,6 +37,7 @@ object TestDatabaseFactory {
                 UserKeywords,
                 RefreshTokens,
                 Keywords,
+                Friends,
                 Users,
             )
 
@@ -43,6 +46,7 @@ object TestDatabaseFactory {
                 RefreshTokens,
                 Keywords,
                 UserKeywords,
+                Friends,
             )
         }
     }

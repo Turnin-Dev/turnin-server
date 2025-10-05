@@ -1,24 +1,45 @@
 package com.peekr.domain.user
 
+import com.peekr.common.db.schema.FriendEntity
+import com.peekr.common.db.schema.FriendStatus
 import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.Users
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.application.dto.UserDto
 import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
+import java.time.Instant
+import org.jetbrains.exposed.dao.id.EntityID
 
 object UserTestDoubles {
-    fun saveAndGetUserEntity() = UserEntity.new {
+    fun saveAndGetUserEntity(
+        providerId: String = "123901239",
+        displayId: String = "hong_gd_123",
+    ) = UserEntity.new {
         this.role = Role.USER
         this.provider = SocialLoginProvider.GOOGLE
-        this.providerId = "123901239"
-        this.displayId = "hong_gd_123"
+        this.providerId = providerId
+        this.displayId = displayId
         this.name = "honggd"
         this.profileImageUrl = "https://example.com/image.jpg"
         this.introduce = "hello world!"
+    }
+
+    fun saveFriendEntity(
+        requesterId: Long,
+        receiverId: Long,
+        status: FriendStatus,
+    ) {
+        FriendEntity.new {
+            this.requesterId = EntityID(requesterId, Users)
+            this.receiverId = EntityID(receiverId, Users)
+            this.status = status
+            respondedAt = Instant.now()
+        }
     }
 
     val MockUserDto = UserDto(

@@ -7,6 +7,7 @@ import com.peekr.common.route.Api
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
+import com.peekr.domain.user.presentation.dto.UserProfileResponse
 import com.peekr.domain.user.presentation.dto.UserResponse
 import com.peekr.domain.user.presentation.dto.toDto
 import com.peekr.domain.user.presentation.dto.toResponse
@@ -27,6 +28,19 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
         get(route.ROUTE, { getUserByIdDocs() }) {
             val userId = extractUserIdWithToken()
             val user = userUseCases.get(userId)
+            if (user != null) {
+                call.respond(user.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        get(route.PROFILE, { getUserProfileByIdDocs() }) {
+            val userId = extractUserIdWithToken()
+            val user = userUseCases.getProfile(userId)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {
@@ -64,6 +78,30 @@ fun RouteConfig.getUserByIdDocs() {
                 description = "사용자 정보"
                 example("UserResponse") {
                     value = UserResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자가 존재하지 않는 경우"
+                example("UserResponse") {
+                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+fun RouteConfig.getUserProfileByIdDocs() {
+    summary = "사용자 프로필 조회"
+    description = "사용자 ID로 사용자 프로필을 조회한다." +
+        "(사용자 조회와 다른점은 사용자 데이터에 추가 데이터가 포함된다)"
+    response {
+        code(HttpStatusCode.OK) {
+            body<UserProfileResponse> {
+                description = "사용자 프로필"
+                example("UserProfileResponse") {
+                    value = UserProfileResponse.sample
                 }
             }
         }
