@@ -42,7 +42,7 @@ class UserKeywordRepositoryImplTest {
     fun `create 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId)
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
 
         // when
         val savedUserKeyword = repository.create(
@@ -75,7 +75,7 @@ class UserKeywordRepositoryImplTest {
     fun `findByUserId 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId)
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
@@ -116,7 +116,7 @@ class UserKeywordRepositoryImplTest {
     fun `findByKeywordIdAndUserId 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId)
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
@@ -144,7 +144,7 @@ class UserKeywordRepositoryImplTest {
     fun `update 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId)
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
@@ -184,7 +184,7 @@ class UserKeywordRepositoryImplTest {
     fun `delete 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId)
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
@@ -224,12 +224,16 @@ class UserKeywordRepositoryImplTest {
 
     private suspend fun insertKeywordAndReturnId(
         userId: UserId,
-        keyword: String = "keyword",
+        keyword: String,
     ): KeywordId = dbQuery {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keyword
             this.createdBy = EntityID(userId.value, Users)
         }
         KeywordId(savedKeyword.id.value)
+    }
+
+    companion object {
+        private const val TEST_KEYWORD = "keyword"
     }
 }
