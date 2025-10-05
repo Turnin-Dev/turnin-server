@@ -77,21 +77,21 @@ class UserRepositoryImplTest {
         // given
         val user1Id = TestDatabaseFactory.dbQuery {
             val savedUserEntity1 = UserTestDoubles.saveAndGetUserEntity("g1", "user1")
-            val savedEserEntity2 = UserTestDoubles.saveAndGetUserEntity("g2", "user2")
-            val savedEserEntity3 = UserTestDoubles.saveAndGetUserEntity("g3", "user3")
-            val savedEserEntity4 = UserTestDoubles.saveAndGetUserEntity("g4", "user4")
+            val savedUserEntity2 = UserTestDoubles.saveAndGetUserEntity("g2", "user2")
+            val savedUserEntity3 = UserTestDoubles.saveAndGetUserEntity("g3", "user3")
+            val savedUserEntity4 = UserTestDoubles.saveAndGetUserEntity("g4", "user4")
             UserTestDoubles.saveFriendEntity(
-                requesterId = savedEserEntity2.id.value,
+                requesterId = savedUserEntity2.id.value,
                 receiverId = savedUserEntity1.id.value,
                 status = FriendStatus.ACCEPTED,
             )
             UserTestDoubles.saveFriendEntity(
-                requesterId = savedEserEntity3.id.value,
+                requesterId = savedUserEntity3.id.value,
                 receiverId = savedUserEntity1.id.value,
                 status = FriendStatus.PENDING,
             )
             UserTestDoubles.saveFriendEntity(
-                requesterId = savedEserEntity4.id.value,
+                requesterId = savedUserEntity4.id.value,
                 receiverId = savedUserEntity1.id.value,
                 status = FriendStatus.REJECTED,
             )
