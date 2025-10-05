@@ -51,6 +51,7 @@ class CreateUserKeywordUseCaseTest {
             id = TestUserKeywordId,
             userId = TestUserId,
             keywordId = TestKeywordId,
+            keywordName = "sample",
             offsetX = 0.0f,
             offsetY = 0.0f,
             description = "",

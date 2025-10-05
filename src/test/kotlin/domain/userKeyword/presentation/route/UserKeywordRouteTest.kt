@@ -500,9 +500,11 @@ class UserKeywordRouteTest {
         private val TestUserKeywordId = UserKeywordId(1L)
         private const val TEST_OFFSET = 0.0f
         private const val TEST_DESC = "Test description"
+        private const val TEST_KEYWORD = "keyword"
         private val TestUserKeywordDto = UserKeywordDto(
             id = TestUserKeywordId.value,
             keywordId = TestKeywordId.value,
+            keywordName = TEST_KEYWORD,
             userId = TestUserId.value,
             offsetX = TEST_OFFSET,
             offsetY = TEST_OFFSET,

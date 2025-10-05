@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
  *
  * @property id 사용자별 키워드 ID
  * @property keywordId 키워드 ID
+ * @property keywordName 키워드 명
  * @property userId 사용자 ID
  * @property offsetX UI 좌표 상에서의 X 위치
  * @property offsetY UI 좌표 상에서의 Y 위치
@@ -20,6 +21,7 @@ import kotlinx.serialization.Serializable
 data class UserKeywordDto(
     val id: Long,
     val keywordId: Long,
+    val keywordName: String,
     val userId: Long,
     val offsetX: Float,
     val offsetY: Float,
@@ -31,6 +33,7 @@ data class UserKeywordDto(
 fun UserKeyword.toDto(): UserKeywordDto = UserKeywordDto(
     id = id.value,
     keywordId = keywordId.value,
+    keywordName = keywordName,
     userId = userId.value,
     offsetX = offsetX,
     offsetY = offsetY,
@@ -44,6 +47,7 @@ fun List<UserKeyword>.toDto(): List<UserKeywordDto> = map { it.toDto() }
 fun UserKeywordDto.toResponse(): UserKeywordResponse = UserKeywordResponse(
     id = this.id,
     keywordId = this.keywordId,
+    keywordName = this.keywordName,
     userId = this.userId,
     offsetX = this.offsetX,
     offsetY = this.offsetY,

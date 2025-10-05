@@ -29,4 +29,6 @@ class UserKeywordEntity(id: EntityID<Long>) : BaseEntity(id, UserKeywords) {
     var offsetX by UserKeywords.offsetX
     var offsetY by UserKeywords.offsetY
     var description by UserKeywords.description
+
+    val keywordEntity by KeywordEntity referencedOn UserKeywords.keywordId
 }
