@@ -35,6 +35,16 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
             }
         }
 
+        get(route.ROUTE.byPathParam("keywordName"), { getKeywordByNameDocs() }) {
+            val keywordName = call.pathParameters["keywordName"].inputValidationAndReturn("키워드 명")
+            val keywordDto = usecase.getByName(keywordName)
+            if (keywordDto == null) {
+                call.respond(HttpStatusCode.NotFound)
+            } else {
+                call.respond(HttpStatusCode.OK, keywordDto.toResponse())
+            }
+        }
+
         post(route.ROUTE, { createKeywordDocs() }) {
             val createKeywordRequest = call.receive<CreateKeywordRequest>()
             val createById = extractUserIdWithToken()
@@ -55,6 +65,32 @@ private fun RouteConfig.getKeywordByIdDocs() {
             description = "키워드 ID"
             example("Example") {
                 value = 1
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<KeywordResponse> {
+                description = "키워드"
+                example("KeywordResponse") {
+                    value = KeywordResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            description = "키워드가 존재하지 않는 경우"
+        }
+    }
+}
+
+private fun RouteConfig.getKeywordByNameDocs() {
+    summary = "키워드 조회"
+    description = "키워드 명으로 키워드를 조회한다."
+    request {
+        pathParameter<String>("keywordName") {
+            description = "키워드 명"
+            example("Example") {
+                value = "Sample KeywordName"
             }
         }
     }

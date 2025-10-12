@@ -9,6 +9,9 @@ import com.peekr.domain.keyword.domain.service.KeywordService
 class KeywordServiceImpl(private val keywordRepository: KeywordRepository) : KeywordService {
     override suspend fun getKeyword(id: KeywordId): Keyword? = keywordRepository.findById(id)
 
+    override suspend fun getKeywordByName(keywordName: String): Keyword? =
+        keywordRepository.findByName(keywordName)
+
     override suspend fun create(
         keyword: String,
         createdBy: UserId,
