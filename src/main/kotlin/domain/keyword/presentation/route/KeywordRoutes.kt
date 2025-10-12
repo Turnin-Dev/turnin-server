@@ -9,6 +9,7 @@ import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.KeywordResponse
 import com.peekr.domain.keyword.presentation.dto.toResponse
+import com.peekr.domain.keyword.presentation.validation.validateKeywordName
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -18,11 +19,11 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 
 fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseCases) {
-    route({
+    route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "Keyword API"
     }) {
-        get(route.ROUTE.byPathParam("keywordId"), { getKeywordByIdDocs() }) {
+        get(route.ID.byPathParam("keywordId"), { getKeywordByIdDocs() }) {
             val keywordIdParam = call.pathParameters["keywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("키워드 ID")
@@ -35,8 +36,9 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
             }
         }
 
-        get(route.ROUTE.byPathParam("keywordName"), { getKeywordByNameDocs() }) {
+        get(route.NAME.byPathParam("keywordName"), { getKeywordByNameDocs() }) {
             val keywordName = call.pathParameters["keywordName"].inputValidationAndReturn("키워드 명")
+            keywordName.validateKeywordName()
             val keywordDto = usecase.getByName(keywordName)
             if (keywordDto == null) {
                 call.respond(HttpStatusCode.NotFound)
@@ -45,7 +47,7 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
             }
         }
 
-        post(route.ROUTE, { createKeywordDocs() }) {
+        post({ createKeywordDocs() }) {
             val createKeywordRequest = call.receive<CreateKeywordRequest>()
             val createById = extractUserIdWithToken()
             val keywordResult = usecase.create(

@@ -23,7 +23,7 @@ class KeywordServiceImplTest {
     }
 
     @Test
-    fun `키워드를 성공적으로 가져온다`() = runTest {
+    fun `키워드 ID로 키워드를 성공적으로 가져온다`() = runTest {
         // given
         coEvery { keywordRepository.findById(TestKeyword.id) } returns TestKeyword
 
@@ -35,7 +35,7 @@ class KeywordServiceImplTest {
     }
 
     @Test
-    fun `키워드가 존재하지 않으면 null을 반환한다`() = runTest {
+    fun `키워드 ID 조회 시 존재하지 않으면 null을 반환한다`() = runTest {
         // given
         coEvery { keywordRepository.findById(TestKeyword.id) } returns null
 
@@ -46,10 +46,49 @@ class KeywordServiceImplTest {
         assertNull(keyword)
     }
 
+    @Test
+    fun `키워드를 성공적으로 생성한다`() = runTest {
+        // given
+        coEvery {
+            keywordRepository.create(TEST_KEYWORD, TestKeyword.createdBy)
+        } returns TestKeyword
+
+        // when
+        val keyword = service.create(TEST_KEYWORD, TestKeyword.createdBy)
+
+        // then
+        assertEquals(keyword, TestKeyword)
+    }
+
+    @Test
+    fun `키워드 명으로 키워드를 성공적으로 가져온다`() = runTest {
+        // given
+        coEvery { keywordRepository.findByName(TEST_KEYWORD) } returns TestKeyword
+
+        // when
+        val keyword = service.getKeywordByName(TEST_KEYWORD)
+
+        // then
+        assertEquals(keyword, TestKeyword)
+    }
+
+    @Test
+    fun `키워드 명 조회 시 존재하지 않으면 null을 반환한다`() = runTest {
+        // given
+        coEvery { keywordRepository.findByName(TEST_KEYWORD) } returns null
+
+        // when
+        val keyword = service.getKeywordByName(TEST_KEYWORD)
+
+        // then
+        assertNull(keyword)
+    }
+
     companion object {
+        private const val TEST_KEYWORD = "keyword"
         private val TestKeyword = Keyword(
             id = KeywordId(1L),
-            keyword = "keyword",
+            keyword = TEST_KEYWORD,
             createdBy = UserId(1L),
             createdAt = 1000,
             updatedAt = 1000,
