@@ -100,12 +100,12 @@ class KeywordRepositoryImplTest {
     }
 
     @Test
-    fun `findByName 실패 테스트 - 존재하지 않는 키워드 ID 조회`() = runTest {
+    fun `findByName 실패 테스트 - 존재하지 않는 키워드 명 조회`() = runTest {
         // given
-        val invalidKeywordId = KeywordId(0L)
+        val invalidKeywordName = "asd"
 
         // when
-        val keyword = repository.findById(invalidKeywordId)
+        val keyword = repository.findByName(invalidKeywordName)
 
         // then
         assertNull(keyword)

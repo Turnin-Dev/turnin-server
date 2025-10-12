@@ -301,7 +301,6 @@ class KeywordRoutesTest {
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
-            setBody(TestCreateKeywordRequest)
         }
         val responseBody = response.bodyAsText()
 
@@ -328,7 +327,6 @@ class KeywordRoutesTest {
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
-            setBody(TestKeywordResponse)
         }
 
         // then
@@ -353,7 +351,6 @@ class KeywordRoutesTest {
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
-            setBody(TestKeywordResponse)
         }
 
         // then
@@ -379,7 +376,6 @@ class KeywordRoutesTest {
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
-            setBody(TestKeywordResponse)
         }
 
         // then
@@ -407,7 +403,6 @@ class KeywordRoutesTest {
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
-            setBody(TestKeywordResponse)
         }
         val responseBody = response.bodyAsText()
 
