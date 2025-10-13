@@ -57,8 +57,8 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             val displayId = DisplayId(request.displayId)
             val existsByDisplayId = authUseCase.existsDisplayId(displayId)
             if (!existsByDisplayId) {
-                val resultResultDto = authUseCase.register(request.toDto())
-                call.respond(HttpStatusCode.Created, resultResultDto.toResponse())
+                val registerResultDto = authUseCase.register(request.toDto())
+                call.respond(HttpStatusCode.Created, registerResultDto.toResponse())
             } else {
                 call.respond(
                     HttpStatusCode.Conflict,
