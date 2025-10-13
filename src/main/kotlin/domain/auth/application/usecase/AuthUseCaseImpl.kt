@@ -10,7 +10,9 @@ import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
+import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.application.dto.RegisterDto
+import com.peekr.domain.auth.application.dto.RegisterResultDto
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDomain
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDto
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
@@ -22,7 +24,7 @@ class AuthUseCaseImpl(
     private val refreshTokenService: RefreshTokenService,
     private val jwtTokenService: JWTTokenService,
 ) : AuthUseCase {
-    override suspend fun login(loginDto: LoginDto): JWTTokenDto? {
+    override suspend fun login(loginDto: LoginDto): LoginResultDto? {
         LOGGER.debug("login called: $loginDto")
         val loginResult = authService.login(loginDto.provider, loginDto.providerId)
         if (loginResult == null) {
@@ -33,10 +35,11 @@ class AuthUseCaseImpl(
         }
         saveRefreshToken(loginResult.authUser.userId, loginResult.jwtToken.refreshToken)
         LOGGER.debug("login successful")
-        return loginResult.jwtToken.toDto()
+        val jwtTokenDto = loginResult.jwtToken.toDto()
+        return LoginResultDto(loginResult.authUser.userId, jwtTokenDto)
     }
 
-    override suspend fun register(registerDto: RegisterDto): JWTTokenDto {
+    override suspend fun register(registerDto: RegisterDto): RegisterResultDto {
         LOGGER.debug("register called")
         val authUser = registerDto.toDomain()
         val registerResult = authService.register(authUser)
@@ -44,7 +47,7 @@ class AuthUseCaseImpl(
         val jwtTokenDto = registerResult.jwtToken.toDto()
         saveRefreshToken(savedAuthUser.userId, jwtTokenDto.refreshToken)
         LOGGER.debug("register successful, username: ${savedAuthUser.name}")
-        return jwtTokenDto
+        return RegisterResultDto(savedAuthUser.userId, jwtTokenDto)
     }
 
     override suspend fun refresh(token: String): JWTTokenDto? {

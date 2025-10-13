@@ -4,7 +4,9 @@ import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.model.DisplayId
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
+import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.application.dto.RegisterDto
+import com.peekr.domain.auth.application.dto.RegisterResultDto
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 
 interface AuthUseCase {
@@ -13,19 +15,19 @@ interface AuthUseCase {
      *
      * @param loginDto [LoginDto]
      *
-     * @return [JWTTokenDto] 정상적으로 로그인이 진행된 경우
+     * @return [LoginResultDto] 정상적으로 로그인이 진행된 경우
      * (로그인 실패 (사용자를 가져올 수 없는 경우) **`null`** 반환)
      */
-    suspend fun login(loginDto: LoginDto): JWTTokenDto?
+    suspend fun login(loginDto: LoginDto): LoginResultDto?
 
     /**
      * 회원가입
      *
      * @param registerDto [RegisterDto]
      *
-     * @return [JWTTokenDto] 정상적으로 회원가입이 진행된 경우
+     * @return [RegisterResultDto] 정상적으로 회원가입이 진행된 경우
      */
-    suspend fun register(registerDto: RegisterDto): JWTTokenDto
+    suspend fun register(registerDto: RegisterDto): RegisterResultDto
 
     /**
      * 리프레쉬 토큰 갱신
