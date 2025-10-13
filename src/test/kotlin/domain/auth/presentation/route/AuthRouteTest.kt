@@ -7,6 +7,8 @@ import com.peekr.common.route.Api
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
+import com.peekr.domain.auth.AuthTestDoubles.MockLoginResultDto
+import com.peekr.domain.auth.AuthTestDoubles.MockRegisterResultDto
 import com.peekr.domain.auth.AuthTestDoubles.MockValidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockValidRegisterRequest
 import com.peekr.domain.auth.application.dto.FindUserResultDto
@@ -37,7 +39,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.login(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.login(any()) } returns MockLoginResultDto
 
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
@@ -54,7 +56,7 @@ class AuthRouteTest {
         // then
         coVerify(exactly = 1) { authUseCase.login(any()) }
         assertEquals(HttpStatusCode.OK, response.status)
-        assertTrue(responseBody.contains(MockJWTTokenDto.accessToken))
+        assertTrue(responseBody.contains(MockLoginResultDto.jwtTokenDto.accessToken))
     }
 
     @Test
@@ -62,7 +64,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.login(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.login(any()) } returns MockLoginResultDto
 
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
@@ -86,7 +88,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.login(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.login(any()) } returns MockLoginResultDto
 
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
@@ -173,7 +175,7 @@ class AuthRouteTest {
         val route = Api.V1.Auth
         val client = createTestClient()
         val displayId = DisplayId(MockValidRegisterRequest.displayId)
-        coEvery { authUseCase.register(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.register(any()) } returns MockRegisterResultDto
         coEvery { authUseCase.existsDisplayId(displayId) } returns false
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
@@ -190,7 +192,7 @@ class AuthRouteTest {
         // then
         coVerify(exactly = 1) { authUseCase.register(any()) }
         assertEquals(HttpStatusCode.Created, response.status)
-        assertTrue(responseBody.contains(MockJWTTokenDto.accessToken))
+        assertTrue(responseBody.contains(MockRegisterResultDto.jwtTokenDto.accessToken))
     }
 
     @Test
@@ -198,7 +200,7 @@ class AuthRouteTest {
         // given
         val route = Api.V1.Auth
         val client = createTestClient()
-        coEvery { authUseCase.register(any()) } returns MockJWTTokenDto
+        coEvery { authUseCase.register(any()) } returns MockRegisterResultDto
         testPlugin(
             routing = { authRoutes(route, authUseCase) },
         )

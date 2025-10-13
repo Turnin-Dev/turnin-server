@@ -15,7 +15,9 @@ import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
+import com.peekr.domain.auth.presentation.dto.LoginResultResponse
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
+import com.peekr.domain.auth.presentation.dto.RegisterResultResponse
 import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse
@@ -38,14 +40,14 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         post(route.LOGIN, { loginDocs() }) {
             val request = call.receive<LoginRequest>()
             request.validate()
-            val token = authUseCase.login(request.toDto())
-            if (token == null) {
+            val loginResultDto = authUseCase.login(request.toDto())
+            if (loginResultDto == null) {
                 call.respond(
                     HttpStatusCode.BadRequest,
                     AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest),
                 )
             } else {
-                call.respond(token.toResponse())
+                call.respond(loginResultDto.toResponse())
             }
         }
 
@@ -55,8 +57,8 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             val displayId = DisplayId(request.displayId)
             val existsByDisplayId = authUseCase.existsDisplayId(displayId)
             if (!existsByDisplayId) {
-                val token = authUseCase.register(request.toDto())
-                call.respond(HttpStatusCode.Created, token.toResponse())
+                val resultResultDto = authUseCase.register(request.toDto())
+                call.respond(HttpStatusCode.Created, resultResultDto.toResponse())
             } else {
                 call.respond(
                     HttpStatusCode.Conflict,
@@ -135,10 +137,10 @@ private fun RouteConfig.loginDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            body<JWTTokenResponse> {
-                description = "로그인 응답 본문 (JWT 토큰)"
-                example("JWTTokenResponse") {
-                    value = JWTTokenResponse.sample
+            body<LoginResultResponse> {
+                description = "로그인 응답 본문 (사용자 ID + JWT 토큰)"
+                example("LoginResultResponse") {
+                    value = LoginResultResponse.sample
                 }
             }
         }
@@ -169,10 +171,10 @@ private fun RouteConfig.registerDocs() {
     }
     response {
         code(HttpStatusCode.Created) {
-            body<JWTTokenResponse> {
-                description = "회원가입 응답 본문 (JWT 토큰)"
-                example("JWTTokenResponse") {
-                    value = JWTTokenResponse.sample
+            body<RegisterResultResponse> {
+                description = "회원가입 응답 본문 (사용자 ID + JWT 토큰)"
+                example("RegisterResultResponse") {
+                    value = RegisterResultResponse.sample
                 }
             }
         }
