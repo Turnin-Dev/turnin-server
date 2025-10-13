@@ -84,6 +84,33 @@ class KeywordRepositoryImplTest {
         assertNull(keyword)
     }
 
+    @Test
+    fun `findByName 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val savedKeyword = repository.create(TEST_KEYWORD, userId)
+
+        // when
+        val keyword = repository.findByName(savedKeyword.keyword)
+
+        // then
+        assertNotNull(keyword)
+        assertEquals(keyword.keyword, savedKeyword.keyword)
+        assertEquals(keyword.createdBy, savedKeyword.createdBy)
+    }
+
+    @Test
+    fun `findByName 실패 테스트 - 존재하지 않는 키워드 명 조회`() = runTest {
+        // given
+        val invalidKeywordName = "asd"
+
+        // when
+        val keyword = repository.findByName(invalidKeywordName)
+
+        // then
+        assertNull(keyword)
+    }
+
     private suspend fun insertUserAndReturnId(): UserId = dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER

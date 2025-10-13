@@ -8,6 +8,7 @@ import com.peekr.common.model.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.keyword.application.dto.KeywordDto
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
+import com.peekr.domain.keyword.domain.model.Keyword
 import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.KeywordResponse
 import com.peekr.util.TestClientFactory.createTestClient
@@ -52,7 +53,7 @@ class KeywordRoutesTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/1"
+        val endpoint = "${route.ROUTE}/${route.ID}/${TestKeywordId.value}"
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
@@ -79,7 +80,7 @@ class KeywordRoutesTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/1"
+        val endpoint = "${route.ROUTE}/${route.ID}/${TestKeywordId.value}"
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
@@ -104,7 +105,7 @@ class KeywordRoutesTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/-1"
+        val endpoint = "${route.ROUTE}/${route.ID}/-1"
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
@@ -130,7 +131,7 @@ class KeywordRoutesTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/1"
+        val endpoint = "${route.ROUTE}/${route.ID}/${TestKeywordId.value}"
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
@@ -158,7 +159,7 @@ class KeywordRoutesTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/1"
+        val endpoint = "${route.ROUTE}/${route.ID}/${TestKeywordId.value}"
         val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
@@ -275,6 +276,133 @@ class KeywordRoutesTest {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(TestCreateKeywordRequest)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(expectedException.status, response.status)
+        assertTrue(responseBody.contains(expectedException.errorCode.code))
+    }
+
+    @Test
+    fun `키워드 명으로 키워드 조회 - 요청 성공 테스트`() = testApplication {
+        // given
+        val route = Api.V1.Keyword
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery { keywordUseCases.getByName(TEST_KEYWORD) } returns TestKeywordDto
+
+        testPlugin(
+            authRouting = { keywordRoutes(route, keywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.NAME}/$TEST_KEYWORD"
+        val response = client.get(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        coVerify(exactly = 1) { keywordUseCases.getByName(TEST_KEYWORD) }
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(responseBody.contains(TestKeywordResponse.keyword))
+    }
+
+    @Test
+    fun `키워드 명으로 키워드 조회 - 키워드가 존재하지 않을 때 HTTP 상태코드 NotFound를 반환한다`() = testApplication {
+        // given
+        val route = Api.V1.Keyword
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery { keywordUseCases.getByName(TEST_KEYWORD) } returns null
+
+        testPlugin(
+            authRouting = { keywordRoutes(route, keywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.NAME}/$TEST_KEYWORD"
+        val response = client.get(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+        }
+
+        // then
+        coVerify(exactly = 1) { keywordUseCases.getByName(TEST_KEYWORD) }
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `키워드 명으로 키워드 조회 - 키워드 명 유효성 검사 실패 테스트`() = testApplication {
+        // given
+        val route = Api.V1.Keyword
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery { keywordUseCases.getByName(TEST_KEYWORD) } returns TestKeywordDto
+
+        testPlugin(
+            authRouting = { keywordRoutes(route, keywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.NAME}/${"a".repeat(Keyword.MAX_LENGTH + 1)}"
+        val response = client.get(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `키워드 명으로 키워드 조회 - 알 수 없는 예외가 발생하는 경우 HTTP 상태코드 500을 반환한다`() = testApplication {
+        // given
+        val route = Api.V1.Keyword
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery {
+            keywordUseCases.getByName(TEST_KEYWORD)
+        } throws Exception("")
+
+        testPlugin(
+            authRouting = { keywordRoutes(route, keywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.NAME}/$TEST_KEYWORD"
+        val response = client.get(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.InternalServerError, response.status)
+    }
+
+    @Test
+    fun `키워드 명으로 키워드 조회 - 알려진 예외가 발생하는 경우 정해진 메시지를 반환할 수 있다`() = testApplication {
+        // given
+        val route = Api.V1.Keyword
+        val client = createTestClient()
+        val expectedMessage = "expected message"
+        val expectedException = TestApiException(expectedMessage)
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery {
+            keywordUseCases.getByName(TEST_KEYWORD)
+        } throws expectedException
+
+        testPlugin(
+            authRouting = { keywordRoutes(route, keywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.NAME}/$TEST_KEYWORD"
+        val response = client.get(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
         }
         val responseBody = response.bodyAsText()
 

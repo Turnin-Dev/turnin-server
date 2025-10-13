@@ -9,6 +9,7 @@ import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.KeywordResponse
 import com.peekr.domain.keyword.presentation.dto.toResponse
+import com.peekr.domain.keyword.presentation.validation.validateKeywordName
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -18,11 +19,11 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 
 fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseCases) {
-    route({
+    route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "Keyword API"
     }) {
-        get(route.ROUTE.byPathParam("keywordId"), { getKeywordByIdDocs() }) {
+        get(route.ID.byPathParam("keywordId"), { getKeywordByIdDocs() }) {
             val keywordIdParam = call.pathParameters["keywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("키워드 ID")
@@ -35,7 +36,18 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
             }
         }
 
-        post(route.ROUTE, { createKeywordDocs() }) {
+        get(route.NAME.byPathParam("keywordName"), { getKeywordByNameDocs() }) {
+            val keywordName = call.pathParameters["keywordName"].inputValidationAndReturn("키워드 명")
+            keywordName.validateKeywordName()
+            val keywordDto = usecase.getByName(keywordName)
+            if (keywordDto == null) {
+                call.respond(HttpStatusCode.NotFound)
+            } else {
+                call.respond(HttpStatusCode.OK, keywordDto.toResponse())
+            }
+        }
+
+        post({ createKeywordDocs() }) {
             val createKeywordRequest = call.receive<CreateKeywordRequest>()
             val createById = extractUserIdWithToken()
             val keywordResult = usecase.create(
@@ -55,6 +67,32 @@ private fun RouteConfig.getKeywordByIdDocs() {
             description = "키워드 ID"
             example("Example") {
                 value = 1
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<KeywordResponse> {
+                description = "키워드"
+                example("KeywordResponse") {
+                    value = KeywordResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            description = "키워드가 존재하지 않는 경우"
+        }
+    }
+}
+
+private fun RouteConfig.getKeywordByNameDocs() {
+    summary = "키워드 조회"
+    description = "키워드 명으로 키워드를 조회한다."
+    request {
+        pathParameter<String>("keywordName") {
+            description = "키워드 명"
+            example("Example") {
+                value = "Sample KeywordName"
             }
         }
     }

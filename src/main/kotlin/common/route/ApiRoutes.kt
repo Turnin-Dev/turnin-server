@@ -39,6 +39,8 @@ object Api {
 
         object Keyword {
             const val ROUTE = "/keyword"
+            const val ID = "/id"
+            const val NAME = "/name"
             const val TAG = "Keyword"
         }
 

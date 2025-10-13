@@ -2,6 +2,7 @@ package com.peekr.domain.keyword.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.KeywordEntity
+import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
@@ -9,10 +10,18 @@ import com.peekr.domain.keyword.domain.model.Keyword
 import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class KeywordRepositoryImpl : KeywordRepository {
     override suspend fun findById(id: KeywordId): Keyword? = dbQuery {
         KeywordEntity.findById(id.value)?.toDomain()
+    }
+
+    override suspend fun findByName(keywordName: String): Keyword? = dbQuery {
+        KeywordEntity
+            .find(Keywords.keyword eq keywordName)
+            .firstOrNull()
+            ?.toDomain()
     }
 
     override suspend fun create(

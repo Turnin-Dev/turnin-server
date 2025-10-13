@@ -15,6 +15,15 @@ interface KeywordRepository {
     suspend fun findById(id: KeywordId): Keyword?
 
     /**
+     * 키워드 명을 통해 키워드가 존재하는지 찾는다.
+     *
+     * @param keywordName 키워드 명
+     *
+     * @return 키워드가 이미 존재하면 저장된 [Keyword]를 반환하고 만약 없다면 `null`을 반환한다.
+     */
+    suspend fun findByName(keywordName: String): Keyword?
+
+    /**
      * 키워드를 생성하고 성공 시 키워드를 반환한다.
      *
      * @param keyword 키워드명
