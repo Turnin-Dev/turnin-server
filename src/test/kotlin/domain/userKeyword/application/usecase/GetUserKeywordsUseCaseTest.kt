@@ -4,7 +4,7 @@ import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.service.UserKeywordService
+import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertTrue
@@ -13,12 +13,12 @@ import org.junit.Before
 import org.junit.Test
 
 class GetUserKeywordsUseCaseTest {
-    private val userKeywordService = mockk<UserKeywordService>()
+    private val userKeywordRepository = mockk<UserKeywordRepository>()
     private lateinit var usecase: GetUserKeywordsUseCase
 
     @Before
     fun setUp() {
-        usecase = GetUserKeywordsUseCase(userKeywordService)
+        usecase = GetUserKeywordsUseCase(userKeywordRepository)
     }
 
     @Test
@@ -26,7 +26,7 @@ class GetUserKeywordsUseCaseTest {
         // given
         val itemCount = 2
         coEvery {
-            userKeywordService.getKeywords(TestUserId)
+            userKeywordRepository.findByUserId(TestUserId)
         } returns List(itemCount) { TestUserKeyword }
 
         // when

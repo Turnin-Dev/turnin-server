@@ -4,12 +4,12 @@ import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
 import com.peekr.domain.userKeyword.application.dto.toDomain
-import com.peekr.domain.userKeyword.domain.service.UserKeywordService
+import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 
 /**
  * 사용자별 키워드를 업데이트한다.
  */
-class UpdateUserKeywordUseCase(private val userKeywordService: UserKeywordService) {
+class UpdateUserKeywordUseCase(private val userKeywordRepository: UserKeywordRepository) {
     /**
      * @param ownerId 사용자 ID
      * @param userKeywordId [UserKeywordId] 사용자별 키워드 ID DTO
@@ -21,7 +21,7 @@ class UpdateUserKeywordUseCase(private val userKeywordService: UserKeywordServic
         ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatchDto,
-    ): Boolean = userKeywordService.update(
+    ): Boolean = userKeywordRepository.update(
         ownerId,
         userKeywordId,
         patch.toDomain(),

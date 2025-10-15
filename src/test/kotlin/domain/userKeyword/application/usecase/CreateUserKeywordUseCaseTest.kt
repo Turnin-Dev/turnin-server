@@ -6,7 +6,7 @@ import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.service.UserKeywordService
+import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals
@@ -15,19 +15,19 @@ import org.junit.Before
 import org.junit.Test
 
 class CreateUserKeywordUseCaseTest {
-    private val userKeywordService = mockk<UserKeywordService>()
+    private val userKeywordRepository = mockk<UserKeywordRepository>()
     private lateinit var usecase: CreateUserKeywordUseCase
 
     @Before
     fun setUp() {
-        usecase = CreateUserKeywordUseCase(userKeywordService)
+        usecase = CreateUserKeywordUseCase(userKeywordRepository)
     }
 
     @Test
     fun `사용자 키워드 생성 성공 테스트`() = runTest {
         // given
         coEvery {
-            userKeywordService.create(
+            userKeywordRepository.create(
                 keywordId = TestUserKeyword.keywordId,
                 userId = TestUserKeyword.userId,
                 offsetX = TestUserKeyword.offsetX,

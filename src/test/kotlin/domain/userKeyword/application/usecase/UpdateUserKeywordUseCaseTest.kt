@@ -4,7 +4,7 @@ import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
 import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
-import com.peekr.domain.userKeyword.domain.service.UserKeywordService
+import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test
@@ -13,19 +13,19 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 
 class UpdateUserKeywordUseCaseTest {
-    private val userKeywordService = mockk<UserKeywordService>()
+    private val userKeywordRepository = mockk<UserKeywordRepository>()
     private lateinit var usecase: UpdateUserKeywordUseCase
 
     @Before
     fun setUp() {
-        usecase = UpdateUserKeywordUseCase(userKeywordService)
+        usecase = UpdateUserKeywordUseCase(userKeywordRepository)
     }
 
     @Test
     fun `사용자 키워드 수정 성공 테스트`() = runTest {
         // given
         coEvery {
-            userKeywordService.update(
+            userKeywordRepository.update(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
                 patch = TestUserKeywordPatch,

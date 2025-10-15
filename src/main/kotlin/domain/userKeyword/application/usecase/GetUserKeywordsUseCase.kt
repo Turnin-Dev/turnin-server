@@ -3,17 +3,17 @@ package com.peekr.domain.userKeyword.application.usecase
 import com.peekr.common.model.UserId
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
-import com.peekr.domain.userKeyword.domain.service.UserKeywordService
+import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 
 /**
  * 사용자 ID로 사용자별 키워드 리스트를 조회한다.
  */
-class GetUserKeywordsUseCase(private val userKeywordService: UserKeywordService) {
+class GetUserKeywordsUseCase(private val userKeywordRepository: UserKeywordRepository) {
     /**
      * @param userId 사용자 ID
      *
      * @return [UserKeywordDto] 리스트를 반환한다.
      */
     suspend operator fun invoke(userId: UserId): List<UserKeywordDto> =
-        userKeywordService.getKeywords(userId).toDto()
+        userKeywordRepository.findByUserId(userId).toDto()
 }
