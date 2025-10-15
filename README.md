@@ -1,6 +1,7 @@
 # peekr-server
 
-# 1. Project Structure (Layered)
+# 1. Project Structure
+### (Clean Architecture + 도메인 별 관리)
 
 ```
 project/
@@ -29,12 +30,11 @@ project/
 
 ### 내부 구조
 
-- `/controller`         : API 엔드포인트 정의
 - `/route`              : 라우팅 정의
 - `/dto`                : 요청/응답 DTO
 - `/exception`          : 프레젠테이션 공통 예외 및 핸들러
-- `/plugin`             : 미들웨어 역할 (Ex. 인증, 로깅, CORS 등)
 - `/util`               : 프레젠테이션 유틸
+- `/api`                : 추후 필요 시 추가
 
 ### 설명 & 역할
 
@@ -42,6 +42,7 @@ project/
 
 - HTTP 요청/응답 처리
 - DTO 검증 등
+- 추후 다른 다른 도메인에 대해 API 제공
 
 ## Application Layer
 
@@ -89,7 +90,7 @@ project/
 
 - `/persistence`         : ORM 기반 DB Entity (Ex. Exposed 등)
 - `/repository-impl`     : 리포지토리 구현체
-- `/service-impl`        : 외부 API 클라이언트 구현체
+- `/provider`            : 외부 API 클라이언트 구현체 (도메인 계층에 있는 인터페이스을 구현) 
 - `/mapper`              : 엔티티 <-> 도메인 매핑
 - `/util`                : 인프라 유틸 (Ex. DB 커넥터, Parser 등)
 
@@ -108,10 +109,17 @@ DB, 외부 API, 시스템 연동 등 기술 세부 구현 담당 계층
 
 ```mermaid
 flowchart TD
-    subgraph Each Domain Module
-        p(presentation) --> a(application)
-        a --> d(domain)
-        i(infrastructure) --> d
+    subgraph Domain
+        subgraph Bounded Context 1
+            p(presentation) --> a(application)
+            a --> d(domain)
+            i(infrastructure) --> d
+        end
+        subgraph Bounded Context 2
+            p2(presentation) --> a2(application)
+            a2 --> d2(domain)
+            i2(infrastructure) --> d2
+        end
     end
 ```
 
