@@ -1,7 +1,10 @@
 # peekr-server
 
 # 1. Project Structure
-### (Clean Architecture + 도메인 별 관리)
+
+## Clean Architecture + 도메인 별 관리
+
+### (DDD로 점진적 리팩토링 예정)
 
 ```
 project/
@@ -90,7 +93,7 @@ project/
 
 - `/persistence`         : ORM 기반 DB Entity (Ex. Exposed 등)
 - `/repository-impl`     : 리포지토리 구현체
-- `/provider`            : 외부 API 클라이언트 구현체 (도메인 계층에 있는 인터페이스을 구현) 
+- `/provider`            : 외부 API 클라이언트 구현체 (도메인 계층에 있는 인터페이스을 구현)
 - `/mapper`              : 엔티티 <-> 도메인 매핑
 - `/util`                : 인프라 유틸 (Ex. DB 커넥터, Parser 등)
 
