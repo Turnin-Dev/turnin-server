@@ -13,8 +13,8 @@ val userKeywordModule = module {
     single<UserKeywordRepository> { UserKeywordRepositoryImpl() }
 
     // UseCases
-    factory { CreateUserKeywordUseCase(get()) }
-    factory { GetUserKeywordsUseCase(get()) }
+    factory { CreateUserKeywordUseCase(get(), get()) }
+    factory { GetUserKeywordsUseCase(get(), get()) }
     factory { UpdateUserKeywordUseCase(get()) }
     factory { DeleteUserKeywordUseCase(get()) }
     single<UserKeywordUseCases> { UserKeywordUseCases(get(), get(), get(), get()) }

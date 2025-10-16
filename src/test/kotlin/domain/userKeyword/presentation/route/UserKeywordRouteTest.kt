@@ -513,15 +513,15 @@ class UserKeywordRouteTest {
             updatedAt = 1000,
         )
         private val TestCreateUserKeywordDto = CreateUserKeywordDto(
-            keywordId = TestKeywordId,
             userId = TestUserId,
+            keywordName = TEST_KEYWORD,
             offsetX = TEST_OFFSET,
             offsetY = TEST_OFFSET,
             description = TEST_DESC,
         )
         private val TestCreateUserKeywordRequest = CreateUserKeywordRequest(
             userId = TestUserId.value,
-            keywordId = TestKeywordId.value,
+            keywordName = TEST_KEYWORD,
             offsetX = TEST_OFFSET,
             offsetY = TEST_OFFSET,
             description = TEST_DESC,
