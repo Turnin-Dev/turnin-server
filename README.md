@@ -93,9 +93,9 @@ project/
 
 - `/persistence`         : ORM 기반 DB Entity (Ex. Exposed 등)
 - `/repository-impl`     : 리포지토리 구현체
-- `/provider`            : 외부 API 클라이언트 구현체 (도메인 계층에 있는 인터페이스을 구현)
 - `/mapper`              : 엔티티 <-> 도메인 매핑
 - `/util`                : 인프라 유틸 (Ex. DB 커넥터, Parser 등)
+- `/provider`            : 외부 API 클라이언트 구현체 (도메인 계층에 있는 인터페이스을 구현)
 
 ### 설명 & 역할
 
@@ -108,7 +108,7 @@ DB, 외부 API, 시스템 연동 등 기술 세부 구현 담당 계층
 
 # 3. Dependency Direction
 
-## Layer
+## Domain, Bounded Context
 
 ```mermaid
 flowchart TD
@@ -124,6 +124,23 @@ flowchart TD
             i2(infrastructure) --> d2
         end
     end
+```
+
+## 외부 Bounded Context의 API 사용
+
+```mermaid
+graph LR
+    subgraph Domain
+        subgraph Bounded Context 1
+            i(infrastructure/provider)
+        end
+        subgraph Bounded Context 2
+            d(domain)
+            p(presentation)
+        end
+    end
+    i -- 현재 구조의 경우 --> d
+    i -- MSA의 경우 HTTP 호출 --> p
 ```
 
 ## Common

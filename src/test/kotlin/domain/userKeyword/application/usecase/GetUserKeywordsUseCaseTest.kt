@@ -4,8 +4,8 @@ import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.ExternalKeyword
-import com.peekr.domain.userKeyword.application.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.exception.UserKeywordException
 import io.mockk.coEvery
@@ -17,12 +17,12 @@ import org.junit.Before
 
 class GetUserKeywordsUseCaseTest {
     private val userKeywordRepository = mockk<UserKeywordRepository>()
-    private val keywordProvider = mockk<KeywordProvider>()
+    private val keywordProviderImpl = mockk<KeywordProvider>()
     private lateinit var usecase: GetUserKeywordsUseCase
 
     @Before
     fun setUp() {
-        usecase = GetUserKeywordsUseCase(userKeywordRepository, keywordProvider)
+        usecase = GetUserKeywordsUseCase(userKeywordRepository, keywordProviderImpl)
     }
 
     @Test
@@ -33,7 +33,7 @@ class GetUserKeywordsUseCaseTest {
             userKeywordRepository.findByUserId(TestUserId)
         } returns List(itemCount) { TestUserKeyword }
         coEvery {
-            keywordProvider.findById(TestUserKeyword.keywordId)
+            keywordProviderImpl.findById(TestUserKeyword.keywordId)
         } returns TestExternalKeyword
 
         // when
@@ -51,7 +51,7 @@ class GetUserKeywordsUseCaseTest {
             userKeywordRepository.findByUserId(TestUserId)
         } returns List(itemCount) { TestUserKeyword }
         coEvery {
-            keywordProvider.findById(TestUserKeyword.keywordId)
+            keywordProviderImpl.findById(TestUserKeyword.keywordId)
         } returns null
 
         // when
