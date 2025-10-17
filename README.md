@@ -45,7 +45,7 @@ project/
 
 - HTTP 요청/응답 처리
 - DTO 검증 등
-- 추후 다른 다른 도메인에 대해 API 제공
+- 추후 다른 도메인에 대해 API 제공
 
 ## Application Layer
 
@@ -95,7 +95,7 @@ project/
 - `/repository-impl`     : 리포지토리 구현체
 - `/mapper`              : 엔티티 <-> 도메인 매핑
 - `/util`                : 인프라 유틸 (Ex. DB 커넥터, Parser 등)
-- `/provider`            : 외부 API 클라이언트 구현체 (도메인 계층에 있는 인터페이스을 구현)
+- `/provider`            : 외부 API 클라이언트 구현체 (도메인 계층에 있는 인터페이스를 구현)
 
 ### 설명 & 역할
 

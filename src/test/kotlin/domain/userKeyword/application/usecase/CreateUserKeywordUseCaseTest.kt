@@ -4,9 +4,9 @@ import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
-import com.peekr.domain.userKeyword.application.dto.ExternalKeyword
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery

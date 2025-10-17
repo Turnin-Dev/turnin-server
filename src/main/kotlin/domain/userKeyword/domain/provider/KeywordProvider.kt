@@ -2,7 +2,6 @@ package com.peekr.domain.userKeyword.domain.provider
 
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
-import com.peekr.domain.userKeyword.application.dto.ExternalKeyword
 
 /**
  * 키워드 BC(Bounded Context)에서 제공되는 서비스
@@ -14,7 +13,7 @@ interface KeywordProvider {
      * 키워드 ID로 키워드 조회
      *
      * @param [keywordId] 키워드 ID
-     * @return [com.peekr.domain.userKeyword.application.dto.ExternalKeyword]
+     * @return [ExternalKeyword]
      */
     suspend fun findById(keywordId: KeywordId): ExternalKeyword?
 
