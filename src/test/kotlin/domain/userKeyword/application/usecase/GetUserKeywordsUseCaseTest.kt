@@ -33,7 +33,7 @@ class GetUserKeywordsUseCaseTest {
             userKeywordRepository.findByUserId(TestUserId)
         } returns List(itemCount) { TestUserKeyword }
         coEvery {
-            keywordProvider.getKeywordById(TestUserKeyword.keywordId)
+            keywordProvider.findById(TestUserKeyword.keywordId)
         } returns TestExternalKeyword
 
         // when
@@ -51,7 +51,7 @@ class GetUserKeywordsUseCaseTest {
             userKeywordRepository.findByUserId(TestUserId)
         } returns List(itemCount) { TestUserKeyword }
         coEvery {
-            keywordProvider.getKeywordById(TestUserKeyword.keywordId)
+            keywordProvider.findById(TestUserKeyword.keywordId)
         } returns null
 
         // when

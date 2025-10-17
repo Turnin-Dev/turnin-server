@@ -3,10 +3,10 @@ package com.peekr.domain.userKeyword.application.usecase
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
-import com.peekr.domain.keyword.domain.model.Keyword
-import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.ExternalKeyword
 import com.peekr.domain.userKeyword.application.dto.toDto
+import com.peekr.domain.userKeyword.application.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery
@@ -18,12 +18,12 @@ import org.junit.Test
 
 class CreateUserKeywordUseCaseTest {
     private val userKeywordRepository = mockk<UserKeywordRepository>()
-    private val keywordRepository = mockk<KeywordRepository>()
+    private val keywordProvider = mockk<KeywordProvider>()
     private lateinit var usecase: CreateUserKeywordUseCase
 
     @Before
     fun setUp() {
-        usecase = CreateUserKeywordUseCase(userKeywordRepository, keywordRepository)
+        usecase = CreateUserKeywordUseCase(userKeywordRepository, keywordProvider)
     }
 
     @Test
@@ -38,7 +38,7 @@ class CreateUserKeywordUseCaseTest {
                 description = TestUserKeyword.description,
             )
         } returns TestUserKeyword
-        coEvery { keywordRepository.findByName(any()) } returns TestKeyword
+        coEvery { keywordProvider.findByName(any()) } returns TestExternalKeyword
 
         // when
         val userKeyword = usecase(TestCreateUserKeywordDto)
@@ -50,7 +50,7 @@ class CreateUserKeywordUseCaseTest {
     @Test
     fun `키워드가 존재하지 않는 경우 저장하고 저장된 키워드 ID로 사용자 키워드를 저장한다`() = runTest {
         // given
-        coEvery { keywordRepository.create(TEST_KEYWORD_NAME, TestUserId) } returns TestKeyword
+        coEvery { keywordProvider.create(TEST_KEYWORD_NAME, TestUserId) } returns TestExternalKeyword
         coEvery {
             userKeywordRepository.create(
                 keywordId = TestUserKeyword.keywordId,
@@ -60,7 +60,7 @@ class CreateUserKeywordUseCaseTest {
                 description = TestUserKeyword.description,
             )
         } returns TestUserKeyword
-        coEvery { keywordRepository.findByName(TEST_KEYWORD_NAME) } returns null
+        coEvery { keywordProvider.findByName(TEST_KEYWORD_NAME) } returns null
 
         // when
         val userKeyword = usecase(TestCreateUserKeywordDto)
@@ -91,7 +91,7 @@ class CreateUserKeywordUseCaseTest {
             offsetY = TestUserKeyword.offsetY,
             description = TestUserKeyword.description,
         )
-        private val TestKeyword = Keyword(
+        private val TestExternalKeyword = ExternalKeyword(
             id = TestKeywordId,
             keyword = TEST_KEYWORD_NAME,
             createdBy = TestUserId,

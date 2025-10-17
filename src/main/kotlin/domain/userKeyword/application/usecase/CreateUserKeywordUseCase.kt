@@ -1,9 +1,9 @@
 package com.peekr.domain.userKeyword.application.usecase
 
-import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
+import com.peekr.domain.userKeyword.application.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 
 /**
@@ -14,7 +14,7 @@ import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
  */
 class CreateUserKeywordUseCase(
     private val userKeywordRepository: UserKeywordRepository,
-    private val keywordRepository: KeywordRepository,
+    private val keywordProvider: KeywordProvider,
 ) {
     /**
      * @param createUserKeywordDto [CreateUserKeywordDto] 사용자별 키워드 DTO
@@ -22,7 +22,7 @@ class CreateUserKeywordUseCase(
      * @return [UserKeywordDto] 사용자별 키워드 DTO
      */
     suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto {
-        val keyword = keywordRepository.findByName(createUserKeywordDto.keywordName)
+        val keyword = keywordProvider.findByName(createUserKeywordDto.keywordName)
         return if (keyword != null) {
             userKeywordRepository
                 .create(
@@ -33,8 +33,8 @@ class CreateUserKeywordUseCase(
                     createUserKeywordDto.description,
                 ).toDto(keyword.keyword)
         } else {
-            val savedKeyword = keywordRepository.create(
-                keyword = createUserKeywordDto.keywordName,
+            val savedKeyword = keywordProvider.create(
+                keywordName = createUserKeywordDto.keywordName,
                 createdBy = createUserKeywordDto.userId,
             )
             userKeywordRepository

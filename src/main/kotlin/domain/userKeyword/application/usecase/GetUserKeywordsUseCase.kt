@@ -21,7 +21,7 @@ class GetUserKeywordsUseCase(
      */
     suspend operator fun invoke(userId: UserId): List<UserKeywordDto> =
         userKeywordRepository.findByUserId(userId).map { userKeyword ->
-            val keyword = keywordProvider.getKeywordById(userKeyword.keywordId)
+            val keyword = keywordProvider.findById(userKeyword.keywordId)
             if (keyword != null) {
                 userKeyword.toDto(keyword.keyword)
             } else {
