@@ -1,17 +1,17 @@
 package com.peekr.common.db
 
+import com.peekr.common.util.AppDispatchers.ioDispatcher
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.config.RunEnvironment
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import java.sql.SQLException
 import javax.sql.DataSource
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.FlywayException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 /**
@@ -23,8 +23,6 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
  * - 트랜잭션 헬퍼(dbQuery)는 IO 전용 컨텍스트(Dispatchers.IO)에서 newSuspendedTransaction을 실행합니다.
  */
 object DatabaseFactory {
-    private val ioContext: CoroutineContext = Dispatchers.IO
-
     fun initialize(
         environment: RunEnvironment,
         dbUrl: String,
@@ -52,17 +50,30 @@ object DatabaseFactory {
      * @throws DatabaseException.DuplicatedDataException 중복 데이터 저장 시도 시
      * @throws DatabaseException.ForeignKeyViolationException 외래키 제약조건 위반 시
      */
-    suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(ioContext) {
-        try {
-            block()
-        } catch (e: SQLException) {
-            LOGGER.error("Database query failed: ${e.message}")
-            throw handleSqlException(e)
-        } catch (e: ExposedSQLException) {
-            LOGGER.error("Database query failed: ${e.message}")
-            throw handleSqlException(e)
+    suspend fun <T> dbQuery(block: suspend () -> T): T =
+        if (TransactionManager.currentOrNull() != null) {
+            try {
+                block()
+            } catch (e: SQLException) {
+                LOGGER.error("Database query failed: ${e.message}")
+                throw handleSqlException(e)
+            } catch (e: ExposedSQLException) {
+                LOGGER.error("Database query failed: ${e.message}")
+                throw handleSqlException(e)
+            }
+        } else {
+            newSuspendedTransaction(ioDispatcher) {
+                try {
+                    block()
+                } catch (e: SQLException) {
+                    LOGGER.error("Database query failed: ${e.message}")
+                    throw handleSqlException(e)
+                } catch (e: ExposedSQLException) {
+                    LOGGER.error("Database query failed: ${e.message}")
+                    throw handleSqlException(e)
+                }
+            }
         }
-    }
 
     private fun hikariDataSource(
         dbUrl: String,

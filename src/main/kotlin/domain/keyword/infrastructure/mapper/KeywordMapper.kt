@@ -33,7 +33,6 @@ object KeywordMapper {
         UserKeyword(
             id = UserKeywordId(this.id.value),
             keywordId = KeywordId(this.keywordId.value),
-            keywordName = this.keywordEntity.keyword,
             userId = UserId(this.userId.value),
             offsetX = this.offsetX.toFloat(),
             offsetY = this.offsetY.toFloat(),
