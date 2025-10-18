@@ -1,9 +1,9 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import org.jetbrains.exposed.sql.JoinType
@@ -16,7 +16,7 @@ import org.jetbrains.exposed.sql.upsert
 // 토큰 탈취 시 피해 최소화 및 규제/감사 대응 측면에서 유리합니다.
 // 원한다면, 해싱 전략(솔트 포함)과 마이그레이션 플랜(기존 데이터 처리)까지 제안드릴 수 있습니다.
 class RefreshTokenRepositoryImpl : RefreshTokenRepository {
-    override suspend fun findUserIdByRefreshToken(token: String): UserId? = dbQuery {
+    override suspend fun findUserIdByRefreshToken(token: String): UserId? = suspendTransaction {
         val result = RefreshTokens
             .join(Users, JoinType.INNER, RefreshTokens.user, Users.id)
             .select(Users.id)
@@ -28,7 +28,7 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
         }
     }
 
-    override suspend fun save(userId: UserId, token: String): Boolean = dbQuery {
+    override suspend fun save(userId: UserId, token: String): Boolean = suspendTransaction {
         val userEntity = UserEntity.findById(userId.value)
         if (userEntity == null) {
             false
