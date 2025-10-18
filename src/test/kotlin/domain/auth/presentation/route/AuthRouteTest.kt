@@ -12,6 +12,7 @@ import com.peekr.domain.auth.AuthTestDoubles.MockRegisterResultDto
 import com.peekr.domain.auth.AuthTestDoubles.MockValidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockValidRegisterRequest
 import com.peekr.domain.auth.application.dto.FindUserResultDto
+import com.peekr.domain.auth.application.usecase.AuthUseCases
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
