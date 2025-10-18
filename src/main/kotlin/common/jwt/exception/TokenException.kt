@@ -54,4 +54,12 @@ sealed class TokenException(
             message = TokenErrorCode.UnauthorizedUser.description,
             cause = cause,
         )
+
+    class TokenExpiredException(cause: Throwable? = null) :
+        TokenException(
+            code = TokenErrorCode.TokenExpired,
+            status = HttpStatusCode.Unauthorized,
+            message = TokenErrorCode.TokenExpired.description,
+            cause = cause,
+        )
 }
