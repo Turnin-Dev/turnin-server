@@ -1,7 +1,6 @@
 package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseException
-import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
@@ -207,7 +206,7 @@ class UserKeywordRepositoryImplTest {
         assertFalse(result)
     }
 
-    private suspend fun insertUserAndReturnId(): UserId = dbQuery {
+    private suspend fun insertUserAndReturnId(): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
             this.provider = SocialLoginProvider.GOOGLE
@@ -225,7 +224,7 @@ class UserKeywordRepositoryImplTest {
     private suspend fun insertKeywordAndReturnId(
         userId: UserId,
         keyword: String,
-    ): KeywordId = dbQuery {
+    ): KeywordId = TestDatabaseFactory.dbQuery {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keyword
             this.createdBy = EntityID(userId.value, Users)

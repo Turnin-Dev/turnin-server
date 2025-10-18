@@ -1,11 +1,11 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.SubCountQueryFunction
 import com.peekr.common.db.schema.FriendStatus
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
@@ -18,13 +18,13 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {
-    override suspend fun findById(id: UserId): User? = dbQuery {
+    override suspend fun findById(id: UserId): User? = suspendTransaction {
         UserEntity.findById(id.value)?.let { entity ->
             UserMapper.toDomain(entity)
         }
     }
 
-    override suspend fun findUserProfileById(id: UserId): UserProfile? = dbQuery {
+    override suspend fun findUserProfileById(id: UserId): UserProfile? = suspendTransaction {
         val friendCountAlias = Friends.alias("friendCountAlias")
         val friendsCount = SubCountQueryFunction(
             table = friendCountAlias,
@@ -46,7 +46,7 @@ class UserRepositoryImpl : UserRepository {
     override suspend fun update(
         userId: UserId,
         patch: UserPatch,
-    ): Boolean = dbQuery {
+    ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
             row[displayId] = patch.displayId.value
             row[name] = patch.name.value

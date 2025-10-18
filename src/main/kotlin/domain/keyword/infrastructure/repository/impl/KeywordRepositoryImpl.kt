@@ -1,9 +1,9 @@
 package com.peekr.domain.keyword.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.Users
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
@@ -13,11 +13,11 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class KeywordRepositoryImpl : KeywordRepository {
-    override suspend fun findById(id: KeywordId): Keyword? = dbQuery {
+    override suspend fun findById(id: KeywordId): Keyword? = suspendTransaction {
         KeywordEntity.findById(id.value)?.toDomain()
     }
 
-    override suspend fun findByName(keywordName: String): Keyword? = dbQuery {
+    override suspend fun findByName(keywordName: String): Keyword? = suspendTransaction {
         KeywordEntity
             .find(Keywords.keyword eq keywordName)
             .firstOrNull()
@@ -27,7 +27,7 @@ class KeywordRepositoryImpl : KeywordRepository {
     override suspend fun create(
         keyword: String,
         createdBy: UserId,
-    ): Keyword = dbQuery {
+    ): Keyword = suspendTransaction {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keyword
             this.createdBy = EntityID(createdBy.value, Users)
