@@ -25,7 +25,9 @@ class LoginUseCase(
      * (로그인 실패 (사용자를 가져올 수 없는 경우) **`null`** 반환)
      */
     suspend operator fun invoke(loginDto: LoginDto): LoginResultDto? = suspendTransaction {
-        LOGGER.debug("login called: $loginDto")
+        LOGGER.debug(
+            "login called, provider: ${loginDto.provider}, providerId: ${loginDto.providerId.masking()}",
+        )
         val loginResult = authService.login(loginDto.provider, loginDto.providerId)
         if (loginResult == null) {
             LOGGER.debug(
@@ -33,7 +35,11 @@ class LoginUseCase(
             )
             return@suspendTransaction null
         }
-        refreshTokenService.save(loginResult.authUser.userId, loginResult.jwtToken.refreshToken)
+        val saved = refreshTokenService.save(loginResult.authUser.userId, loginResult.jwtToken.refreshToken)
+        if (!saved) {
+            LOGGER.debug("token refresh failed, userId: ${loginResult.authUser.userId}")
+            return@suspendTransaction null
+        }
         LOGGER.debug("login successful")
         val jwtTokenDto = loginResult.jwtToken.toDto()
         LoginResultDto(loginResult.authUser.userId, jwtTokenDto)
