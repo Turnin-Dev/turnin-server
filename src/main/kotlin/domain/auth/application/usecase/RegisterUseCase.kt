@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.application.usecase
 
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.jwt.application.dto.toDto
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.auth.application.dto.RegisterDto
@@ -20,7 +21,7 @@ class RegisterUseCase(
      *
      * @return [RegisterResultDto] 정상적으로 회원가입이 진행된 경우
      */
-    suspend operator fun invoke(registerDto: RegisterDto): RegisterResultDto {
+    suspend operator fun invoke(registerDto: RegisterDto): RegisterResultDto = suspendTransaction {
         LOGGER.debug("register called")
         val authUser = registerDto.toDomain()
         val registerResult = authService.register(authUser)
@@ -28,7 +29,7 @@ class RegisterUseCase(
         val jwtTokenDto = registerResult.jwtToken.toDto()
         refreshTokenService.save(savedAuthUser.userId, jwtTokenDto.refreshToken)
         LOGGER.debug("register successful, username: ${savedAuthUser.name}")
-        return RegisterResultDto(savedAuthUser.userId, jwtTokenDto)
+        RegisterResultDto(savedAuthUser.userId, jwtTokenDto)
     }
 }
 
