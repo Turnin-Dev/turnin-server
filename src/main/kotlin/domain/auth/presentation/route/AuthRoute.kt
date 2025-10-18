@@ -9,7 +9,7 @@ import com.peekr.common.model.DisplayId
 import com.peekr.common.route.Api
 import com.peekr.common.route.Api.byPathParam
 import com.peekr.common.validator.inputValidationAndReturn
-import com.peekr.domain.auth.application.usecase.AuthUseCase
+import com.peekr.domain.auth.application.usecase.AuthUseCases
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
@@ -32,7 +32,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 
 // ------------------------------ Route ------------------------------
-fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
+fun Route.authRoutes(route: Api.V1.Auth, authUseCases: AuthUseCases) {
     route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "Auth API"
@@ -40,7 +40,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
         post(route.LOGIN, { loginDocs() }) {
             val request = call.receive<LoginRequest>()
             request.validate()
-            val loginResultDto = authUseCase.login(request.toDto())
+            val loginResultDto = authUseCases.login(request.toDto())
             if (loginResultDto == null) {
                 call.respond(
                     HttpStatusCode.BadRequest,
@@ -55,9 +55,9 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             val request = call.receive<RegisterRequest>()
             request.validate()
             val displayId = DisplayId(request.displayId)
-            val existsByDisplayId = authUseCase.existsDisplayId(displayId)
+            val existsByDisplayId = authUseCases.existsDisplayId(displayId)
             if (!existsByDisplayId) {
-                val registerResultDto = authUseCase.register(request.toDto())
+                val registerResultDto = authUseCases.register(request.toDto())
                 call.respond(HttpStatusCode.Created, registerResultDto.toResponse())
             } else {
                 call.respond(
@@ -71,7 +71,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             val refreshTokenParam = call.request.headers["Authorization"].inputValidationAndReturn("인증 토큰")
             JWTValidator.validate(refreshTokenParam)
             val refreshToken = refreshTokenParam.removeBearerHeader()
-            val token = authUseCase.refresh(refreshToken)
+            val token = authUseCases.refresh(refreshToken)
             if (token == null) {
                 call.respond(
                     HttpStatusCode.Unauthorized,
@@ -87,7 +87,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             val providerId = call.request.pathVariables["providerId"] ?: return@get
 
             try {
-                val findUserResultDto = authUseCase.findUser(
+                val findUserResultDto = authUseCases.findUser(
                     provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
                     providerId = providerId.trim(),
                 )
@@ -114,7 +114,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCase: AuthUseCase) {
             }
 
             val displayId = DisplayId(displayIdParam.trim())
-            val existsDisplayId = authUseCase.existsDisplayId(displayId)
+            val existsDisplayId = authUseCases.existsDisplayId(displayId)
             call.respond(
                 HttpStatusCode.OK,
                 ExistsResultResponse(exists = existsDisplayId),

@@ -12,7 +12,6 @@ import com.peekr.domain.auth.AuthTestDoubles.MockRegisterResultDto
 import com.peekr.domain.auth.AuthTestDoubles.MockValidLoginRequest
 import com.peekr.domain.auth.AuthTestDoubles.MockValidRegisterRequest
 import com.peekr.domain.auth.application.dto.FindUserResultDto
-import com.peekr.domain.auth.application.usecase.AuthUseCase
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
@@ -32,7 +31,7 @@ import kotlin.test.assertTrue
 import org.junit.Test
 
 class AuthRouteTest {
-    private val authUseCase: AuthUseCase = mockk()
+    private val authUseCase: AuthUseCases = mockk()
 
     @Test
     fun `login 성공 테스트`() = testApplication {
