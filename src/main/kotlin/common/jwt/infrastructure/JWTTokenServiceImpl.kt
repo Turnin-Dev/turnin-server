@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.exceptions.JWTDecodeException
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
@@ -117,6 +118,8 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         createVerifier(type)
             .verify(token)
             .subject
+    } catch (e: TokenExpiredException) {
+        throw TokenException.TokenExpiredException(e)
     } catch (e: JWTDecodeException) {
         throw TokenException.CannotDecodedException(e)
     }
