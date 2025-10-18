@@ -1,10 +1,10 @@
 package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseFactory
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
@@ -19,7 +19,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
-    override suspend fun findByUserId(userId: UserId): List<UserKeyword> = DatabaseFactory.dbQuery {
+    override suspend fun findByUserId(userId: UserId): List<UserKeyword> = suspendTransaction {
         UserKeywordEntity
             .find(UserKeywords.userId eq userId.value)
             .map { it.toDomain() }
@@ -28,7 +28,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun findByKeywordIdAndUserId(
         keywordId: KeywordId,
         userId: UserId,
-    ): UserKeyword? = DatabaseFactory.dbQuery {
+    ): UserKeyword? = suspendTransaction {
         UserKeywordEntity
             .find(
                 (UserKeywords.keywordId eq keywordId.value) and
@@ -43,7 +43,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         offsetX: Float,
         offsetY: Float,
         description: String?,
-    ): UserKeyword = DatabaseFactory.dbQuery {
+    ): UserKeyword = suspendTransaction {
         val savedUserKeywordEntity = UserKeywordEntity.new {
             this.keywordId = EntityID(keywordId.value, Keywords)
             this.userId = EntityID(userId.value, Users)
@@ -59,7 +59,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
         patch: UserKeywordPatch,
-    ): Boolean = DatabaseFactory.dbQuery {
+    ): Boolean = suspendTransaction {
         UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
             it[offsetX] = patch.offsetX.toDouble()
             it[offsetY] = patch.offsetY.toDouble()
@@ -70,7 +70,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun delete(
         ownerId: UserId,
         userKeywordId: UserKeywordId,
-    ): Boolean = DatabaseFactory.dbQuery {
+    ): Boolean = suspendTransaction {
         UserKeywords.deleteWhere { (id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) } > 0
     }
 }

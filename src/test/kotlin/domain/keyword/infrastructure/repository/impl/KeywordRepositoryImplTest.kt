@@ -1,6 +1,5 @@
 package com.peekr.domain.keyword.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseFactory.dbQuery
 import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
@@ -111,7 +110,7 @@ class KeywordRepositoryImplTest {
         assertNull(keyword)
     }
 
-    private suspend fun insertUserAndReturnId(): UserId = dbQuery {
+    private suspend fun insertUserAndReturnId(): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
             this.provider = SocialLoginProvider.GOOGLE

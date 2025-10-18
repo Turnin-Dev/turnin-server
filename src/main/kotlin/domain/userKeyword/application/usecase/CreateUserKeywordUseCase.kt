@@ -1,6 +1,6 @@
 package com.peekr.domain.userKeyword.application.usecase
 
-import com.peekr.common.db.DatabaseFactory.dbQuery
+import com.peekr.common.db.suspendTransaction
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
@@ -26,7 +26,7 @@ class CreateUserKeywordUseCase(
      *
      * @return [UserKeywordDto] 사용자별 키워드 DTO
      */
-    suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto = dbQuery {
+    suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto = suspendTransaction {
         val keyword = keywordProvider.findByName(createUserKeywordDto.keywordName)
             ?: keywordProvider.create(
                 keywordName = createUserKeywordDto.keywordName,
