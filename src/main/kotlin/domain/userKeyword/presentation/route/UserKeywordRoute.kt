@@ -23,18 +23,18 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 
 fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCases) {
-    route({
+    route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "User Keyword API"
     }) {
-        get(route.ROUTE, { getUserKeywordByUserIdDocs() }) {
+        get({ getUserKeywordByUserIdDocs() }) {
             val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
             val userKeywords = usecase.get(userId)
             call.respond(userKeywords.toResponse())
         }
 
-        post(route.ROUTE, { createUserKeywordDocs() }) {
+        post({ createUserKeywordDocs() }) {
             val createUserKeywordRequest = call.receive<CreateUserKeywordRequest>()
             val ownerId = UserId(createUserKeywordRequest.userId)
             verifyAuthUserId(ownerId)
@@ -43,7 +43,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
         }
 
-        patch(route.ROUTE, { patchUserKeywordDocs() }) {
+        patch({ patchUserKeywordDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
@@ -63,7 +63,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        delete(route.ROUTE, { deleteUserKeywordDocs() }) {
+        delete({ deleteUserKeywordDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
