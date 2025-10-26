@@ -8,8 +8,8 @@ import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.common.route.Api
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
-import com.peekr.domain.userKeyword.application.dto.UpdateDescriptionDto
-import com.peekr.domain.userKeyword.application.dto.UpdateOffsetDto
+import com.peekr.domain.userKeyword.application.dto.DescriptionDto
+import com.peekr.domain.userKeyword.application.dto.OffsetDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
@@ -249,9 +249,9 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateOffset(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateOffsetDto,
+                patch = TestOffsetDto,
             )
-        } returns TestUpdateOffsetDto
+        } returns TestOffsetDto
 
         testPlugin(
             authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
@@ -285,7 +285,7 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateOffset(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateOffsetDto,
+                patch = TestOffsetDto,
             )
         } returns null
 
@@ -319,7 +319,7 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateOffset(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateOffsetDto,
+                patch = TestOffsetDto,
             )
         } throws Exception()
 
@@ -355,7 +355,7 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateOffset(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateOffsetDto,
+                patch = TestOffsetDto,
             )
         } throws expectedException
 
@@ -391,9 +391,9 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateDescription(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateDescriptionDto,
+                patch = TestDescriptionDto,
             )
-        } returns TestUpdateDescriptionDto
+        } returns TestDescriptionDto
 
         testPlugin(
             authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
@@ -429,7 +429,7 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateDescription(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateDescriptionDto,
+                patch = TestDescriptionDto,
             )
         } returns null
 
@@ -463,7 +463,7 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateDescription(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateDescriptionDto,
+                patch = TestDescriptionDto,
             )
         } throws Exception()
 
@@ -499,7 +499,7 @@ class UserKeywordRouteTest {
             userKeywordUseCases.updateDescription(
                 ownerId = TestUserId,
                 userKeywordId = TestUserKeywordId,
-                patch = TestUpdateDescriptionDto,
+                patch = TestDescriptionDto,
             )
         } throws expectedException
 
@@ -665,9 +665,8 @@ class UserKeywordRouteTest {
         private val TestCreateUserKeywordDto = CreateUserKeywordDto(
             userId = TestUserId,
             keywordName = TEST_KEYWORD,
-            offsetX = TestOffset.x,
-            offsetY = TestOffset.y,
-            description = TestDescription.value,
+            offset = TestOffset.toDto(),
+            description = TestDescription.toDto(),
         )
         private val TestCreateUserKeywordRequest = CreateUserKeywordRequest(
             userId = TestUserId.value,
@@ -676,9 +675,9 @@ class UserKeywordRouteTest {
             offsetY = TestOffset.y,
             description = TestDescription.value,
         )
-        private val TestUpdateOffsetDto = UpdateOffsetDto(x = TestOffset.x, y = TestOffset.y)
+        private val TestOffsetDto = OffsetDto(x = TestOffset.x, y = TestOffset.y)
         private val TestUpdateOffsetRequest = UpdateOffsetRequest(offsetX = TestOffset.x, offsetY = TestOffset.y)
-        private val TestUpdateDescriptionDto = UpdateDescriptionDto(value = TestDescription.value)
+        private val TestDescriptionDto = DescriptionDto(value = TestDescription.value)
         private val TestUpdateDescriptionRequest = UpdateDescriptionRequest(description = TestDescription.value)
     }
 }

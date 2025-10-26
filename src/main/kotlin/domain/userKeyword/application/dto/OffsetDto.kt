@@ -8,11 +8,11 @@ import com.peekr.domain.userKeyword.domain.model.Offset
  * @property x 오프셋 X
  * @property y 오프셋 Y
  */
-data class UpdateOffsetDto(
+data class OffsetDto(
     val x: Float,
     val y: Float,
 )
 
-fun Offset.toDto(): UpdateOffsetDto = UpdateOffsetDto(x, y)
+fun Offset.toDto(): OffsetDto = OffsetDto(x, y)
 
-fun UpdateOffsetDto.toDomain(): Offset = Offset(x, y)
+fun OffsetDto.toDomain(): Offset = Offset(x, y)

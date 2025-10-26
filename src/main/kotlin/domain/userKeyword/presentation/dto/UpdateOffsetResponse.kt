@@ -1,6 +1,6 @@
 package com.peekr.domain.userKeyword.presentation.dto
 
-import com.peekr.domain.userKeyword.application.dto.UpdateOffsetDto
+import com.peekr.domain.userKeyword.application.dto.OffsetDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -22,4 +22,4 @@ data class UpdateOffsetResponse(
     }
 }
 
-fun UpdateOffsetDto.toResponse() = UpdateOffsetResponse(x, y)
+fun OffsetDto.toResponse() = UpdateOffsetResponse(x, y)

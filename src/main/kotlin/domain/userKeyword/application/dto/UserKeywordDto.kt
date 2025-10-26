@@ -1,7 +1,6 @@
 package com.peekr.domain.userKeyword.application.dto
 
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.model.toDto
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
 
 /**
@@ -21,8 +20,8 @@ data class UserKeywordDto(
     val keywordId: Long,
     val keywordName: String,
     val userId: Long,
-    val offset: UpdateOffsetDto,
-    val description: UpdateDescriptionDto?,
+    val offset: OffsetDto,
+    val description: DescriptionDto?,
     val createdAt: Long,
     val updatedAt: Long,
 )

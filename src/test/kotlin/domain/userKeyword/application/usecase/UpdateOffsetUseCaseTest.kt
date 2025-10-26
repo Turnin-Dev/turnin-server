@@ -46,7 +46,7 @@ class UpdateOffsetUseCaseTest {
     }
 
     companion object {
-        private val TestUserId = UserId.Companion(1)
+        private val TestUserId = UserId(1)
         private val TestUserKeywordId = UserKeywordId(1)
         private val TestOffset = Offset(
             x = 0.0f,

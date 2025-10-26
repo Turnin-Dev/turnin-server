@@ -43,9 +43,8 @@ class CreateUserKeywordUseCaseTest {
             userKeywordRepository.create(
                 keywordId = TestUserKeyword.keywordId,
                 userId = TestUserKeyword.userId,
-                offsetX = TestUserKeyword.offset.x,
-                offsetY = TestUserKeyword.offset.y,
-                description = TestUserKeyword.description?.value,
+                offset = TestUserKeyword.offset,
+                description = TestUserKeyword.description,
             )
         } returns TestUserKeyword
         coEvery { keywordProviderImpl.findByName(any()) } returns TestExternalKeyword
@@ -65,9 +64,8 @@ class CreateUserKeywordUseCaseTest {
             userKeywordRepository.create(
                 keywordId = TestUserKeyword.keywordId,
                 userId = TestUserKeyword.userId,
-                offsetX = TestUserKeyword.offset.x,
-                offsetY = TestUserKeyword.offset.y,
-                description = TestUserKeyword.description?.value,
+                offset = TestUserKeyword.offset,
+                description = TestUserKeyword.description,
             )
         } returns TestUserKeyword
         coEvery { keywordProviderImpl.findByName(TEST_KEYWORD_NAME) } returns null
@@ -98,9 +96,8 @@ class CreateUserKeywordUseCaseTest {
         private val TestCreateUserKeywordDto = CreateUserKeywordDto(
             userId = TestUserKeyword.userId,
             keywordName = TEST_KEYWORD_NAME,
-            offsetX = TestOffset.x,
-            offsetY = TestOffset.y,
-            description = TestDescription.value,
+            offset = TestOffset.toDto(),
+            description = TestDescription.toDto(),
         )
         private val TestExternalKeyword = ExternalKeyword(
             id = TestKeywordId,

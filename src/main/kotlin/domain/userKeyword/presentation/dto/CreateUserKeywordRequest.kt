@@ -2,6 +2,8 @@ package com.peekr.domain.userKeyword.presentation.dto
 
 import com.peekr.common.model.UserId
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.DescriptionDto
+import com.peekr.domain.userKeyword.application.dto.OffsetDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -35,7 +37,6 @@ data class CreateUserKeywordRequest(
 fun CreateUserKeywordRequest.toDto(): CreateUserKeywordDto = CreateUserKeywordDto(
     userId = UserId(this.userId),
     keywordName = keywordName,
-    offsetX = offsetX,
-    offsetY = offsetY,
-    description = description,
+    offset = OffsetDto(offsetX, offsetY),
+    description = DescriptionDto(description),
 )
