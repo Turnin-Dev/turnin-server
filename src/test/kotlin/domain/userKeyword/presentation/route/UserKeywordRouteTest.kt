@@ -258,7 +258,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_OFFSET}"
+        val endpoint = "${route.ROUTE}${route.PATCH_OFFSET}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -294,7 +294,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_OFFSET}"
+        val endpoint = "${route.ROUTE}${route.PATCH_OFFSET}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -328,7 +328,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_OFFSET}"
+        val endpoint = "${route.ROUTE}${route.PATCH_OFFSET}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -364,7 +364,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_OFFSET}"
+        val endpoint = "${route.ROUTE}${route.PATCH_OFFSET}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -400,7 +400,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -438,7 +438,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -472,7 +472,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -508,7 +508,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.SAVE_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
