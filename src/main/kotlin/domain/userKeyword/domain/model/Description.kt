@@ -1,6 +1,6 @@
 package com.peekr.domain.userKeyword.domain.model
 
-import com.peekr.domain.userKeyword.application.dto.DescriptionDto
+import com.peekr.domain.userKeyword.application.dto.UpdateDescriptionDto
 
 /**
  * 사용자별 키워드 설명
@@ -9,6 +9,6 @@ import com.peekr.domain.userKeyword.application.dto.DescriptionDto
  */
 data class Description(val value: String?)
 
-fun Description.toDto(): DescriptionDto = DescriptionDto(value)
+fun Description.toDto(): UpdateDescriptionDto = UpdateDescriptionDto(value)
 
-fun DescriptionDto.toDomain(): Description = Description(value)
+fun UpdateDescriptionDto.toDomain(): Description = Description(value)

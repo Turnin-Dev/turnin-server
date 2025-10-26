@@ -21,8 +21,8 @@ data class UserKeywordDto(
     val keywordId: Long,
     val keywordName: String,
     val userId: Long,
-    val offset: OffsetDto,
-    val description: DescriptionDto?,
+    val offset: UpdateOffsetDto,
+    val description: UpdateDescriptionDto?,
     val createdAt: Long,
     val updatedAt: Long,
 )

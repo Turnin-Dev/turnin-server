@@ -9,6 +9,9 @@ import com.peekr.common.db.schema.Users
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
+import com.peekr.domain.userKeyword.application.dto.UpdateDescriptionDto
+import com.peekr.domain.userKeyword.application.dto.UpdateOffsetDto
+import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test
@@ -139,7 +142,7 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
-    fun `update 성공 테스트`() = runTest {
+    fun `updateOffset 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
@@ -152,28 +155,60 @@ class UserKeywordRepositoryImplTest {
         )
 
         // when
-        val patch = UserKeywordPatch(
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "수정된 키워드 설명",
+        val patch = UpdateOffsetDto(
+            x = 0.0f,
+            y = 0.0f,
         )
-        val result = repository.update(userId, userKeyword.id, patch)
+        val result = repository.updateOffset(userId, userKeyword.id, patch.toDomain())
         val patchedUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
 
         // then
         assertTrue(result)
         assertNotNull(patchedUserKeyword)
-        assertEquals(patch.description, patchedUserKeyword.description)
+        assertEquals(patch.x, patchedUserKeyword.offset.x)
     }
 
     @Test
-    fun `update 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
-        val patch = UserKeywordPatch(
+    fun `updateOffset 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
+        val patch = UpdateOffsetDto(
+            x = 0.0f,
+            y = 0.0f,
+        )
+        val result =
+            repository.updateOffset(UserId(10), UserKeywordId(10), patch.toDomain())
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun `updateDescription 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
             offsetX = 0.0f,
             offsetY = 0.0f,
-            description = "수정된 키워드 설명",
+            description = "",
         )
-        val result = repository.update(UserId(10), UserKeywordId(10), patch)
+
+        // when
+        val patch = UpdateDescriptionDto(value = "hello")
+        val result = repository.updateDescription(userId, userKeyword.id, patch.toDomain())
+        val patchedUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
+
+        // then
+        assertTrue(result)
+        assertNotNull(patchedUserKeyword)
+        assertEquals(patch.value, patchedUserKeyword.description?.value)
+    }
+
+    @Test
+    fun `updateDescription 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
+        val patch = UpdateDescriptionDto(value = "hello")
+        val result =
+            repository.updateDescription(UserId(10), UserKeywordId(10), patch.toDomain())
 
         assertFalse(result)
     }
