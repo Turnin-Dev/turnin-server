@@ -9,7 +9,6 @@ import com.peekr.common.db.schema.Users
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
-import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test

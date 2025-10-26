@@ -8,14 +8,16 @@ import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.GetUserKeywordResponse
-import com.peekr.domain.userKeyword.presentation.dto.PatchUserKeywordRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionResponse
+import com.peekr.domain.userKeyword.presentation.dto.UpdateOffsetRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateOffsetResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.toDto
 import com.peekr.domain.userKeyword.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
-import io.github.smiley4.ktoropenapi.patch
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
@@ -43,21 +45,65 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
         }
 
-        patch({ patchUserKeywordDocs() }) {
+        // TODO: 사용자별 키워드 통합 수정이 아니라 오프셋, 설명 수정 따로 따로 나눠서 엔드포인트 작성하기 (물론 로직도 수정)
+        // TODO 1. 도메인 로직부터 바꿔 나가기 ~
+        // TODO or
+        // TODO 2. 컨트롤러에서 기능 시나리오 우선 작성하기 ~
+//        patch({ patchUserKeywordDocs() }) {
+//            val userKeywordIdParam = call.queryParameters["userKeywordId"]
+//                ?.toLongOrNull()
+//                .inputValidationAndReturn("사용자 키워드 ID")
+//            val ownerId = extractUserIdWithToken()
+//            verifyAuthUserId(ownerId)
+//            val userKeywordId = UserKeywordId(userKeywordIdParam)
+//            val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
+//            val result = usecase.update(
+//                ownerId = ownerId,
+//                userKeywordId = userKeywordId,
+//                patch = patchUserKeywordRequest.toDto(),
+//            )
+//            if (result) {
+//                call.respond(HttpStatusCode.NoContent)
+//            } else {
+//                call.respond(HttpStatusCode.NotFound)
+//            }
+//        }
+
+        post(route.SAVE_OFFSET, {}) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
             val ownerId = extractUserIdWithToken()
             verifyAuthUserId(ownerId)
             val userKeywordId = UserKeywordId(userKeywordIdParam)
-            val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
-            val result = usecase.update(
+            val offsetDto = call.receive<UpdateOffsetRequest>().toDto()
+            val result = usecase.updateOffset(
                 ownerId = ownerId,
                 userKeywordId = userKeywordId,
-                patch = patchUserKeywordRequest.toDto(),
+                patch = offsetDto,
             )
-            if (result) {
-                call.respond(HttpStatusCode.NoContent)
+            if (result != null) {
+                call.respond(HttpStatusCode.OK, result.toResponse())
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
+        post(route.SAVE_DESCRIPTION, {}) {
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 키워드 ID")
+            val ownerId = extractUserIdWithToken()
+            verifyAuthUserId(ownerId)
+            val userKeywordId = UserKeywordId(userKeywordIdParam)
+            val descriptionDto = call.receive<UpdateDescriptionRequest>().toDto()
+            val result = usecase.updateDescription(
+                ownerId = ownerId,
+                userKeywordId = userKeywordId,
+                patch = descriptionDto,
+            )
+            if (result != null) {
+                call.respond(HttpStatusCode.OK, result.toResponse())
             } else {
                 call.respond(HttpStatusCode.NotFound)
             }
@@ -117,9 +163,9 @@ private fun RouteConfig.createUserKeywordDocs() {
     }
 }
 
-private fun RouteConfig.patchUserKeywordDocs() {
-    summary = "사용자 키워드 수정"
-    description = "사용자 키워드를 수정한다."
+private fun RouteConfig.patchOffsetDocs() {
+    summary = "사용자 키워드 오프셋 수정"
+    description = "사용자 키워드 오프셋을 수정한다."
     request {
         queryParameter<Long>("userKeywordId") {
             description = "사용자 키워드 ID"
@@ -127,19 +173,56 @@ private fun RouteConfig.patchUserKeywordDocs() {
                 value = 1
             }
         }
-        body<PatchUserKeywordRequest> {
-            description = "사용자 키워드 수정 요청 바디"
-            example("PatchUserKeywordRequest") {
-                value = PatchUserKeywordRequest.sample
+        body<UpdateOffsetRequest> {
+            description = "사용자 키워드 오프셋 수정 요청 바디"
+            example("UpdateOffsetRequest") {
+                value = UpdateOffsetRequest.sample
             }
         }
     }
     response {
-        code(HttpStatusCode.NoContent) {
-            description = "사용자 키워드 수정 응답 결과 (성공)"
+        code(HttpStatusCode.OK) {
+            body<UpdateOffsetResponse> {
+                description = "사용자 키워드 오프셋 수정 응답 결과 (성공)"
+                example("UpdateOffsetResponse") {
+                    value = UpdateOffsetResponse.sample
+                }
+            }
         }
         code(HttpStatusCode.NotFound) {
-            description = "사용자 키워드 수정 응답 결과 (실패)"
+            description = "사용자 키워드 오프셋 수정 응답 결과 (실패)"
+        }
+    }
+}
+
+private fun RouteConfig.patchDescriptionDocs() {
+    summary = "사용자 키워드 설명 수정"
+    description = "사용자 키워드 설명을 수정한다."
+    request {
+        queryParameter<Long>("userKeywordId") {
+            description = "사용자 키워드 ID"
+            example("userKeywordId") {
+                value = 1
+            }
+        }
+        body<UpdateDescriptionRequest> {
+            description = "사용자 키워드 설명 수정 요청 바디"
+            example("UpdateDescriptionRequest") {
+                value = UpdateDescriptionRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<UpdateDescriptionResponse> {
+                description = "사용자 키워드 설명 수정 응답 결과 (성공)"
+                example("UpdateDescriptionResponse") {
+                    value = UpdateDescriptionResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            description = "사용자 키워드 설명 수정 응답 결과 (실패)"
         }
     }
 }
