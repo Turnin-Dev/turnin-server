@@ -15,7 +15,7 @@ class ExistsDisplayIdUseCaseTest {
     @Test
     fun `사용자 표시 ID 존재 여부 확인 성공 테스트`() = runTest {
         // given
-        coEvery { authService.existsDisplayId(any()) } returns true
+        coEvery { authService.existsDisplayId(TestDisplayId) } returns true
 
         // then
         val result = usecase(TestDisplayId)

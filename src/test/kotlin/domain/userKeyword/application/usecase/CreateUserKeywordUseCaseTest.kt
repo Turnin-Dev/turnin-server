@@ -5,14 +5,18 @@ import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
+import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -23,7 +27,13 @@ class CreateUserKeywordUseCaseTest {
 
     @Before
     fun setUp() {
+        TestDatabaseFactory.init()
         usecase = CreateUserKeywordUseCase(userKeywordRepository, keywordProviderImpl)
+    }
+
+    @After
+    fun tearDown() {
+        TestDatabaseFactory.cleanUp()
     }
 
     @Test
@@ -33,8 +43,7 @@ class CreateUserKeywordUseCaseTest {
             userKeywordRepository.create(
                 keywordId = TestUserKeyword.keywordId,
                 userId = TestUserKeyword.userId,
-                offsetX = TestUserKeyword.offsetX,
-                offsetY = TestUserKeyword.offsetY,
+                offset = TestUserKeyword.offset,
                 description = TestUserKeyword.description,
             )
         } returns TestUserKeyword
@@ -55,8 +64,7 @@ class CreateUserKeywordUseCaseTest {
             userKeywordRepository.create(
                 keywordId = TestUserKeyword.keywordId,
                 userId = TestUserKeyword.userId,
-                offsetX = TestUserKeyword.offsetX,
-                offsetY = TestUserKeyword.offsetY,
+                offset = TestUserKeyword.offset,
                 description = TestUserKeyword.description,
             )
         } returns TestUserKeyword
@@ -74,22 +82,22 @@ class CreateUserKeywordUseCaseTest {
         private val TestKeywordId = KeywordId(1)
         private val TestUserKeywordId = UserKeywordId(1)
         private const val TEST_KEYWORD_NAME = "sample"
+        private val TestOffset = Offset(0.0f, 0.0f)
+        private val TestDescription = Description("test")
         private val TestUserKeyword = UserKeyword(
             id = TestUserKeywordId,
             userId = TestUserId,
             keywordId = TestKeywordId,
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "",
+            offset = TestOffset,
+            description = TestDescription,
             createdAt = 1000,
             updatedAt = 1000,
         )
         private val TestCreateUserKeywordDto = CreateUserKeywordDto(
             userId = TestUserKeyword.userId,
             keywordName = TEST_KEYWORD_NAME,
-            offsetX = TestUserKeyword.offsetX,
-            offsetY = TestUserKeyword.offsetY,
-            description = TestUserKeyword.description,
+            offset = TestOffset.toDto(),
+            description = TestDescription.toDto(),
         )
         private val TestExternalKeyword = ExternalKeyword(
             id = TestKeywordId,

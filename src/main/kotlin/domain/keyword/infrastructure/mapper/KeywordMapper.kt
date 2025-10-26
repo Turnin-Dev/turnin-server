@@ -7,6 +7,8 @@ import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.keyword.domain.model.Keyword
+import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import org.jetbrains.exposed.sql.ResultRow
 
@@ -34,9 +36,8 @@ object KeywordMapper {
             id = UserKeywordId(this.id.value),
             keywordId = KeywordId(this.keywordId.value),
             userId = UserId(this.userId.value),
-            offsetX = this.offsetX.toFloat(),
-            offsetY = this.offsetY.toFloat(),
-            description = this.description,
+            offset = Offset(this.offsetX.toFloat(), this.offsetY.toFloat()),
+            description = Description(this.description),
             createdAt = this.createdAt.toEpochSecond(),
             updatedAt = this.updatedAt.toEpochSecond(),
         )

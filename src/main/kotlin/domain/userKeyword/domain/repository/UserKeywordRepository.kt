@@ -3,8 +3,9 @@ package com.peekr.domain.userKeyword.domain.repository
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
+import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 
 interface UserKeywordRepository {
     /**
@@ -29,33 +30,46 @@ interface UserKeywordRepository {
      *
      * @param keywordId 키워드 ID
      * @param userId 사용자 ID
-     * @param offsetX UI 좌표 상에서의 X 위치
-     * @param offsetY UI 좌표 상에서의 Y 위치
+     * @param offset UI 좌표 상에서의 위치(오프셋)
      * @param description 키워드 개인 설명
      *
-     * @return [UserKeyword] 사용자별 키워드 ID를 반환한다.
+     * @return 생성된 [UserKeyword]를 반환한다.
      */
     suspend fun create(
         keywordId: KeywordId,
         userId: UserId,
-        offsetX: Float,
-        offsetY: Float,
-        description: String?,
+        offset: Offset,
+        description: Description?,
     ): UserKeyword
 
     /**
-     * 사용자별 키워드를 업데이트한다.
+     * 사용자별 키워드 오프셋을 업데이트한다.
      *
      * @param ownerId 사용자 ID
      * @param userKeywordId 사용자별 키워드 ID
-     * @param patch [UserKeywordPatch]
+     * @param patch [Offset]
      *
-     * @return [Boolean] 업데이트 성공 시 `true`, 실패 시 `false`를 반환한다.
+     * @return 성공 시 `true`, 실패 시 `false` 반환
      */
-    suspend fun update(
+    suspend fun updateOffset(
         ownerId: UserId,
         userKeywordId: UserKeywordId,
-        patch: UserKeywordPatch,
+        patch: Offset,
+    ): Boolean
+
+    /**
+     * 사용자별 키워드 설명을 업데이트한다.
+     *
+     * @param ownerId 사용자 ID
+     * @param userKeywordId 사용자별 키워드 ID
+     * @param patch [Description]
+     *
+     * @return 성공 시 `true`, 실패 시 `false` 반환
+     */
+    suspend fun updateDescription(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+        patch: Description,
     ): Boolean
 
     /**

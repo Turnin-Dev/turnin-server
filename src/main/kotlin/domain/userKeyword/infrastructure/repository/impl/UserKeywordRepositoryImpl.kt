@@ -9,8 +9,9 @@ import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
+import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -40,30 +41,38 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun create(
         keywordId: KeywordId,
         userId: UserId,
-        offsetX: Float,
-        offsetY: Float,
-        description: String?,
+        offset: Offset,
+        description: Description?,
     ): UserKeyword = suspendTransaction {
         val savedUserKeywordEntity = UserKeywordEntity.new {
             this.keywordId = EntityID(keywordId.value, Keywords)
             this.userId = EntityID(userId.value, Users)
-            this.offsetX = offsetX.toDouble()
-            this.offsetY = offsetY.toDouble()
-            this.description = description
+            this.offsetX = offset.x.toDouble()
+            this.offsetY = offset.y.toDouble()
+            this.description = description?.value
         }
 
         savedUserKeywordEntity.toDomain()
     }
 
-    override suspend fun update(
+    override suspend fun updateOffset(
         ownerId: UserId,
         userKeywordId: UserKeywordId,
-        patch: UserKeywordPatch,
+        patch: Offset,
     ): Boolean = suspendTransaction {
         UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
-            it[offsetX] = patch.offsetX.toDouble()
-            it[offsetY] = patch.offsetY.toDouble()
-            it[description] = patch.description
+            it[offsetX] = patch.x.toDouble()
+            it[offsetY] = patch.y.toDouble()
+        } > 0
+    }
+
+    override suspend fun updateDescription(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+        patch: Description,
+    ): Boolean = suspendTransaction {
+        UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
+            it[description] = patch.value
         } > 0
     }
 

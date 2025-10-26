@@ -8,7 +8,10 @@ import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.GetUserKeywordResponse
-import com.peekr.domain.userKeyword.presentation.dto.PatchUserKeywordRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionResponse
+import com.peekr.domain.userKeyword.presentation.dto.UpdateOffsetRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateOffsetResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.toDto
 import com.peekr.domain.userKeyword.presentation.dto.toResponse
@@ -21,20 +24,21 @@ import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.patch
 
 fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCases) {
-    route({
+    route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "User Keyword API"
     }) {
-        get(route.ROUTE, { getUserKeywordByUserIdDocs() }) {
+        get({ getUserKeywordByUserIdDocs() }) {
             val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
             val userKeywords = usecase.get(userId)
             call.respond(userKeywords.toResponse())
         }
 
-        post(route.ROUTE, { createUserKeywordDocs() }) {
+        post({ createUserKeywordDocs() }) {
             val createUserKeywordRequest = call.receive<CreateUserKeywordRequest>()
             val ownerId = UserId(createUserKeywordRequest.userId)
             verifyAuthUserId(ownerId)
@@ -43,27 +47,47 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
         }
 
-        patch(route.ROUTE, { patchUserKeywordDocs() }) {
+        patch(route.SAVE_OFFSET, { updateOffsetDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
             val ownerId = extractUserIdWithToken()
             verifyAuthUserId(ownerId)
             val userKeywordId = UserKeywordId(userKeywordIdParam)
-            val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
-            val result = usecase.update(
+            val offsetDto = call.receive<UpdateOffsetRequest>().toDto()
+            val result = usecase.updateOffset(
                 ownerId = ownerId,
                 userKeywordId = userKeywordId,
-                patch = patchUserKeywordRequest.toDto(),
+                patch = offsetDto,
             )
-            if (result) {
-                call.respond(HttpStatusCode.NoContent)
+            if (result != null) {
+                call.respond(HttpStatusCode.OK, result.toResponse())
             } else {
                 call.respond(HttpStatusCode.NotFound)
             }
         }
 
-        delete(route.ROUTE, { deleteUserKeywordDocs() }) {
+        patch(route.SAVE_DESCRIPTION, { updateDescriptionDocs() }) {
+            val userKeywordIdParam = call.queryParameters["userKeywordId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 키워드 ID")
+            val ownerId = extractUserIdWithToken()
+            verifyAuthUserId(ownerId)
+            val userKeywordId = UserKeywordId(userKeywordIdParam)
+            val descriptionDto = call.receive<UpdateDescriptionRequest>().toDto()
+            val result = usecase.updateDescription(
+                ownerId = ownerId,
+                userKeywordId = userKeywordId,
+                patch = descriptionDto,
+            )
+            if (result != null) {
+                call.respond(HttpStatusCode.OK, result.toResponse())
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
+        delete({ deleteUserKeywordDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
@@ -117,9 +141,9 @@ private fun RouteConfig.createUserKeywordDocs() {
     }
 }
 
-private fun RouteConfig.patchUserKeywordDocs() {
-    summary = "사용자 키워드 수정"
-    description = "사용자 키워드를 수정한다."
+private fun RouteConfig.updateOffsetDocs() {
+    summary = "사용자 키워드 오프셋 수정"
+    description = "사용자 키워드 오프셋을 수정한다."
     request {
         queryParameter<Long>("userKeywordId") {
             description = "사용자 키워드 ID"
@@ -127,19 +151,56 @@ private fun RouteConfig.patchUserKeywordDocs() {
                 value = 1
             }
         }
-        body<PatchUserKeywordRequest> {
-            description = "사용자 키워드 수정 요청 바디"
-            example("PatchUserKeywordRequest") {
-                value = PatchUserKeywordRequest.sample
+        body<UpdateOffsetRequest> {
+            description = "사용자 키워드 오프셋 수정 요청 바디"
+            example("UpdateOffsetRequest") {
+                value = UpdateOffsetRequest.sample
             }
         }
     }
     response {
-        code(HttpStatusCode.NoContent) {
-            description = "사용자 키워드 수정 응답 결과 (성공)"
+        code(HttpStatusCode.OK) {
+            body<UpdateOffsetResponse> {
+                description = "사용자 키워드 오프셋 수정 응답 결과 (성공)"
+                example("UpdateOffsetResponse") {
+                    value = UpdateOffsetResponse.sample
+                }
+            }
         }
         code(HttpStatusCode.NotFound) {
-            description = "사용자 키워드 수정 응답 결과 (실패)"
+            description = "사용자 키워드 오프셋 수정 응답 결과 (실패)"
+        }
+    }
+}
+
+private fun RouteConfig.updateDescriptionDocs() {
+    summary = "사용자 키워드 설명 수정"
+    description = "사용자 키워드 설명을 수정한다."
+    request {
+        queryParameter<Long>("userKeywordId") {
+            description = "사용자 키워드 ID"
+            example("userKeywordId") {
+                value = 1
+            }
+        }
+        body<UpdateDescriptionRequest> {
+            description = "사용자 키워드 설명 수정 요청 바디"
+            example("UpdateDescriptionRequest") {
+                value = UpdateDescriptionRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<UpdateDescriptionResponse> {
+                description = "사용자 키워드 설명 수정 응답 결과 (성공)"
+                example("UpdateDescriptionResponse") {
+                    value = UpdateDescriptionResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            description = "사용자 키워드 설명 수정 응답 결과 (실패)"
         }
     }
 }
