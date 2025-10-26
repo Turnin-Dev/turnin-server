@@ -45,31 +45,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
         }
 
-        // TODO: 사용자별 키워드 통합 수정이 아니라 오프셋, 설명 수정 따로 따로 나눠서 엔드포인트 작성하기 (물론 로직도 수정)
-        // TODO 1. 도메인 로직부터 바꿔 나가기 ~
-        // TODO or
-        // TODO 2. 컨트롤러에서 기능 시나리오 우선 작성하기 ~
-//        patch({ patchUserKeywordDocs() }) {
-//            val userKeywordIdParam = call.queryParameters["userKeywordId"]
-//                ?.toLongOrNull()
-//                .inputValidationAndReturn("사용자 키워드 ID")
-//            val ownerId = extractUserIdWithToken()
-//            verifyAuthUserId(ownerId)
-//            val userKeywordId = UserKeywordId(userKeywordIdParam)
-//            val patchUserKeywordRequest = call.receive<PatchUserKeywordRequest>()
-//            val result = usecase.update(
-//                ownerId = ownerId,
-//                userKeywordId = userKeywordId,
-//                patch = patchUserKeywordRequest.toDto(),
-//            )
-//            if (result) {
-//                call.respond(HttpStatusCode.NoContent)
-//            } else {
-//                call.respond(HttpStatusCode.NotFound)
-//            }
-//        }
-
-        post(route.SAVE_OFFSET, {}) {
+        post(route.SAVE_OFFSET, { updateOffsetDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
@@ -89,7 +65,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        post(route.SAVE_DESCRIPTION, {}) {
+        post(route.SAVE_DESCRIPTION, { updateDescriptionDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
@@ -163,7 +139,7 @@ private fun RouteConfig.createUserKeywordDocs() {
     }
 }
 
-private fun RouteConfig.patchOffsetDocs() {
+private fun RouteConfig.updateOffsetDocs() {
     summary = "사용자 키워드 오프셋 수정"
     description = "사용자 키워드 오프셋을 수정한다."
     request {
@@ -195,7 +171,7 @@ private fun RouteConfig.patchOffsetDocs() {
     }
 }
 
-private fun RouteConfig.patchDescriptionDocs() {
+private fun RouteConfig.updateDescriptionDocs() {
     summary = "사용자 키워드 설명 수정"
     description = "사용자 키워드 설명을 수정한다."
     request {
