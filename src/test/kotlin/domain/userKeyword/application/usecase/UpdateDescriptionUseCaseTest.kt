@@ -46,7 +46,7 @@ class UpdateDescriptionUseCaseTest {
     }
 
     companion object {
-        private val TestUserId = UserId.Companion(1)
+        private val TestUserId = UserId(1)
         private val TestUserKeywordId = UserKeywordId(1)
         private val TestDescription = Description(value = "hello")
     }

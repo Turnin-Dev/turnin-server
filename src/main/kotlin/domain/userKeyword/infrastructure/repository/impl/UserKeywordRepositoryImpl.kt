@@ -41,16 +41,15 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun create(
         keywordId: KeywordId,
         userId: UserId,
-        offsetX: Float,
-        offsetY: Float,
-        description: String?,
+        offset: Offset,
+        description: Description?,
     ): UserKeyword = suspendTransaction {
         val savedUserKeywordEntity = UserKeywordEntity.new {
             this.keywordId = EntityID(keywordId.value, Keywords)
             this.userId = EntityID(userId.value, Users)
-            this.offsetX = offsetX.toDouble()
-            this.offsetY = offsetY.toDouble()
-            this.description = description
+            this.offsetX = offset.x.toDouble()
+            this.offsetY = offset.y.toDouble()
+            this.description = description?.value
         }
 
         savedUserKeywordEntity.toDomain()

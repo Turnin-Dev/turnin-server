@@ -3,6 +3,7 @@ package com.peekr.domain.userKeyword.application.usecase
 import com.peekr.common.db.suspendTransaction
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
+import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
@@ -37,9 +38,8 @@ class CreateUserKeywordUseCase(
             .create(
                 keyword.id,
                 createUserKeywordDto.userId,
-                createUserKeywordDto.offsetX,
-                createUserKeywordDto.offsetY,
-                createUserKeywordDto.description,
+                createUserKeywordDto.offset.toDomain(),
+                createUserKeywordDto.description?.toDomain(),
             ).toDto(keyword.keyword)
     }
 }

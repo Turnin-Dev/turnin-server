@@ -9,9 +9,11 @@ import com.peekr.common.db.schema.Users
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
-import com.peekr.domain.userKeyword.application.dto.UpdateDescriptionDto
-import com.peekr.domain.userKeyword.application.dto.UpdateOffsetDto
+import com.peekr.domain.userKeyword.application.dto.DescriptionDto
+import com.peekr.domain.userKeyword.application.dto.OffsetDto
 import com.peekr.domain.userKeyword.application.dto.toDomain
+import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test
@@ -49,9 +51,8 @@ class UserKeywordRepositoryImplTest {
         val savedUserKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "",
+            offset = TestOffset,
+            description = TestDescription,
         )
 
         // then
@@ -65,9 +66,8 @@ class UserKeywordRepositoryImplTest {
             repository.create(
                 keywordId = KeywordId(1),
                 userId = UserId(1),
-                offsetX = 0.0f,
-                offsetY = 0.0f,
-                description = "",
+                offset = TestOffset,
+                description = TestDescription,
             )
         }
     }
@@ -80,9 +80,8 @@ class UserKeywordRepositoryImplTest {
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "",
+            offset = TestOffset,
+            description = TestDescription,
         )
 
         // when
@@ -121,9 +120,8 @@ class UserKeywordRepositoryImplTest {
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "",
+            offset = TestOffset,
+            description = TestDescription,
         )
 
         // when
@@ -149,15 +147,14 @@ class UserKeywordRepositoryImplTest {
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "",
+            offset = TestOffset,
+            description = TestDescription,
         )
 
         // when
-        val patch = UpdateOffsetDto(
-            x = 0.0f,
-            y = 0.0f,
+        val patch = OffsetDto(
+            x = 100.0f,
+            y = 200.0f,
         )
         val result = repository.updateOffset(userId, userKeyword.id, patch.toDomain())
         val patchedUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
@@ -166,11 +163,12 @@ class UserKeywordRepositoryImplTest {
         assertTrue(result)
         assertNotNull(patchedUserKeyword)
         assertEquals(patch.x, patchedUserKeyword.offset.x)
+        assertEquals(patch.y, patchedUserKeyword.offset.y)
     }
 
     @Test
     fun `updateOffset 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
-        val patch = UpdateOffsetDto(
+        val patch = OffsetDto(
             x = 0.0f,
             y = 0.0f,
         )
@@ -188,13 +186,12 @@ class UserKeywordRepositoryImplTest {
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "",
+            offset = TestOffset,
+            description = TestDescription,
         )
 
         // when
-        val patch = UpdateDescriptionDto(value = "hello")
+        val patch = DescriptionDto(value = "hello")
         val result = repository.updateDescription(userId, userKeyword.id, patch.toDomain())
         val patchedUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
 
@@ -206,7 +203,7 @@ class UserKeywordRepositoryImplTest {
 
     @Test
     fun `updateDescription 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
-        val patch = UpdateDescriptionDto(value = "hello")
+        val patch = DescriptionDto(value = "hello")
         val result =
             repository.updateDescription(UserId(10), UserKeywordId(10), patch.toDomain())
 
@@ -221,9 +218,8 @@ class UserKeywordRepositoryImplTest {
         val userKeyword = repository.create(
             keywordId = keywordId,
             userId = userId,
-            offsetX = 0.0f,
-            offsetY = 0.0f,
-            description = "",
+            offset = TestOffset,
+            description = TestDescription,
         )
 
         // when
@@ -267,6 +263,11 @@ class UserKeywordRepositoryImplTest {
     }
 
     companion object {
+        private val TestOffset = Offset(
+            x = 0.0f,
+            y = 0.0f,
+        )
+        private val TestDescription = Description("hello")
         private const val TEST_KEYWORD = "keyword"
     }
 }

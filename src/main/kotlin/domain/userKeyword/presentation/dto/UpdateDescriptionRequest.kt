@@ -1,6 +1,6 @@
 package com.peekr.domain.userKeyword.presentation.dto
 
-import com.peekr.domain.userKeyword.application.dto.UpdateDescriptionDto
+import com.peekr.domain.userKeyword.application.dto.DescriptionDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -17,5 +17,5 @@ data class UpdateDescriptionRequest(val description: String?) {
     }
 }
 
-fun UpdateDescriptionRequest.toDto(): UpdateDescriptionDto =
-    UpdateDescriptionDto(description)
+fun UpdateDescriptionRequest.toDto(): DescriptionDto =
+    DescriptionDto(description)
