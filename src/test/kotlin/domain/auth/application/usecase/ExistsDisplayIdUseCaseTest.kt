@@ -17,7 +17,7 @@ class ExistsDisplayIdUseCaseTest {
         // given
         coEvery { authService.existsDisplayId(TestDisplayId) } returns true
 
-        // then
+        // when
         val result = usecase(TestDisplayId)
 
         // then

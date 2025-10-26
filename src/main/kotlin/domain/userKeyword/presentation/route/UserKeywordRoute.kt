@@ -24,7 +24,6 @@ import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.patch
 
 fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCases) {
     route(route.ROUTE, {
@@ -47,7 +46,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
         }
 
-        patch(route.SAVE_OFFSET, { updateOffsetDocs() }) {
+        patch(route.PATCH_OFFSET, { updateOffsetDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
@@ -67,7 +66,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        patch(route.SAVE_DESCRIPTION, { updateDescriptionDocs() }) {
+        patch(route.PATCH_DESCRIPTION, { updateDescriptionDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
