@@ -1,6 +1,5 @@
 package com.peekr.domain.userKeyword.presentation.dto
 
-import com.peekr.common.db.schema.UserKeywords.offsetX
 import com.peekr.domain.userKeyword.application.dto.OffsetDto
 import kotlinx.serialization.Serializable
 
