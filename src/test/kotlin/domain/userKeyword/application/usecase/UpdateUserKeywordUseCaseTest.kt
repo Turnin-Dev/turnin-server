@@ -3,7 +3,6 @@ package com.peekr.domain.userKeyword.application.usecase
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
-import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk

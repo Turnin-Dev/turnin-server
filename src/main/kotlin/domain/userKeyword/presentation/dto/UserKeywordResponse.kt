@@ -48,9 +48,9 @@ fun UserKeywordDto.toResponse() = UserKeywordResponse(
     keywordId = keywordId,
     keywordName = keywordName,
     userId = userId,
-    offsetX = offsetX,
-    offsetY = offsetY,
-    description = description,
+    offsetX = offset.x,
+    offsetY = offset.y,
+    description = description?.value,
     createdAt = createdAt,
     updatedAt = updatedAt,
 )

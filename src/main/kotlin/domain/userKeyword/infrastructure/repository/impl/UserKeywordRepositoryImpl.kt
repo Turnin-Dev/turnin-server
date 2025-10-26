@@ -9,8 +9,9 @@ import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
+import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -55,15 +56,24 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         savedUserKeywordEntity.toDomain()
     }
 
-    override suspend fun update(
+    override suspend fun updateOffset(
         ownerId: UserId,
         userKeywordId: UserKeywordId,
-        patch: UserKeywordPatch,
+        patch: Offset,
     ): Boolean = suspendTransaction {
         UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
-            it[offsetX] = patch.offsetX.toDouble()
-            it[offsetY] = patch.offsetY.toDouble()
-            it[description] = patch.description
+            it[offsetX] = patch.x.toDouble()
+            it[offsetY] = patch.y.toDouble()
+        } > 0
+    }
+
+    override suspend fun updateDescription(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+        patch: Description,
+    ): Boolean = suspendTransaction {
+        UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
+            it[description] = patch.value
         } > 0
     }
 
