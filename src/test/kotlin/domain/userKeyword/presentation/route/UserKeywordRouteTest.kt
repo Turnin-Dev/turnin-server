@@ -660,7 +660,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())
@@ -691,7 +691,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())
@@ -718,7 +718,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())
@@ -748,7 +748,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())

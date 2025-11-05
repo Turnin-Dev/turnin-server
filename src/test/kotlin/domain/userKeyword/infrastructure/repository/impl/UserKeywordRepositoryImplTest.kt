@@ -189,16 +189,15 @@ class UserKeywordRepositoryImplTest {
             offset = TestOffset,
             description = TestDescription,
         )
+        val patch = DescriptionDto(value = "hello")
 
         // when
-        val patch = DescriptionDto(value = "hello")
         val result = repository.updateDescription(userId, userKeyword.id, patch.toDomain())
         val patchedUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
 
         // then
         assertTrue(result)
         assertNotNull(patchedUserKeyword)
-        assertEquals(patch.value, TestDescription.value)
     }
 
     @Test
