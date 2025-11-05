@@ -56,11 +56,25 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             .singleOrNull()
     }
 
+    override suspend fun findDescriptionById(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+    ): Description? = suspendTransaction {
+        UserKeywords
+            .select(UserKeywords.description)
+            .where((UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value))
+            .map {
+                it[UserKeywords.description]?.let {
+                    Description(it)
+                }
+            }.singleOrNull()
+    }
+
     override suspend fun create(
         keywordId: KeywordId,
         userId: UserId,
         offset: Offset,
-        description: Description?,
+        description: Description,
     ): UserKeyword = suspendTransaction {
         val savedUserKeywordEntity = UserKeywordEntity.new {
             this.keywordId = EntityID(keywordId.value, Keywords)

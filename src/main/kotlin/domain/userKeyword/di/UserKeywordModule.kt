@@ -2,6 +2,7 @@ package com.peekr.domain.userKeyword.di
 
 import com.peekr.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
 import com.peekr.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
+import com.peekr.domain.userKeyword.application.usecase.GetDescriptionUseCase
 import com.peekr.domain.userKeyword.application.usecase.GetUserKeywordsUseCase
 import com.peekr.domain.userKeyword.application.usecase.UpdateDescriptionUseCase
 import com.peekr.domain.userKeyword.application.usecase.UpdateOffsetUseCase
@@ -24,7 +25,15 @@ val userKeywordModule = module {
     factory { UpdateOffsetUseCase(get()) }
     factory { UpdateDescriptionUseCase(get()) }
     factory { DeleteUserKeywordUseCase(get()) }
+    factory { GetDescriptionUseCase(get()) }
     single<UserKeywordUseCases> {
-        UserKeywordUseCases(get(), get(), get(), get(), get())
+        UserKeywordUseCases(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+        )
     }
 }
