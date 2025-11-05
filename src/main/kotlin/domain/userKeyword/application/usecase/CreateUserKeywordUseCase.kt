@@ -39,7 +39,7 @@ class CreateUserKeywordUseCase(
                 keyword.id,
                 createUserKeywordDto.userId,
                 createUserKeywordDto.offset.toDomain(),
-                createUserKeywordDto.description?.toDomain(),
+                createUserKeywordDto.description.toDomain(),
             ).toDto(keyword.keyword)
     }
 }

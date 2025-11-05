@@ -26,6 +26,19 @@ interface UserKeywordRepository {
     suspend fun findByKeywordIdAndUserId(keywordId: KeywordId, userId: UserId): UserKeyword?
 
     /**
+     * 사용자 키워드 ID를 통해 사용자 키워드 설명을 조회한다.
+     *
+     * @param ownerId 사용자 ID
+     * @param userKeywordId 사용자 키워드 ID
+     *
+     * @return 사용자별 키워드를 찾으면 [Description]를 반환하고 만약 없다면 `null`을 반환한다.
+     */
+    suspend fun findDescriptionById(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+    ): Description?
+
+    /**
      * 사용자별 키워드를 생성한다.
      *
      * @param keywordId 키워드 ID
@@ -39,7 +52,7 @@ interface UserKeywordRepository {
         keywordId: KeywordId,
         userId: UserId,
         offset: Offset,
-        description: Description?,
+        description: Description,
     ): UserKeyword
 
     /**
