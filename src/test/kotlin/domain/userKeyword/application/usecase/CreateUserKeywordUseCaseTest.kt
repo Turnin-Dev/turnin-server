@@ -44,7 +44,7 @@ class CreateUserKeywordUseCaseTest {
                 keywordId = TestUserKeyword.keywordId,
                 userId = TestUserKeyword.userId,
                 offset = TestUserKeyword.offset,
-                description = TestUserKeyword.description,
+                description = TestDescription,
             )
         } returns TestUserKeyword
         coEvery { keywordProviderImpl.findByName(any()) } returns TestExternalKeyword
@@ -65,7 +65,7 @@ class CreateUserKeywordUseCaseTest {
                 keywordId = TestUserKeyword.keywordId,
                 userId = TestUserKeyword.userId,
                 offset = TestUserKeyword.offset,
-                description = TestUserKeyword.description,
+                description = TestDescription,
             )
         } returns TestUserKeyword
         coEvery { keywordProviderImpl.findByName(TEST_KEYWORD_NAME) } returns null
@@ -89,7 +89,6 @@ class CreateUserKeywordUseCaseTest {
             userId = TestUserId,
             keywordId = TestKeywordId,
             offset = TestOffset,
-            description = TestDescription,
             createdAt = 1000,
             updatedAt = 1000,
         )

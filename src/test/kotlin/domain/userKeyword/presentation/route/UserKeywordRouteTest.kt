@@ -658,7 +658,6 @@ class UserKeywordRouteTest {
             keywordName = TEST_KEYWORD,
             userId = TestUserId.value,
             offset = TestOffset.toDto(),
-            description = TestDescription.toDto(),
             createdAt = 1000,
             updatedAt = 1000,
         )

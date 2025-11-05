@@ -8,11 +8,11 @@ import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
-import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
@@ -21,17 +21,35 @@ import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun findByUserId(userId: UserId): List<UserKeyword> = suspendTransaction {
-        UserKeywordEntity
-            .find(UserKeywords.userId eq userId.value)
-            .map { it.toDomain() }
+        UserKeywords
+            .select(
+                UserKeywords.id,
+                UserKeywords.userId,
+                UserKeywords.keywordId,
+                UserKeywords.userId,
+                UserKeywords.offsetX,
+                UserKeywords.offsetY,
+                UserKeywords.createdAt,
+                UserKeywords.updatedAt,
+            ).where(UserKeywords.userId eq userId.value)
+            .map { row -> row.toDomain() }
     }
 
     override suspend fun findByKeywordIdAndUserId(
         keywordId: KeywordId,
         userId: UserId,
     ): UserKeyword? = suspendTransaction {
-        UserKeywordEntity
-            .find(
+        UserKeywords
+            .select(
+                UserKeywords.id,
+                UserKeywords.userId,
+                UserKeywords.keywordId,
+                UserKeywords.userId,
+                UserKeywords.offsetX,
+                UserKeywords.offsetY,
+                UserKeywords.createdAt,
+                UserKeywords.updatedAt,
+            ).where(
                 (UserKeywords.keywordId eq keywordId.value) and
                     (UserKeywords.userId eq userId.value),
             ).map { it.toDomain() }
