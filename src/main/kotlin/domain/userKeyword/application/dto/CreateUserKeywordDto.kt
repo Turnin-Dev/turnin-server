@@ -14,5 +14,5 @@ data class CreateUserKeywordDto(
     val userId: UserId,
     val keywordName: String,
     val offset: OffsetDto,
-    val description: DescriptionDto?,
+    val description: DescriptionDto,
 )

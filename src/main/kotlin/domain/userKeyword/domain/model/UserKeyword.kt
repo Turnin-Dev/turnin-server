@@ -11,7 +11,6 @@ import com.peekr.common.model.UserKeywordId
  * @property keywordId 키워드 ID
  * @property userId 사용자 ID
  * @property offset 키워드 오프셋
- * @property description 키워드 개인 설명
  * @property createdAt 생성 일자
  * @property updatedAt 수정 일자
  */
@@ -20,7 +19,6 @@ data class UserKeyword(
     val keywordId: KeywordId,
     val userId: UserId,
     val offset: Offset,
-    val description: Description?,
     val createdAt: Long,
     val updatedAt: Long,
 )

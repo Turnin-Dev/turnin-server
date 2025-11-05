@@ -47,6 +47,7 @@ object Api {
         object UserKeyword {
             const val ROUTE = "/user-keyword"
             const val TAG = "UserKeyword"
+            const val GET_DESCRIPTION = "/description"
             const val PATCH_OFFSET = "/offset"
             const val PATCH_DESCRIPTION = "/description"
         }

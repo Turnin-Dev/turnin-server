@@ -189,16 +189,15 @@ class UserKeywordRepositoryImplTest {
             offset = TestOffset,
             description = TestDescription,
         )
+        val patch = DescriptionDto(value = "hello")
 
         // when
-        val patch = DescriptionDto(value = "hello")
         val result = repository.updateDescription(userId, userKeyword.id, patch.toDomain())
         val patchedUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
 
         // then
         assertTrue(result)
         assertNotNull(patchedUserKeyword)
-        assertEquals(patch.value, patchedUserKeyword.description?.value)
     }
 
     @Test
@@ -234,6 +233,57 @@ class UserKeywordRepositoryImplTest {
         val result = repository.delete(UserId(10), UserKeywordId(10))
 
         assertFalse(result)
+    }
+
+    @Test
+    fun `findDescriptionById 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            offset = TestOffset,
+            description = TestDescription,
+        )
+
+        // when
+        val description = repository.findDescriptionById(userId, userKeyword.id)
+
+        // then
+        assertNotNull(description)
+        assertEquals(description, TestDescription)
+    }
+
+    @Test
+    fun `findDescriptionById 성공 테스트 - 등록되지 않은 사용자 키워드 조회 시 null을 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+
+        // when
+        val description = repository.findDescriptionById(userId, UserKeywordId(1L))
+
+        // then
+        assertNull(description)
+    }
+
+    @Test
+    fun `findDescriptionById 성공 테스트 - 사용자 키워드 설명이 비어있는 경우 null을 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            offset = TestOffset,
+            description = Description(null),
+        )
+
+        // when
+        val description = repository.findDescriptionById(userId, userKeyword.id)
+
+        // then
+        assertNull(description)
     }
 
     private suspend fun insertUserAndReturnId(): UserId = TestDatabaseFactory.dbQuery {
