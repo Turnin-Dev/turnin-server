@@ -81,7 +81,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             this.userId = EntityID(userId.value, Users)
             this.offsetX = offset.x.toDouble()
             this.offsetY = offset.y.toDouble()
-            this.description = description?.value
+            this.description = description.value
         }
 
         savedUserKeywordEntity.toDomain()
