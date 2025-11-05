@@ -3,7 +3,6 @@ package com.peekr.domain.userKeyword.application.usecase
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
-import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
@@ -71,7 +70,6 @@ class GetUserKeywordsUseCaseTest {
         private val TestUserKeywordId = UserKeywordId(1)
         private const val TEST_KEYWORD = "TestKeyword"
         private val TestOffset = Offset(0.0f, 0.0f)
-        private val TestDescription = Description("test")
         private val TestUserKeyword = UserKeyword(
             id = TestUserKeywordId,
             userId = TestUserId,
