@@ -645,6 +645,124 @@ class UserKeywordRouteTest {
         assertTrue(responseBody.contains(expectedException.errorCode.code))
     }
 
+    @Test
+    fun `사용자 키워드 설명 조회 - 요청 성공 테스트`() = testApplication {
+        // given
+        val route = Api.V1.UserKeyword
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery {
+            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
+        } returns TestDescriptionDto
+
+        testPlugin(
+            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val response = client.get(endpoint) {
+            url {
+                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
+            }
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(HttpStatusCode.OK, response.status)
+        TestDescriptionDto.value?.let {
+            assertTrue(responseBody.contains(it))
+        }
+    }
+
+    @Test
+    fun `사용자 키워드 설명 조회 - 토큰 에러 발생 시 HTTP 상태코드 401을 반환한다`() = testApplication {
+        // given
+        val route = Api.V1.UserKeyword
+        val client = createTestClient()
+        coEvery {
+            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
+        } returns TestDescriptionDto
+
+        testPlugin(
+            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val response = client.get(endpoint) {
+            url {
+                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
+            }
+            contentType(ContentType.Application.Json)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun `사용자 키워드 설명 조회 - 알 수 없는 예외가 발생하는 경우 HTTP 상태코드 500을 반환한다`() = testApplication {
+        // given
+        val route = Api.V1.UserKeyword
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery {
+            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
+        } throws Exception("")
+
+        testPlugin(
+            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val response = client.get(endpoint) {
+            url {
+                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
+            }
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.InternalServerError, response.status)
+    }
+
+    @Test
+    fun `사용자 키워드 설명 조회 - 알려진 예외가 발생하는 경우 정해진 메시지를 반환할 수 있다`() = testApplication {
+        // given
+        val route = Api.V1.UserKeyword
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        val expectedMessage = "error!"
+        val expectedException = TestApiException(expectedMessage)
+        coEvery {
+            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
+        } throws expectedException
+
+        testPlugin(
+            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}/${route.GET_DESCRIPTION}"
+        val response = client.get(endpoint) {
+            url {
+                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
+            }
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(expectedException.status, response.status)
+        assertTrue(responseBody.contains(expectedException.errorCode.code))
+    }
+
     companion object {
         private val TestUserId = UserId(1L)
         private val TestKeywordId = KeywordId(1L)
