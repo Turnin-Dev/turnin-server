@@ -198,7 +198,7 @@ class UserKeywordRepositoryImplTest {
         // then
         assertTrue(result)
         assertNotNull(patchedUserKeyword)
-        assertEquals(patch.value, patchedUserKeyword.description?.value)
+        assertEquals(patch.value, TestDescription.value)
     }
 
     @Test
