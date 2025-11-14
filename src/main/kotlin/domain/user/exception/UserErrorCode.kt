@@ -8,7 +8,7 @@ sealed class UserErrorCode(
 ) : ApiErrorCode(code, description) {
     data object UserNotFound : UserErrorCode(U001, "사용자를 찾을 수 없습니다.")
 
-    data object UserPatchFailed : UserErrorCode(U003, "사용자 정보가 수정되지 않았습니다.")
+    data object UserPatchFailed : UserErrorCode(U002, "사용자 정보가 수정되지 않았습니다.")
 
     data object IntroducePatchFailed : UserErrorCode(U003, "소개글이 수정되지 않았습니다.")
 }
