@@ -42,4 +42,17 @@ interface UserRepository {
         userId: UserId,
         patch: UserPatch,
     ): Boolean
+
+    /**
+     * 사용자 소개글을 수정한다.
+     *
+     * @param userId 사용자 ID
+     * @param patchIntroduce 소개글
+     *
+     * @return [Boolean] 업데이트 성공 시 `true`, 실패 시 `false`를 반환한다.
+     */
+    suspend fun updateIntroduce(
+        userId: UserId,
+        patchIntroduce: String,
+    ): Boolean
 }

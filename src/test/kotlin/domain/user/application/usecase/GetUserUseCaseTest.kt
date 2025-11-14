@@ -7,7 +7,7 @@ import com.peekr.domain.user.application.dto.toDto
 import com.peekr.domain.user.domain.model.RoleForUser
 import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User
-import com.peekr.domain.user.domain.service.UserService
+import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -21,8 +21,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 
 class GetUserUseCaseTest {
-    private val userService = mockk<UserService>()
-    private val usecase = GetUserUseCase(userService)
+    private val userRepository = mockk<UserRepository>()
+    private val usecase = GetUserUseCase(userRepository)
 
     @Before
     fun setUp() {
@@ -37,7 +37,7 @@ class GetUserUseCaseTest {
     @Test
     fun `성공 테스트`() = runTest {
         // given
-        coEvery { userService.getUserById(TestUserId) } returns TestUser
+        coEvery { userRepository.findById(TestUserId) } returns TestUser
 
         // when
         val userDto = usecase(TestUserId)
@@ -50,7 +50,7 @@ class GetUserUseCaseTest {
     @Test
     fun `사용자가 존재하지 않을 때 실패 테스트`() = runTest {
         // given
-        coEvery { userService.getUserById(TestUserId) } returns null
+        coEvery { userRepository.findById(TestUserId) } returns null
 
         // when
         val userDto = usecase(TestUserId)
