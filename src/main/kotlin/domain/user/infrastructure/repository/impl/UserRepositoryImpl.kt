@@ -55,4 +55,13 @@ class UserRepositoryImpl : UserRepository {
             patch.profileImageUrl?.let { row[profileImageUrl] = it }
         } > 0
     }
+
+    override suspend fun updateIntroduce(
+        userId: UserId,
+        patchIntroduce: String,
+    ): Boolean = suspendTransaction {
+        Users.update({ (Users.id eq userId.value) }) { row ->
+            row[introduce] = patchIntroduce
+        } > 0
+    }
 }

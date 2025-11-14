@@ -5,7 +5,7 @@ import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.application.dto.UserPatchDto
 import com.peekr.domain.user.domain.model.UserPatch
-import com.peekr.domain.user.domain.service.UserService
+import com.peekr.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test
@@ -13,14 +13,14 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 
 class UpdateUserUseCaseTest {
-    private val userService = mockk<UserService>()
-    private val usecase = UpdateUserUseCase(userService)
+    private val userRepository = mockk<UserRepository>()
+    private val usecase = UpdateUserUseCase(userRepository)
 
     @Test
     fun `성공 테스트`() = runTest {
         // given
         coEvery {
-            userService.updateUser(TestUserId, TestUserPatch)
+            userRepository.update(TestUserId, TestUserPatch)
         } returns true
 
         // when

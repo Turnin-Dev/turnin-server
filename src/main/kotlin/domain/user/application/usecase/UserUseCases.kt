@@ -4,4 +4,5 @@ data class UserUseCases(
     val get: GetUserUseCase,
     val getProfile: GetUserProfileUseCase,
     val update: UpdateUserUseCase,
+    val updateIntroduce: UpdateIntroduceUseCase,
 )
