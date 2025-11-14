@@ -6,6 +6,7 @@ import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
+import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.domain.user.presentation.dto.UserProfileResponse
 import com.peekr.domain.user.presentation.dto.UserResponse
@@ -21,11 +22,11 @@ import io.ktor.server.response.respond
 
 // ------------------------------ Route ------------------------------
 fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases) {
-    route({
+    route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "User API"
     }) {
-        get(route.ROUTE, { getUserByIdDocs() }) {
+        get({ getUserByIdDocs() }) {
             val userId = extractUserIdWithToken()
             val user = userUseCases.get(userId)
             if (user != null) {
@@ -51,7 +52,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
             }
         }
 
-        patch(route.ROUTE, { patchUserDocs() }) {
+        patch({ patchUserDocs() }) {
             val userPatchRequest = call.receive<UserPatchRequest>()
             val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
@@ -61,7 +62,22 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
             } else {
                 call.respond(
                     HttpStatusCode.NotFound,
-                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                    UserErrorCode.UserPatchFailed.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        patch(route.INTRODUCE, { patchIntroduceDocs() }) {
+            val introducePatchRequest = call.receive<IntroducePatchRequest>()
+            val userId = extractUserIdWithToken()
+            verifyAuthUserId(userId)
+            val result = userUseCases.updateIntroduce(userId, introducePatchRequest.introduce)
+            if (result) {
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.IntroducePatchFailed.toErrorResponse(HttpStatusCode.NotFound),
                 )
             }
         }
@@ -69,7 +85,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
 }
 
 // ------------------------------ Route Docs ------------------------------
-fun RouteConfig.getUserByIdDocs() {
+private fun RouteConfig.getUserByIdDocs() {
     summary = "사용자 조회"
     description = "사용자 ID로 사용자를 조회한다."
     response {
@@ -92,7 +108,7 @@ fun RouteConfig.getUserByIdDocs() {
     }
 }
 
-fun RouteConfig.getUserProfileByIdDocs() {
+private fun RouteConfig.getUserProfileByIdDocs() {
     summary = "사용자 프로필 조회"
     description = "사용자 ID로 사용자 프로필을 조회한다." +
         "(사용자 조회와 다른점은 사용자 데이터에 추가 데이터가 포함된다)"
@@ -116,7 +132,7 @@ fun RouteConfig.getUserProfileByIdDocs() {
     }
 }
 
-fun RouteConfig.patchUserDocs() {
+private fun RouteConfig.patchUserDocs() {
     summary = "사용자 정보 수정"
     description = "사용자 정보를 수정한다."
     request {
@@ -133,9 +149,35 @@ fun RouteConfig.patchUserDocs() {
         }
         code(HttpStatusCode.NotFound) {
             body<ErrorResponse> {
-                description = "사용자가 존재하지 않는 경우"
-                example("UserResponse") {
-                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
+                description = "사용자 정보가 수정되지 않았을 때"
+                example("UserPatchFailed") {
+                    value = UserErrorCode.UserPatchFailed.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.patchIntroduceDocs() {
+    summary = "사용자 소개글 수정"
+    description = "사용자 소개글을 수정한다."
+    request {
+        body<IntroducePatchRequest> {
+            description = "사용자 소개글 수정 요청 바디"
+            example("Example") {
+                value = IntroducePatchRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.NoContent) {
+            description = "사용자 소개글 수정 성공 시"
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "소개글이 수정되지 않았을 때"
+                example("IntroducePatchFailed") {
+                    value = UserErrorCode.IntroducePatchFailed.toErrorResponse(HttpStatusCode.NotFound)
                 }
             }
         }

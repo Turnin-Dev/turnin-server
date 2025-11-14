@@ -17,6 +17,7 @@ import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.update
 
+// TODO: Friend 테이블 조작은 Provider로 빼야함
 class UserRepositoryImpl : UserRepository {
     override suspend fun findById(id: UserId): User? = suspendTransaction {
         UserEntity.findById(id.value)?.let { entity ->
