@@ -147,6 +147,33 @@ class UserRepositoryImplTest {
         assertFalse(result)
     }
 
+    @Test
+    fun `updateIntroduce 성공 테스트`() = runTest {
+        // given
+        val savedUserEntity = TestDatabaseFactory.dbQuery {
+            UserTestDoubles.saveAndGetUserEntity()
+        }
+
+        // when
+        val userId = UserId(savedUserEntity.id.value)
+        val result = repository.updateIntroduce(userId, TEST_PATCH_INTRODUCE)
+        val updatedUserEntity = repository.findById(userId)
+
+        // then
+        assertTrue(result)
+        assertEquals(TEST_PATCH_INTRODUCE, updatedUserEntity?.introduce)
+    }
+
+    @Test
+    fun `updateIntroduce 실패 테스트 - 사용자를 찾지 못하는 경우 false를 반환한다`() = runTest {
+        // when
+        val userId = UserId(1L)
+        val result = repository.updateIntroduce(userId, TEST_PATCH_INTRODUCE)
+
+        // then
+        assertFalse(result)
+    }
+
     companion object {
         private val TestUserPatch = UserPatch(
             displayId = DisplayId("ididid"),
@@ -154,5 +181,6 @@ class UserRepositoryImplTest {
             profileImageUrl = null,
             introduce = "introduce",
         )
+        private const val TEST_PATCH_INTRODUCE = "test introduce"
     }
 }
