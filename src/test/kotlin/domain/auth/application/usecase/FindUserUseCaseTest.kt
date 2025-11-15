@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.application.usecase
 
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.model.FindUserResult
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.service.AuthService
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -28,7 +28,7 @@ class FindUserUseCaseTest {
     }
 
     companion object {
-        private val TestProvider = SocialLoginProviderForAuth.GOOGLE
+        private val TestProvider = SocialLoginProvider.GOOGLE
         private const val TEST_PROVIDER_ID = "provider-id"
     }
 }

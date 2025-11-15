@@ -1,17 +1,16 @@
 package com.peekr.domain.auth
 
-import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.application.dto.RegisterResultDto
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
-import com.peekr.domain.auth.domain.model.RoleForAuth
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
 
@@ -19,8 +18,8 @@ internal object AuthTestDoubles {
     private val MockUserId = UserId(1L)
     val MockAuthUser = AuthUser(
         userId = MockUserId,
-        role = RoleForAuth.USER,
-        provider = SocialLoginProviderForAuth.GOOGLE,
+        role = Role.USER,
+        provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
         displayId = DisplayId("hong_gd_123"),
         name = Name("honggd"),
@@ -31,7 +30,7 @@ internal object AuthTestDoubles {
     )
 
     val MockRegister = Register(
-        provider = SocialLoginProviderForAuth.GOOGLE,
+        provider = SocialLoginProvider.GOOGLE,
         providerId = "providerIDDDDD",
         displayId = DisplayId("hong_gd_123"),
         name = Name("honggd"),

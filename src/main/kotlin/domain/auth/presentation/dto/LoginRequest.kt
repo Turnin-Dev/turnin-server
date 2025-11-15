@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.presentation.dto
 
-import com.peekr.common.db.schema.SocialLoginProvider
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.validator.PeekrValidator.validation
 import kotlinx.serialization.Serializable
 
