@@ -11,6 +11,7 @@ import com.peekr.domain.user.UserTestDoubles.MockUserDto
 import com.peekr.domain.user.application.dto.UserPatchDto
 import com.peekr.domain.user.application.dto.UserProfileDto
 import com.peekr.domain.user.application.usecase.UserUseCases
+import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
@@ -116,7 +117,8 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.get(route.PROFILE) {
+        val endpoint = "${route.ROUTE}/${route.PROFILE}"
+        val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
         }
         val responseBody = response.bodyAsText()
@@ -140,7 +142,8 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.get(route.PROFILE) {
+        val endpoint = "${route.ROUTE}/${route.PROFILE}"
+        val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)
@@ -162,7 +165,8 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.get(route.PROFILE) {
+        val endpoint = "${route.ROUTE}/${route.PROFILE}"
+        val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)
@@ -183,7 +187,8 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.get(route.PROFILE) {
+        val endpoint = "${route.ROUTE}/${route.PROFILE}"
+        val response = client.get(endpoint) {
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)
         }
@@ -209,7 +214,8 @@ class UserRoutesTest {
         )
 
         // when
-        val response = client.get(route.PROFILE) {
+        val endpoint = "${route.ROUTE}/${route.PROFILE}"
+        val response = client.get(endpoint) {
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
             setBody(TestUserPatchRequest)
@@ -223,7 +229,7 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 UPDATE 요청 성공 테스트`() = testApplication {
+    fun `사용자 수정 PATCH 요청 성공 테스트`() = testApplication {
         // given
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
@@ -245,7 +251,7 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 UPDATE 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+    fun `사용자 수정 PATCH 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken(INVALID_USER_ID)
@@ -267,7 +273,7 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 UPDATE 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+    fun `사용자 수정 PATCH 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
@@ -293,7 +299,7 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 UPDATE 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+    fun `사용자 수정 PATCH 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
         coEvery { userUseCases.update(TestUserId, TestUserPatchDto) } returns false
@@ -313,7 +319,7 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 UPDATE 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+    fun `사용자 수정 PATCH 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
         // given
         val expectedApiException = ApiException(
             errorCode = CommonErrorCode.Unexpected,
@@ -344,6 +350,129 @@ class UserRoutesTest {
         assertTrue(responseBody.contains(expectedApiException.errorCode.description))
     }
 
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 성공 테스트`() = testApplication {
+        // given
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery { userUseCases.updateIntroduce(TestUserId, TEST_INTRODUCE) } returns true
+
+        testPlugin(
+            authRouting = { userRoutes(route, userUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}${route.INTRODUCE}"
+        val response = client.patch(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(TestIntroducePatchRequest)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.NoContent, response.status)
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+        // given
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(INVALID_USER_ID)
+        coEvery { userUseCases.updateIntroduce(TestUserId, TEST_INTRODUCE) } returns true
+
+        testPlugin(
+            authRouting = { userRoutes(route, userUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}${route.INTRODUCE}"
+        val response = client.patch(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(TestIntroducePatchRequest)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+        // given
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery { userUseCases.updateIntroduce(TestUserId, TEST_INTRODUCE) } returns false
+
+        testPlugin(
+            authRouting = { userRoutes(route, userUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}${route.INTRODUCE}"
+        val response = client.patch(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(TestIntroducePatchRequest)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        // given
+        val client = createTestClient()
+        coEvery { userUseCases.updateIntroduce(TestUserId, TEST_INTRODUCE) } returns true
+
+        testPlugin(
+            authRouting = { userRoutes(route, userUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}${route.INTRODUCE}"
+        val response = client.patch(endpoint) {
+            contentType(ContentType.Application.Json)
+            setBody(TestIntroducePatchRequest)
+        }
+
+        // then
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        // given
+        val expectedApiException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        val client = createTestClient()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery {
+            userUseCases.updateIntroduce(TestUserId, TEST_INTRODUCE)
+        } throws expectedApiException
+
+        testPlugin(
+            authRouting = { userRoutes(route, userUseCases) },
+        )
+
+        // when
+        val endpoint = "${route.ROUTE}${route.INTRODUCE}"
+        val response = client.patch(endpoint) {
+            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
+            contentType(ContentType.Application.Json)
+            setBody(TestIntroducePatchRequest)
+        }
+        val responseBody = response.bodyAsText()
+
+        // then
+        assertEquals(expectedApiException.status, response.status)
+        assertTrue(responseBody.contains(expectedApiException.errorCode.code))
+        assertTrue(responseBody.contains(expectedApiException.errorCode.description))
+    }
+
     companion object {
         private val TestUserId = UserId(1L)
         private const val INVALID_USER_ID = "asd"
@@ -363,6 +492,10 @@ class UserRoutesTest {
         private val TestUserProfileDto = UserProfileDto(
             user = MockUserDto,
             friendsCount = 2,
+        )
+        private const val TEST_INTRODUCE = "test introduce"
+        private val TestIntroducePatchRequest = IntroducePatchRequest(
+            introduce = TEST_INTRODUCE,
         )
     }
 }
