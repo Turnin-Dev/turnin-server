@@ -1,8 +1,16 @@
 package com.peekr.common.model
 
-/** 키워드 ID VO */
+import com.peekr.common.validator.ValidatorException
+
+class KeywordIdValidationException(message: String) : ValidatorException(message)
+
 @JvmInline
 value class KeywordId private constructor(val value: Long) {
+    /**
+     * 키워드 ID VO
+     *
+     * @throws ValidatorException
+     */
     companion object {
         fun from(value: Long): KeywordId = KeywordId(value)
 
@@ -14,6 +22,8 @@ value class KeywordId private constructor(val value: Long) {
     }
 
     private fun validateKeywordId() {
-        require(value >= 0) { "키워드 ID는 음수가 될 수 없습니다." }
+        if (value < 0) {
+            throw KeywordIdValidationException("키워드 ID는 음수가 될 수 없습니다.")
+        }
     }
 }

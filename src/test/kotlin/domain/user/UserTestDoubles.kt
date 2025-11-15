@@ -1,14 +1,14 @@
 package com.peekr.domain.user
 
 import com.peekr.common.db.schema.FriendEntity
-import com.peekr.common.db.schema.FriendStatus
-import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.application.dto.UserDto
 import com.peekr.domain.user.domain.model.RoleForUser

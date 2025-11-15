@@ -1,7 +1,16 @@
 package com.peekr.common.model
 
+import com.peekr.common.validator.ValidatorException
+
+class NameValidationException(message: String) : ValidatorException(message)
+
 @JvmInline
 value class Name private constructor(val value: String) {
+    /**
+     * 사용자 이름 VO
+     *
+     * @throws ValidatorException
+     */
     companion object {
         const val MIN_LENGTH = 1
         const val MAX_LENGTH = 30
@@ -17,14 +26,14 @@ value class Name private constructor(val value: String) {
     }
 
     private fun validate() {
-        require(value.isNotBlank()) {
-            "이름이 비어있습니다."
+        if (value.isEmpty()) {
+            throw NameValidationException("이름이 비어있습니다.")
         }
-        require(value.length in MIN_LENGTH..MAX_LENGTH) {
-            "이름은 $MIN_LENGTH~$MAX_LENGTH 이내여야 합니다."
+        if (value.length !in MIN_LENGTH..MAX_LENGTH) {
+            throw NameValidationException("이름은 $MIN_LENGTH~$MAX_LENGTH 이내여야 합니다.")
         }
-        require(value.matches(RegexRule)) {
-            "이름은 영문/숫자/한글만 허용됩니다."
+        if (!value.matches(RegexRule)) {
+            throw NameValidationException("이름은 영문/숫자/한글만 허용됩니다.")
         }
     }
 }

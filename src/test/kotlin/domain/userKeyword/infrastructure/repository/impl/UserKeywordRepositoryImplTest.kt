@@ -2,11 +2,11 @@ package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.KeywordEntity
-import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.KeywordId
+import com.peekr.common.model.Role
 import com.peekr.common.model.UserId
 import com.peekr.common.model.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.DescriptionDto
