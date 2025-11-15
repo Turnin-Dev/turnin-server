@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.domain.model
 
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import java.time.Instant
@@ -27,7 +28,7 @@ data class AuthUser(
     val displayId: DisplayId,
     val name: Name,
     val profileImageUrl: String?,
-    val introduce: String?,
+    val introduce: Introduce?,
     val isActive: Boolean,
     val lastLoginAt: Instant?,
 ) {
@@ -40,7 +41,7 @@ data class AuthUser(
             displayId = DisplayId("hong_gd_123"),
             name = Name("honggd"),
             profileImageUrl = "https://example.com/image.jpg",
-            introduce = "hello world!",
+            introduce = Introduce("hello world!"),
             isActive = true,
             lastLoginAt = Instant.ofEpochMilli(1697875200000L),
         )

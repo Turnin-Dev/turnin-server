@@ -36,23 +36,23 @@ fun Application.configureExceptionHandler() {
             )
         }
 
-        exception<IllegalArgumentException> { call, cause ->
-            call.respond(
-                status = HttpStatusCode.BadRequest,
-                message = ErrorResponse(
-                    code = CommonErrorCode.MalformedRequest.code,
-                    message = cause.message ?: CommonErrorCode.MalformedRequest.description,
-                    status = HttpStatusCode.BadRequest.value,
-                ),
-            )
-        }
-
         exception<ValidatorException> { call, cause ->
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
                     code = CommonErrorCode.ValidationDefault.code,
                     message = cause.message ?: CommonErrorCode.ValidationDefault.description,
+                    status = HttpStatusCode.BadRequest.value,
+                ),
+            )
+        }
+
+        exception<IllegalArgumentException> { call, cause ->
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                message = ErrorResponse(
+                    code = CommonErrorCode.MalformedRequest.code,
+                    message = cause.message ?: CommonErrorCode.MalformedRequest.description,
                     status = HttpStatusCode.BadRequest.value,
                 ),
             )

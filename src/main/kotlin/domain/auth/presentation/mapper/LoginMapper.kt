@@ -2,6 +2,7 @@ package com.peekr.domain.auth.presentation.mapper
 
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginDto
@@ -27,7 +28,7 @@ fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
     displayId = DisplayId(displayId),
     name = Name(name),
     profileImageUrl = profileImageUrl,
-    introduce = introduce,
+    introduce = introduce?.let { Introduce(it) },
 )
 
 fun JWTTokenDto.toResponse(): JWTTokenResponse = JWTTokenResponse(accessToken, refreshToken)

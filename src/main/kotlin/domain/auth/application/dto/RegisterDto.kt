@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.application.dto
 
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 
@@ -20,5 +21,5 @@ data class RegisterDto(
     val displayId: DisplayId,
     val name: Name,
     val profileImageUrl: String?,
-    val introduce: String?,
+    val introduce: Introduce?,
 )
