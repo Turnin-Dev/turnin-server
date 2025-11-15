@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.domain.model
 
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import java.time.Instant
@@ -21,7 +22,7 @@ data class Register(
     val displayId: DisplayId,
     val name: Name,
     val profileImageUrl: String?,
-    val introduce: String?,
+    val introduce: Introduce?,
 )
 
 fun Register.toAuthUser(

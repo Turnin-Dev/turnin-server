@@ -3,6 +3,7 @@ package com.peekr.domain.user.presentation.route
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.common.route.Api
@@ -403,13 +404,13 @@ class UserRoutesTest {
             displayId = DisplayId("id"),
             name = Name("name"),
             profileImageUrl = null,
-            introduce = "",
+            introduce = Introduce(TEST_INTRODUCE),
         )
         private val TestUserPatchRequest = UserPatchRequest(
             displayId = "id",
             name = "name",
             profileImageUrl = null,
-            introduce = "",
+            introduce = TEST_INTRODUCE,
         )
         private val TestUserProfileDto = UserProfileDto(
             user = MockUserDto,

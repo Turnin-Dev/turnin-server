@@ -1,6 +1,7 @@
 package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.application.dto.toDto
@@ -69,7 +70,7 @@ class GetUserUseCaseTest {
             displayId = DisplayId("displayId"),
             name = Name("name"),
             profileImageUrl = "profileImageUrl",
-            introduce = "introduce",
+            introduce = Introduce("introduce"),
             isActive = true,
             lastLoginAt = Instant.now(),
         )

@@ -6,6 +6,7 @@ import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
@@ -52,17 +53,17 @@ class UserRepositoryImpl : UserRepository {
             row[displayId] = patch.displayId.value
             row[name] = patch.name.value
             row[profileImageUrl] = patch.profileImageUrl
-            patch.introduce?.let { row[introduce] = it }
+            patch.introduce?.let { row[introduce] = it.value }
             patch.profileImageUrl?.let { row[profileImageUrl] = it }
         } > 0
     }
 
     override suspend fun updateIntroduce(
         userId: UserId,
-        patchIntroduce: String,
+        patchIntroduce: Introduce,
     ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
-            row[introduce] = patchIntroduce
+            row[introduce] = patchIntroduce.value
         } > 0
     }
 }

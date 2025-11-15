@@ -2,6 +2,7 @@ package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.application.dto.RegisterDto
@@ -66,7 +67,7 @@ class RegisterUseCaseTest {
             displayId = DisplayId("id"),
             name = Name("name"),
             profileImageUrl = "profileImageUrl",
-            introduce = "introduce",
+            introduce = Introduce("introduce"),
             isActive = true,
             lastLoginAt = null,
         )
@@ -76,7 +77,7 @@ class RegisterUseCaseTest {
             displayId = DisplayId("id"),
             name = Name("name"),
             profileImageUrl = "profileImageUrl",
-            introduce = "introduce",
+            introduce = Introduce("introduce"),
         )
         private val TestRegisterResult = RegisterResult(
             jwtToken = TestJwtToken,

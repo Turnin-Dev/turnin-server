@@ -1,5 +1,6 @@
 package com.peekr.domain.user.domain.repository
 
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
@@ -53,6 +54,6 @@ interface UserRepository {
      */
     suspend fun updateIntroduce(
         userId: UserId,
-        patchIntroduce: String,
+        patchIntroduce: Introduce,
     ): Boolean
 }

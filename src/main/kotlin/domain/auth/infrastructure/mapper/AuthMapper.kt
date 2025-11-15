@@ -4,6 +4,7 @@ import com.peekr.common.db.schema.Role
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
@@ -21,7 +22,7 @@ object AuthMapper {
             displayId = DisplayId(row[Users.displayId]),
             name = Name(row[Users.name]),
             profileImageUrl = row[Users.profileImageUrl],
-            introduce = row[Users.introduce],
+            introduce = row[Users.introduce]?.let { Introduce(it) },
             isActive = row[Users.isActive],
             lastLoginAt = row[Users.lastLoginAt],
         )

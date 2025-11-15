@@ -81,10 +81,8 @@ object TestEndpoint {
 
         // then
         assertEquals(expectedHttpStatusCode, response.status)
-        tokenSubject?.let {
-            expectedResponseBody.forEach {
-                assertTrue(responseBody.contains(it))
-            }
+        expectedResponseBody.forEach {
+            assertTrue(responseBody.contains(it))
         }
     }
 
