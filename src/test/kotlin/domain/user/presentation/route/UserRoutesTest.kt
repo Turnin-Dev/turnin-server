@@ -15,7 +15,6 @@ import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.util.TestEndpoint.testGetEndpoint
 import com.peekr.util.TestEndpoint.testPatchEndpoint
 import com.peekr.util.testPlugin
-import io.ktor.client.request.get
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
