@@ -15,11 +15,47 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+/**
+ * API 엔드포인트 테스트 도구
+ */
 object TestEndpoint {
-    suspend fun ApplicationTestBuilder.getEndpointTest(
-        tokenSubject: String?,
-        testPlugin: ApplicationTestBuilder.() -> Unit,
+    /**
+     * GET 엔드포인트를 테스트한다.
+     *
+     * ##### Usage
+     * ```
+     *         val route = Api.V1.User
+     *         coEvery { userUseCases.get(TestUserId) } returns MockUserDto
+     *
+     *         getEndpointTest(
+     *             endpoint = route.ROUTE,
+     *             queryParameters = mapOf("id" to "1"),
+     *             testPlugin = {
+     *                 testPlugin(
+     *                     authRouting = { userRoutes(route, userUseCases) },
+     *                 )
+     *             },
+     *             tokenSubject = TestUserId.value.toString(),
+     *             expectedHttpStatusCode = HttpStatusCode.OK,
+     *             // expectedResponseBodies ->
+     *             MockUserDto.name.value,
+     *             MockUserDto.displayId.value,
+     *             MockUserDto.role.name,
+     *         )
+     * ```
+     *
+     * @param endpoint 테스트할 엔드포인트
+     * @param queryParameters 쿼리 파라미터를 [Map]형태로 입력한다.
+     * @param testPlugin 테스트 플러그인 [testPlugin]을 사용한다.
+     * @param tokenSubject 인증 토큰 Subject
+     * @param expectedHttpStatusCode 예상되는 HTTP 상태 코드
+     * @param expectedResponseBody 예상되는 응답 바디
+     */
+    suspend fun ApplicationTestBuilder.testGetEndpoint(
         endpoint: String,
+        queryParameters: Map<String, String>?,
+        testPlugin: ApplicationTestBuilder.() -> Unit,
+        tokenSubject: String?,
         expectedHttpStatusCode: HttpStatusCode,
         vararg expectedResponseBody: String,
     ) {
@@ -32,6 +68,11 @@ object TestEndpoint {
 
         // when
         val response = client.get(endpoint) {
+            url {
+                queryParameters?.let {
+                    it.forEach { (key, value) -> parameters.append(key, value) }
+                }
+            }
             token?.let {
                 header(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
             }
@@ -40,16 +81,30 @@ object TestEndpoint {
 
         // then
         assertEquals(expectedHttpStatusCode, response.status)
-        expectedResponseBody.forEach {
-            assertTrue(responseBody.contains(it))
+        tokenSubject?.let {
+            expectedResponseBody.forEach {
+                assertTrue(responseBody.contains(it))
+            }
         }
     }
 
-    suspend fun ApplicationTestBuilder.patchEndpointTest(
-        tokenSubject: String?,
-        testPlugin: ApplicationTestBuilder.() -> Unit,
+    /**
+     * PATCH 엔드포인트를 테스트한다.
+     *
+     * @param endpoint 테스트할 엔드포인트
+     * @param queryParameters 쿼리 파라미터를 [Map]형태로 입력한다.
+     * @param requestBuilder 요청 옵션 ([HttpRequestBuilder] 내부에서 사용 가능한 옵션은 전부 다 가능하다)
+     * @param testPlugin 테스트 플러그인 [testPlugin]을 사용한다.
+     * @param tokenSubject 인증 토큰 Subject
+     * @param expectedHttpStatusCode 예상되는 HTTP 상태 코드
+     * @param expectedResponseBody 예상되는 응답 바디
+     */
+    suspend fun ApplicationTestBuilder.testPatchEndpoint(
         endpoint: String,
+        queryParameters: Map<String, String>?,
         requestBuilder: HttpRequestBuilder.() -> Unit,
+        testPlugin: ApplicationTestBuilder.() -> Unit,
+        tokenSubject: String?,
         expectedHttpStatusCode: HttpStatusCode,
         vararg expectedResponseBody: String,
     ) {
@@ -62,6 +117,11 @@ object TestEndpoint {
 
         // when
         val response = client.patch(endpoint) {
+            url {
+                queryParameters?.let {
+                    it.forEach { (key, value) -> parameters.append(key, value) }
+                }
+            }
             token?.let {
                 header(HttpHeaders.Authorization, "Bearer ${it.accessToken}")
             }
