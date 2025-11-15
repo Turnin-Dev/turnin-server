@@ -1,7 +1,7 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
-import com.peekr.common.db.schema.FriendStatus
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId

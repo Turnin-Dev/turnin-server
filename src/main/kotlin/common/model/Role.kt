@@ -1,4 +1,4 @@
-package com.peekr.common.db.schema
+package com.peekr.common.model
 
 /** 사용자 역할 */
 enum class Role {

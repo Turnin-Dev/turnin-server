@@ -1,4 +1,4 @@
-package com.peekr.common.db.schema
+package com.peekr.common.model
 
 /**
  * 친구 관계 상태.

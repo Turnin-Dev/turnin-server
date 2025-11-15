@@ -9,7 +9,7 @@ value class Introduce private constructor(val value: String) {
     /**
      * (사용자) 소개글 VO
      *
-     * @throws IllegalArgumentException
+     * @throws ValidatorException
      */
     companion object {
         const val MIN_LENGTH = 0
