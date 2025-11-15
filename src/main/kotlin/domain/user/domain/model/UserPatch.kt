@@ -1,6 +1,7 @@
 package com.peekr.domain.user.domain.model
 
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 
 /**
@@ -15,5 +16,5 @@ data class UserPatch(
     val displayId: DisplayId,
     val name: Name,
     val profileImageUrl: String?,
-    val introduce: String?,
+    val introduce: Introduce?,
 )

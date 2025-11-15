@@ -43,7 +43,7 @@ fun UserDto.toResponse(): UserResponse = UserResponse(
     displayId = displayId.value,
     name = name.value,
     profileImageUrl = profileImageUrl,
-    introduce = introduce,
+    introduce = introduce?.value,
     isActive = isActive,
     lastLoginAt = lastLoginAt,
 )

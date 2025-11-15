@@ -42,7 +42,7 @@ class RefreshTokenRepositoryImplTest {
                 this.displayId = MockUser.displayId.value
                 this.name = MockUser.name.value
                 this.profileImageUrl = MockUser.profileImageUrl
-                this.introduce = MockUser.introduce
+                this.introduce = MockUser.introduce?.value
             }
 
             RefreshTokens.upsert {
@@ -86,7 +86,7 @@ class RefreshTokenRepositoryImplTest {
                 this.displayId = MockUser.displayId.value
                 this.name = MockUser.name.value
                 this.profileImageUrl = MockUser.profileImageUrl
-                this.introduce = MockUser.introduce
+                this.introduce = MockUser.introduce?.value
             }
             savedUserEntity.id.value
         }

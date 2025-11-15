@@ -7,6 +7,7 @@ import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.application.dto.UserDto
@@ -50,7 +51,7 @@ object UserTestDoubles {
         displayId = DisplayId("hong_gd_123"),
         name = Name("honggd"),
         profileImageUrl = "https://example.com/image.jpg",
-        introduce = "hello world!",
+        introduce = Introduce("hello world!"),
         isActive = true,
         lastLoginAt = null,
     )

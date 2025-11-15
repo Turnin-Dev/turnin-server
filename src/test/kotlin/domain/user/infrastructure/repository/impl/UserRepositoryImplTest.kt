@@ -2,6 +2,7 @@ package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.db.schema.FriendStatus
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.UserTestDoubles
@@ -147,12 +148,40 @@ class UserRepositoryImplTest {
         assertFalse(result)
     }
 
+    @Test
+    fun `updateIntroduce 성공 테스트`() = runTest {
+        // given
+        val savedUserEntity = TestDatabaseFactory.dbQuery {
+            UserTestDoubles.saveAndGetUserEntity()
+        }
+
+        // when
+        val userId = UserId(savedUserEntity.id.value)
+        val result = repository.updateIntroduce(userId, TestIntroduce)
+        val updatedUserEntity = repository.findById(userId)
+
+        // then
+        assertTrue(result)
+        assertEquals(TestIntroduce, updatedUserEntity?.introduce)
+    }
+
+    @Test
+    fun `updateIntroduce 실패 테스트 - 사용자를 찾지 못하는 경우 false를 반환한다`() = runTest {
+        // when
+        val userId = UserId(1L)
+        val result = repository.updateIntroduce(userId, TestIntroduce)
+
+        // then
+        assertFalse(result)
+    }
+
     companion object {
         private val TestUserPatch = UserPatch(
             displayId = DisplayId("ididid"),
             name = Name("name"),
             profileImageUrl = null,
-            introduce = "introduce",
+            introduce = Introduce("introduce"),
         )
+        private val TestIntroduce = Introduce("introduce")
     }
 }

@@ -5,4 +5,4 @@ package com.peekr.common.validator
  *
  * @param message 유효성 검사 실패/에러 메시지
  */
-class ValidatorException(message: String?) : RuntimeException(message)
+open class ValidatorException(message: String?) : IllegalArgumentException(message)

@@ -3,6 +3,7 @@ package com.peekr.domain.auth
 import com.peekr.common.db.schema.SocialLoginProvider
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.application.dto.LoginResultDto
@@ -24,7 +25,7 @@ internal object AuthTestDoubles {
         displayId = DisplayId("hong_gd_123"),
         name = Name("honggd"),
         profileImageUrl = "http://example.com/profile.jpg",
-        introduce = "Hello!",
+        introduce = Introduce("Hello!"),
         isActive = true,
         lastLoginAt = null,
     )
@@ -35,7 +36,7 @@ internal object AuthTestDoubles {
         displayId = DisplayId("hong_gd_123"),
         name = Name("honggd"),
         profileImageUrl = "http://example.com/profile.jpg",
-        introduce = "Hello!",
+        introduce = Introduce("Hello!"),
     )
 
     val MockValidLoginRequest = LoginRequest(

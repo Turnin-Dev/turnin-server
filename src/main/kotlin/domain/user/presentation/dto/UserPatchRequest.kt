@@ -1,6 +1,7 @@
 package com.peekr.domain.user.presentation.dto
 
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.domain.user.application.dto.UserPatchDto
 import kotlinx.serialization.Serializable
@@ -35,5 +36,5 @@ fun UserPatchRequest.toDto(): UserPatchDto =
         displayId = DisplayId(displayId),
         name = Name(name),
         profileImageUrl = profileImageUrl,
-        introduce = introduce,
+        introduce = Introduce(introduce),
     )
