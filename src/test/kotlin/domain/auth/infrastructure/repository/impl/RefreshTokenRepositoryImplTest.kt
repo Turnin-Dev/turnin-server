@@ -4,8 +4,6 @@ import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.infrastructure.mapper.toRole
-import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
 import com.peekr.util.TestDatabaseFactory
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -36,8 +34,8 @@ class RefreshTokenRepositoryImplTest {
         // given
         val expectedUserId = TestDatabaseFactory.dbQuery {
             val savedUserEntity = UserEntity.new {
-                this.role = MockUser.role.toRole()
-                this.provider = MockUser.provider.toSocialLoginProvider()
+                this.role = MockUser.role
+                this.provider = MockUser.provider
                 this.providerId = MockUser.providerId
                 this.displayId = MockUser.displayId.value
                 this.name = MockUser.name.value
@@ -80,8 +78,8 @@ class RefreshTokenRepositoryImplTest {
         // given
         val userId = TestDatabaseFactory.dbQuery {
             val savedUserEntity = UserEntity.new {
-                this.role = MockUser.role.toRole()
-                this.provider = MockUser.provider.toSocialLoginProvider()
+                this.role = MockUser.role
+                this.provider = MockUser.provider
                 this.providerId = MockUser.providerId
                 this.displayId = MockUser.displayId.value
                 this.name = MockUser.name.value

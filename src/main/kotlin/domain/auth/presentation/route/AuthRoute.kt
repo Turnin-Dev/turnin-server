@@ -6,11 +6,11 @@ import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.JWTValidator
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.route.Api
 import com.peekr.common.route.Api.byPathParam
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.auth.application.usecase.AuthUseCases
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.exception.AuthErrorCode
 import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
@@ -88,7 +88,7 @@ fun Route.authRoutes(route: Api.V1.Auth, authUseCases: AuthUseCases) {
 
             try {
                 val findUserResultDto = authUseCases.findUser(
-                    provider = SocialLoginProviderForAuth.valueOf(provider.trim().uppercase()),
+                    provider = SocialLoginProvider.valueOf(provider.trim().uppercase()),
                     providerId = providerId.trim(),
                 )
                 call.respond(findUserResultDto.toResponse())

@@ -9,7 +9,6 @@ import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.application.dto.RegisterResultDto
-import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProviderForAuth
 import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
 import com.peekr.domain.auth.presentation.dto.LoginRequest
@@ -18,12 +17,12 @@ import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.domain.auth.presentation.dto.RegisterResultResponse
 
 fun LoginRequest.toDto(): LoginDto = LoginDto(
-    provider = provider.toSocialLoginProviderForAuth(),
+    provider = provider,
     providerId = providerId,
 )
 
 fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
-    provider = provider.toSocialLoginProviderForAuth(),
+    provider = provider,
     providerId = providerId,
     displayId = DisplayId(displayId),
     name = Name(name),

@@ -1,10 +1,10 @@
 package com.peekr.domain.auth.application.usecase
 
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDto
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.service.AuthService
 
 /**
@@ -18,7 +18,7 @@ class FindUserUseCase(private val authService: AuthService) {
      * @return [FindUserResultDto] 가입 여부(`exists`)
      */
     suspend operator fun invoke(
-        provider: SocialLoginProviderForAuth,
+        provider: SocialLoginProvider,
         providerId: String,
     ): FindUserResultDto {
         LOGGER.debug("findUser called, provider: $provider, providerId: ${providerId.masking()}")

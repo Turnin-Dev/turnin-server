@@ -2,11 +2,11 @@ package com.peekr.domain.auth.domain.service
 
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.domain.auth.domain.model.FindUserResult
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RegisterResult
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 
 interface AuthService {
     /**
@@ -19,7 +19,7 @@ interface AuthService {
      * (로그인 실패 (사용자를 가져올 수 없는 경우) **`null`** 반환)
      */
     suspend fun login(
-        provider: SocialLoginProviderForAuth,
+        provider: SocialLoginProvider,
         providerId: String,
     ): LoginResult?
 
@@ -45,7 +45,7 @@ interface AuthService {
 
     /** [provider]와 [providerId]로 사용자를 찾는다. */
     suspend fun findUser(
-        provider: SocialLoginProviderForAuth,
+        provider: SocialLoginProvider,
         providerId: String,
     ): FindUserResult
 

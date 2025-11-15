@@ -4,12 +4,12 @@ import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RegisterResult
-import com.peekr.domain.auth.domain.model.RoleForAuth
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.service.AuthService
 import com.peekr.domain.auth.domain.service.RefreshTokenService
 import com.peekr.util.TestDatabaseFactory
@@ -52,7 +52,7 @@ class RegisterUseCaseTest {
     }
 
     companion object {
-        private val TestProvider = SocialLoginProviderForAuth.GOOGLE
+        private val TestProvider = SocialLoginProvider.GOOGLE
         private const val TEST_PROVIDER_ID = "provider-id"
         private val TestUserId = UserId(1L)
         private val TestJwtToken = JWTToken(
@@ -61,7 +61,7 @@ class RegisterUseCaseTest {
         )
         private val TestAuthUser = AuthUser(
             userId = TestUserId,
-            role = RoleForAuth.USER,
+            role = Role.USER,
             provider = TestProvider,
             providerId = TEST_PROVIDER_ID,
             displayId = DisplayId("id"),

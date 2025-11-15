@@ -3,16 +3,16 @@ package com.peekr.domain.user.application.dto
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
-import com.peekr.domain.user.domain.model.RoleForUser
-import com.peekr.domain.user.domain.model.SocialLoginProviderForUser
 import com.peekr.domain.user.domain.model.User
 
 /** 애플리케이션 계층에서 사용하는 User */
 data class UserDto(
     val id: UserId,
-    val role: RoleForUser,
-    val provider: SocialLoginProviderForUser,
+    val role: Role,
+    val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: DisplayId,
     val name: Name,

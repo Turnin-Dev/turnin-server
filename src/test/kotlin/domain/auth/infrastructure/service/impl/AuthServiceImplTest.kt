@@ -9,9 +9,9 @@ import com.peekr.common.jwt.JWTTestDoubles.getMockJWTToken
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.domain.auth.AuthTestDoubles.MockAuthUser
 import com.peekr.domain.auth.AuthTestDoubles.MockRegister
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
@@ -62,7 +62,7 @@ class AuthServiceImplTest {
 
         // when
         val loginResult = authService.login(
-            provider = SocialLoginProviderForAuth.GOOGLE,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123",
         )
 
@@ -82,7 +82,7 @@ class AuthServiceImplTest {
 
         // when
         val token = authService.login(
-            provider = SocialLoginProviderForAuth.GOOGLE,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123",
         )
 
@@ -198,7 +198,7 @@ class AuthServiceImplTest {
         } returns MockAuthUser
 
         // when
-        val findUserResult = authService.findUser(SocialLoginProviderForAuth.GOOGLE, "123123")
+        val findUserResult = authService.findUser(SocialLoginProvider.GOOGLE, "123123")
 
         // then
         assertTrue(findUserResult.exists)
@@ -212,7 +212,7 @@ class AuthServiceImplTest {
         } returns null
 
         // when
-        val findUserResult = authService.findUser(SocialLoginProviderForAuth.GOOGLE, "123123")
+        val findUserResult = authService.findUser(SocialLoginProvider.GOOGLE, "123123")
 
         // then
         assertFalse(findUserResult.exists)

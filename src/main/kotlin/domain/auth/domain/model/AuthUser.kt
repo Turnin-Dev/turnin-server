@@ -3,6 +3,8 @@ package com.peekr.domain.auth.domain.model
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import java.time.Instant
 
@@ -22,8 +24,8 @@ import java.time.Instant
  */
 data class AuthUser(
     val userId: UserId,
-    val role: RoleForAuth,
-    val provider: SocialLoginProviderForAuth,
+    val role: Role,
+    val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: DisplayId,
     val name: Name,
@@ -35,8 +37,8 @@ data class AuthUser(
     companion object {
         val sample: AuthUser = AuthUser(
             userId = UserId(1L),
-            role = RoleForAuth.USER,
-            provider = SocialLoginProviderForAuth.GOOGLE,
+            role = Role.USER,
+            provider = SocialLoginProvider.GOOGLE,
             providerId = "123123123",
             displayId = DisplayId("hong_gd_123"),
             name = Name("honggd"),
