@@ -23,7 +23,7 @@ class GetUserKeywordsUseCase(
         userKeywordRepository.findByUserId(userId).map { userKeyword ->
             val keyword = keywordProvider.findById(userKeyword.keywordId)
             if (keyword != null) {
-                userKeyword.toDto(keyword.keyword)
+                userKeyword.toDto(keyword.name)
             } else {
                 throw UserKeywordException.NotExistsKeyword(null)
             }

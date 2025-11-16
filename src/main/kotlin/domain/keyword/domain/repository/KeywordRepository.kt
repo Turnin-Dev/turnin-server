@@ -1,6 +1,7 @@
 package com.peekr.domain.keyword.domain.repository
 
 import com.peekr.common.model.KeywordId
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
 
@@ -21,15 +22,15 @@ interface KeywordRepository {
      *
      * @return 키워드가 이미 존재하면 저장된 [Keyword]를 반환하고 만약 없다면 `null`을 반환한다.
      */
-    suspend fun findByName(keywordName: String): Keyword?
+    suspend fun findByName(keywordName: KeywordName): Keyword?
 
     /**
      * 키워드를 생성하고 성공 시 키워드를 반환한다.
      *
-     * @param keyword 키워드명
+     * @param keywordName 키워드명
      * @param createdBy 키워드 최초 등록자
      *
      * @return 생성된 [Keyword] 키워드를 반환한다.
      */
-    suspend fun create(keyword: String, createdBy: UserId): Keyword
+    suspend fun create(keywordName: KeywordName, createdBy: UserId): Keyword
 }

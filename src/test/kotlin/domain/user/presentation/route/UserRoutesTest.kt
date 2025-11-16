@@ -13,10 +13,9 @@ import com.peekr.domain.user.application.dto.UserProfileDto
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
-import com.peekr.util.TestEndpoint.testGetEndpoint
-import com.peekr.util.TestEndpoint.testPatchEndpoint
+import com.peekr.util.testGetEndpoint
+import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
-import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
@@ -40,10 +39,14 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.OK,
-            MockUserDto.name.value,
-            MockUserDto.displayId.value,
-            MockUserDto.role.name,
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                containsAll(
+                    MockUserDto.name.value,
+                    MockUserDto.displayId.value,
+                    MockUserDto.role.name,
+                )
+            },
         )
     }
 
@@ -60,7 +63,7 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = INVALID_USER_ID,
-            expectedHttpStatusCode = HttpStatusCode.BadRequest,
+            expectedStatus = HttpStatusCode.BadRequest,
         )
     }
 
@@ -77,8 +80,10 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.NotFound,
-            HttpStatusCode.NotFound.value.toString(),
+            expectedStatus = HttpStatusCode.NotFound,
+            responseValidator = {
+                contains(HttpStatusCode.NotFound.value.toString())
+            },
         )
     }
 
@@ -95,10 +100,14 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.OK,
-            TestUserProfileDto.user.name.value,
-            TestUserProfileDto.user.displayId.value,
-            TestUserProfileDto.friendsCount.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                containsAll(
+                    TestUserProfileDto.user.name.value,
+                    TestUserProfileDto.user.displayId.value,
+                    TestUserProfileDto.friendsCount.toString(),
+                )
+            },
         )
     }
 
@@ -115,7 +124,7 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = INVALID_USER_ID,
-            expectedHttpStatusCode = HttpStatusCode.BadRequest,
+            expectedStatus = HttpStatusCode.BadRequest,
         )
     }
 
@@ -132,7 +141,7 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.NotFound,
+            expectedStatus = HttpStatusCode.NotFound,
         )
     }
 
@@ -149,7 +158,7 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = null,
-            expectedHttpStatusCode = HttpStatusCode.Unauthorized,
+            expectedStatus = HttpStatusCode.Unauthorized,
         )
     }
 
@@ -171,9 +180,13 @@ class UserRoutesTest {
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = expectedApiException.status,
-            expectedApiException.errorCode.code,
-            expectedApiException.errorCode.description,
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
         )
     }
 
@@ -184,16 +197,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestUserPatchRequest)
-            },
+            requestBody = TestUserPatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.NoContent,
+            expectedStatus = HttpStatusCode.NoContent,
         )
     }
 
@@ -204,16 +215,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestUserPatchRequest)
-            },
+            requestBody = TestUserPatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = INVALID_USER_ID,
-            expectedHttpStatusCode = HttpStatusCode.BadRequest,
+            expectedStatus = HttpStatusCode.BadRequest,
         )
     }
 
@@ -224,16 +233,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestUserPatchRequest)
-            },
+            requestBody = TestUserPatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.NotFound,
+            expectedStatus = HttpStatusCode.NotFound,
         )
     }
 
@@ -244,16 +251,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestUserPatchRequest)
-            },
+            requestBody = TestUserPatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = null,
-            expectedHttpStatusCode = HttpStatusCode.Unauthorized,
+            expectedStatus = HttpStatusCode.Unauthorized,
         )
     }
 
@@ -272,18 +277,20 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestUserPatchRequest)
-            },
+            requestBody = TestUserPatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = expectedApiException.status,
-            expectedApiException.errorCode.code,
-            expectedApiException.errorCode.description,
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
         )
     }
 
@@ -294,16 +301,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.INTRODUCE}",
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestIntroducePatchRequest)
-            },
+            requestBody = TestIntroducePatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.NoContent,
+            expectedStatus = HttpStatusCode.NoContent,
         )
     }
 
@@ -314,16 +319,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.INTRODUCE}",
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestIntroducePatchRequest)
-            },
+            requestBody = TestIntroducePatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = INVALID_USER_ID,
-            expectedHttpStatusCode = HttpStatusCode.BadRequest,
+            expectedStatus = HttpStatusCode.BadRequest,
         )
     }
 
@@ -334,16 +337,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.INTRODUCE}",
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestIntroducePatchRequest)
-            },
+            requestBody = TestIntroducePatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = HttpStatusCode.NotFound,
+            expectedStatus = HttpStatusCode.NotFound,
         )
     }
 
@@ -354,16 +355,14 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.INTRODUCE}",
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestIntroducePatchRequest)
-            },
+            requestBody = TestIntroducePatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = null,
-            expectedHttpStatusCode = HttpStatusCode.Unauthorized,
+            expectedStatus = HttpStatusCode.Unauthorized,
         )
     }
 
@@ -382,18 +381,20 @@ class UserRoutesTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.INTRODUCE}",
             queryParameters = null,
-            requestBuilder = {
-                setBody(TestIntroducePatchRequest)
-            },
+            requestBody = TestIntroducePatchRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedHttpStatusCode = expectedApiException.status,
-            expectedApiException.errorCode.code,
-            expectedApiException.errorCode.description,
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
         )
     }
 
