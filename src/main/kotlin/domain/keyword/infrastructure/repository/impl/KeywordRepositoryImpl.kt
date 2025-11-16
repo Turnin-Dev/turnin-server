@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.KeywordId
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
 import com.peekr.domain.keyword.domain.repository.KeywordRepository
@@ -17,19 +18,19 @@ class KeywordRepositoryImpl : KeywordRepository {
         KeywordEntity.findById(id.value)?.toDomain()
     }
 
-    override suspend fun findByName(keywordName: String): Keyword? = suspendTransaction {
+    override suspend fun findByName(keywordName: KeywordName): Keyword? = suspendTransaction {
         KeywordEntity
-            .find(Keywords.keyword eq keywordName)
+            .find(Keywords.keyword eq keywordName.value)
             .firstOrNull()
             ?.toDomain()
     }
 
     override suspend fun create(
-        keyword: String,
+        keywordName: KeywordName,
         createdBy: UserId,
     ): Keyword = suspendTransaction {
         val savedKeyword = KeywordEntity.new {
-            this.keyword = keyword
+            this.keyword = keywordName.value
             this.createdBy = EntityID(createdBy.value, Users)
         }
         savedKeyword.toDomain()

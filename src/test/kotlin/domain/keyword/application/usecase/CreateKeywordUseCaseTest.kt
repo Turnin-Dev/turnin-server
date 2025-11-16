@@ -1,10 +1,11 @@
 package com.peekr.domain.keyword.application.usecase
 
 import com.peekr.common.model.KeywordId
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.application.dto.toDto
 import com.peekr.domain.keyword.domain.model.Keyword
-import com.peekr.domain.keyword.domain.service.KeywordService
+import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test
@@ -13,32 +14,32 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 
 class CreateKeywordUseCaseTest {
-    private val keywordService = mockk<KeywordService>()
+    private val keywordRepository = mockk<KeywordRepository>()
     private lateinit var usecase: CreateKeywordUseCase
 
     @Before
     fun setUp() {
-        usecase = CreateKeywordUseCase(keywordService)
+        usecase = CreateKeywordUseCase(keywordRepository)
     }
 
     @Test
     fun `성공적으로 키워드를 생성한다`() = runTest {
         // given
-        coEvery { keywordService.create(TEST_KEYWORD, TestUserId) } returns TestKeyword
+        coEvery { keywordRepository.create(TestKeywordName, TestUserId) } returns TestKeyword
 
         // when
-        val keyword = usecase(TEST_KEYWORD, TestUserId)
+        val keyword = usecase(TestKeywordName.value, TestUserId)
 
         // then
         assertEquals(TestKeyword.toDto(), keyword)
     }
 
     companion object {
-        private const val TEST_KEYWORD = "keyword"
+        private val TestKeywordName = KeywordName("keyword")
         private val TestUserId = UserId(1L)
         private val TestKeyword = Keyword(
             id = KeywordId(1L),
-            keyword = TEST_KEYWORD,
+            name = TestKeywordName,
             createdBy = TestUserId,
             createdAt = 1000,
             updatedAt = 1000,

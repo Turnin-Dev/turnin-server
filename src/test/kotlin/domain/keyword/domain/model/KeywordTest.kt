@@ -1,6 +1,7 @@
 package com.peekr.domain.keyword.domain.model
 
 import com.peekr.common.model.KeywordId
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.UserId
 import com.peekr.common.validator.ValidatorException
 import kotlin.test.Test
@@ -13,7 +14,7 @@ class KeywordTest {
         assertDoesNotThrow {
             Keyword(
                 id = KeywordId(0),
-                keyword = "sample",
+                name = KeywordName("test"),
                 createdBy = UserId(0),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),
@@ -26,7 +27,7 @@ class KeywordTest {
         assertThrows<ValidatorException> {
             Keyword(
                 id = KeywordId(0),
-                keyword = "a".repeat(Keyword.MAX_LENGTH + 1),
+                name = KeywordName("a".repeat(KeywordName.MAX_LENGTH + 1)),
                 createdBy = UserId(0),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),
@@ -39,7 +40,7 @@ class KeywordTest {
         assertThrows<ValidatorException> {
             Keyword(
                 id = KeywordId(0),
-                keyword = "",
+                name = KeywordName(""),
                 createdBy = UserId(0),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),

@@ -33,7 +33,7 @@ data class KeywordResponse(
 
 fun KeywordDto.toResponse(): KeywordResponse = KeywordResponse(
     id = id.value,
-    keyword = keyword,
+    keyword = name,
     createdBy = createdBy.value,
     createdAt = createdAt,
     updatedAt = updatedAt,
