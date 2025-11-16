@@ -1,7 +1,6 @@
 package com.peekr.domain.file.di
 
 import com.peekr.domain.file.application.usecase.FileUseCase
-import com.peekr.domain.file.application.usecase.FileUseCaseImpl
 import com.peekr.domain.file.domain.service.FileService
 import com.peekr.domain.file.infrastructure.service.impl.CloudflareR2Service
 import com.peekr.domain.file.infrastructure.service.impl.FileServiceImpl
@@ -13,7 +12,7 @@ val fileModule = module {
     single<FileService> { FileServiceImpl(get()) }
 
     // UseCase
-    single<FileUseCase> { FileUseCaseImpl(get()) }
+    factory { FileUseCase(get()) }
 
     // Third-Party
     single { S3PresignerFactory() }

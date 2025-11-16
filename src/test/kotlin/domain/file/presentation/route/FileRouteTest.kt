@@ -24,7 +24,7 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 성공 테스트`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { fileUseCase.createPresignedUrl(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { fileUseCase(any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
             routing = { fileRoutes(route, fileUseCase) },
@@ -52,7 +52,7 @@ class FileRouteTest {
         val expectedException = FileException.InvalidS3PresignerArgument()
         val client = createTestClient()
         coEvery {
-            fileUseCase.createPresignedUrl(any(), any())
+            fileUseCase(any(), any())
         } throws expectedException
 
         testPlugin(
@@ -77,7 +77,7 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 실패 테스트 - 파일이름 유효성 검사 실패 시 상태코드 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { fileUseCase.createPresignedUrl(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { fileUseCase(any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
             routing = { fileRoutes(route, fileUseCase) },
@@ -99,7 +99,7 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 실패 테스트 - MIME 유효성 검사 실패 시 상태코드 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { fileUseCase.createPresignedUrl(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { fileUseCase(any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
             routing = { fileRoutes(route, fileUseCase) },
