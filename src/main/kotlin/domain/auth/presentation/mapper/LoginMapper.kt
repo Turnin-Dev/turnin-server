@@ -5,21 +5,14 @@ import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.domain.auth.application.dto.FindUserResultDto
-import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.application.dto.RegisterResultDto
 import com.peekr.domain.auth.presentation.dto.ExistsResultResponse
 import com.peekr.domain.auth.presentation.dto.JWTTokenResponse
-import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.LoginResultResponse
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.domain.auth.presentation.dto.RegisterResultResponse
-
-fun LoginRequest.toDto(): LoginDto = LoginDto(
-    provider = provider,
-    providerId = providerId,
-)
 
 fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
     provider = provider,

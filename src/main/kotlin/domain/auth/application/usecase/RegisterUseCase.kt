@@ -2,34 +2,68 @@ package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.jwt.application.dto.toDto
+import com.peekr.common.jwt.domain.model.JWTClaimName
+import com.peekr.common.jwt.domain.model.JWTTokenPayload
+import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.application.dto.RegisterResultDto
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDomain
-import com.peekr.domain.auth.domain.service.AuthService
-import com.peekr.domain.auth.domain.service.RefreshTokenService
+import com.peekr.domain.auth.domain.model.Register
+import com.peekr.domain.auth.domain.model.RegisterResult
+import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import com.peekr.domain.auth.exception.AuthException.DuplicateUserException
 
-/**
- * 회원가입
- */
 class RegisterUseCase(
-    private val authService: AuthService,
-    private val refreshTokenService: RefreshTokenService,
+    private val authRepository: AuthRepository,
+    private val refreshTokenRepository: RefreshTokenRepository,
+    private val jwtTokenService: JWTTokenService,
 ) {
     /**
+     * 회원가입
+     *
      * @param registerDto [RegisterDto]
      *
      * @return [RegisterResultDto] 정상적으로 회원가입이 진행된 경우
      */
     suspend operator fun invoke(registerDto: RegisterDto): RegisterResultDto = suspendTransaction {
-        LOGGER.debug("register called")
+        // 회원가입 진행
+        LOGGER.debug("register called, displayId: ${registerDto.displayId.value.masking()}")
         val authUser = registerDto.toDomain()
-        val registerResult = authService.register(authUser)
+        val registerResult = authRegister(authUser)
         val savedAuthUser = registerResult.authUser
         val jwtTokenDto = registerResult.jwtToken.toDto()
-        refreshTokenService.save(savedAuthUser.userId, jwtTokenDto.refreshToken)
+
+        // 리프레쉬 토큰 저장
+        refreshTokenRepository.save(savedAuthUser.userId, jwtTokenDto.refreshToken)
+
+        // 회원가입 성공 후 결과 반환
         LOGGER.debug("register successful, username: ${savedAuthUser.name}")
         RegisterResultDto(savedAuthUser.userId, jwtTokenDto)
+    }
+
+    /**
+     * 회원가입
+     *
+     * 단, 회원가입은 기존 회원이 존재하지 않는다는 가정하에 진행된다.
+     *
+     * @param register 회원가입 정보 [Register]
+     *
+     * @throws DuplicateUserException 이미 동일한 provider/providerId로 가입된 사용자가 존재하는 경우
+     */
+    private suspend fun authRegister(register: Register): RegisterResult {
+        val savedAuthUser = authRepository.save(register)
+
+        val payload = JWTTokenPayload(
+            userId = savedAuthUser.userId.value.toString(),
+            claimName = JWTClaimName.DISPLAY_ID,
+            claim = savedAuthUser.displayId.value,
+        )
+        val jwtToken = jwtTokenService.generate(payload)
+
+        return RegisterResult(jwtToken, savedAuthUser)
     }
 }
 

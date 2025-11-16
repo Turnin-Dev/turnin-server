@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
@@ -10,8 +11,8 @@ import com.peekr.common.model.UserId
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RegisterResult
-import com.peekr.domain.auth.domain.service.AuthService
-import com.peekr.domain.auth.domain.service.RefreshTokenService
+import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -22,13 +23,24 @@ import org.junit.After
 import org.junit.Before
 
 class RegisterUseCaseTest {
-    private val authService = mockk<AuthService>()
-    private val refreshTokenService = mockk<RefreshTokenService>()
-    private val usecase = RegisterUseCase(authService, refreshTokenService)
+    private val authRepository = mockk<AuthRepository>()
+    private val refreshTokenRepository = mockk<RefreshTokenRepository>()
+    private val jwtTokenService = mockk<JWTTokenService>()
+    private val usecase = RegisterUseCase(authRepository, refreshTokenRepository, jwtTokenService)
 
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
+
+        coEvery {
+            refreshTokenRepository.save(TestUserId, TestRegisterResult.jwtToken.refreshToken)
+        } returns true
+        coEvery {
+            authRepository.save(any())
+        } returns TestAuthUser
+        coEvery {
+            jwtTokenService.generate(any())
+        } returns TestJwtToken
     }
 
     @After
@@ -38,12 +50,6 @@ class RegisterUseCaseTest {
 
     @Test
     fun `회원가입 성공 테스트`() = runTest {
-        // given
-        coEvery { authService.register(any()) } returns TestRegisterResult
-        coEvery {
-            refreshTokenService.save(TestUserId, TestRegisterResult.jwtToken.refreshToken)
-        } returns true
-
         // when
         val registerResultDto = usecase(TestRegisterDto)
 

@@ -25,11 +25,4 @@ sealed class AuthException(
             status = HttpStatusCode.Conflict,
             cause = cause,
         )
-
-    class CannotSaveRefreshTokenException(cause: Throwable? = null) :
-        AuthException(
-            code = AuthErrorCode.CannotSaveRefreshToken,
-            status = HttpStatusCode.Conflict,
-            cause = cause,
-        )
 }
