@@ -60,10 +60,10 @@ class UserRepositoryImpl : UserRepository {
 
     override suspend fun updateIntroduce(
         userId: UserId,
-        patchIntroduce: Introduce,
+        introduce: Introduce,
     ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
-            row[introduce] = patchIntroduce.value
+            row[this.introduce] = introduce.value
         } > 0
     }
 }
