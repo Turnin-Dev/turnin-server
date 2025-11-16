@@ -1,10 +1,17 @@
 # peekr-server
 
+# Documents
+
+| No | Title                                                                             |
+|:--:|:----------------------------------------------------------------------------------|
+| 1  | [Project Structure](#1-project-structure)                                         |
+| 2  | [Bounded Context Structure Description](#2-bounded-context-structure-description) |
+| 3  | [Dependency Direction](#3-dependency-direction)                                   |
+| 4  | [Rule (추가중)](#4-rule-추가중)                                                         |
+
 # 1. Project Structure
 
-## Clean Architecture + 도메인 별 관리
-
-### (DDD로 점진적 리팩토링 예정)
+## Clean Architecture + DDD (점진적 리팩토링 진행)
 
 ```
 project/
@@ -14,12 +21,12 @@ project/
 │   ├── jwt/                     # 공통 기능
 │   ├── .../
 │
-├── domain/                     # 도메인 모듈들
-│   ├── auth/                     # 각 도메인 모듈
+├── domain/                     # 도메인 모듈들 (Bounded Context)
+│   ├── auth/                     # 각 도메인 모듈 (Bounded Context)
 │   │   └── .../
-│   ├── user/                     # 각 도메인 모듈
+│   ├── user/                     # 각 도메인 모듈 (Bounded Context)
 │   │   └── .../
-│   ├── post/                     # 각 도메인 모듈
+│   ├── post/                     # 각 도메인 모듈 (Bounded Context)
 │   │   ├── di/                    # 의존성 주입 계층
 │   │   ├── presentation/          # 프레젠테이션 계층
 │   │   ├── application/           # 애플리케이션 계층
@@ -27,17 +34,16 @@ project/
 │   │   └── infrastructure/        # 인프라스트럭처 계층
 ```
 
-# 2. Project Structure Description
+# 2. Bounded Context Structure Description
 
 ## Presentation Layer
 
 ### 내부 구조
 
-- `/route`              : 라우팅 정의
+- `/route`              : 라우팅(API 엔드포인트) 정의
 - `/dto`                : 요청/응답 DTO
-- `/exception`          : 프레젠테이션 공통 예외 및 핸들러
-- `/util`               : 프레젠테이션 유틸
-- `/api`                : 추후 필요 시 추가
+- `/exception`          : 프레젠테이션 계층 공통 예외 및 핸들러
+- `/util`               : 프레젠테이션 계층 유틸
 
 ### 설명 & 역할
 
@@ -45,7 +51,6 @@ project/
 
 - HTTP 요청/응답 처리
 - DTO 검증 등
-- 추후 다른 도메인에 대해 API 제공
 
 ## Application Layer
 
@@ -56,6 +61,7 @@ project/
 - `/service`             : 도매인 조합 흐름 관리 (optional)
 - `/mapper`              : DTO <-> 도메인 매핑
 - `/exception`           : 유스케이스 공통 예외 및 핸들러
+- `/provider`            : 외부로 제공되는 API
 
 ### 설명 & 역할
 
@@ -76,14 +82,15 @@ project/
 - `/model/value`         : 값 객체 (Ex. Email.kt, Password.kt)
 - `/model/aggregate`     : Aggregate Root 객체
 - `/repository`          : 리포지토리 인터페이스
-- `/service`             : 도메인 서비스 (여러 엔티티에 걸친 복잡한 로직)
+- `/service`             : 도메인 서비스 (여러 엔티티에 걸친 복잡한 로직, optional)
+- `/provider`            : 외부 API 클라이언트 인터페이스
 
 ### 설명 & 역할
 
 핵심 비즈니스 로직, 규칙, 개념을 담은 순수 계층
 
 - 비즈니스 규칙 정의
-- Entity / Value Object / Service 간 협력
+- Entity / Value Object / Aggregate / Service 간 협력
 - 순수 Kotlin 코드
 - 핵심 모델 정의 등
 
@@ -102,45 +109,54 @@ project/
 DB, 외부 API, 시스템 연동 등 기술 세부 구현 담당 계층
 
 - DB 영속성 구현
-- 외부 API 연동
 - 메일, 메시지, Kafka 등 연동
 - 도메인 인터페이스의 구현체 제공 등
+- 외부 API 연동
 
 # 3. Dependency Direction
 
-## Domain, Bounded Context
+## Bounded Context
 
 ```mermaid
 flowchart TD
-    subgraph Domain
-        subgraph Bounded Context 1
-            p(presentation) --> a(application)
-            a --> d(domain)
-            i(infrastructure) --> d
-        end
-        subgraph Bounded Context 2
-            p2(presentation) --> a2(application)
-            a2 --> d2(domain)
-            i2(infrastructure) --> d2
-        end
+    subgraph Bounded Context 1
+        p(presentation) --> a(application)
+        a --> d(domain)
+        i(infrastructure) --> d
+    end
+    subgraph Bounded Context 2
+        p2(presentation) --> a2(application)
+        a2 --> d2(domain)
+        i2(infrastructure) --> d2
     end
 ```
 
 ## 외부 Bounded Context의 API 사용
 
+(Bounded Context 1이 Bounded Context 2의 API를 사용한다고 가정)
+
 ```mermaid
 graph LR
-    subgraph Domain
-        subgraph Bounded Context 1
-            i(infrastructure/provider)
+    subgraph Bounded Context 1
+        subgraph :infrastructure
+            pimpl(ProviderImplementation)
         end
-        subgraph Bounded Context 2
-            d(domain)
-            p(presentation)
+        subgraph :domain
+            pi(ProviderInterface)
+        end
+        subgraph :application.
+            uc(UsecaseClass)
         end
     end
-    i -- 현재 구조의 경우 --> d
-    i -- MSA의 경우 HTTP 호출 --> p
+    subgraph Bounded Context 2
+        subgraph :application
+            pac(ProviderApiClass)
+        end
+    end
+
+    pimpl -- 구현 --> pi
+    pimpl -- API 사용 --> pac
+    uc -- 인터페이스에 의존 --> pi
 ```
 
 ## Common
@@ -156,10 +172,16 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    subgraph Domain Module
-        di(di) --> p(presentation)
-        di --> a(application)
-        di --> do(domain)
-        di --> i(infrastructure)
-    end
+    di(di) --> p(presentation)
+    di --> a(application)
+    di --> do(domain)
+    di --> i(infrastructure)
 ```
+
+# 4. Rule (추가중)
+
+1. 모든 Entity / Value Object / Aggregate 으로의 매핑은 **`application`** 계층에서 진행한다.  
+   **매핑 예시**
+    1. Primitive Type -> Value Object
+    2. UserDto -> User
+2. 엔드포인트 테스트는 `TestEndpoint` 테스트 도구를 사용하여 테스트한다.
