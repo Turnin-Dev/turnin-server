@@ -88,6 +88,18 @@ class RefreshTokenUseCaseTest {
         assertNull(jwtTokenDto)
     }
 
+    @Test
+    fun `리프레쉬 토큰 갱신 과정에서 토큰 생성에 실패하면 null을 반환한다`() = runTest {
+        // given
+        coEvery { jwtTokenService.generate(any()) } throws Exception()
+
+        // when
+        val jwtTokenDto = usecase("aaa.bbb.ccc")
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
     companion object {
         private const val TEST_SUBJECT = "1"
         private val TestUserId = UserId(TEST_SUBJECT.toLong())
