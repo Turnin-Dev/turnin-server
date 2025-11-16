@@ -80,10 +80,10 @@ class RegisterUseCaseTest {
         private val TestRegisterDto = RegisterDto(
             provider = TestProvider,
             providerId = TEST_PROVIDER_ID,
-            displayId = DisplayId("id"),
-            name = Name("name"),
+            displayId = "id",
+            name = "name",
             profileImageUrl = "profileImageUrl",
-            introduce = Introduce("introduce"),
+            introduce = "introduce",
         )
         private val TestRegisterResult = RegisterResult(
             jwtToken = TestJwtToken,

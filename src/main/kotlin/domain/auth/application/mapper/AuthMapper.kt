@@ -1,5 +1,8 @@
 package com.peekr.domain.auth.application.mapper
 
+import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
+import com.peekr.common.model.Name
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.domain.model.FindUserResult
@@ -9,10 +12,10 @@ object AuthMapper {
     fun RegisterDto.toDomain(): Register = Register(
         provider = provider,
         providerId = providerId,
-        name = name,
-        displayId = displayId,
+        name = Name(name),
+        displayId = DisplayId(displayId),
         profileImageUrl = profileImageUrl,
-        introduce = introduce,
+        introduce = introduce?.let { Introduce(it) },
     )
 
     fun FindUserResult.toDto(): FindUserResultDto = FindUserResultDto(exists)

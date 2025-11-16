@@ -1,8 +1,5 @@
 package com.peekr.domain.auth.application.dto
 
-import com.peekr.common.model.DisplayId
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.SocialLoginProvider
 
 /**
@@ -18,8 +15,8 @@ import com.peekr.common.model.SocialLoginProvider
 data class RegisterDto(
     val provider: SocialLoginProvider,
     val providerId: String,
-    val displayId: DisplayId,
-    val name: Name,
+    val displayId: String,
+    val name: String,
     val profileImageUrl: String?,
-    val introduce: Introduce?,
+    val introduce: String?,
 )
