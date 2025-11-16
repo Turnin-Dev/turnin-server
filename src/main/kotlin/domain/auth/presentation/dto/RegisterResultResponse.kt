@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.presentation.dto
 
+import com.peekr.domain.auth.application.dto.RegisterResultDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,3 +24,10 @@ data class RegisterResultResponse(
         )
     }
 }
+
+// ------------------------------ Mapper ------------------------------
+fun RegisterResultDto.toResponse(): RegisterResultResponse = RegisterResultResponse(
+    userId = userId.value,
+    accessToken = jwtTokenDto.accessToken,
+    refreshToken = jwtTokenDto.refreshToken,
+)

@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.presentation.dto
 
+import com.peekr.common.jwt.application.dto.JWTTokenDto
 import kotlinx.serialization.Serializable
 
 /** JWT 토큰 응답 바디 */
@@ -15,3 +16,6 @@ data class JWTTokenResponse(
         )
     }
 }
+
+// ------------------------------ Mapper ------------------------------
+fun JWTTokenDto.toResponse(): JWTTokenResponse = JWTTokenResponse(accessToken, refreshToken)

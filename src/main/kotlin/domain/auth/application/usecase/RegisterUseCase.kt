@@ -30,7 +30,7 @@ class RegisterUseCase(
      */
     suspend operator fun invoke(registerDto: RegisterDto): RegisterResultDto = suspendTransaction {
         // 회원가입 진행
-        LOGGER.debug("register called, displayId: ${registerDto.displayId.value.masking()}")
+        LOGGER.debug("register called, displayId: ${registerDto.displayId.masking()}")
         val authUser = registerDto.toDomain()
         val registerResult = authRegister(authUser)
         val savedAuthUser = registerResult.authUser
