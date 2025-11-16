@@ -1,7 +1,6 @@
 package com.peekr.domain.auth.domain.repository
 
 import com.peekr.common.model.UserId
-import com.peekr.domain.auth.exception.AuthException
 
 interface RefreshTokenRepository {
     /**
@@ -17,8 +16,6 @@ interface RefreshTokenRepository {
      *
      * @param userId 사용자 ID
      * @param token 리프레쉬 토큰
-     *
-     * @throws AuthException.CannotSaveRefreshTokenException 존재하지 않는 사용자의 ID로 토큰 저장 시 예외 발생
      */
     suspend fun save(
         userId: UserId,

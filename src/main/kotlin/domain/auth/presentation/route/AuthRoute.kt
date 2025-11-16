@@ -18,6 +18,7 @@ import com.peekr.domain.auth.presentation.dto.LoginRequest
 import com.peekr.domain.auth.presentation.dto.LoginResultResponse
 import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.domain.auth.presentation.dto.RegisterResultResponse
+import com.peekr.domain.auth.presentation.dto.toDto
 import com.peekr.domain.auth.presentation.dto.validate
 import com.peekr.domain.auth.presentation.mapper.toDto
 import com.peekr.domain.auth.presentation.mapper.toResponse

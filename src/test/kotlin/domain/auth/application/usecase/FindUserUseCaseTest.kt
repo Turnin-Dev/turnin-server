@@ -1,8 +1,8 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.domain.auth.domain.model.FindUserResult
-import com.peekr.domain.auth.domain.service.AuthService
+import com.peekr.domain.auth.AuthTestDoubles
+import com.peekr.domain.auth.domain.repository.AuthRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test
@@ -10,15 +10,18 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 
 class FindUserUseCaseTest {
-    private val authService = mockk<AuthService>()
-    private val usecase = FindUserUseCase(authService)
+    private val authRepository = mockk<AuthRepository>()
+    private val usecase = FindUserUseCase(authRepository)
 
     @Test
     fun `사용자 찾기 성공 테스트`() = runTest {
         // given
         coEvery {
-            authService.findUser(any(), any())
-        } returns FindUserResult(true)
+            authRepository.findAuthUserByProviderAndProviderId(any(), any())
+        } returns AuthTestDoubles.MockAuthUser.copy(
+            provider = TestProvider,
+            providerId = TEST_PROVIDER_ID,
+        )
 
         // when
         val result = usecase(TestProvider, TEST_PROVIDER_ID)
