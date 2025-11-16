@@ -25,6 +25,7 @@ import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.jupiter.api.assertThrows
 
 class LoginUseCaseTest {
     private val authRepository = mockk<AuthRepository>()
@@ -79,6 +80,19 @@ class LoginUseCaseTest {
 
         // then
         assertNull(loginResultDto)
+    }
+
+    @Test
+    fun `로그인 시 토큰을 정상적으로 생성하지 못할 경우 예외가 발생한다`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.generate(any())
+        } throws Exception()
+
+        // when, then
+        assertThrows<Exception> {
+            usecase(TestLoginDto)
+        }
     }
 
     companion object {
