@@ -1,5 +1,6 @@
 package com.peekr.domain.keyword.di
 
+import com.peekr.domain.keyword.application.provider.KeywordProviderApi
 import com.peekr.domain.keyword.application.usecase.CreateKeywordUseCase
 import com.peekr.domain.keyword.application.usecase.GetKeywordByNameUseCase
 import com.peekr.domain.keyword.application.usecase.GetKeywordUseCase
@@ -17,4 +18,7 @@ val keywordModule = module {
     factory { CreateKeywordUseCase(get()) }
     factory { GetKeywordByNameUseCase(get()) }
     single<KeywordUseCases> { KeywordUseCases(get(), get(), get()) }
+
+    // Provider API
+    factory { KeywordProviderApi(get()) }
 }
