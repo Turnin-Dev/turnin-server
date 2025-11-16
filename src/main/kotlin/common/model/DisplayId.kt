@@ -7,7 +7,7 @@ class DisplayIdValidationException(message: String) : ValidatorException(message
 @JvmInline
 value class DisplayId private constructor(val value: String) {
     /**
-     * 사용자 표시 ID 소개글 VO
+     * 사용자 표시 ID VO
      *
      * @throws ValidatorException
      */
