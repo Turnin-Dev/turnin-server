@@ -14,7 +14,6 @@ import com.peekr.domain.keyword.presentation.dto.KeywordResponse
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPlugin
 import com.peekr.util.testPostEndpoint
-import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
