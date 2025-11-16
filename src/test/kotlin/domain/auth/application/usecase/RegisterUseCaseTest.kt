@@ -3,6 +3,7 @@ package com.peekr.domain.auth.application.usecase
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.DisplayIdValidationException
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.Role
@@ -21,6 +22,7 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.jupiter.api.assertThrows
 
 class RegisterUseCaseTest {
     private val authRepository = mockk<AuthRepository>()
@@ -55,6 +57,17 @@ class RegisterUseCaseTest {
 
         // then
         assertEquals(TestUserId, registerResultDto.userId)
+    }
+
+    @Test
+    fun `사용자 표시 ID 유효성 검사 실패 시 예외가 발생한다`() = runTest {
+        // given
+        val invalidDisplayId = "a".repeat(DisplayId.MAX_LENGTH + 1)
+
+        // when, then
+        assertThrows<DisplayIdValidationException> {
+            usecase(TestRegisterDto.copy(displayId = invalidDisplayId))
+        }
     }
 
     companion object {

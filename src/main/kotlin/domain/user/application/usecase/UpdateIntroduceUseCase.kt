@@ -7,9 +7,9 @@ import com.peekr.domain.user.domain.repository.UserRepository
 class UpdateIntroduceUseCase(private val userRepository: UserRepository) {
     suspend operator fun invoke(
         userId: UserId,
-        patchIntroduce: String,
+        introduce: String,
     ): Boolean {
-        val introduce = Introduce(patchIntroduce)
-        return userRepository.updateIntroduce(userId, introduce)
+        val introduceVO = Introduce(introduce)
+        return userRepository.updateIntroduce(userId, introduceVO)
     }
 }

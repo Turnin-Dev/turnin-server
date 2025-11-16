@@ -2,6 +2,7 @@ package com.peekr.domain.keyword.application.usecase
 
 import com.peekr.common.model.KeywordId
 import com.peekr.common.model.KeywordName
+import com.peekr.common.model.KeywordNameValidationException
 import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.application.dto.toDto
 import com.peekr.domain.keyword.domain.model.Keyword
@@ -13,6 +14,7 @@ import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.assertThrows
 
 class GetKeywordByNameUseCaseTest {
     private val keywordRepository: KeywordRepository = mockk()
@@ -45,6 +47,17 @@ class GetKeywordByNameUseCaseTest {
 
         // then
         assertNull(keyword)
+    }
+
+    @Test
+    fun `키워드 명 유효성 검사 실패 시 에러가 발생한다`() = runTest {
+        // given
+        val invalidKeywordName = "a".repeat(KeywordName.MAX_LENGTH + 1)
+
+        // when, then
+        assertThrows<KeywordNameValidationException> {
+            usecase(invalidKeywordName)
+        }
     }
 
     companion object {
