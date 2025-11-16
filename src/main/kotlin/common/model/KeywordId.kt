@@ -22,8 +22,8 @@ value class KeywordId private constructor(val value: Long) {
     }
 
     private fun validateKeywordId() {
-        if (value < 0) {
-            throw KeywordIdValidationException("키워드 ID는 음수가 될 수 없습니다.")
+        if (value <= 0) {
+            throw KeywordIdValidationException("키워드 ID는 0이나 음수가 될 수 없습니다.")
         }
     }
 }

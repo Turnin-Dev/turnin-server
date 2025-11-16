@@ -22,8 +22,8 @@ value class UserId private constructor(val value: Long) {
     }
 
     private fun validateUserId(value: Long) {
-        if (value < 0) {
-            throw UserIdValidationException("사용자 ID는 음수가 될 수 없습니다.")
+        if (value <= 0) {
+            throw UserIdValidationException("사용자 ID는 0이나 음수가 될 수 없습니다.")
         }
     }
 }
