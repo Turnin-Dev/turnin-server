@@ -290,7 +290,7 @@ suspend fun ApplicationTestBuilder.testDeleteEndpoint(
     additionalAssertions: (() -> Unit)? = null,
     responseValidator: ResponseValidator.() -> Unit = {},
 ) = testEndpoint(
-    method = HttpMethod.Put,
+    method = HttpMethod.Delete,
     endpoint = endpoint,
     queryParameters = queryParameters,
     requestBody = requestBody,

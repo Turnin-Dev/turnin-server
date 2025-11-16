@@ -33,7 +33,7 @@ class RefreshTokenUseCaseTest {
         } returns TEST_SUBJECT
         coEvery {
             jwtTokenService.createVerifier(any())
-        } returns JWTTestDoubles.MockRefreshTokenVerifier
+        } returns JWTTestDoubles.MockVerifier
         coEvery {
             jwtTokenService.generate(any())
         } returns TestJWTToken

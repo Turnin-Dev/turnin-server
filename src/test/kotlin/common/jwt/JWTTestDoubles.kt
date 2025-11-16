@@ -6,7 +6,6 @@ import com.peekr.common.jwt.JWTTestDoubles.ACCESS_TOKEN_EXPIRES_IN
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
 import com.peekr.common.jwt.JWTTestDoubles.MockAlgorithm
-import com.peekr.common.jwt.JWTTestDoubles.REFRESH_TOKEN_EXPIRES_IN
 import com.peekr.common.jwt.domain.model.JWTClaimName
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
@@ -26,9 +25,6 @@ internal object JWTTestDoubles {
         .require(MockAlgorithm)
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
-        .build()
-    val MockRefreshTokenVerifier = JWT
-        .require(MockAlgorithm)
         .build()
 
     fun getJWTTokenPayload(
@@ -62,12 +58,9 @@ private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
         .sign(MockAlgorithm)
     val refreshToken = JWT
         .create()
-        .withAudience(AUDIENCE)
-        .withIssuer(ISSUER)
         .withSubject(payload.userId)
-        .withClaim(payload.claimName.name, payload.claim)
         .withIssuedAt(Date.from(now))
-        .withExpiresAt(Date.from(now.plusMillis(REFRESH_TOKEN_EXPIRES_IN)))
+        .withExpiresAt(Date.from(now.plusMillis(ACCESS_TOKEN_EXPIRES_IN)))
         .sign(MockAlgorithm)
 
     return JWTToken(accessToken, refreshToken)
