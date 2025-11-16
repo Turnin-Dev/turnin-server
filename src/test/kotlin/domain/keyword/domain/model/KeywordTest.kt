@@ -13,9 +13,9 @@ class KeywordTest {
     fun `정상적인 키워드 생성()`() {
         assertDoesNotThrow {
             Keyword(
-                id = KeywordId(0),
+                id = KeywordId(1),
                 name = KeywordName("test"),
-                createdBy = UserId(0),
+                createdBy = UserId(1),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),
             )
@@ -26,9 +26,9 @@ class KeywordTest {
     fun `키워드 길이 제약 위반시 ValidatorException 예외가 발생한다`() {
         assertThrows<ValidatorException> {
             Keyword(
-                id = KeywordId(0),
+                id = KeywordId(1),
                 name = KeywordName("a".repeat(KeywordName.MAX_LENGTH + 1)),
-                createdBy = UserId(0),
+                createdBy = UserId(1),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),
             )
@@ -39,9 +39,9 @@ class KeywordTest {
     fun `키워드가 비어있을 경우 ValidatorException 예외가 발생한다`() {
         assertThrows<ValidatorException> {
             Keyword(
-                id = KeywordId(0),
+                id = KeywordId(1),
                 name = KeywordName(""),
-                createdBy = UserId(0),
+                createdBy = UserId(1),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),
             )

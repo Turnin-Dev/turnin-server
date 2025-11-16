@@ -26,6 +26,9 @@ internal object JWTTestDoubles {
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
         .build()
+    val MockRefreshTokenVerifier = JWT
+        .require(MockAlgorithm)
+        .build()
 
     fun getJWTTokenPayload(
         subject: String = "user123",
