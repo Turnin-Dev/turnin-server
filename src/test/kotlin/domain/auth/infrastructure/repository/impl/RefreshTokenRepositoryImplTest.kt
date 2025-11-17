@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.DisplayId
@@ -14,13 +15,13 @@ import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.upsert
 import org.junit.Before
+import org.junit.jupiter.api.assertThrows
 
 class RefreshTokenRepositoryImplTest {
     private val refreshTokenRepository = RefreshTokenRepositoryImpl()
@@ -102,7 +103,7 @@ class RefreshTokenRepositoryImplTest {
 
     @Test
     fun `save 실패 테스트 - 사용자가 존재하지 않는 경우`() = runTest {
-        assertFalse {
+        assertThrows<DatabaseException.ForeignKeyViolationException> {
             refreshTokenRepository.save(UserId(1L), TEST_REFRESH_TOKEN)
         }
     }

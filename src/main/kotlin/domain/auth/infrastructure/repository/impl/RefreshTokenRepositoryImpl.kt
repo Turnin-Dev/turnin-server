@@ -1,11 +1,11 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.common.db.schema.RefreshTokens
-import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.upsert
 
@@ -29,15 +29,11 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
     }
 
     override suspend fun save(userId: UserId, token: String): Boolean = suspendTransaction {
-        val userEntity = UserEntity.findById(userId.value)
-        if (userEntity == null) {
-            false
-        } else {
-            RefreshTokens.upsert {
-                it[user] = userEntity.id
+        RefreshTokens
+            .upsert {
+                it[user] = EntityID(userId.value, Users)
                 it[refreshToken] = token
-            }
-            true
-        }
+            }.resultedValues
+            ?.isNotEmpty() == true
     }
 }
