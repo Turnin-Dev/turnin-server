@@ -25,4 +25,18 @@ sealed class AuthException(
             status = HttpStatusCode.Conflict,
             cause = cause,
         )
+
+    class UserNotFound(cause: Throwable? = null) :
+        AuthException(
+            code = AuthErrorCode.UserNotFound,
+            status = HttpStatusCode.NotFound,
+            cause = cause,
+        )
+
+    class RefreshTokenSaveFailed(cause: Throwable? = null) :
+        AuthException(
+            code = AuthErrorCode.RefreshTokenSaveFailed,
+            status = HttpStatusCode.InternalServerError,
+            cause = cause,
+        )
 }

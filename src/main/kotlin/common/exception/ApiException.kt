@@ -16,7 +16,7 @@ import io.ktor.http.HttpStatusCode
  * @param errorCode [ApiErrorCode] 에러 코드
  * @param status [HttpStatusCode] HTTP 상태 코드
  * @param message 에러 메시지 (디버깅/로깅 용)
- * @param cause 스택트레이스를 위한 예외 전달 용 (필요시 메시지를 꺼낼 수 있다)
+ * @param cause 스택트레이스를 위한 예외 전달 용 (디버깅/로깅 용)
  */
 open class ApiException(
     val errorCode: ApiErrorCode,

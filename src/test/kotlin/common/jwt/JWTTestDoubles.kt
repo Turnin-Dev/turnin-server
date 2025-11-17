@@ -6,6 +6,7 @@ import com.peekr.common.jwt.JWTTestDoubles.ACCESS_TOKEN_EXPIRES_IN
 import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
 import com.peekr.common.jwt.JWTTestDoubles.ISSUER
 import com.peekr.common.jwt.JWTTestDoubles.MockAlgorithm
+import com.peekr.common.jwt.JWTTestDoubles.REFRESH_TOKEN_EXPIRES_IN
 import com.peekr.common.jwt.domain.model.JWTClaimName
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
@@ -63,7 +64,7 @@ private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
         .create()
         .withSubject(payload.userId)
         .withIssuedAt(Date.from(now))
-        .withExpiresAt(Date.from(now.plusMillis(ACCESS_TOKEN_EXPIRES_IN)))
+        .withExpiresAt(Date.from(now.plusMillis(REFRESH_TOKEN_EXPIRES_IN)))
         .sign(MockAlgorithm)
 
     return JWTToken(accessToken, refreshToken)

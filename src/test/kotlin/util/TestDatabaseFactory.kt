@@ -16,7 +16,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object TestDatabaseFactory {
     fun init() {
         Database.connect(
-            url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;",
+            url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL",
             driver = "org.h2.Driver",
         )
         // 실제 테이블 모델 그대로 사용
