@@ -13,6 +13,7 @@ import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -69,30 +70,30 @@ class LoginUseCaseTest {
     }
 
     @Test
-    fun `로그인 실패 시 null을 반환한다`() = runTest {
+    fun `사용자를 찾을 수 없는 경우 알려진 예외가 발생한다`() = runTest {
         // given
         coEvery {
             authRepository.findAuthUserByProviderAndProviderId(any(), any())
         } returns null
 
-        // when
-        val loginResultDto = usecase(TestLoginDto)
-
-        // then
-        assertNull(loginResultDto)
+        // when, then
+        assertThrows<AuthException> {
+            usecase(TestLoginDto)
+        }
     }
 
     @Test
-    fun `로그인 시 토큰을 정상적으로 생성하지 못할 경우 예외가 발생한다`() = runTest {
+    fun `알 수 없는 예외가 발생하는 경우 null 을 반환한다`() = runTest {
         // given
         coEvery {
             jwtTokenService.generate(any())
         } throws Exception()
 
-        // when, then
-        assertThrows<Exception> {
-            usecase(TestLoginDto)
-        }
+        // when
+        val result = usecase(TestLoginDto)
+
+        // then
+        assertNull(result)
     }
 
     companion object {

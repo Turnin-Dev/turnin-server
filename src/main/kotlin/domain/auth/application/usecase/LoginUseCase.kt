@@ -6,6 +6,7 @@ import com.peekr.common.jwt.domain.model.JWTClaimName
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.service.JWTTokenService
+import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
@@ -31,12 +32,10 @@ class LoginUseCase(
     /**
      * 소셜로그인
      *
-     * 로그인에 성공 시 리프레쉬 토큰을 저장한다.
-     *
      * @param loginDto [LoginDto]
      *
      * @return [LoginResultDto] 정상적으로 로그인이 진행된 경우
-     * (로그인 실패 (사용자를 가져올 수 없는 경우) **`null`** 반환)
+     * (로그인 실패 혹은 사용자를 가져올 수 없는 경우 **`null`** 반환)
      */
     suspend operator fun invoke(loginDto: LoginDto): LoginResultDto? {
         LOGGER.debug("login called, provider: ${loginDto.provider}, providerId: ${loginDto.providerId.masking()}")
@@ -48,7 +47,10 @@ class LoginUseCase(
             result
         } catch (e: AuthException) {
             LOGGER.debug("login failed, ${e.message}")
-            null
+            throw e
+        } catch (e: TokenException) {
+            LOGGER.debug("login failed, ${e.message}")
+            throw e
         } catch (e: Exception) {
             LOGGER.debug("unexpected error during login", e)
             null
@@ -56,7 +58,7 @@ class LoginUseCase(
     }
 
     // 로그인 수행
-    private suspend fun performLogin(loginDto: LoginDto): LoginResultDto? {
+    private suspend fun performLogin(loginDto: LoginDto): LoginResultDto {
         // 1) 사용자 조회
         val authUser = getAuthUser(loginDto.provider, loginDto.providerId)
             ?: throw AuthException.UserNotFound()

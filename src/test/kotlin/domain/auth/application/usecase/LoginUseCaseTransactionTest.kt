@@ -17,6 +17,7 @@ import com.peekr.common.util.config.AppConfig
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.infrastructure.repository.impl.AuthRepositoryImpl
 import com.peekr.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
 import com.peekr.util.TestDatabaseFactory
@@ -109,15 +110,15 @@ class LoginUseCaseTransactionTest {
         } returns false
 
         // when
-        val result = usecase(TestLoginDto)
+        val exception = runCatching { usecase(TestLoginDto) }.exceptionOrNull()
         val finalLastLoginAt = TestDatabaseFactory.dbQuery {
             UserEntity.findById(userId.value)?.lastLoginAt
         }
 
         // then
-        assertNull(
-            result,
-            "리프레쉬 토큰 로직이 실패하므로 결과는 null 이다.",
+        assertTrue(
+            exception is AuthException,
+            "리프레쉬 토큰 로직 실패 시 알려진 예외가 발생해야 한다.",
         )
         assertEquals(
             initialLastLoginAt,
