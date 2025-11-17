@@ -3,6 +3,8 @@ package com.peekr.domain.auth.domain.model
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import java.time.Instant
 
@@ -17,7 +19,7 @@ import java.time.Instant
  * @property introduce 사용자 소개 글
  */
 data class Register(
-    val provider: SocialLoginProviderForAuth,
+    val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: DisplayId,
     val name: Name,
@@ -27,7 +29,7 @@ data class Register(
 
 fun Register.toAuthUser(
     id: Long,
-    role: RoleForAuth,
+    role: Role,
     isActive: Boolean,
     lastLoginAt: Instant?,
 ): AuthUser = AuthUser(

@@ -9,7 +9,6 @@ import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
 import com.peekr.domain.keyword.presentation.dto.KeywordResponse
 import com.peekr.domain.keyword.presentation.dto.toResponse
-import com.peekr.domain.keyword.presentation.validation.validateKeywordName
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
@@ -38,7 +37,6 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
 
         get(route.NAME.byPathParam("keywordName"), { getKeywordByNameDocs() }) {
             val keywordName = call.pathParameters["keywordName"].inputValidationAndReturn("키워드 명")
-            keywordName.validateKeywordName()
             val keywordDto = usecase.getByName(keywordName)
             if (keywordDto == null) {
                 call.respond(HttpStatusCode.NotFound)
@@ -51,7 +49,7 @@ fun AuthenticatedRoute.keywordRoutes(route: Api.V1.Keyword, usecase: KeywordUseC
             val createKeywordRequest = call.receive<CreateKeywordRequest>()
             val createById = extractUserIdWithToken()
             val keywordResult = usecase.create(
-                keyword = createKeywordRequest.keyword,
+                keywordName = createKeywordRequest.keyword,
                 createdBy = createById,
             )
             call.respond(HttpStatusCode.Created, keywordResult.toResponse())

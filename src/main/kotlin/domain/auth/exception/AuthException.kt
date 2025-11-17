@@ -26,10 +26,17 @@ sealed class AuthException(
             cause = cause,
         )
 
-    class CannotSaveRefreshTokenException(cause: Throwable? = null) :
+    class UserNotFound(cause: Throwable? = null) :
         AuthException(
-            code = AuthErrorCode.CannotSaveRefreshToken,
-            status = HttpStatusCode.Conflict,
+            code = AuthErrorCode.UserNotFound,
+            status = HttpStatusCode.NotFound,
+            cause = cause,
+        )
+
+    class RefreshTokenSaveFailed(cause: Throwable? = null) :
+        AuthException(
+            code = AuthErrorCode.RefreshTokenSaveFailed,
+            status = HttpStatusCode.InternalServerError,
             cause = cause,
         )
 }

@@ -1,44 +1,58 @@
 package com.peekr.domain.keyword.application.usecase
 
 import com.peekr.common.model.KeywordId
+import com.peekr.common.model.KeywordName
+import com.peekr.common.model.KeywordNameValidationException
 import com.peekr.common.model.UserId
 import com.peekr.domain.keyword.application.dto.toDto
 import com.peekr.domain.keyword.domain.model.Keyword
-import com.peekr.domain.keyword.domain.service.KeywordService
+import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.jupiter.api.assertThrows
 
 class CreateKeywordUseCaseTest {
-    private val keywordService = mockk<KeywordService>()
+    private val keywordRepository = mockk<KeywordRepository>()
     private lateinit var usecase: CreateKeywordUseCase
 
     @Before
     fun setUp() {
-        usecase = CreateKeywordUseCase(keywordService)
+        usecase = CreateKeywordUseCase(keywordRepository)
     }
 
     @Test
     fun `성공적으로 키워드를 생성한다`() = runTest {
         // given
-        coEvery { keywordService.create(TEST_KEYWORD, TestUserId) } returns TestKeyword
+        coEvery { keywordRepository.create(TestKeywordName, TestUserId) } returns TestKeyword
 
         // when
-        val keyword = usecase(TEST_KEYWORD, TestUserId)
+        val keyword = usecase(TestKeywordName.value, TestUserId)
 
         // then
         assertEquals(TestKeyword.toDto(), keyword)
     }
 
+    @Test
+    fun `키워드 명 유효성 검사 실패 시 에러가 발생한다`() = runTest {
+        // given
+        val invalidKeywordName = "a".repeat(KeywordName.MAX_LENGTH + 1)
+
+        // when, then
+        assertThrows<KeywordNameValidationException> {
+            usecase(invalidKeywordName, TestUserId)
+        }
+    }
+
     companion object {
-        private const val TEST_KEYWORD = "keyword"
+        private val TestKeywordName = KeywordName("keyword")
         private val TestUserId = UserId(1L)
         private val TestKeyword = Keyword(
             id = KeywordId(1L),
-            keyword = TEST_KEYWORD,
+            name = TestKeywordName,
             createdBy = TestUserId,
             createdAt = 1000,
             updatedAt = 1000,

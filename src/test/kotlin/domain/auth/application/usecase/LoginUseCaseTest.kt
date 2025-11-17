@@ -1,20 +1,23 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.LoginResult
-import com.peekr.domain.auth.domain.model.RoleForAuth
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
-import com.peekr.domain.auth.domain.service.AuthService
-import com.peekr.domain.auth.domain.service.RefreshTokenService
+import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.TestDatabaseFactory
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.just
 import io.mockk.mockk
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,13 +29,28 @@ import org.junit.Before
 import org.junit.jupiter.api.assertThrows
 
 class LoginUseCaseTest {
-    private val authService = mockk<AuthService>()
-    private val refreshTokenService = mockk<RefreshTokenService>()
-    private val usecase = LoginUseCase(authService, refreshTokenService)
+    private val authRepository = mockk<AuthRepository>()
+    private val refreshTokenRepository = mockk<RefreshTokenRepository>()
+    private val jwtTokenService = mockk<JWTTokenService>()
+    private val usecase = LoginUseCase(authRepository, refreshTokenRepository, jwtTokenService)
 
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
+
+        // given
+        coEvery {
+            authRepository.findAuthUserByProviderAndProviderId(any(), any())
+        } returns TestAuthUser
+        coEvery {
+            refreshTokenRepository.save(TestLoginResult.authUser.userId, TestLoginResult.jwtToken.refreshToken)
+        } returns true
+        coEvery {
+            jwtTokenService.generate(any())
+        } returns TestJwtToken
+        coEvery {
+            authRepository.updateLastLoginAt(TestAuthUser.userId)
+        } just Runs
     }
 
     @After
@@ -42,12 +60,6 @@ class LoginUseCaseTest {
 
     @Test
     fun `로그인 성공 테스트`() = runTest {
-        // given
-        coEvery { authService.login(any(), any()) } returns TestLoginResult
-        coEvery {
-            refreshTokenService.save(TestLoginResult.authUser.userId, TestLoginResult.jwtToken.refreshToken)
-        } returns true
-
         // when
         val loginResultDto = usecase(TestLoginDto)
 
@@ -58,33 +70,34 @@ class LoginUseCaseTest {
     }
 
     @Test
-    fun `로그인 실패 시 null을 반환한다`() = runTest {
+    fun `사용자를 찾을 수 없는 경우 알려진 예외가 발생한다`() = runTest {
         // given
-        coEvery { authService.login(any(), any()) } returns null
-
-        // when
-        val loginResultDto = usecase(TestLoginDto)
-
-        // then
-        assertNull(loginResultDto)
-    }
-
-    @Test
-    fun `리프레쉬 토큰 저장 중 실패하면 예외가 발생한다`() = runTest {
-        // given
-        coEvery { authService.login(any(), any()) } returns TestLoginResult
         coEvery {
-            refreshTokenService.save(TestLoginResult.authUser.userId, TestLoginResult.jwtToken.refreshToken)
-        } throws AuthException.CannotSaveRefreshTokenException()
+            authRepository.findAuthUserByProviderAndProviderId(any(), any())
+        } returns null
 
         // when, then
-        assertThrows<AuthException.CannotSaveRefreshTokenException> {
+        assertThrows<AuthException> {
             usecase(TestLoginDto)
         }
     }
 
+    @Test
+    fun `알 수 없는 예외가 발생하는 경우 null 을 반환한다`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.generate(any())
+        } throws Exception()
+
+        // when
+        val result = usecase(TestLoginDto)
+
+        // then
+        assertNull(result)
+    }
+
     companion object {
-        private val TestProvider = SocialLoginProviderForAuth.GOOGLE
+        private val TestProvider = SocialLoginProvider.GOOGLE
         private const val TEST_PROVIDER_ID = "provider-id"
         private val TestLoginDto = LoginDto(
             provider = TestProvider,
@@ -96,7 +109,7 @@ class LoginUseCaseTest {
         )
         private val TestAuthUser = AuthUser(
             userId = UserId(1L),
-            role = RoleForAuth.USER,
+            role = Role.USER,
             provider = TestProvider,
             providerId = TEST_PROVIDER_ID,
             displayId = DisplayId("id"),

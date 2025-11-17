@@ -2,18 +2,18 @@ package com.peekr.domain.auth.presentation.route
 
 import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
+import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserId
 import com.peekr.common.route.Api
-import com.peekr.domain.auth.AuthTestDoubles.MockInvalidLoginRequest
-import com.peekr.domain.auth.AuthTestDoubles.MockInvalidRegisterRequest
-import com.peekr.domain.auth.AuthTestDoubles.MockJWTTokenDto
-import com.peekr.domain.auth.AuthTestDoubles.MockLoginResultDto
-import com.peekr.domain.auth.AuthTestDoubles.MockRegisterResultDto
-import com.peekr.domain.auth.AuthTestDoubles.MockValidLoginRequest
-import com.peekr.domain.auth.AuthTestDoubles.MockValidRegisterRequest
 import com.peekr.domain.auth.application.dto.FindUserResultDto
+import com.peekr.domain.auth.application.dto.LoginResultDto
+import com.peekr.domain.auth.application.dto.RegisterResultDto
 import com.peekr.domain.auth.application.usecase.AuthUseCases
 import com.peekr.domain.auth.exception.AuthErrorCode
+import com.peekr.domain.auth.presentation.dto.LoginRequest
+import com.peekr.domain.auth.presentation.dto.RegisterRequest
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
 import io.ktor.client.request.get
@@ -370,6 +370,46 @@ class AuthRouteTest {
             responseBody.contains(
                 AuthErrorCode.PathParameterInvalid("provider").description,
             ),
+        )
+    }
+
+    companion object {
+        private val MockUserId = UserId(1L)
+        val MockJWTTokenDto = JWTTokenDto(
+            accessToken = "aaa.bbb.ccc",
+            refreshToken = "aaa.bbb.ccc",
+        )
+        val MockLoginResultDto = LoginResultDto(
+            userId = MockUserId,
+            jwtTokenDto = MockJWTTokenDto,
+        )
+        val MockValidLoginRequest = LoginRequest(
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "providerIDDDDD",
+        )
+        val MockInvalidLoginRequest = LoginRequest(
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "",
+        )
+        val MockRegisterResultDto = RegisterResultDto(
+            userId = MockUserId,
+            jwtTokenDto = MockJWTTokenDto,
+        )
+        val MockValidRegisterRequest = RegisterRequest(
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "providerIDDDDD",
+            displayId = "hong_gd_123",
+            name = "honggd",
+            profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
+            introduce = "Hello!",
+        )
+        val MockInvalidRegisterRequest = RegisterRequest(
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "providerIDDDDD",
+            displayId = "",
+            name = "",
+            profileImageUrl = "aaaa",
+            introduce = "Hello!",
         )
     }
 }

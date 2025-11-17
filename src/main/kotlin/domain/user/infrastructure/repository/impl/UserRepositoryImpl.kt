@@ -1,11 +1,11 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.db.SubCountQueryFunction
-import com.peekr.common.db.schema.FriendStatus
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.model.User
@@ -60,10 +60,10 @@ class UserRepositoryImpl : UserRepository {
 
     override suspend fun updateIntroduce(
         userId: UserId,
-        patchIntroduce: Introduce,
+        introduce: Introduce,
     ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
-            row[introduce] = patchIntroduce.value
+            row[this.introduce] = introduce.value
         } > 0
     }
 }

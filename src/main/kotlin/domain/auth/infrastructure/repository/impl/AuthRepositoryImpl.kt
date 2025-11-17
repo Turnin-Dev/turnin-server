@@ -5,30 +5,28 @@ import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register
-import com.peekr.domain.auth.domain.model.RoleForAuth
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
 import com.peekr.domain.auth.domain.model.toAuthUser
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
-import com.peekr.domain.auth.infrastructure.mapper.toRole
-import com.peekr.domain.auth.infrastructure.mapper.toSocialLoginProvider
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 
 class AuthRepositoryImpl : AuthRepository {
     override suspend fun findAuthUserByProviderAndProviderId(
-        provider: SocialLoginProviderForAuth,
+        provider: SocialLoginProvider,
         providerId: String,
     ): AuthUser? = suspendTransaction {
         UserEntity
             .find(
-                (Users.provider eqEnum provider.toSocialLoginProvider()) and (Users.providerId eq providerId),
+                (Users.provider eqEnum provider) and (Users.providerId eq providerId),
             ).map {
                 AuthMapper.toDomain(it.readValues)
             }.singleOrNull()
@@ -41,13 +39,13 @@ class AuthRepositoryImpl : AuthRepository {
     }
 
     override suspend fun save(register: Register): AuthUser = suspendTransaction {
-        val role = RoleForAuth.USER
+        val role = Role.USER
         val isActive = true
         val lastLoginAt = PeekrDateTime.now()
 
         val savedUserEntity = UserEntity.new {
-            this.role = role.toRole()
-            this.provider = register.provider.toSocialLoginProvider()
+            this.role = role
+            this.provider = register.provider
             this.providerId = register.providerId
             this.name = register.name.value
             this.displayId = register.displayId.value

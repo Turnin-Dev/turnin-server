@@ -80,7 +80,7 @@ class GetUserKeywordsUseCaseTest {
         )
         private val TestExternalKeyword = ExternalKeyword(
             id = TestKeywordId,
-            keyword = TEST_KEYWORD,
+            name = TEST_KEYWORD,
             createdBy = TestUserId,
             createdAt = 1000,
             updatedAt = 1000,

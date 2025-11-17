@@ -27,6 +27,9 @@ internal object JWTTestDoubles {
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
         .build()
+    val MockRefreshTokenVerifier = JWT
+        .require(MockAlgorithm)
+        .build()
 
     fun getJWTTokenPayload(
         subject: String = "user123",
@@ -59,10 +62,7 @@ private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
         .sign(MockAlgorithm)
     val refreshToken = JWT
         .create()
-        .withAudience(AUDIENCE)
-        .withIssuer(ISSUER)
         .withSubject(payload.userId)
-        .withClaim(payload.claimName.name, payload.claim)
         .withIssuedAt(Date.from(now))
         .withExpiresAt(Date.from(now.plusMillis(REFRESH_TOKEN_EXPIRES_IN)))
         .sign(MockAlgorithm)

@@ -1,11 +1,16 @@
 package com.peekr.common.model
 
-/** 사용자 ID 래퍼 클래스
- *
- * @throws IllegalArgumentException 사용자 ID 형식에 맞지 않으면 예외 발생
- */
+import com.peekr.common.validator.ValidatorException
+
+class UserIdValidationException(message: String) : ValidatorException(message)
+
 @JvmInline
 value class UserId private constructor(val value: Long) {
+    /**
+     * 사용자 ID VO
+     *
+     * @throws ValidatorException
+     */
     companion object {
         fun from(value: Long): UserId = UserId(value)
 
@@ -17,6 +22,8 @@ value class UserId private constructor(val value: Long) {
     }
 
     private fun validateUserId(value: Long) {
-        require(value >= 0) { "사용자 ID는 음수가 될 수 없습니다." }
+        if (value <= 0) {
+            throw UserIdValidationException("사용자 ID는 0이나 음수가 될 수 없습니다.")
+        }
     }
 }

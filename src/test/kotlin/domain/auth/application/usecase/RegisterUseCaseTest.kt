@@ -1,17 +1,19 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.jwt.domain.model.JWTToken
+import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.DisplayIdValidationException
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RegisterResult
-import com.peekr.domain.auth.domain.model.RoleForAuth
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
-import com.peekr.domain.auth.domain.service.AuthService
-import com.peekr.domain.auth.domain.service.RefreshTokenService
+import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -20,15 +22,27 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.jupiter.api.assertThrows
 
 class RegisterUseCaseTest {
-    private val authService = mockk<AuthService>()
-    private val refreshTokenService = mockk<RefreshTokenService>()
-    private val usecase = RegisterUseCase(authService, refreshTokenService)
+    private val authRepository = mockk<AuthRepository>()
+    private val refreshTokenRepository = mockk<RefreshTokenRepository>()
+    private val jwtTokenService = mockk<JWTTokenService>()
+    private val usecase = RegisterUseCase(authRepository, refreshTokenRepository, jwtTokenService)
 
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
+
+        coEvery {
+            refreshTokenRepository.save(TestUserId, TestRegisterResult.jwtToken.refreshToken)
+        } returns true
+        coEvery {
+            authRepository.save(any())
+        } returns TestAuthUser
+        coEvery {
+            jwtTokenService.generate(any())
+        } returns TestJwtToken
     }
 
     @After
@@ -38,12 +52,6 @@ class RegisterUseCaseTest {
 
     @Test
     fun `회원가입 성공 테스트`() = runTest {
-        // given
-        coEvery { authService.register(any()) } returns TestRegisterResult
-        coEvery {
-            refreshTokenService.save(TestUserId, TestRegisterResult.jwtToken.refreshToken)
-        } returns true
-
         // when
         val registerResultDto = usecase(TestRegisterDto)
 
@@ -51,8 +59,19 @@ class RegisterUseCaseTest {
         assertEquals(TestUserId, registerResultDto.userId)
     }
 
+    @Test
+    fun `사용자 표시 ID 유효성 검사 실패 시 예외가 발생한다`() = runTest {
+        // given
+        val invalidDisplayId = "a".repeat(DisplayId.MAX_LENGTH + 1)
+
+        // when, then
+        assertThrows<DisplayIdValidationException> {
+            usecase(TestRegisterDto.copy(displayId = invalidDisplayId))
+        }
+    }
+
     companion object {
-        private val TestProvider = SocialLoginProviderForAuth.GOOGLE
+        private val TestProvider = SocialLoginProvider.GOOGLE
         private const val TEST_PROVIDER_ID = "provider-id"
         private val TestUserId = UserId(1L)
         private val TestJwtToken = JWTToken(
@@ -61,7 +80,7 @@ class RegisterUseCaseTest {
         )
         private val TestAuthUser = AuthUser(
             userId = TestUserId,
-            role = RoleForAuth.USER,
+            role = Role.USER,
             provider = TestProvider,
             providerId = TEST_PROVIDER_ID,
             displayId = DisplayId("id"),
@@ -74,10 +93,10 @@ class RegisterUseCaseTest {
         private val TestRegisterDto = RegisterDto(
             provider = TestProvider,
             providerId = TEST_PROVIDER_ID,
-            displayId = DisplayId("id"),
-            name = Name("name"),
+            displayId = "id",
+            name = "name",
             profileImageUrl = "profileImageUrl",
-            introduce = Introduce("introduce"),
+            introduce = "introduce",
         )
         private val TestRegisterResult = RegisterResult(
             jwtToken = TestJwtToken,

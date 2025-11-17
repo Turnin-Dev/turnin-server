@@ -1,17 +1,16 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.model.DisplayId
-import com.peekr.domain.auth.domain.service.AuthService
+import com.peekr.domain.auth.domain.repository.AuthRepository
 
-/**
- * 사용자 표시 ID의 존재 여부를 확인한다.
- */
-class ExistsDisplayIdUseCase(private val authService: AuthService) {
+class ExistsDisplayIdUseCase(private val authRepository: AuthRepository) {
     /**
+     * 사용자 표시 ID의 존재 여부를 확인한다.
+     *
      * @param displayId 사용자 표시 ID
      *
      * @return 존재하면 `true`, 존재하지 않으면 `false`
      */
     suspend operator fun invoke(displayId: DisplayId): Boolean =
-        authService.existsDisplayId(displayId)
+        authRepository.existsByDisplayId(displayId)
 }

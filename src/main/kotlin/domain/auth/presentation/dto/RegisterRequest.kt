@@ -1,6 +1,10 @@
 package com.peekr.domain.auth.presentation.dto
 
-import com.peekr.common.db.schema.SocialLoginProvider
+import com.peekr.common.model.DisplayId.Companion.invoke
+import com.peekr.common.model.Introduce.Companion.invoke
+import com.peekr.common.model.Name.Companion.invoke
+import com.peekr.common.model.SocialLoginProvider
+import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.presentation.validation.validateDisplayId
 import com.peekr.domain.auth.presentation.validation.validateIntroduce
 import com.peekr.domain.auth.presentation.validation.validateName
@@ -39,6 +43,17 @@ data class RegisterRequest(
     }
 }
 
+// ------------------------------ Mapper ------------------------------
+fun RegisterRequest.toDto(): RegisterDto = RegisterDto(
+    provider = provider,
+    providerId = providerId,
+    displayId = displayId,
+    name = name,
+    profileImageUrl = profileImageUrl,
+    introduce = introduce,
+)
+
+// ------------------------------ Validation ------------------------------
 fun RegisterRequest.validate() {
     providerId.validateProviderId()
     name.validateName()

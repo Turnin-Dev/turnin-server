@@ -1,11 +1,13 @@
 package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.Introduce
+import com.peekr.common.model.IntroduceValidationException
 import com.peekr.common.model.UserId
 import com.peekr.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -40,6 +42,17 @@ class UpdateIntroduceUseCaseTest {
 
         // then
         assertFalse(result)
+    }
+
+    @Test
+    fun `소개글 유효성 검사 실패 시 에러가 발생한다`() = runTest {
+        // given
+        val invalidIntroduce = "a".repeat(Introduce.MAX_LENGTH + 1)
+
+        // when, then
+        assertFailsWith<IntroduceValidationException> {
+            usecase(TestUserId, invalidIntroduce)
+        }
     }
 
     companion object {

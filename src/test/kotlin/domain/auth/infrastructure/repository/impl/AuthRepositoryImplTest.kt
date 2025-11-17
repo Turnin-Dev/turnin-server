@@ -2,10 +2,12 @@ package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.model.DisplayId
+import com.peekr.common.model.Introduce
+import com.peekr.common.model.Name
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.common.util.PeekrDateTime
-import com.peekr.domain.auth.AuthTestDoubles.MockRegister
-import com.peekr.domain.auth.domain.model.SocialLoginProviderForAuth
+import com.peekr.domain.auth.domain.model.Register
 import com.peekr.util.TestDatabaseFactory
 import junit.framework.TestCase.assertFalse
 import kotlin.test.AfterTest
@@ -33,12 +35,12 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `save & findByProviderAndProviderId 성공 테스트`() = runTest {
-        val savedUser = repository.save(MockRegister)
+        val savedUser = repository.save(TestRegister)
         assertTrue(savedUser.userId.value > 0L)
 
         val foundUser = repository.findAuthUserByProviderAndProviderId(
-            provider = MockRegister.provider,
-            providerId = MockRegister.providerId,
+            provider = TestRegister.provider,
+            providerId = TestRegister.providerId,
         )
 
         assertNotNull(foundUser)
@@ -48,7 +50,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findByProviderAndProviderId 실패 테스트 - 존재하지 않는 사용자`() = runTest {
         val notFoundUser = repository.findAuthUserByProviderAndProviderId(
-            provider = SocialLoginProviderForAuth.KAKAO,
+            provider = SocialLoginProvider.KAKAO,
             providerId = "not_found_id",
         )
 
@@ -57,12 +59,12 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `save 실패 테스트 - 중복된 providerId 저장 시도`() = runTest {
-        val savedUser = repository.save(MockRegister)
+        val savedUser = repository.save(TestRegister)
 
         assertTrue(savedUser.userId.value > 0L)
 
         val exception = assertFailsWith<DatabaseException.DuplicatedDataException> {
-            repository.save(MockRegister) // 동일한 providerId 삽입 시도
+            repository.save(TestRegister) // 동일한 providerId 삽입 시도
         }
 
         println("발생한 예외: ${exception.message}")
@@ -71,7 +73,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findUserByUserId 성공 테스트`() = runTest {
         // given
-        val savedUser = repository.save(MockRegister)
+        val savedUser = repository.save(TestRegister)
         assertTrue(savedUser.userId.value > 0L)
 
         // when
@@ -94,7 +96,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `updateLastLoginAt 성공 테스트`() = runTest {
         // given
-        val savedUser = repository.save(MockRegister)
+        val savedUser = repository.save(TestRegister)
         val userId = savedUser.userId
 
         // when
@@ -111,7 +113,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `updateLastLoginAt 실패 테스트 - 2초 뒤에 시간과 비교`() = runTest {
         // given
-        val savedUser = repository.save(MockRegister)
+        val savedUser = repository.save(TestRegister)
         val userId = savedUser.userId
 
         // when
@@ -128,7 +130,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `existsByDisplayId 성공 테스트`() = runTest {
         // given
-        val savedUser = repository.save(MockRegister)
+        val savedUser = repository.save(TestRegister)
         val displayId = savedUser.displayId
 
         // when
@@ -145,5 +147,16 @@ class AuthRepositoryImplTest {
 
         // then
         assertFalse(result)
+    }
+
+    companion object {
+        private val TestRegister = Register(
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "providerIDDDDD",
+            displayId = DisplayId("hong_gd_123"),
+            name = Name("honggd"),
+            profileImageUrl = "http://example.com/profile.jpg",
+            introduce = Introduce("Hello!"),
+        )
     }
 }

@@ -3,6 +3,8 @@ package com.peekr.domain.user.domain.model
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import java.time.Instant
 
@@ -22,8 +24,8 @@ import java.time.Instant
  */
 data class User(
     val id: UserId,
-    val role: RoleForUser,
-    val provider: SocialLoginProviderForUser,
+    val role: Role,
+    val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: DisplayId,
     val name: Name,

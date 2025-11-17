@@ -4,6 +4,8 @@ import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import com.peekr.common.db.DatabaseUtils.customPostgresEnum
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.javatime.timestamp
 

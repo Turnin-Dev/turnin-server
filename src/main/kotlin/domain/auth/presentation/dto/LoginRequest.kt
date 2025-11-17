@@ -1,7 +1,8 @@
 package com.peekr.domain.auth.presentation.dto
 
-import com.peekr.common.db.schema.SocialLoginProvider
+import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.validator.PeekrValidator.validation
+import com.peekr.domain.auth.application.dto.LoginDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,6 +24,13 @@ data class LoginRequest(
     }
 }
 
+// ------------------------------ Mapper ------------------------------
+fun LoginRequest.toDto(): LoginDto = LoginDto(
+    provider = provider,
+    providerId = providerId,
+)
+
+// ------------------------------ Validation ------------------------------
 fun LoginRequest.validate() {
     validation(providerId.isNotBlank()) { "providerId가 존재하지 않습니다." }
 }
