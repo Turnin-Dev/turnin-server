@@ -4,6 +4,8 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.RefreshTokens
+import com.peekr.common.db.schema.ReportReasons
+import com.peekr.common.db.schema.Reports
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -27,6 +29,8 @@ object TestDatabaseFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
+                ReportReasons,
+                Reports,
             )
         }
     }
@@ -39,6 +43,8 @@ object TestDatabaseFactory {
                 Keywords,
                 Friends,
                 Users,
+                ReportReasons,
+                Reports,
             )
 
             SchemaUtils.create(
@@ -47,6 +53,8 @@ object TestDatabaseFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
+                ReportReasons,
+                Reports,
             )
         }
     }

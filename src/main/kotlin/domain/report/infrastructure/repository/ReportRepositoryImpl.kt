@@ -20,11 +20,14 @@ class ReportRepositoryImpl : ReportRepository {
             .map { it.toDomain() }
     }
 
-    override suspend fun createReportReason(reason: ReportReason): ReportReason? = suspendTransaction {
+    override suspend fun createReportReason(
+        code: String,
+        description: String,
+    ): ReportReason? = suspendTransaction {
         ReportReasonEntity
             .new {
-                this.code = reason.code
-                this.description = reason.description
+                this.code = code
+                this.description = description
             }.toDomain()
     }
 

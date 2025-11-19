@@ -13,11 +13,15 @@ interface ReportRepository {
     /**
      * 신고 사유 생성
      *
-     * @param reason 신고 사유
+     * @param code 신고 사유 코드
+     * @param description 신고 사유 설명
      *
      * @return [ReportReason] 신고 사유
      */
-    suspend fun createReportReason(reason: ReportReason): ReportReason?
+    suspend fun createReportReason(
+        code: String,
+        description: String,
+    ): ReportReason?
 
     /**
      * 신고 생성
