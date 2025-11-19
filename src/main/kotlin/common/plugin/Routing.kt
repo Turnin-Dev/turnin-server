@@ -7,6 +7,8 @@ import com.peekr.domain.file.application.usecase.FileUseCase
 import com.peekr.domain.file.presentation.route.fileRoutes
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.route.keywordRoutes
+import com.peekr.domain.report.application.usecase.ReportUseCases
+import com.peekr.domain.report.presentation.route.reportRoutes
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.presentation.route.userRoutes
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
@@ -25,6 +27,7 @@ fun Application.configureRouting() {
     val fileUseCase by inject<FileUseCase>()
     val keywordUseCases by inject<KeywordUseCases>()
     val userKeywordUseCases by inject<UserKeywordUseCases>()
+    val reportUseCases by inject<ReportUseCases>()
 
     routing {
         customRoutingOption()
@@ -32,12 +35,13 @@ fun Application.configureRouting() {
         // Add Peekr routes
         route(Api.ROUTE, { description = "Peekr API" }) {
             route(Api.V1.ROUTE, { description = "Peekr API V1" }) {
-                authRoutes(route = Api.V1.Auth, authUseCases = authUseCases)
-                fileRoutes(route = Api.V1.File, fileUseCase = fileUseCase)
+                authRoutes(route = Api.V1.Auth, usecase = authUseCases)
+                fileRoutes(route = Api.V1.File, usecase = fileUseCase)
                 authenticatedRoute {
-                    userRoutes(route = Api.V1.User, userUseCases = userUseCases)
+                    userRoutes(route = Api.V1.User, usecase = userUseCases)
                     keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
                     userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
+                    reportRoutes(route = Api.V1.Report, usecase = reportUseCases)
                 }
             }
         }

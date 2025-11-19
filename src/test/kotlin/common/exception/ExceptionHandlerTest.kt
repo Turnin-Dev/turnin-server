@@ -1,6 +1,7 @@
 package com.peekr.common.exception
 
 import com.peekr.common.exception.ExceptionTestDoubles.MockEmptyTestRequest
+import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.plugin.configureContentNegotiation
 import com.peekr.common.validator.PeekrValidator.validation
 import com.peekr.util.TestClientFactory.createTestClient

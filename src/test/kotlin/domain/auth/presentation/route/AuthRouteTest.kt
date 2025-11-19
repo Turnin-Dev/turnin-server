@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.presentation.route
 
-import com.peekr.common.exception.CommonErrorCode
+import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.application.dto.JWTTokenDto
 import com.peekr.common.model.DisplayId

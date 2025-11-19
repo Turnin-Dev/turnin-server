@@ -1,7 +1,7 @@
 package com.peekr.domain.file.presentation.route
 
-import com.peekr.common.exception.CommonErrorCode
 import com.peekr.common.exception.ErrorResponse
+import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.route.Api
 import com.peekr.domain.file.application.usecase.FileUseCase
@@ -17,7 +17,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 
-fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
+fun Route.fileRoutes(route: Api.V1.File, usecase: FileUseCase) {
     route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "File API"
@@ -27,7 +27,7 @@ fun Route.fileRoutes(route: Api.V1.File, fileUseCase: FileUseCase) {
             val mimeRaw = call.request.queryParameters["mime"]
             val fileName = fileNameRaw?.trim().validateFileNameAndReturn()
             val mime = mimeRaw?.trim().validateImageMimeAndReturn()
-            val uploadFileInfoDto = fileUseCase(fileName, mime)
+            val uploadFileInfoDto = usecase(fileName, mime)
             call.response.headers.append(HttpHeaders.CacheControl, "no-store")
             call.respond(
                 HttpStatusCode.OK,
