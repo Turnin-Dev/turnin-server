@@ -4,6 +4,7 @@ import com.peekr.common.jwt.di.jwtModule
 import com.peekr.domain.auth.di.authModule
 import com.peekr.domain.file.di.fileModule
 import com.peekr.domain.keyword.di.keywordModule
+import com.peekr.domain.report.di.reportModule
 import com.peekr.domain.user.di.userModule
 import com.peekr.domain.userKeyword.di.userKeywordModule
 import io.ktor.server.application.Application
@@ -24,6 +25,7 @@ fun Application.configureKoin() {
             fileModule,
             keywordModule,
             userKeywordModule,
+            reportModule,
         )
     }
 }

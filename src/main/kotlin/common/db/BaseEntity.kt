@@ -114,4 +114,10 @@ abstract class BaseEntityClass<E : BaseEntity>(table: BaseLongIdTable) : LongEnt
     }
 }
 
+/**
+ * 타임스탬프 기능이 없는 베이스 엔티티 클래스
+ */
+abstract class BaseEntityClassWithoutTimestamp<E : BaseEntityWithoutTimestamp>(table: BaseLongIdTableWithoutTimestamp) :
+    LongEntityClass<E>(table)
+
 private val LOGGER = KtorSimpleLogger("BaseEntity")
