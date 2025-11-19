@@ -34,5 +34,5 @@ interface ReportRepository {
         reportedId: UserId,
         reasonId: ReportReasonId,
         customReason: String? = null,
-    ): Unit
+    )
 }
