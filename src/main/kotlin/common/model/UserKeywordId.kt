@@ -22,8 +22,8 @@ value class UserKeywordId(val value: Long) {
     }
 
     fun validateUserKeywordId() {
-        if (value <= 0) {
-            throw UserKeywordIdValidationException("사용자 키워드 ID는 0이나 음수가 될 수 없습니다.")
+        if (value < 0) {
+            throw UserKeywordIdValidationException("사용자 키워드 ID는 음수가 될 수 없습니다.")
         }
     }
 }

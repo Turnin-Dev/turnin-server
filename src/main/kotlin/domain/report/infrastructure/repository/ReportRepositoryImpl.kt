@@ -2,11 +2,10 @@ package com.peekr.domain.report.infrastructure.repository
 
 import com.peekr.common.db.schema.ReportEntity
 import com.peekr.common.db.schema.ReportReasonEntity
-import com.peekr.common.db.schema.ReportReasonId
 import com.peekr.common.db.schema.ReportReasons
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.UserId
+import com.peekr.domain.report.domain.model.Report
 import com.peekr.domain.report.domain.model.ReportReason
 import com.peekr.domain.report.domain.repository.ReportRepository
 import com.peekr.domain.report.infrastructure.mapper.ReportReasonMapper.toDomain
@@ -32,16 +31,13 @@ class ReportRepositoryImpl : ReportRepository {
     }
 
     override suspend fun createReport(
-        reporterId: UserId,
-        reportedId: UserId,
-        reasonId: ReportReasonId,
-        customReason: String?,
+        report: Report,
     ): Unit = suspendTransaction {
         ReportEntity.new {
-            this.reporterId = EntityID(reporterId.value, Users)
-            this.reportedId = EntityID(reportedId.value, Users)
-            this.reasonId = EntityID(reasonId.value, ReportReasons)
-            this.customReason = customReason
+            this.reporterId = EntityID(report.reporterId.value, Users)
+            this.reportedId = EntityID(report.reportedId.value, Users)
+            this.reasonId = EntityID(report.reasonId.value, ReportReasons)
+            this.customReason = report.customReason
         }
     }
 }
