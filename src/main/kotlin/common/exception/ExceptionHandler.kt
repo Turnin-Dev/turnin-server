@@ -47,6 +47,17 @@ fun Application.configureExceptionHandler() {
             )
         }
 
+        exception<DomainException> { call, cause ->
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                message = ErrorResponse(
+                    code = CommonErrorCode.DomainError.code,
+                    message = cause.message ?: CommonErrorCode.DomainError.description,
+                    status = HttpStatusCode.InternalServerError.value,
+                ),
+            )
+        }
+
         exception<IllegalArgumentException> { call, cause ->
             call.respond(
                 status = HttpStatusCode.BadRequest,

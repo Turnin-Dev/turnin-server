@@ -28,6 +28,12 @@ sealed class CommonErrorCode(
             ErrorCodes.EmptyRequest.Parameter.description,
         )
 
+    data object DomainError :
+        CommonErrorCode(
+            ErrorCodes.Domain.Invalid.code,
+            ErrorCodes.Domain.Invalid.description,
+        )
+
     object Unexpected : CommonErrorCode("UN001", "알 수 없는 오류입니다.")
 }
 
@@ -52,5 +58,12 @@ private object ErrorCodes {
     ) {
         Header("EMP001", "요청 헤더 값이 비어있습니다."),
         Parameter("EMP002", "요청 파라미터 값이 비어있습니다."),
+    }
+
+    enum class Domain(
+        val code: String,
+        val description: String,
+    ) {
+        Invalid("D001", "도메인 규칙 에러"),
     }
 }

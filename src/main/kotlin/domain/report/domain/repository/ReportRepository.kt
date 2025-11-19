@@ -1,7 +1,6 @@
 package com.peekr.domain.report.domain.repository
 
-import com.peekr.common.db.schema.ReportReasonId
-import com.peekr.common.model.UserId
+import com.peekr.domain.report.domain.model.Report
 import com.peekr.domain.report.domain.model.ReportReason
 
 interface ReportRepository {
@@ -26,17 +25,9 @@ interface ReportRepository {
     /**
      * 신고 생성
      *
-     * @param reporterId 신고자 ID
-     * @param reportedId 피신고자 ID
-     * @param reasonId 신고 사유 ID
-     * @param customReason 기타 신고 사유
+     * @param report 신고 도메인 모델
      *
      * @return 신고 생성에 성공하면 `true`, 실패하면 `false`를 반환한다.
      */
-    suspend fun createReport(
-        reporterId: UserId,
-        reportedId: UserId,
-        reasonId: ReportReasonId,
-        customReason: String? = null,
-    )
+    suspend fun createReport(report: Report)
 }
