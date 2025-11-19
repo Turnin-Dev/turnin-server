@@ -1,7 +1,9 @@
 package com.peekr.domain.report.application.usecase
 
 import com.peekr.common.db.schema.ReportReasonId
+import com.peekr.common.exception.common.CommonException
 import com.peekr.common.model.UserId
+import com.peekr.domain.report.application.dto.ReportDto
 import com.peekr.domain.report.domain.model.Report
 import com.peekr.domain.report.domain.repository.ReportRepository
 
@@ -12,12 +14,16 @@ import com.peekr.domain.report.domain.repository.ReportRepository
  */
 class CreateReportUseCase(private val reportRepository: ReportRepository) {
     suspend operator fun invoke(
-        reporterId: UserId,
-        reportedId: UserId,
-        reasonId: ReportReasonId,
-        customReason: String? = null,
+        ownerId: UserId,
+        reportDto: ReportDto,
     ) {
-        val report = Report(reporterId, reportedId, reasonId, customReason)
+        if (ownerId.value != reportDto.reporterId) {
+            throw CommonException.AccessDenied()
+        }
+        val reporterId = UserId(reportDto.reporterId)
+        val reportedId = UserId(reportDto.reportedId)
+        val reasonId = ReportReasonId(reportDto.reasonId)
+        val report = Report(reporterId, reportedId, reasonId, reportDto.customReason)
         reportRepository.createReport(report)
     }
 }

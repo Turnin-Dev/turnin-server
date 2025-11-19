@@ -1,4 +1,6 @@
-package com.peekr.common.exception
+package com.peekr.common.exception.common
+
+import com.peekr.common.exception.ApiErrorCode
 
 sealed class CommonErrorCode(
     code: String,
@@ -34,6 +36,12 @@ sealed class CommonErrorCode(
             ErrorCodes.Domain.Invalid.description,
         )
 
+    data object AccessDenied :
+        CommonErrorCode(
+            ErrorCodes.Auth.AccessDenied.code,
+            ErrorCodes.Auth.AccessDenied.description,
+        )
+
     object Unexpected : CommonErrorCode("UN001", "알 수 없는 오류입니다.")
 }
 
@@ -65,5 +73,12 @@ private object ErrorCodes {
         val description: String,
     ) {
         Invalid("D001", "도메인 규칙 에러"),
+    }
+
+    enum class Auth(
+        val code: String,
+        val description: String,
+    ) {
+        AccessDenied("AD001", "액세스 접근 불가"),
     }
 }

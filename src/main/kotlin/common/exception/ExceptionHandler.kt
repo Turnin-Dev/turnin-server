@@ -2,6 +2,7 @@ package com.peekr.common.exception
 
 import com.peekr.common.db.DatabaseErrorMessage
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.validator.ValidatorException
 import io.ktor.http.HttpStatusCode

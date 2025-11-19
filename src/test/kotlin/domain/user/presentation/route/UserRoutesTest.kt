@@ -1,7 +1,7 @@
 package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.exception.ApiException
-import com.peekr.common.exception.CommonErrorCode
+import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name

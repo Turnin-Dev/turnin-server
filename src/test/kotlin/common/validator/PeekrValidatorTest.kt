@@ -1,7 +1,7 @@
 package com.peekr.common.validator
 
 import com.peekr.common.exception.ApiException
-import com.peekr.common.exception.CommonErrorCode
+import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.validator.PeekrValidator.validation
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
