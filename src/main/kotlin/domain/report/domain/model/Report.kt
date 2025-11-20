@@ -2,7 +2,6 @@ package com.peekr.domain.report.domain.model
 
 import com.peekr.common.exception.DomainException
 import com.peekr.common.model.ReportId
-import org.flywaydb.core.internal.reports.ReportDetails
 
 class ReportDomainException(message: String) : DomainException(message)
 
@@ -14,5 +13,5 @@ class ReportDomainException(message: String) : DomainException(message)
  */
 data class Report(
     val id: ReportId,
-    val details: ReportDetails,
+    val details: ReportDetail,
 )
