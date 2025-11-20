@@ -8,7 +8,7 @@ package com.peekr.domain.report.application.dto
  * @param reasonId 신고 사유 ID
  * @param customReason 기타 신고 사유
  */
-data class ReportDto(
+data class ReportDetailDto(
     val reporterId: Long,
     val reportedId: Long,
     val reasonId: Long,

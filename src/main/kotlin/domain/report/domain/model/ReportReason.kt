@@ -1,6 +1,6 @@
 package com.peekr.domain.report.domain.model
 
-import com.peekr.common.db.schema.ReportReasonId
+import com.peekr.common.model.ReportReasonId
 
 /**
  * 신고 사유 엔티티 모델

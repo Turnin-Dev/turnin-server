@@ -1,8 +1,8 @@
 package com.peekr.domain.report.application.usecase
 
-import com.peekr.common.db.schema.ReportReasonId
+import com.peekr.common.model.ReportReasonId
 import com.peekr.common.model.UserId
-import com.peekr.domain.report.application.dto.ReportDto
+import com.peekr.domain.report.application.dto.ReportDetailDto
 import com.peekr.domain.report.domain.repository.ReportRepository
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -26,7 +26,7 @@ class CreateReportUseCaseTest {
 
         // when, then
         assertDoesNotThrow {
-            usecase(TestReporterId, TestReportDto)
+            usecase(TestReporterId, TestReportDetailDto)
         }
     }
 
@@ -39,7 +39,7 @@ class CreateReportUseCaseTest {
 
         // when
         val exception = runCatching {
-            usecase(UserId(100L), TestReportDto)
+            usecase(UserId(100L), TestReportDetailDto)
         }.exceptionOrNull()
 
         // then
@@ -50,7 +50,7 @@ class CreateReportUseCaseTest {
         private val TestReporterId = UserId(1L)
         private val TestReportedId = UserId(2L)
         private val TestReportReasonId = ReportReasonId(1L)
-        private val TestReportDto = ReportDto(
+        private val TestReportDetailDto = ReportDetailDto(
             reporterId = TestReporterId.value,
             reportedId = TestReportedId.value,
             reasonId = TestReportReasonId.value,

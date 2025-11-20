@@ -27,7 +27,6 @@ fun AuthenticatedRoute.reportRoutes(route: Api.V1.Report, usecase: ReportUseCase
 
         post({ createReportDocs() }) {
             val ownerId = extractUserIdWithToken()
-            verifyAuthUserId(ownerId)
             val reportRequest = call.receive<ReportRequest>()
             usecase.createReport(ownerId, reportRequest.toDto())
             call.respond(HttpStatusCode.NoContent)
