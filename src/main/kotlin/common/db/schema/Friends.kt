@@ -4,17 +4,17 @@ import com.peekr.common.db.BaseEntity
 import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import com.peekr.common.db.DatabaseUtils.customPostgresEnum
+import com.peekr.common.db.DatabaseUtils.timestamptz
 import com.peekr.common.model.FriendStatus
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
-import org.jetbrains.exposed.sql.javatime.timestamp
 
 /** 친구 엔티티 클래스 (복수형) */
 object Friends : BaseLongIdTable("friend") {
     val requesterId = reference("requester_id", Users, onDelete = ReferenceOption.RESTRICT)
     val receiverId = reference("receiver_id", Users, onDelete = ReferenceOption.RESTRICT)
     val status = customPostgresEnum<FriendStatus>("status", "friend_status").default(FriendStatus.PENDING)
-    val respondedAt = timestamp("responded_at").nullable()
+    val respondedAt = timestamptz("responded_at").nullable()
 
     init {
         // 중복 친구 요청 방지

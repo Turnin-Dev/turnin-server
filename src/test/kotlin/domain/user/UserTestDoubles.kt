@@ -10,6 +10,7 @@ import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
+import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.user.application.dto.UserDto
 import java.time.Instant
 import org.jetbrains.exposed.dao.id.EntityID
@@ -37,7 +38,7 @@ object UserTestDoubles {
             this.requesterId = EntityID(requesterId, Users)
             this.receiverId = EntityID(receiverId, Users)
             this.status = status
-            respondedAt = Instant.now()
+            respondedAt = Instant.now().toOffsetDateTime()
         }
     }
 

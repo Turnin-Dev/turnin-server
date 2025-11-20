@@ -6,7 +6,6 @@ import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.domain.report.domain.model.ReportDetail
-import com.peekr.util.DatabaseTestRule
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.assertEquals
@@ -14,14 +13,22 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 class ReportRepositoryImplTest {
-    @get:Rule
-    val databaseTestRule = DatabaseTestRule()
-
     private val repository = ReportRepositoryImpl()
+
+    @Before
+    fun setUp() {
+        TestDatabaseFactory.init()
+    }
+
+    @After
+    fun teardown() {
+        TestDatabaseFactory.cleanUp()
+    }
 
     @Test
     fun `신고 사유 생성 성공 테스트`() = runTest {
