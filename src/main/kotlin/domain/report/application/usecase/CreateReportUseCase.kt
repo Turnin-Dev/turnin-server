@@ -1,10 +1,10 @@
 package com.peekr.domain.report.application.usecase
 
-import com.peekr.common.db.schema.ReportReasonId
 import com.peekr.common.exception.common.CommonException
+import com.peekr.common.model.ReportReasonId
 import com.peekr.common.model.UserId
-import com.peekr.domain.report.application.dto.ReportDto
-import com.peekr.domain.report.domain.model.Report
+import com.peekr.domain.report.application.dto.ReportDetailDto
+import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.domain.report.domain.repository.ReportRepository
 
 /**
@@ -15,15 +15,15 @@ import com.peekr.domain.report.domain.repository.ReportRepository
 class CreateReportUseCase(private val reportRepository: ReportRepository) {
     suspend operator fun invoke(
         ownerId: UserId,
-        reportDto: ReportDto,
+        reportDetailDto: ReportDetailDto,
     ) {
-        if (ownerId.value != reportDto.reporterId) {
+        if (ownerId.value != reportDetailDto.reporterId) {
             throw CommonException.AccessDenied()
         }
-        val reporterId = UserId(reportDto.reporterId)
-        val reportedId = UserId(reportDto.reportedId)
-        val reasonId = ReportReasonId(reportDto.reasonId)
-        val report = Report(reporterId, reportedId, reasonId, reportDto.customReason)
+        val reporterId = UserId(reportDetailDto.reporterId)
+        val reportedId = UserId(reportDetailDto.reportedId)
+        val reasonId = ReportReasonId(reportDetailDto.reasonId)
+        val report = ReportDetail(reporterId, reportedId, reasonId, reportDetailDto.customReason)
         reportRepository.createReport(report)
     }
 }

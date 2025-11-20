@@ -1,6 +1,6 @@
 package com.peekr.domain.report.presentation.dto
 
-import com.peekr.domain.report.application.dto.ReportDto
+import com.peekr.domain.report.application.dto.ReportDetailDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,8 +23,8 @@ data class ReportRequest(
     }
 }
 
-fun ReportRequest.toDto(): ReportDto =
-    ReportDto(
+fun ReportRequest.toDto(): ReportDetailDto =
+    ReportDetailDto(
         reporterId = reporterId,
         reportedId = reportedId,
         reasonId = reasonId,
