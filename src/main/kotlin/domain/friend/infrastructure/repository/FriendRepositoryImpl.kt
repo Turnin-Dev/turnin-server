@@ -36,7 +36,6 @@ class FriendRepositoryImpl : FriendRepository {
             .map { it.toDomain() }
     }
 
-    // TODO: 이미 존재하는 요청(중복 요청 방지) 혹은 자기 자신에게 요청 하는 것에 대한 유효성 검사 필요
     override suspend fun createFriend(
         requesterId: UserId,
         receiverId: UserId,

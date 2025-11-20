@@ -1,5 +1,6 @@
 package com.peekr.domain.user.di
 
+import com.peekr.domain.user.application.provider.UserProviderApi
 import com.peekr.domain.user.application.usecase.GetUserProfileUseCase
 import com.peekr.domain.user.application.usecase.GetUserUseCase
 import com.peekr.domain.user.application.usecase.UpdateIntroduceUseCase
@@ -10,6 +11,9 @@ import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
 import org.koin.dsl.module
 
 val userModule = module {
+    // Provider
+    single<UserProviderApi> { UserProviderApi(get()) }
+
     // Repository
     single<UserRepository> { UserRepositoryImpl() }
 

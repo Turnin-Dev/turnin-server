@@ -59,6 +59,19 @@ class FriendRepositoryImplTest {
     }
 
     @Test
+    fun `친구 요청 실패 테스트 - 이미 존재하는 요청이 있다면 중복 데이터 예외가 발생한다`() = runTest {
+        val userId1 = insertUserAndReturnId("a")
+        val userId2 = insertUserAndReturnId("b")
+        // 첫번째 요청
+        repository.createFriend(userId1, userId2)
+
+        assertThrows<DatabaseException.DuplicatedDataException> {
+            // 두번째 요청 - 예외 발생
+            repository.createFriend(userId1, userId2)
+        }
+    }
+
+    @Test
     fun `친구 상태 수정 성공 테스트`() = runTest {
         // given
         val userId1 = insertUserAndReturnId("a")
