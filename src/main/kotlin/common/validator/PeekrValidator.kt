@@ -1,7 +1,7 @@
 package com.peekr.common.validator
 
 import com.peekr.common.exception.ApiException
-import com.peekr.common.exception.CommonErrorCode
+import com.peekr.common.exception.common.CommonErrorCode
 import io.ktor.http.HttpStatusCode
 
 /** 유효성 검사 유틸 */

@@ -2,6 +2,7 @@ package com.peekr.common.exception
 
 import com.peekr.common.db.DatabaseErrorMessage
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.validator.ValidatorException
 import io.ktor.http.HttpStatusCode
@@ -43,6 +44,17 @@ fun Application.configureExceptionHandler() {
                     code = CommonErrorCode.ValidationDefault.code,
                     message = cause.message ?: CommonErrorCode.ValidationDefault.description,
                     status = HttpStatusCode.BadRequest.value,
+                ),
+            )
+        }
+
+        exception<DomainException> { call, cause ->
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                message = ErrorResponse(
+                    code = CommonErrorCode.DomainError.code,
+                    message = cause.message ?: CommonErrorCode.DomainError.description,
+                    status = HttpStatusCode.InternalServerError.value,
                 ),
             )
         }

@@ -21,14 +21,14 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 
 // ------------------------------ Route ------------------------------
-fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases) {
+fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
     route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "User API"
     }) {
         get({ getUserByIdDocs() }) {
             val userId = extractUserIdWithToken()
-            val user = userUseCases.get(userId)
+            val user = usecase.get(userId)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {
@@ -41,7 +41,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
 
         get(route.PROFILE, { getUserProfileByIdDocs() }) {
             val userId = extractUserIdWithToken()
-            val user = userUseCases.getProfile(userId)
+            val user = usecase.getProfile(userId)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {
@@ -56,7 +56,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
             val userPatchRequest = call.receive<UserPatchRequest>()
             val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
-            val result = userUseCases.update(userId, userPatchRequest.toDto())
+            val result = usecase.update(userId, userPatchRequest.toDto())
             if (result) {
                 call.respond(HttpStatusCode.NoContent)
             } else {
@@ -71,7 +71,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, userUseCases: UserUseCases
             val introducePatchRequest = call.receive<IntroducePatchRequest>()
             val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
-            val result = userUseCases.updateIntroduce(userId, introducePatchRequest.introduce)
+            val result = usecase.updateIntroduce(userId, introducePatchRequest.introduce)
             if (result) {
                 call.respond(HttpStatusCode.NoContent)
             } else {
