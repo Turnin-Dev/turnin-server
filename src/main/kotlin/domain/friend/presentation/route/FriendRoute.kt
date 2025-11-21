@@ -42,7 +42,6 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
             }
 
             val friendDto = usecase.add(
-                ownerId = userId,
                 requesterId = addFriendRequest.requesterId,
                 receiverId = addFriendRequest.receiverId,
             )
@@ -55,8 +54,15 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
         patch(route.STATUS, { updateFriendStatusDocs() }) {
             val userId = extractUserIdWithToken()
             val updateFriendStatusRequest = call.receive<UpdateFriendStatusRequest>()
+
+            // 인증된 사용자가 requesterId와 일치하는지 검증
+            if (userId.value != updateFriendStatusRequest.requesterId) {
+                call.respond(HttpStatusCode.Forbidden)
+                return@patch
+            }
+
             val result = usecase.updateStatus(
-                userId1 = userId.value,
+                userId1 = updateFriendStatusRequest.requesterId,
                 userId2 = updateFriendStatusRequest.receiverId,
                 status = updateFriendStatusRequest.status,
             )
@@ -128,7 +134,7 @@ private fun RouteConfig.addFriendDocs() {
             }
         }
         code(HttpStatusCode.Forbidden) {
-            description = "요청자 ID와 실제 요청을 한 사용자가 같지 않은 경우"
+            description = "요청자 ID와 실제 요청을 한 사용자 ID가 같지 않은 경우"
         }
         code(HttpStatusCode.NotFound) {
             description = "사용자가 존재하지 않는 경우"
@@ -157,6 +163,9 @@ private fun RouteConfig.updateFriendStatusDocs() {
         code(HttpStatusCode.NotFound) {
             description = "친구 상태 수정 실패 시 혹은 수정 대상 사용자를 찾지 못하는 경우"
         }
+        code(HttpStatusCode.Forbidden) {
+            description = "요청자 ID와 실제 요청을 한 사용자 ID가 같지 않은 경우"
+        }
     }
 }
 
@@ -177,6 +186,9 @@ private fun RouteConfig.deleteFriendDocs() {
         }
         code(HttpStatusCode.NotFound) {
             description = "친구 삭제 실패 시 혹은 삭제 대상 사용자를 찾지 못하는 경우"
+        }
+        code(HttpStatusCode.Forbidden) {
+            description = "실제 요청을 한 사용자 ID가 요청자 ID, 요청 받을 ID와 모두 같지 않은 경우"
         }
     }
 }
