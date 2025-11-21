@@ -5,6 +5,8 @@ import com.peekr.domain.auth.application.usecase.AuthUseCases
 import com.peekr.domain.auth.presentation.route.authRoutes
 import com.peekr.domain.file.application.usecase.FileUseCase
 import com.peekr.domain.file.presentation.route.fileRoutes
+import com.peekr.domain.friend.application.usecase.FriendUseCases
+import com.peekr.domain.friend.presentation.route.friendRoutes
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.route.keywordRoutes
 import com.peekr.domain.report.application.usecase.ReportUseCases
@@ -28,6 +30,7 @@ fun Application.configureRouting() {
     val keywordUseCases by inject<KeywordUseCases>()
     val userKeywordUseCases by inject<UserKeywordUseCases>()
     val reportUseCases by inject<ReportUseCases>()
+    val friendUseCases by inject<FriendUseCases>()
 
     routing {
         customRoutingOption()
@@ -42,6 +45,7 @@ fun Application.configureRouting() {
                     keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
                     userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
                     reportRoutes(route = Api.V1.Report, usecase = reportUseCases)
+                    friendRoutes(route = Api.V1.Friend, usecase = friendUseCases)
                 }
             }
         }
