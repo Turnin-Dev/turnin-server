@@ -48,6 +48,3 @@ fun FriendDto.toResponse(): FriendResponse =
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
-
-fun List<FriendDto>.toResponse(): List<FriendResponse> =
-    this.map { it.toResponse() }
