@@ -1,6 +1,7 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.exception.common.CommonException
 import com.peekr.common.model.FriendId
 import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.UserId
@@ -31,7 +32,11 @@ class AddFriendUseCaseTest {
         } returns true
 
         // when
-        val friendDto = usecase(TestRequesterId.value, TestReceiverId.value)
+        val friendDto = usecase(
+            ownerId = TestOwnerId,
+            requesterId = TestRequesterId.value,
+            receiverId = TestReceiverId.value,
+        )
 
         // then
         assertEquals(TestRequesterId.value, friendDto.requesterId)
@@ -47,12 +52,16 @@ class AddFriendUseCaseTest {
 
         // when, then
         assertThrows<FriendException.UserNotFoundException> {
-            usecase(TestRequesterId.value, TestReceiverId.value)
+            usecase(
+                ownerId = TestOwnerId,
+                requesterId = TestRequesterId.value,
+                receiverId = TestReceiverId.value,
+            )
         }
     }
 
     @Test
-    fun `친구 요청한 ID와 요청 받은 ID가 같을 때 예외가 발생한다`() = runTest {
+    fun `친구 요청한 사용자 ID와 요청 받은 사용자 ID가 같을 때 예외가 발생한다`() = runTest {
         // given
         coEvery {
             userProvider.existsUser(TestRequesterId)
@@ -60,7 +69,7 @@ class AddFriendUseCaseTest {
 
         // when, then
         assertThrows<FriendException.SelfRequestException> {
-            usecase(1L, 1L)
+            usecase(TestOwnerId, 1L, 1L)
         }
     }
 
@@ -76,11 +85,27 @@ class AddFriendUseCaseTest {
 
         // when, then
         assertThrows<FriendException.AlreadyFriendRequestException> {
-            usecase(TestRequesterId.value, TestReceiverId.value)
+            usecase(
+                ownerId = TestOwnerId,
+                requesterId = TestRequesterId.value,
+                receiverId = TestReceiverId.value,
+            )
+        }
+    }
+
+    @Test
+    fun `친구 요청한 사용자 ID와 실제 요청을 호출한 사용자 ID가 같지 않은 경우 예외가 발생한다`() = runTest {
+        assertThrows<CommonException.AccessDenied> {
+            usecase(
+                ownerId = UserId(3L),
+                requesterId = 1L,
+                receiverId = 2L,
+            )
         }
     }
 
     companion object {
+        private val TestOwnerId = UserId(1L)
         private val TestRequesterId = UserId(1L)
         private val TestReceiverId = UserId(2L)
         private val TestFriend = Friend(
