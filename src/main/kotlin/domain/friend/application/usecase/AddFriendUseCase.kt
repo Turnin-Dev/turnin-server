@@ -25,7 +25,6 @@ class AddFriendUseCase(
      * @return [FriendDto]
      */
     suspend operator fun invoke(
-        ownerId: UserId,
         requesterId: Long,
         receiverId: Long,
     ): FriendDto {
@@ -33,7 +32,7 @@ class AddFriendUseCase(
         val receiverIdVO = UserId(receiverId)
 
         // 1) 요청 받을 사용자가 존재하지 않으면 요청을 할 수 없다.
-        if (!userProvider.existsUser(UserId(receiverId))) {
+        if (!userProvider.existsUser(receiverIdVO)) {
             throw FriendException.UserNotFoundException()
         }
 

@@ -30,7 +30,7 @@ class FriendRouteTest {
     fun setUp() {
         coEvery { usecase.getFriends(TestUserId) } returns listOf(TestFriendDto)
         coEvery {
-            usecase.add(ownerId = TestUserId, TestRequesterId.value, TestReceiverId.value)
+            usecase.add(TestRequesterId.value, TestReceiverId.value)
         } returns TestFriendDto
         coEvery {
             usecase.updateStatus(
@@ -158,7 +158,7 @@ class FriendRouteTest {
             message = "unexpected error",
         )
         coEvery {
-            usecase.add(TestUserId, TestRequesterId.value, TestReceiverId.value)
+            usecase.add(TestRequesterId.value, TestReceiverId.value)
         } throws expectedApiException
 
         testPostEndpoint(
@@ -210,6 +210,24 @@ class FriendRouteTest {
             },
             tokenSubject = TestUserId.value.toString(),
             expectedStatus = HttpStatusCode.OK,
+        )
+    }
+
+    @Test
+    fun `친구 상태 수정 - 인증된 사용자 ID와 requesterId가 같지 않은 경우 Forbidden을 반환한다`() = testApplication {
+        val invalidRequesterId = 10L
+
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.STATUS}",
+            queryParameters = null,
+            requestBody = TestUpdateFriendStatusRequest.copy(requesterId = invalidRequesterId),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { friendRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.Forbidden,
         )
     }
 
@@ -297,7 +315,23 @@ class FriendRouteTest {
     }
 
     @Test
-    fun `친구 삭제 -예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+    fun `친구 삭제 - 인증된 사용자 ID가 requesterId, receiveId 둘 중 아무와도 일치하지 않는 경우 Forbidden을 반환한다`() = testApplication {
+        testDeleteEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestDeleteFriendRequest.copy(requesterId = 10L, receiverId = 11L),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { friendRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.Forbidden,
+        )
+    }
+
+    @Test
+    fun `친구 삭제 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
         val expectedApiException = ApiException(
             errorCode = CommonErrorCode.Unexpected,
             status = HttpStatusCode.InternalServerError,
@@ -363,22 +397,6 @@ class FriendRouteTest {
         )
     }
 
-    @Test
-    fun `친구 삭제 - 인증된 사용자 ID가 requesterId, receiveId 둘 중 아무와도 일치하지 않는 경우 Forbidden을 반환한다`() = testApplication {
-        testDeleteEndpoint(
-            endpoint = route.ROUTE,
-            queryParameters = null,
-            requestBody = TestDeleteFriendRequest.copy(requesterId = 10L, receiverId = 11L),
-            testPlugin = {
-                testPlugin(
-                    authRouting = { friendRoutes(route, usecase) },
-                )
-            },
-            tokenSubject = TestUserId.value.toString(),
-            expectedStatus = HttpStatusCode.Forbidden,
-        )
-    }
-
     companion object {
         private val TestUserId = UserId(1L)
         private val TestRequesterId = UserId(1L)
@@ -397,6 +415,7 @@ class FriendRouteTest {
             receiverId = TestReceiverId.value,
         )
         private val TestUpdateFriendStatusRequest = UpdateFriendStatusRequest(
+            requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
             status = FriendStatus.ACCEPTED,
         )

@@ -32,7 +32,6 @@ class AddFriendUseCaseTest {
 
         // when
         val friendDto = usecase(
-            ownerId = TestOwnerId,
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
         )
@@ -52,7 +51,6 @@ class AddFriendUseCaseTest {
         // when, then
         assertThrows<FriendException.UserNotFoundException> {
             usecase(
-                ownerId = TestOwnerId,
                 requesterId = TestRequesterId.value,
                 receiverId = TestReceiverId.value,
             )
@@ -68,7 +66,7 @@ class AddFriendUseCaseTest {
 
         // when, then
         assertThrows<FriendException.SelfRequestException> {
-            usecase(TestOwnerId, 1L, 1L)
+            usecase(1L, 1L)
         }
     }
 
@@ -85,7 +83,6 @@ class AddFriendUseCaseTest {
         // when, then
         assertThrows<FriendException.AlreadyFriendRequestException> {
             usecase(
-                ownerId = TestOwnerId,
                 requesterId = TestRequesterId.value,
                 receiverId = TestReceiverId.value,
             )
