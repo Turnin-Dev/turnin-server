@@ -92,7 +92,7 @@ class ReportRouteTest {
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedStatus = HttpStatusCode.NoContent,
+            expectedStatus = HttpStatusCode.Created,
         )
     }
 

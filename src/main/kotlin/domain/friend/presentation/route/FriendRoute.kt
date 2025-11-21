@@ -39,7 +39,10 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
                 requesterId = addFriendRequest.requesterId,
                 receiverId = addFriendRequest.receiverId,
             )
-            call.respond(friendDto.toResponse())
+            call.respond(
+                status = HttpStatusCode.Created,
+                message = friendDto.toResponse(),
+            )
         }
 
         patch(route.STATUS, { updateFriendStatusDocs() }) {
