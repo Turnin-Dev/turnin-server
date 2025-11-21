@@ -29,7 +29,7 @@ fun AuthenticatedRoute.reportRoutes(route: Api.V1.Report, usecase: ReportUseCase
             val ownerId = extractUserIdWithToken()
             val reportRequest = call.receive<ReportRequest>()
             usecase.createReport(ownerId, reportRequest.toDto())
-            call.respond(HttpStatusCode.NoContent)
+            call.respond(HttpStatusCode.Created)
         }
     }
 }
