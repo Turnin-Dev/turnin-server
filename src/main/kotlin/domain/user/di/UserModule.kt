@@ -12,7 +12,7 @@ import org.koin.dsl.module
 
 val userModule = module {
     // Provider
-    single<UserProviderApi> { UserProviderApi(get()) }
+    factory { UserProviderApi(get()) }
 
     // Repository
     single<UserRepository> { UserRepositoryImpl() }
