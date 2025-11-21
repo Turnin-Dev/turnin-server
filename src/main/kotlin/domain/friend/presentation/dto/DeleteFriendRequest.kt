@@ -3,8 +3,8 @@ package com.peekr.domain.friend.presentation.dto
 /**
  * 친구 삭제 요청 바디
  *
- * @property requesterId 친구 상태 수정을 요청한 사용자 ID
- * @property receiverId 친구 상태 수정 대상 사용자 ID
+ * @property requesterId 친구 삭제를 요청한 사용자 ID
+ * @property receiverId 친구 삭제 대상 사용자 ID
  */
 data class DeleteFriendRequest(
     val requesterId: Long,
