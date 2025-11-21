@@ -61,7 +61,7 @@ private fun RouteConfig.createReportDocs() {
         }
     }
     response {
-        code(HttpStatusCode.NoContent) {
+        code(HttpStatusCode.Created) {
             description = "신고 요청 성공 시"
         }
         code(HttpStatusCode.Forbidden) {

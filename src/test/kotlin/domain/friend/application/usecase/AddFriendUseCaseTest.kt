@@ -1,7 +1,6 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.db.DatabaseException
-import com.peekr.common.exception.common.CommonException
 import com.peekr.common.model.FriendId
 import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.UserId
@@ -28,7 +27,7 @@ class AddFriendUseCaseTest {
             friendRepository.createFriend(TestRequesterId, TestReceiverId)
         } returns TestFriend
         coEvery {
-            userProvider.existsUser(TestRequesterId)
+            userProvider.existsUser(TestReceiverId)
         } returns true
 
         // when
@@ -47,7 +46,7 @@ class AddFriendUseCaseTest {
     fun `요청 받을 사용자가 존재하지 않을 때 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            userProvider.existsUser(TestRequesterId)
+            userProvider.existsUser(TestReceiverId)
         } returns false
 
         // when, then
@@ -80,7 +79,7 @@ class AddFriendUseCaseTest {
             friendRepository.createFriend(TestRequesterId, TestReceiverId)
         } throws DatabaseException.DuplicatedDataException(Throwable())
         coEvery {
-            userProvider.existsUser(TestRequesterId)
+            userProvider.existsUser(TestReceiverId)
         } returns true
 
         // when, then
@@ -89,17 +88,6 @@ class AddFriendUseCaseTest {
                 ownerId = TestOwnerId,
                 requesterId = TestRequesterId.value,
                 receiverId = TestReceiverId.value,
-            )
-        }
-    }
-
-    @Test
-    fun `친구 요청한 사용자 ID와 실제 요청을 호출한 사용자 ID가 같지 않은 경우 예외가 발생한다`() = runTest {
-        assertThrows<CommonException.AccessDenied> {
-            usecase(
-                ownerId = UserId(3L),
-                requesterId = 1L,
-                receiverId = 2L,
             )
         }
     }

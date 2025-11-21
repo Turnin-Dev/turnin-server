@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
  * 친구 요청 바디
  *
  * @property requesterId 친구 요청을 한 사용자 ID
- * @property receiverId 친구 요청을 벋을 사용자 ID
+ * @property receiverId 친구 요청을 받을 사용자 ID
  */
 @Serializable
 data class AddFriendRequest(

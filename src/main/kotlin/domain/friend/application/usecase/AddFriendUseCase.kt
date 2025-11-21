@@ -1,7 +1,6 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.db.DatabaseException
-import com.peekr.common.exception.common.CommonException
 import com.peekr.common.model.UserId
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.dto.toDto
@@ -19,6 +18,7 @@ class AddFriendUseCase(
     /**
      * 친구 추가(요청)
      *
+     * @param ownerId 실제로 친구 요청한 사용자 ID
      * @param requesterId 친구 요청한 사용자 ID
      * @param receiverId 친구 요청받을 사용자 ID
      *
@@ -32,26 +32,21 @@ class AddFriendUseCase(
         val requesterIdVO = UserId(requesterId)
         val receiverIdVO = UserId(receiverId)
 
-        // 1) 요청자 ID와 실제 요청을 한 사용자가 같아야 한다.
-        if (requesterIdVO != ownerId) {
-            throw CommonException.AccessDenied()
-        }
-
-        // 2) 사용자가 존재하지 않으면 요청을 할 수 없다.
-        if (!userProvider.existsUser(UserId(requesterId))) {
+        // 1) 요청 받을 사용자가 존재하지 않으면 요청을 할 수 없다.
+        if (!userProvider.existsUser(UserId(receiverId))) {
             throw FriendException.UserNotFoundException()
         }
 
-        // 3) 본인에게 친구 추가를 할 수 없다.
+        // 2) 본인에게 친구 추가를 할 수 없다.
         if (requesterId == receiverId) {
             throw FriendException.SelfRequestException()
         }
 
-        // 4) 이미 친구 요청을 했거나 친구 상태인 경우
+        // 3) 이미 친구 요청을 했거나 친구 상태인 경우
         return try {
             friendRepository.createFriend(requesterIdVO, receiverIdVO).toDto()
         } catch (e: DatabaseException.DuplicatedDataException) {
-            throw FriendException.AlreadyFriendRequestException()
+            throw FriendException.AlreadyFriendRequestException(e)
         }
     }
 }
