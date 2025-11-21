@@ -9,6 +9,8 @@ import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserId
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -17,19 +19,17 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
-import org.junit.After
-import org.junit.Before
 import org.junit.jupiter.api.assertThrows
 
 class FriendRepositoryImplTest {
     private val repository = FriendRepositoryImpl()
 
-    @Before
+    @BeforeTest
     fun setUp() {
         TestDatabaseFactory.init()
     }
 
-    @After
+    @AfterTest
     fun teardown() {
         TestDatabaseFactory.cleanUp()
     }

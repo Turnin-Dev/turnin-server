@@ -7,10 +7,10 @@ import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.jupiter.api.assertThrows
 
 class UpdateFriendStatusUseCaseTest {
@@ -18,7 +18,7 @@ class UpdateFriendStatusUseCaseTest {
     private val userProvider: UserProvider = mockk()
     private val usecase = UpdateFriendStatusUseCase(friendRepository, userProvider)
 
-    @Before
+    @BeforeTest
     fun setUp() {
         coEvery { userProvider.existsUser(TestUserId1) } returns true
         coEvery { userProvider.existsUser(TestUserId2) } returns true

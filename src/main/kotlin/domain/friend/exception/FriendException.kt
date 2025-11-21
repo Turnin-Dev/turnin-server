@@ -22,9 +22,10 @@ sealed class FriendException(
             status = HttpStatusCode.NotFound,
         )
 
-    class AlreadyFriendRequestException :
+    class AlreadyFriendRequestException(cause: Throwable? = null) :
         FriendException(
             code = FriendErrorCode.AlreadyFriendRequest,
             status = HttpStatusCode.Conflict,
+            cause = cause,
         )
 }

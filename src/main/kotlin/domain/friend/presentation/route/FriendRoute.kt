@@ -34,6 +34,13 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
         post({ addFriendDocs() }) {
             val userId = extractUserIdWithToken()
             val addFriendRequest = call.receive<AddFriendRequest>()
+
+            // 인증된 사용자가 requesterId와 일치하는지 검증
+            if (userId.value != addFriendRequest.requesterId) {
+                call.respond(HttpStatusCode.Forbidden)
+                return@post
+            }
+
             val friendDto = usecase.add(
                 ownerId = userId,
                 requesterId = addFriendRequest.requesterId,
@@ -46,9 +53,10 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
         }
 
         patch(route.STATUS, { updateFriendStatusDocs() }) {
+            val userId = extractUserIdWithToken()
             val updateFriendStatusRequest = call.receive<UpdateFriendStatusRequest>()
             val result = usecase.updateStatus(
-                userId1 = updateFriendStatusRequest.requesterId,
+                userId1 = userId.value,
                 userId2 = updateFriendStatusRequest.receiverId,
                 status = updateFriendStatusRequest.status,
             )
@@ -60,7 +68,17 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
         }
 
         delete({ deleteFriendDocs() }) {
+            val userId = extractUserIdWithToken()
             val deleteFriendRequest = call.receive<DeleteFriendRequest>()
+
+            // 인증된 사용자가 requesterId 또는 receiveId와 일치하는지 검증
+            if (userId.value != deleteFriendRequest.requesterId &&
+                userId.value != deleteFriendRequest.receiverId
+            ) {
+                call.respond(HttpStatusCode.Forbidden)
+                return@delete
+            }
+
             val result = usecase.delete(
                 userId1 = deleteFriendRequest.requesterId,
                 userId2 = deleteFriendRequest.receiverId,

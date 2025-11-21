@@ -30,7 +30,7 @@ class FriendRouteTest {
     fun setUp() {
         coEvery { usecase.getFriends(TestUserId) } returns listOf(TestFriendDto)
         coEvery {
-            usecase.add(TestUserId, TestRequesterId.value, TestReceiverId.value)
+            usecase.add(ownerId = TestUserId, TestRequesterId.value, TestReceiverId.value)
         } returns TestFriendDto
         coEvery {
             usecase.updateStatus(
@@ -129,6 +129,24 @@ class FriendRouteTest {
                     TestFriendDto.status.toString(),
                 )
             },
+        )
+    }
+
+    @Test
+    fun `친구 추가 - 인증된 사용자 ID와 requesterId가 같지 않은 경우 Forbidden을 반환한다`() = testApplication {
+        val invalidRequesterId = 10L
+
+        testPostEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestAddFriendRequest.copy(requesterId = invalidRequesterId),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { friendRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.Forbidden,
         )
     }
 
@@ -279,22 +297,6 @@ class FriendRouteTest {
     }
 
     @Test
-    fun `친구 삭제 - 삭제 실패 시`() = testApplication {
-        testDeleteEndpoint(
-            endpoint = route.ROUTE,
-            queryParameters = null,
-            requestBody = TestDeleteFriendRequest,
-            testPlugin = {
-                testPlugin(
-                    authRouting = { friendRoutes(route, usecase) },
-                )
-            },
-            tokenSubject = TestUserId.value.toString(),
-            expectedStatus = HttpStatusCode.OK,
-        )
-    }
-
-    @Test
     fun `친구 삭제 -예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
         val expectedApiException = ApiException(
             errorCode = CommonErrorCode.Unexpected,
@@ -342,7 +344,7 @@ class FriendRouteTest {
     }
 
     @Test
-    fun `친구 삭제 - 수정 실패 시 수정할 데이터가 없다는 것으로 간주하고 NotFound를 반환한다`() = testApplication {
+    fun `친구 삭제 - 삭제 실패 시 수정할 데이터가 없다는 것으로 간주하고 NotFound를 반환한다`() = testApplication {
         coEvery {
             usecase.delete(TestRequesterId.value, TestReceiverId.value)
         } returns false
@@ -358,6 +360,22 @@ class FriendRouteTest {
             },
             tokenSubject = TestUserId.value.toString(),
             expectedStatus = HttpStatusCode.NotFound,
+        )
+    }
+
+    @Test
+    fun `친구 삭제 - 인증된 사용자 ID가 requesterId, receiveId 둘 중 아무와도 일치하지 않는 경우 Forbidden을 반환한다`() = testApplication {
+        testDeleteEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestDeleteFriendRequest.copy(requesterId = 10L, receiverId = 11L),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { friendRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.Forbidden,
         )
     }
 
@@ -379,7 +397,6 @@ class FriendRouteTest {
             receiverId = TestReceiverId.value,
         )
         private val TestUpdateFriendStatusRequest = UpdateFriendStatusRequest(
-            requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
             status = FriendStatus.ACCEPTED,
         )
