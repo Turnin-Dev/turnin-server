@@ -161,9 +161,8 @@ private fun RouteConfig.updateFriendStatusDocs() {
             description = "친구 상태 수정 성공 시"
         }
         code(HttpStatusCode.NotFound) {
-            description = "1. 친구 상태 수정 실패 시\n" +
-                "2. 수정 대상 사용자를 찾지 못하는 경우\n" +
-                "3. 이미 친구 관계가 아닌 경우 (상대방이 먼저 친구 취소한 경우)"
+            description = "친구 데이터에서 수정 대상을 찾지 못하는 경우\n" +
+                "(높은 확률로 이미 처리된 요청.)"
         }
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 실제 요청을 한 사용자 ID가 같지 않은 경우"
@@ -187,9 +186,8 @@ private fun RouteConfig.deleteFriendDocs() {
             description = "친구 삭제 성공 시"
         }
         code(HttpStatusCode.NotFound) {
-            description = "1. 친구 삭제 실패 시\n" +
-                "2. 삭제 대상 사용자를 찾지 못하는 경우\n" +
-                "3. 이미 친구 관계가 아닌 경우 (상대방이 먼저 친구 취소한 경우)"
+            description = "친구 데이터에서 삭제 대상을 찾지 못하는 경우\n" +
+                "(높은 확률로 이미 처리된 요청.)"
         }
         code(HttpStatusCode.Forbidden) {
             description = "실제 요청을 한 사용자 ID가 요청자 ID, 요청 받을 ID와 모두 같지 않은 경우"
