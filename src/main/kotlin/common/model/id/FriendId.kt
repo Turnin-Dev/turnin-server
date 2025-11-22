@@ -1,4 +1,4 @@
-package com.peekr.common.model
+package com.peekr.common.model.id
 
 import com.peekr.common.validator.ValidatorException
 

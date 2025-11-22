@@ -3,7 +3,7 @@ package com.peekr.domain.friend.presentation.route
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.usecase.FriendUseCases

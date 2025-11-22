@@ -4,10 +4,10 @@ import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.DisplayId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.masking

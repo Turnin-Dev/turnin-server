@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.presentation.validation
 
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Name
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.validator.PeekrValidator.validation
 
 internal fun String.validateDisplayId() {

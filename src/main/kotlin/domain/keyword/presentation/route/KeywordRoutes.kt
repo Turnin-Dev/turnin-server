@@ -1,6 +1,6 @@
 package com.peekr.domain.keyword.presentation.route
 
-import com.peekr.common.model.KeywordId
+import com.peekr.common.model.id.KeywordId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.common.route.Api.byPathParam

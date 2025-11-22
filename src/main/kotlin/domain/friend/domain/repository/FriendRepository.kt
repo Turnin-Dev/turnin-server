@@ -1,7 +1,7 @@
 package com.peekr.domain.friend.domain.repository
 
 import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 
 interface FriendRepository {

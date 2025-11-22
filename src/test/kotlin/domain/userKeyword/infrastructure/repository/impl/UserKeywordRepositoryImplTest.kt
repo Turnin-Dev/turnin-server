@@ -4,11 +4,11 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
-import com.peekr.common.model.KeywordId
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
-import com.peekr.common.model.UserKeywordId
+import com.peekr.common.model.id.KeywordId
+import com.peekr.common.model.id.UserId
+import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.DescriptionDto
 import com.peekr.domain.userKeyword.application.dto.OffsetDto
 import com.peekr.domain.userKeyword.application.dto.toDomain

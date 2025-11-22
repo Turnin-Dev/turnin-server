@@ -1,6 +1,6 @@
 package com.peekr.domain.keyword.application.usecase
 
-import com.peekr.common.model.KeywordId
+import com.peekr.common.model.id.KeywordId
 import com.peekr.domain.keyword.application.dto.KeywordDto
 import com.peekr.domain.keyword.application.dto.toDto
 import com.peekr.domain.keyword.domain.repository.KeywordRepository

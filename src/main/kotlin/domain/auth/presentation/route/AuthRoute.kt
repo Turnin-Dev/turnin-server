@@ -5,8 +5,8 @@ import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.JWTValidator
 import com.peekr.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.route.Api
 import com.peekr.common.route.Api.byPathParam
 import com.peekr.common.validator.inputValidationAndReturn

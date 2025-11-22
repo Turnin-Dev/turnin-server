@@ -1,8 +1,5 @@
 package com.peekr.domain.auth.presentation.dto
 
-import com.peekr.common.model.DisplayId.Companion.invoke
-import com.peekr.common.model.Introduce.Companion.invoke
-import com.peekr.common.model.Name.Companion.invoke
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.presentation.validation.validateDisplayId

@@ -3,9 +3,9 @@ package com.peekr.domain.auth.presentation.route
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.jwt.application.dto.JWTTokenDto
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.DisplayId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.LoginResultDto

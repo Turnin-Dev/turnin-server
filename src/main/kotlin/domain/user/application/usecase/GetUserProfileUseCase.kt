@@ -1,6 +1,6 @@
 package com.peekr.domain.user.application.usecase
 
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.application.dto.UserProfileDto
 import com.peekr.domain.user.application.dto.toDto
 import com.peekr.domain.user.domain.repository.UserRepository

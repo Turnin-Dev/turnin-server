@@ -1,11 +1,11 @@
 package com.peekr.domain.keyword.infrastructure.repository.impl
 
 import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.model.KeywordId
 import com.peekr.common.model.KeywordName
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.KeywordId
+import com.peekr.common.model.id.UserId
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test

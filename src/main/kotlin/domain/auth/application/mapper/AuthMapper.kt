@@ -1,8 +1,8 @@
 package com.peekr.domain.auth.application.mapper
 
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.id.DisplayId
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.domain.model.FindUserResult

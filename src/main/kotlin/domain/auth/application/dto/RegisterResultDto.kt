@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.application.dto
 
 import com.peekr.common.jwt.application.dto.JWTTokenDto
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 
 /**
  * 회원가입 결과 DTO

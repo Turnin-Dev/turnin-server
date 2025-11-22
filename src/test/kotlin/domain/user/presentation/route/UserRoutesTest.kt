@@ -2,10 +2,10 @@ package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.DisplayId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.user.UserTestDoubles.MockUserDto
 import com.peekr.domain.user.application.dto.UserPatchDto

@@ -4,7 +4,7 @@ import com.peekr.common.db.schema.Reports
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
