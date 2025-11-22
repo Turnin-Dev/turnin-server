@@ -2,7 +2,7 @@ package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.IntroduceValidationException
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.mockk

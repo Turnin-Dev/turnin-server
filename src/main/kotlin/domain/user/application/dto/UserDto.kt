@@ -1,11 +1,11 @@
 package com.peekr.domain.user.application.dto
 
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.DisplayId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.domain.model.User
 
 /** 애플리케이션 계층에서 사용하는 User */

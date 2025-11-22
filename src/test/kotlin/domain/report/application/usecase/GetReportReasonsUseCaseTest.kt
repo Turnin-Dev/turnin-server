@@ -1,6 +1,6 @@
 package com.peekr.domain.report.application.usecase
 
-import com.peekr.common.model.ReportReasonId
+import com.peekr.common.model.id.ReportReasonId
 import com.peekr.domain.report.domain.model.ReportReason
 import com.peekr.domain.report.domain.repository.ReportRepository
 import io.mockk.coEvery

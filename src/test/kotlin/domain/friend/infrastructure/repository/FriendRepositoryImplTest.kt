@@ -6,7 +6,7 @@ import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.AfterTest
@@ -32,6 +32,37 @@ class FriendRepositoryImplTest {
     @AfterTest
     fun teardown() {
         TestDatabaseFactory.cleanUp()
+    }
+
+    @Test
+    fun `친구 목록 조회 성공 테스트`() = runTest {
+        // given: 사용자1이 사용자2에게 친구 요청을 보내고 사용자2가 요청을 수락한 상태
+        val userId1 = insertUserAndReturnId("a")
+        val userId2 = insertUserAndReturnId("b")
+        repository.createFriend(userId1, userId2)
+        repository.updateFriendStatus(userId2, userId1, FriendStatus.ACCEPTED)
+
+        // when
+        val user1Friends = repository.getFriends(userId1)
+        val user2Friends = repository.getFriends(userId2)
+
+        // then: 사용자1, 사용자2가 서로 친구 사이이기 때문에 두 사용자 모두 친구 수는 1이다.
+        assertEquals(1, user1Friends.size)
+        assertTrue(user1Friends.first().receiverId == userId2)
+        assertEquals(1, user2Friends.size)
+        assertTrue(user2Friends.first().requesterId == userId1)
+    }
+
+    @Test
+    fun `친구 목록 조회 성공 테스트 - 친구가 없다면 빈 리스트를 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("a")
+
+        // when
+        val friends = repository.getFriends(userId)
+
+        // then
+        assertTrue(friends.isEmpty())
     }
 
     @Test
@@ -111,37 +142,6 @@ class FriendRepositoryImplTest {
 
         // then
         assertFalse(result)
-    }
-
-    @Test
-    fun `친구 목록 조회 성공 테스트`() = runTest {
-        // given: 사용자1이 사용자2에게 친구 요청을 보내고 사용자2가 요청을 수락한 상태
-        val userId1 = insertUserAndReturnId("a")
-        val userId2 = insertUserAndReturnId("b")
-        repository.createFriend(userId1, userId2)
-        repository.updateFriendStatus(userId2, userId1, FriendStatus.ACCEPTED)
-
-        // when
-        val user1Friends = repository.getFriends(userId1)
-        val user2Friends = repository.getFriends(userId2)
-
-        // then: 사용자1, 사용자2가 서로 친구 사이이기 때문에 두 사용자 모두 친구 수는 1이다.
-        assertEquals(1, user1Friends.size)
-        assertTrue(user1Friends.first().receiverId == userId2)
-        assertEquals(1, user2Friends.size)
-        assertTrue(user2Friends.first().requesterId == userId1)
-    }
-
-    @Test
-    fun `친구 목록 조회 성공 테스트 - 친구가 없다면 빈 리스트를 반환한다`() = runTest {
-        // given
-        val userId = insertUserAndReturnId("a")
-
-        // when
-        val friends = repository.getFriends(userId)
-
-        // then
-        assertTrue(friends.isEmpty())
     }
 
     @Test

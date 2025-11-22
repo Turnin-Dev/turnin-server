@@ -1,8 +1,8 @@
 package com.peekr.domain.report.application.usecase
 
 import com.peekr.common.exception.common.CommonException
-import com.peekr.common.model.ReportReasonId
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.ReportReasonId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.report.application.dto.ReportDetailDto
 import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.domain.report.domain.repository.ReportRepository

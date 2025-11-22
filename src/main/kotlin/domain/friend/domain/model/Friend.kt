@@ -1,8 +1,8 @@
 package com.peekr.domain.friend.domain.model
 
-import com.peekr.common.model.FriendId
 import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.FriendId
+import com.peekr.common.model.id.UserId
 
 /**
  * 친구 엔티티 모델

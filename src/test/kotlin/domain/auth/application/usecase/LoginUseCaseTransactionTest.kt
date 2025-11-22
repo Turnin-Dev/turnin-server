@@ -12,7 +12,7 @@ import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.jwt.infrastructure.JWTTokenServiceImpl
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.util.config.AppConfig
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.LoginResultDto

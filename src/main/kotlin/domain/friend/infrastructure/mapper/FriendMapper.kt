@@ -2,8 +2,8 @@ package com.peekr.domain.friend.infrastructure.mapper
 
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
-import com.peekr.common.model.FriendId
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.FriendId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 import org.jetbrains.exposed.sql.ResultRow
 

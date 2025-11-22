@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.domain.provider
 
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 
 interface UserProvider {
     /**

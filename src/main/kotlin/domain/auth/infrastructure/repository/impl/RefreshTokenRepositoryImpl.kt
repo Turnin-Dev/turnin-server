@@ -3,7 +3,7 @@ package com.peekr.domain.auth.infrastructure.repository.impl
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.JoinType

@@ -1,8 +1,8 @@
 package com.peekr.domain.keyword.domain.repository
 
-import com.peekr.common.model.KeywordId
 import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.KeywordId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
 
 interface KeywordRepository {

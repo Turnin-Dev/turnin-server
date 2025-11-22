@@ -1,7 +1,7 @@
 package com.peekr.domain.userKeyword.presentation.route
 
-import com.peekr.common.model.UserId
-import com.peekr.common.model.UserKeywordId
+import com.peekr.common.model.id.UserId
+import com.peekr.common.model.id.UserKeywordId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.common.validator.inputValidationAndReturn

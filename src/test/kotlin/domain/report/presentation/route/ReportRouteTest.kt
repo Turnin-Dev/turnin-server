@@ -3,7 +3,7 @@ package com.peekr.domain.report.presentation.route
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.exception.common.CommonException
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.report.application.dto.ReportReasonDto
 import com.peekr.domain.report.application.usecase.ReportUseCases

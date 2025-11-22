@@ -1,7 +1,7 @@
 package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.domain.repository.UserRepository
 
 class UpdateIntroduceUseCase(private val userRepository: UserRepository) {

@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.application.usecase
 
-import com.peekr.common.model.DisplayId
+import com.peekr.common.model.id.DisplayId
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import io.mockk.coEvery
 import io.mockk.mockk

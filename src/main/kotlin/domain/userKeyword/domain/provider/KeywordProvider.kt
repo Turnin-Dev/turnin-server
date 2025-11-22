@@ -1,7 +1,7 @@
 package com.peekr.domain.userKeyword.domain.provider
 
-import com.peekr.common.model.KeywordId
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.KeywordId
+import com.peekr.common.model.id.UserId
 
 /**
  * 키워드 BC(Bounded Context)에서 제공되는 서비스

@@ -1,9 +1,9 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.db.DatabaseException
-import com.peekr.common.model.FriendId
 import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.FriendId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository

@@ -1,7 +1,7 @@
 package com.peekr.domain.report.domain.model
 
-import com.peekr.common.model.ReportReasonId
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.ReportReasonId
+import com.peekr.common.model.id.UserId
 
 /**
  * 신고 디테일 엔티티 모델

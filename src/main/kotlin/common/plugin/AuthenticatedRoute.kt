@@ -1,7 +1,7 @@
 package com.peekr.common.plugin
 
 import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.validator.ValidatorException
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal

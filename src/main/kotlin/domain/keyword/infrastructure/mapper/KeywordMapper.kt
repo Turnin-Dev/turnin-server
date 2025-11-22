@@ -2,9 +2,9 @@ package com.peekr.domain.keyword.infrastructure.mapper
 
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.Keywords
-import com.peekr.common.model.KeywordId
 import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.KeywordId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.keyword.domain.model.Keyword
 import org.jetbrains.exposed.sql.ResultRow
 

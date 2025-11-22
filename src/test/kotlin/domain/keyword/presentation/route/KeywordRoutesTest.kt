@@ -3,9 +3,9 @@ package com.peekr.domain.keyword.presentation.route
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.jwt.JWTTestDoubles
-import com.peekr.common.model.KeywordId
 import com.peekr.common.model.KeywordNameValidationException
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.KeywordId
+import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.keyword.application.dto.KeywordDto
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases

@@ -1,8 +1,8 @@
 package com.peekr.domain.user.domain.model
 
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
+import com.peekr.common.model.id.DisplayId
 
 /**
  * UserPatch

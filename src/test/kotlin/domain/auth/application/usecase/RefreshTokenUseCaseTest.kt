@@ -3,12 +3,12 @@ package com.peekr.domain.auth.application.usecase
 import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.model.DisplayId
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserId
+import com.peekr.common.model.id.DisplayId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
