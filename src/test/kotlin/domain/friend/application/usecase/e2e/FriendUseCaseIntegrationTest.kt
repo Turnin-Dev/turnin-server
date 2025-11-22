@@ -87,7 +87,7 @@ class FriendUseCaseIntegrationTest {
         assertTrue(friendDto.requesterId == userA.value)
         assertTrue(friendDto.receiverId == userB.value)
 
-        // 2. 사용자 B가 친구 요청 rjwjf
+        // 2. 사용자 B가 친구 요청 거절
         val result = deleteFriendUseCase(userB.value, userA.value)
         assertTrue(result)
 
@@ -172,7 +172,7 @@ class FriendUseCaseIntegrationTest {
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
-        val savedUser = UserEntity.Companion.new {
+        val savedUser = UserEntity.new {
             this.role = Role.USER
             this.provider = SocialLoginProvider.GOOGLE
             this.providerId = "pid$uniqueValue"
@@ -184,6 +184,6 @@ class FriendUseCaseIntegrationTest {
             this.lastLoginAt = Instant.now()
         }
 
-        UserId.Companion(savedUser.id.value)
+        UserId(savedUser.id.value)
     }
 }

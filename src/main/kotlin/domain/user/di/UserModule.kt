@@ -12,7 +12,9 @@ import org.koin.dsl.module
 
 val userModule = module {
     // Provider
-    factory { UserProviderApi(get()) }
+    // 상태 비저장 서비스는 factory 스코프가 아닌 single 스코프로 관리하는 것이 표준 패턴이다.
+    // factory 스코프는 매번 주입될 때마다 불필요한 객체 할당을 발생시킨다.
+    single { UserProviderApi(get()) }
 
     // Repository
     single<UserRepository> { UserRepositoryImpl() }
