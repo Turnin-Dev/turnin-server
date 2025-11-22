@@ -13,6 +13,13 @@ interface FriendRepository {
     suspend fun getFriends(userId: UserId): List<Friend>
 
     /**
+     * 친구 수 조회
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun countFriends(userId: UserId): Long
+
+    /**
      * 친구 요청 생성
      *
      * @param requesterId 요청한 사용자 ID

@@ -36,6 +36,15 @@ class FriendRepositoryImpl : FriendRepository {
             .map { it.toDomain() }
     }
 
+    override suspend fun countFriends(userId: UserId): Long = suspendTransaction {
+        FriendEntity.count(
+            (
+                ((Friends.requesterId eq userId.value) or (Friends.receiverId eq userId.value)) and
+                    (Friends.status eq FriendStatus.ACCEPTED)
+            ),
+        )
+    }
+
     override suspend fun createFriend(
         requesterId: UserId,
         receiverId: UserId,
