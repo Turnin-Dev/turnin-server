@@ -16,6 +16,8 @@ interface FriendRepository {
      * 친구 수 조회
      *
      * @param userId 사용자 ID
+     *
+     * @return [Long]타입의 친구 수
      */
     suspend fun countFriends(userId: UserId): Long
 

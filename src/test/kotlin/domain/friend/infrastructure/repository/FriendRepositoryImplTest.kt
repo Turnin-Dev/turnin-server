@@ -174,6 +174,21 @@ class FriendRepositoryImplTest {
         assertFalse(result)
     }
 
+    @Test
+    fun `친구 수 조회 성공 테스트`() = runTest {
+        // given: 사용자 1이 사용자2에게 친구 요청 후 수락
+        val userId1 = insertUserAndReturnId("a")
+        val userId2 = insertUserAndReturnId("b")
+        repository.createFriend(userId1, userId2)
+        repository.updateFriendStatus(userId2, userId1, FriendStatus.ACCEPTED)
+
+        // when
+        val count = repository.countFriends(userId1)
+
+        // then
+        assertEquals(1, count)
+    }
+
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER

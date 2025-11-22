@@ -8,40 +8,41 @@ import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.application.dto.toDto
 import com.peekr.domain.user.domain.model.User
-import com.peekr.domain.user.domain.model.UserProfile
+import com.peekr.domain.user.domain.provider.FriendProvider
 import com.peekr.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 
 class GetUserProfileUseCaseTest {
     private val userRepository: UserRepository = mockk()
-    private val usecase = GetUserProfileUseCase(userRepository)
+    private val friendProvider: FriendProvider = mockk()
+    private val usecase = GetUserProfileUseCase(userRepository, friendProvider)
 
     @Test
     fun `사용자 프로필 조회 성공 테스트`() = runTest {
         // given
-        coEvery {
-            userRepository.findUserProfileById(TestUserId)
-        } returns TestUserProfile
+        coEvery { userRepository.findById(TestUserId) } returns TestUser
+        coEvery { friendProvider.countFriends(TestUserId) } returns TEST_FRIENDS_COUNT
 
         // when
         val userProfileDto = usecase(TestUserId)
 
         // then
-        assertEquals(TestUserProfile.toDto(), userProfileDto)
+        assertNotNull(userProfileDto)
+        assertEquals(TestUser.toDto(), userProfileDto.user)
+        assertEquals(TEST_FRIENDS_COUNT, userProfileDto.friendsCount)
     }
 
     @Test
     fun `사용자 프로필 조회 실패 시 null을 반환한다`() = runTest {
         // given
-        coEvery {
-            userRepository.findUserProfileById(TestUserId)
-        } returns null
+        coEvery { userRepository.findById(TestUserId) } returns null
 
         // when
         val userProfileDto = usecase(TestUserId)
@@ -52,20 +53,18 @@ class GetUserProfileUseCaseTest {
 
     companion object {
         private val TestUserId = UserId(1L)
-        private val TestUserProfile = UserProfile(
-            user = User(
-                id = TestUserId,
-                role = Role.USER,
-                provider = SocialLoginProvider.GOOGLE,
-                providerId = "providerId",
-                displayId = DisplayId("displayId"),
-                name = Name("name"),
-                profileImageUrl = "profileImageUrl",
-                introduce = Introduce("introduce"),
-                isActive = true,
-                lastLoginAt = Instant.now(),
-            ),
-            friendsCount = 10,
+        private const val TEST_FRIENDS_COUNT = 10L
+        private val TestUser = User(
+            id = TestUserId,
+            role = Role.USER,
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "providerId",
+            displayId = DisplayId("displayId"),
+            name = Name("name"),
+            profileImageUrl = "profileImageUrl",
+            introduce = Introduce("introduce"),
+            isActive = true,
+            lastLoginAt = Instant.now(),
         )
     }
 }
