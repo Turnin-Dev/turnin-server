@@ -5,6 +5,17 @@ import kotlinx.serialization.Serializable
 
 /**
  * 사용자 조회 응답 바디
+ *
+ * @property id 사용자 ID
+ * @property role 사용자 역할
+ * @property provider 소셜로그인 플랫폼
+ * @property providerId 소셜로그인 ID
+ * @property displayId 사용자 표시 ID
+ * @property name 사용자 이름
+ * @property profileImageUrl 사용자 프로필 이미지 url
+ * @property introduce 사용자 소개 글
+ * @property isActive 사용자 활성 여부
+ * @property lastLoginAt 마지막 로그인 일시
  */
 @Serializable
 data class UserResponse(

@@ -6,6 +6,17 @@ import com.peekr.domain.friend.domain.model.Friend
 
 interface FriendRepository {
     /**
+     * 사용자(본인) ID와 다른 사용자 ID로 친구 데이터를 조회한다.
+     *
+     * @param userId 사용자(본인) ID
+     * @param otherUserId 다른 사용자 ID
+     */
+    suspend fun findByIds(
+        userId: UserId,
+        otherUserId: UserId,
+    ): Friend?
+
+    /**
      * 친구 목록 조회
      *
      * @param userId 사용자(본인) ID
