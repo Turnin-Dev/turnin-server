@@ -92,7 +92,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getProfile(TestUserId) } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}",
+            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -103,8 +103,8 @@ class UserRoutesTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 containsAll(
-                    TestUserProfileDto.user.name.value,
-                    TestUserProfileDto.user.displayId.value,
+                    TestUserProfileDto.displayId.value,
+                    TestUserProfileDto.displayId.value,
                     TestUserProfileDto.friendsCount.toString(),
                 )
             },
@@ -116,7 +116,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getProfile(TestUserId) } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}",
+            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -133,7 +133,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getProfile(TestUserId) } returns null
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}",
+            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -150,7 +150,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getProfile(TestUserId) } returns null
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}",
+            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -172,7 +172,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getProfile(TestUserId) } throws expectedApiException
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}",
+            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -414,7 +414,12 @@ class UserRoutesTest {
             introduce = TEST_INTRODUCE,
         )
         private val TestUserProfileDto = UserProfileDto(
-            user = MockUserDto,
+            displayId = DisplayId("id"),
+            name = Name("name"),
+            profileImageUrl = null,
+            introduce = Introduce(TEST_INTRODUCE),
+            isActive = true,
+            lastLoginAt = 1000,
             friendsCount = 2,
         )
         private const val TEST_INTRODUCE = "test introduce"

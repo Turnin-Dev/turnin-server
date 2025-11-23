@@ -39,7 +39,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.PROFILE, { getUserProfileByIdDocs() }) {
+        get(route.MY_PROFILE, { getUserProfileByIdDocs() }) {
             val userId = extractUserIdWithToken()
             val user = usecase.getProfile(userId)
             if (user != null) {

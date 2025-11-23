@@ -14,4 +14,15 @@ interface FriendProvider {
      * @return [Long]타입의 친구 수
      */
     suspend fun countFriends(userId: UserId): Long
+
+    /**
+     * 친구 관계 상태 조회
+     *
+     * @param userId 나의 사용자 ID
+     * @param otherUserId 다른 사용자 ID
+     */
+    suspend fun getFriendshipStatus(
+        userId: UserId,
+        otherUserId: UserId,
+    ): ExternalFriendshipStatus
 }

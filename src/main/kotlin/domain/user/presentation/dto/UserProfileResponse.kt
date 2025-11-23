@@ -6,10 +6,6 @@ import kotlinx.serialization.Serializable
 /**
  * 사용자 프로필 조회 응답 바디
  *
- * @property id 사용자 ID
- * @property role 사용자 역할
- * @property provider 소셜로그인 플랫폼
- * @property providerId 소셜로그인 ID
  * @property displayId 사용자 표시 ID
  * @property name 사용자 이름
  * @property profileImageUrl 사용자 프로필 이미지 url
@@ -20,10 +16,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class UserProfileResponse(
-    val id: Long,
-    val role: String,
-    val provider: String,
-    val providerId: String,
     val displayId: String,
     val name: String,
     val profileImageUrl: String?,
@@ -34,10 +26,6 @@ data class UserProfileResponse(
 ) {
     companion object {
         val sample = UserProfileResponse(
-            id = 1L,
-            role = "USER",
-            provider = "GOOGLE",
-            providerId = "1231231231",
             displayId = "hong_gd_123",
             name = "honggd",
             profileImageUrl = "https://www.example.com/image.jpg",
@@ -50,15 +38,11 @@ data class UserProfileResponse(
 }
 
 fun UserProfileDto.toResponse(): UserProfileResponse = UserProfileResponse(
-    id = user.id.value,
-    role = user.role.name,
-    provider = user.provider.name,
-    providerId = user.providerId,
-    displayId = user.displayId.value,
-    name = user.name.value,
-    profileImageUrl = user.profileImageUrl,
-    introduce = user.introduce?.value,
-    isActive = user.isActive,
-    lastLoginAt = user.lastLoginAt,
+    displayId = displayId.value,
+    name = name.value,
+    profileImageUrl = profileImageUrl,
+    introduce = introduce?.value,
+    isActive = isActive,
+    lastLoginAt = lastLoginAt,
     friendsCount = friendsCount,
 )

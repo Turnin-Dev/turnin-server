@@ -6,7 +6,6 @@ import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.application.dto.toDto
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.provider.FriendProvider
 import com.peekr.domain.user.domain.repository.UserRepository
@@ -22,7 +21,7 @@ import kotlinx.coroutines.test.runTest
 class GetUserProfileUseCaseTest {
     private val userRepository: UserRepository = mockk()
     private val friendProvider: FriendProvider = mockk()
-    private val usecase = GetUserProfileUseCase(userRepository, friendProvider)
+    private val usecase = GetProfileUseCase(userRepository, friendProvider)
 
     @Test
     fun `사용자 프로필 조회 성공 테스트`() = runTest {
@@ -35,7 +34,7 @@ class GetUserProfileUseCaseTest {
 
         // then
         assertNotNull(userProfileDto)
-        assertEquals(TestUser.toDto(), userProfileDto.user)
+        assertEquals(TestUser.displayId, userProfileDto.displayId)
         assertEquals(TEST_FRIENDS_COUNT, userProfileDto.friendsCount)
     }
 
