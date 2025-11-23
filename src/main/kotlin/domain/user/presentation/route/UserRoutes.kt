@@ -4,9 +4,12 @@ import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
+import com.peekr.common.route.Api.byPathParam
+import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
 import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
+import com.peekr.domain.user.presentation.dto.OtherUserProfileResponse
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.domain.user.presentation.dto.UserProfileResponse
 import com.peekr.domain.user.presentation.dto.UserResponse
@@ -44,6 +47,22 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             val user = usecase.getProfile(userId)
             if (user != null) {
                 call.respond(user.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        get(route.PROFILE.byPathParam("otherUserId"), { getOtherUserProfileByIdDocs() }) {
+            val userId = extractUserIdWithToken()
+            val otherUserId = call.pathParameters["otherUserId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("다른 사용자 ID")
+            val otherUserProfileDto = usecase.getOtherUserProfile(userId, otherUserId)
+            if (otherUserProfileDto != null) {
+                call.respond(otherUserProfileDto.toResponse())
             } else {
                 call.respond(
                     HttpStatusCode.NotFound,
@@ -109,15 +128,46 @@ private fun RouteConfig.getUserByIdDocs() {
 }
 
 private fun RouteConfig.getUserProfileByIdDocs() {
-    summary = "사용자 프로필 조회"
-    description = "사용자 ID로 사용자 프로필을 조회한다." +
+    summary = "나의 사용자 프로필 조회"
+    description = "나의 사용자 ID로 프로필을 조회한다." +
         "(사용자 조회와 다른점은 사용자 데이터에 추가 데이터가 포함된다)"
     response {
         code(HttpStatusCode.OK) {
             body<UserProfileResponse> {
-                description = "사용자 프로필"
+                description = "나의 사용자 프로필"
                 example("UserProfileResponse") {
                     value = UserProfileResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자가 존재하지 않는 경우"
+                example("UserResponse") {
+                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getOtherUserProfileByIdDocs() {
+    summary = "다른 사용자 프로필 조회"
+    description = "다른 사용자 ID로 다른 사용자 프로필을 조회한다."
+    request {
+        pathParameter<Long>("otherUserId") {
+            description = "다른 사용자 ID"
+            example("Example") {
+                value = 1L
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<OtherUserProfileResponse> {
+                description = "다른 사용자 프로필"
+                example("OtherUserProfileResponse") {
+                    value = OtherUserProfileResponse.sample
                 }
             }
         }

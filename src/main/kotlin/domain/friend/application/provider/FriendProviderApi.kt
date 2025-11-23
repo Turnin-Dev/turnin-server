@@ -1,8 +1,8 @@
 package com.peekr.domain.friend.application.provider
 
+import com.peekr.common.model.FriendshipStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.application.usecase.GetFriendshipStatusUseCase
-import com.peekr.domain.friend.domain.model.FriendshipStatus
 import com.peekr.domain.friend.domain.repository.FriendRepository
 
 /**
@@ -31,6 +31,6 @@ class FriendProviderApi(
     suspend fun getFriendshipStatus(
         userId: UserId,
         otherUserId: UserId,
-    ): FriendshipStatus? =
+    ): FriendshipStatus =
         getFriendshipStatusUseCase(userId, otherUserId)
 }

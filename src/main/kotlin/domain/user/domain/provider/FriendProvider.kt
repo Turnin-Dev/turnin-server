@@ -1,5 +1,6 @@
 package com.peekr.domain.user.domain.provider
 
+import com.peekr.common.model.FriendshipStatus
 import com.peekr.common.model.id.UserId
 
 /**
@@ -24,5 +25,5 @@ interface FriendProvider {
     suspend fun getFriendshipStatus(
         userId: UserId,
         otherUserId: UserId,
-    ): ExternalFriendshipStatus
+    ): FriendshipStatus
 }

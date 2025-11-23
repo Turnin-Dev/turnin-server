@@ -1,9 +1,9 @@
-package com.peekr.domain.friend.domain.model
+package com.peekr.common.model
 
 /**
  * 친구 관계 상태
  *
- * [com.peekr.common.model.FriendStatus]와는 다르게 좀 더 자세한 상태이다.
+ * [FriendStatus]와는 다르게 좀 더 자세한 상태이다.
  *
  * 친구 추가/수정/삭제 요청이 요청자, 피요청자 관점 모두를 고려한 명확한 값으로 나타낸다.
  */

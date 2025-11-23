@@ -1,6 +1,6 @@
 package com.peekr.domain.user.application.dto
 
-import com.peekr.domain.user.domain.provider.ExternalFriendshipStatus
+import com.peekr.common.model.FriendshipStatus
 
 /**
  * 다른 사용자 프로필 DTO
@@ -10,5 +10,5 @@ import com.peekr.domain.user.domain.provider.ExternalFriendshipStatus
  */
 data class OtherUserProfileDto(
     val userProfileDto: UserProfileDto,
-    val friendshipStatus: ExternalFriendshipStatus,
+    val friendshipStatus: FriendshipStatus,
 )
