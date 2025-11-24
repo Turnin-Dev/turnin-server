@@ -4,9 +4,7 @@ import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 
 /**
- * 키워드 BC(Bounded Context)에서 제공되는 서비스
- *
- * 내부적으로는 키워드 BC(Bounded Context)에서 제공되는 공개용 API만 사용한다.
+ * 외부에서 제공되는 키워드 BC API 인터페이스
  */
 interface KeywordProvider {
     /**

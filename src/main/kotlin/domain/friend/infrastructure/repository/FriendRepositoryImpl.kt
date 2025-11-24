@@ -36,6 +36,28 @@ class FriendRepositoryImpl : FriendRepository {
             .map { it.toDomain() }
     }
 
+    override suspend fun findByIds(
+        userId: UserId,
+        otherUserId: UserId,
+    ): Friend? = suspendTransaction {
+        Friends
+            .selectAll()
+            .where(
+                ((Friends.requesterId eq userId.value) and (Friends.receiverId eq otherUserId.value)) or
+                    ((Friends.requesterId eq otherUserId.value) and (Friends.receiverId eq userId.value)),
+            ).singleOrNull()
+            ?.toDomain()
+    }
+
+    override suspend fun countFriends(userId: UserId): Long = suspendTransaction {
+        FriendEntity.count(
+            (
+                ((Friends.requesterId eq userId.value) or (Friends.receiverId eq userId.value)) and
+                    (Friends.status eq FriendStatus.ACCEPTED)
+            ),
+        )
+    }
+
     override suspend fun createFriend(
         requesterId: UserId,
         receiverId: UserId,

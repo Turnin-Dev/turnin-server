@@ -1,11 +1,11 @@
-package com.peekr.domain.user.domain.model
+package com.peekr.domain.user.application.dto
 
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.id.DisplayId
 
 /**
- * 사용자 프로필
+ * 나의 프로필 DTO
  *
  * @property displayId 사용자 표시 ID
  * @property name 사용자 이름
@@ -15,7 +15,7 @@ import com.peekr.common.model.id.DisplayId
  * @property lastLoginAt 마지막 로그인 일시
  * @property friendsCount 사용자 친구 수
  */
-data class UserProfile(
+data class MyProfileDto(
     val displayId: DisplayId,
     val name: Name,
     val profileImageUrl: String?,

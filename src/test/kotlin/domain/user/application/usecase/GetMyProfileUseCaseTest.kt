@@ -1,6 +1,5 @@
 package com.peekr.domain.user.application.usecase
 
-import com.peekr.common.model.FriendshipStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.Role
@@ -13,50 +12,47 @@ import com.peekr.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 
-class GetUserProfileUseCaseTest {
+class GetMyProfileUseCaseTest {
     private val userRepository: UserRepository = mockk()
     private val friendProvider: FriendProvider = mockk()
-    private val usecase = GetUserProfileUseCase(userRepository, friendProvider)
-
-    @BeforeTest
-    fun setUp() {
-        coEvery { userRepository.findById(TestUserId) } returns TestUser
-        coEvery { friendProvider.countFriends(TestUserId) } returns 10L
-        coEvery {
-            friendProvider.getFriendshipStatus(TestMyUserId, TestUserId)
-        } returns FriendshipStatus.FRIENDS
-    }
+    private val usecase = GetMyProfileUseCase(userRepository, friendProvider)
 
     @Test
-    fun `사용자 프로필 조회 성공 테스트`() = runTest {
-        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
+    fun `나의 프로필 조회 성공 테스트`() = runTest {
+        // given
+        coEvery { userRepository.findById(TestUserId) } returns TestUser
+        coEvery { friendProvider.countFriends(TestUserId) } returns TEST_FRIENDS_COUNT
 
+        // when
+        val userProfileDto = usecase(TestUserId)
+
+        // then
         assertNotNull(userProfileDto)
         assertEquals(TestUser.displayId, userProfileDto.displayId)
+        assertEquals(TEST_FRIENDS_COUNT, userProfileDto.friendsCount)
     }
 
     @Test
-    fun `사용자를 찾지 못하는 경우 null을 반환한다`() = runTest {
+    fun `나의 프로필 조회 실패 시 null을 반환한다`() = runTest {
         // given
         coEvery { userRepository.findById(TestUserId) } returns null
 
         // when
-        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
+        val userProfileDto = usecase(TestUserId)
 
         // then
         assertNull(userProfileDto)
     }
 
     companion object {
-        private val TestMyUserId = UserId(1L)
-        private val TestUserId = UserId(2L)
+        private val TestUserId = UserId(1L)
+        private const val TEST_FRIENDS_COUNT = 10L
         private val TestUser = User(
             id = TestUserId,
             role = Role.USER,

@@ -7,7 +7,6 @@ import com.peekr.common.model.Name
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.domain.model.User
-import com.peekr.domain.user.domain.model.UserProfile
 import org.jetbrains.exposed.sql.ResultRow
 
 /** ##### 반드시 db transaction 범위 내에서 실행되어야 한다. */
@@ -37,7 +36,4 @@ object UserMapper {
         isActive = row[Users.isActive],
         lastLoginAt = row[Users.lastLoginAt],
     )
-
-    fun toDomain(user: User, friendsCount: Long): UserProfile =
-        UserProfile(user, friendsCount)
 }

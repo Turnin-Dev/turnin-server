@@ -4,9 +4,12 @@ import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
+import com.peekr.common.route.Api.byPathParam
+import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
 import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
+import com.peekr.domain.user.presentation.dto.MyProfileResponse
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.domain.user.presentation.dto.UserProfileResponse
 import com.peekr.domain.user.presentation.dto.UserResponse
@@ -39,11 +42,27 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.PROFILE, { getUserProfileByIdDocs() }) {
+        get(route.MY_PROFILE, { getMyProfileDocs() }) {
             val userId = extractUserIdWithToken()
-            val user = usecase.getProfile(userId)
+            val user = usecase.getMyProfile(userId)
             if (user != null) {
                 call.respond(user.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        get(route.PROFILE.byPathParam("userId"), { getUserProfileDocs() }) {
+            val myUserId = extractUserIdWithToken()
+            val userId = call.pathParameters["userId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 ID")
+            val userProfileDto = usecase.getUserProfile(myUserId = myUserId, userId = userId)
+            if (userProfileDto != null) {
+                call.respond(userProfileDto.toResponse())
             } else {
                 call.respond(
                     HttpStatusCode.NotFound,
@@ -108,10 +127,40 @@ private fun RouteConfig.getUserByIdDocs() {
     }
 }
 
-private fun RouteConfig.getUserProfileByIdDocs() {
+private fun RouteConfig.getMyProfileDocs() {
+    summary = "나의 프로필 조회"
+    description = "나의 사용자 ID로 프로필을 조회한다."
+    response {
+        code(HttpStatusCode.OK) {
+            body<MyProfileResponse> {
+                description = "나의 프로필"
+                example("MyProfileResponse") {
+                    value = MyProfileResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자가 존재하지 않는 경우"
+                example("UserResponse") {
+                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getUserProfileDocs() {
     summary = "사용자 프로필 조회"
-    description = "사용자 ID로 사용자 프로필을 조회한다." +
-        "(사용자 조회와 다른점은 사용자 데이터에 추가 데이터가 포함된다)"
+    description = "사용자 ID로 사용자 프로필을 조회한다."
+    request {
+        pathParameter<Long>("userId") {
+            description = "사용자 ID"
+            example("Example") {
+                value = 1L
+            }
+        }
+    }
     response {
         code(HttpStatusCode.OK) {
             body<UserProfileResponse> {

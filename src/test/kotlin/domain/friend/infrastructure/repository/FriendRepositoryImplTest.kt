@@ -15,6 +15,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -63,6 +64,33 @@ class FriendRepositoryImplTest {
 
         // then
         assertTrue(friends.isEmpty())
+    }
+
+    @Test
+    fun `requesterId와 receiverId로 친구 데이터 조회 성공 테스트`() = runTest {
+        // given
+        val userId1 = insertUserAndReturnId("a")
+        val userId2 = insertUserAndReturnId("b")
+        val expectedFriend = repository.createFriend(userId1, userId2)
+
+        // when
+        val actualFriend = repository.findByIds(userId1, userId2)
+
+        // then
+        assertEquals(expectedFriend, actualFriend)
+    }
+
+    @Test
+    fun `requesterId와 receiverId로 친구 데이터 조회 성공 테스트 - 데이터가 없다면 null을 반환한다`() = runTest {
+        // given: 그냥 사용자만 생성해놓고 두 사용자는 아무 관계가 아니다.
+        val userId1 = insertUserAndReturnId("a")
+        val userId2 = insertUserAndReturnId("b")
+
+        // when
+        val friend = repository.findByIds(userId1, userId2)
+
+        // then
+        assertNull(friend)
     }
 
     @Test
@@ -172,6 +200,21 @@ class FriendRepositoryImplTest {
 
         // then
         assertFalse(result)
+    }
+
+    @Test
+    fun `친구 수 조회 성공 테스트`() = runTest {
+        // given: 사용자 1이 사용자2에게 친구 요청 후 수락
+        val userId1 = insertUserAndReturnId("a")
+        val userId2 = insertUserAndReturnId("b")
+        repository.createFriend(userId1, userId2)
+        repository.updateFriendStatus(userId2, userId1, FriendStatus.ACCEPTED)
+
+        // when
+        val count = repository.countFriends(userId1)
+
+        // then
+        assertEquals(1, count)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
