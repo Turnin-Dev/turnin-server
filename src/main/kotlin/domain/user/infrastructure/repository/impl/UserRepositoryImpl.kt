@@ -11,7 +11,6 @@ import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper
 import org.jetbrains.exposed.sql.update
 
-// TODO: Friend 테이블 조작은 Provider로 빼야함
 class UserRepositoryImpl : UserRepository {
     override suspend fun findById(id: UserId): User? = suspendTransaction {
         UserEntity.findById(id.value)?.let { entity ->

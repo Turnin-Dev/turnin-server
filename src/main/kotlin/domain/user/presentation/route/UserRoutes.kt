@@ -9,7 +9,7 @@ import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
 import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
-import com.peekr.domain.user.presentation.dto.OtherUserProfileResponse
+import com.peekr.domain.user.presentation.dto.MyProfileResponse
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.domain.user.presentation.dto.UserProfileResponse
 import com.peekr.domain.user.presentation.dto.UserResponse
@@ -42,9 +42,9 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.MY_PROFILE, { getUserProfileByIdDocs() }) {
+        get(route.MY_PROFILE, { getMyProfileDocs() }) {
             val userId = extractUserIdWithToken()
-            val user = usecase.getProfile(userId)
+            val user = usecase.getMyProfile(userId)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {
@@ -55,14 +55,14 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.PROFILE.byPathParam("otherUserId"), { getOtherUserProfileByIdDocs() }) {
-            val userId = extractUserIdWithToken()
-            val otherUserId = call.pathParameters["otherUserId"]
+        get(route.PROFILE.byPathParam("userId"), { getUserProfileDocs() }) {
+            val myUserId = extractUserIdWithToken()
+            val userId = call.pathParameters["userId"]
                 ?.toLongOrNull()
-                .inputValidationAndReturn("다른 사용자 ID")
-            val otherUserProfileDto = usecase.getOtherUserProfile(userId, otherUserId)
-            if (otherUserProfileDto != null) {
-                call.respond(otherUserProfileDto.toResponse())
+                .inputValidationAndReturn("사용자 ID")
+            val userProfileDto = usecase.getUserProfile(myUserId = myUserId, userId = userId)
+            if (userProfileDto != null) {
+                call.respond(userProfileDto.toResponse())
             } else {
                 call.respond(
                     HttpStatusCode.NotFound,
@@ -127,16 +127,15 @@ private fun RouteConfig.getUserByIdDocs() {
     }
 }
 
-private fun RouteConfig.getUserProfileByIdDocs() {
-    summary = "나의 사용자 프로필 조회"
-    description = "나의 사용자 ID로 프로필을 조회한다." +
-        "(사용자 조회와 다른점은 사용자 데이터에 추가 데이터가 포함된다)"
+private fun RouteConfig.getMyProfileDocs() {
+    summary = "나의 프로필 조회"
+    description = "나의 사용자 ID로 프로필을 조회한다."
     response {
         code(HttpStatusCode.OK) {
-            body<UserProfileResponse> {
-                description = "나의 사용자 프로필"
-                example("UserProfileResponse") {
-                    value = UserProfileResponse.sample
+            body<MyProfileResponse> {
+                description = "나의 프로필"
+                example("MyProfileResponse") {
+                    value = MyProfileResponse.sample
                 }
             }
         }
@@ -151,12 +150,12 @@ private fun RouteConfig.getUserProfileByIdDocs() {
     }
 }
 
-private fun RouteConfig.getOtherUserProfileByIdDocs() {
-    summary = "다른 사용자 프로필 조회"
-    description = "다른 사용자 ID로 다른 사용자 프로필을 조회한다."
+private fun RouteConfig.getUserProfileDocs() {
+    summary = "사용자 프로필 조회"
+    description = "사용자 ID로 사용자 프로필을 조회한다."
     request {
-        pathParameter<Long>("otherUserId") {
-            description = "다른 사용자 ID"
+        pathParameter<Long>("userId") {
+            description = "사용자 ID"
             example("Example") {
                 value = 1L
             }
@@ -164,10 +163,10 @@ private fun RouteConfig.getOtherUserProfileByIdDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            body<OtherUserProfileResponse> {
-                description = "다른 사용자 프로필"
-                example("OtherUserProfileResponse") {
-                    value = OtherUserProfileResponse.sample
+            body<UserProfileResponse> {
+                description = "사용자 프로필"
+                example("UserProfileResponse") {
+                    value = UserProfileResponse.sample
                 }
             }
         }

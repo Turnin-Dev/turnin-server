@@ -1,8 +1,8 @@
 package com.peekr.domain.user.di
 
 import com.peekr.domain.user.application.provider.UserProviderApi
-import com.peekr.domain.user.application.usecase.GetOtherUserProfileUseCase
-import com.peekr.domain.user.application.usecase.GetProfileUseCase
+import com.peekr.domain.user.application.usecase.GetMyProfileUseCase
+import com.peekr.domain.user.application.usecase.GetUserProfileUseCase
 import com.peekr.domain.user.application.usecase.GetUserUseCase
 import com.peekr.domain.user.application.usecase.UpdateIntroduceUseCase
 import com.peekr.domain.user.application.usecase.UpdateUserUseCase
@@ -25,10 +25,10 @@ val userModule = module {
 
     // UseCase
     factory { GetUserUseCase(get()) }
-    factory { GetProfileUseCase(get(), get()) }
+    factory { GetMyProfileUseCase(get(), get()) }
     factory { UpdateUserUseCase(get()) }
     factory { UpdateIntroduceUseCase(get()) }
-    factory { GetOtherUserProfileUseCase(get(), get()) }
+    factory { GetUserProfileUseCase(get(), get()) }
     single<UserUseCases> {
         UserUseCases(
             get(),

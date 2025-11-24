@@ -21,7 +21,7 @@ import kotlinx.coroutines.test.runTest
 class GetUserProfileUseCaseTest {
     private val userRepository: UserRepository = mockk()
     private val friendProvider: FriendProvider = mockk()
-    private val usecase = GetProfileUseCase(userRepository, friendProvider)
+    private val usecase = GetMyProfileUseCase(userRepository, friendProvider)
 
     @Test
     fun `사용자 프로필 조회 성공 테스트`() = runTest {

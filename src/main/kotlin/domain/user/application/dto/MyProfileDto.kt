@@ -1,12 +1,11 @@
 package com.peekr.domain.user.application.dto
 
-import com.peekr.common.model.FriendshipStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.id.DisplayId
 
 /**
- * 사용자 프로필 DTO
+ * 나의 프로필 DTO
  *
  * @property displayId 사용자 표시 ID
  * @property name 사용자 이름
@@ -15,9 +14,8 @@ import com.peekr.common.model.id.DisplayId
  * @property isActive 사용자 활성 여부
  * @property lastLoginAt 마지막 로그인 일시
  * @property friendsCount 사용자 친구 수
- * @property friendshipStatus 친구 관계 상태
  */
-data class UserProfileDto(
+data class MyProfileDto(
     val displayId: DisplayId,
     val name: Name,
     val profileImageUrl: String?,
@@ -25,5 +23,4 @@ data class UserProfileDto(
     val isActive: Boolean,
     val lastLoginAt: Long?,
     val friendsCount: Long,
-    val friendshipStatus: FriendshipStatus,
 )

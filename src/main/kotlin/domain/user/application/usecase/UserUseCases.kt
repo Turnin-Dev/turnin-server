@@ -3,10 +3,10 @@ package com.peekr.domain.user.application.usecase
 data class UserUseCases(
     /** @see [GetUserUseCase] */
     val get: GetUserUseCase,
-    /** @see [GetProfileUseCase] */
-    val getProfile: GetProfileUseCase,
-    /** @see [GetOtherUserProfileUseCase] */
-    val getOtherUserProfile: GetOtherUserProfileUseCase,
+    /** @see [GetMyProfileUseCase] */
+    val getMyProfile: GetMyProfileUseCase,
+    /** @see [GetUserProfileUseCase] */
+    val getUserProfile: GetUserProfileUseCase,
     /** @see [UpdateUserUseCase] */
     val update: UpdateUserUseCase,
     /** @see [UpdateIntroduceUseCase] */
