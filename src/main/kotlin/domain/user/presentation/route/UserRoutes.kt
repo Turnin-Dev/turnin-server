@@ -152,7 +152,7 @@ private fun RouteConfig.getUserProfileDocs() {
     summary = "사용자 프로필 조회"
     description = "사용자 표시 ID로 사용자 프로필을 조회한다."
     request {
-        pathParameter<Long>("displayId") {
+        pathParameter<String>("displayId") {
             description = "사용자 표시 ID"
             example("Example") {
                 value = "display-id"
