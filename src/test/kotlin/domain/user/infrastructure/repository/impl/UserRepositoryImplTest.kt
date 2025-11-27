@@ -57,6 +57,31 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    fun `findByDisplayId 성공 테스트`() = runTest {
+        // given
+        val displayId = TestDatabaseFactory.dbQuery {
+            val savedUserEntity = UserTestDoubles.saveAndGetUserEntity()
+            DisplayId(savedUserEntity.displayId)
+        }
+
+        // when
+        val user = repository.findByDisplayId(displayId)
+
+        // then
+        assertNotNull(user)
+        assertEquals(displayId, user.displayId)
+    }
+
+    @Test
+    fun `findByDisplayId 실패 테스트 - 사용자를 찾지 못하는 경우 null를 반환한다`() = runTest {
+        // when
+        val userEntity = repository.findByDisplayId(DisplayId("did"))
+
+        // then
+        assertNull(userEntity)
+    }
+
+    @Test
     fun `update 실패 테스트 - 사용자를 찾지 못하는 경우 false를 반환한다`() = runTest {
         // when
         val userId = UserId(1L)
