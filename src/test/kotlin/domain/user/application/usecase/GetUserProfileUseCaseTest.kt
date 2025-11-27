@@ -27,7 +27,7 @@ class GetUserProfileUseCaseTest {
 
     @BeforeTest
     fun setUp() {
-        coEvery { userRepository.findById(TestUserId) } returns TestUser
+        coEvery { userRepository.findByDisplayId(TestDisplayId) } returns TestUser
         coEvery { friendProvider.countFriends(TestUserId) } returns 10L
         coEvery {
             friendProvider.getFriendshipStatus(TestMyUserId, TestUserId)
@@ -36,19 +36,20 @@ class GetUserProfileUseCaseTest {
 
     @Test
     fun `사용자 프로필 조회 성공 테스트`() = runTest {
-        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
+        val userProfileDto = usecase(TestMyUserId, TestDisplayId.value)
 
         assertNotNull(userProfileDto)
         assertEquals(TestUser.displayId, userProfileDto.displayId)
+        assertEquals(TestUser.name, userProfileDto.name)
     }
 
     @Test
     fun `사용자를 찾지 못하는 경우 null을 반환한다`() = runTest {
         // given
-        coEvery { userRepository.findById(TestUserId) } returns null
+        coEvery { userRepository.findByDisplayId(TestDisplayId) } returns null
 
         // when
-        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
+        val userProfileDto = usecase(TestMyUserId, TestDisplayId.value)
 
         // then
         assertNull(userProfileDto)
@@ -57,12 +58,13 @@ class GetUserProfileUseCaseTest {
     companion object {
         private val TestMyUserId = UserId(1L)
         private val TestUserId = UserId(2L)
+        private val TestDisplayId = DisplayId("displayId")
         private val TestUser = User(
             id = TestUserId,
             role = Role.USER,
             provider = SocialLoginProvider.GOOGLE,
             providerId = "providerId",
-            displayId = DisplayId("displayId"),
+            displayId = TestDisplayId,
             name = Name("name"),
             profileImageUrl = "profileImageUrl",
             introduce = Introduce("introduce"),

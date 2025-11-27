@@ -1,5 +1,6 @@
 package com.peekr.domain.user.application.usecase
 
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.application.dto.UserProfileDto
 import com.peekr.domain.user.application.dto.toDto
@@ -17,18 +18,18 @@ class GetUserProfileUseCase(
      * 사용자 ID로 사용자 프로필을 조회한다.
      *
      * @param myUserId 나의 사용자 ID
-     * @param userId 사용자 ID
+     * @param displayId 사용자 표시 ID
      *
      * @return [UserProfileDto] 사용자 프로필 DTO
      */
     suspend operator fun invoke(
         myUserId: UserId,
-        userId: Long,
+        displayId: String,
     ): UserProfileDto? {
-        val userIdVO = UserId(userId)
-        val userDto = userRepository.findById(userIdVO)?.toDto() ?: return null
-        val friendsCount = friendProvider.countFriends(userIdVO)
-        val friendshipStatus = friendProvider.getFriendshipStatus(myUserId, userIdVO)
+        val displayIdVO = DisplayId(displayId)
+        val userDto = userRepository.findByDisplayId(displayIdVO)?.toDto() ?: return null
+        val friendsCount = friendProvider.countFriends(userDto.id)
+        val friendshipStatus = friendProvider.getFriendshipStatus(myUserId, userDto.id)
         return UserProfileDto(
             displayId = userDto.displayId,
             name = userDto.name,
