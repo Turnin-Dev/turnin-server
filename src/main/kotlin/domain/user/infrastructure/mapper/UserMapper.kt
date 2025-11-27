@@ -11,17 +11,17 @@ import org.jetbrains.exposed.sql.ResultRow
 
 /** ##### 반드시 db transaction 범위 내에서 실행되어야 한다. */
 object UserMapper {
-    fun toDomain(entity: UserEntity): User = User(
-        id = UserId(entity.id.value),
-        role = entity.role,
-        provider = entity.provider,
-        providerId = entity.providerId,
-        displayId = DisplayId(entity.displayId),
-        name = Name(entity.name),
-        profileImageUrl = entity.profileImageUrl,
-        introduce = entity.introduce?.let { Introduce(it) },
-        isActive = entity.isActive,
-        lastLoginAt = entity.lastLoginAt,
+    fun UserEntity.toDomain(): User = User(
+        id = UserId(this.id.value),
+        role = this.role,
+        provider = this.provider,
+        providerId = this.providerId,
+        displayId = DisplayId(this.displayId),
+        name = Name(this.name),
+        profileImageUrl = this.profileImageUrl,
+        introduce = this.introduce?.let { Introduce(it) },
+        isActive = this.isActive,
+        lastLoginAt = this.lastLoginAt,
     )
 
     fun toDomain(row: ResultRow): User = User(

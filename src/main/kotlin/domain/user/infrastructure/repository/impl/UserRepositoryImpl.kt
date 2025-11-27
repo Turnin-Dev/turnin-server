@@ -4,18 +4,26 @@ import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.Introduce
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
-import com.peekr.domain.user.infrastructure.mapper.UserMapper
+import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
 import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {
     override suspend fun findById(id: UserId): User? = suspendTransaction {
-        UserEntity.findById(id.value)?.let { entity ->
-            UserMapper.toDomain(entity)
-        }
+        UserEntity
+            .findById(id.value)
+            ?.toDomain()
+    }
+
+    override suspend fun findByDisplayId(id: DisplayId): User? = suspendTransaction {
+        UserEntity
+            .find { Users.displayId eq id.value }
+            .singleOrNull()
+            ?.toDomain()
     }
 
     override suspend fun update(
