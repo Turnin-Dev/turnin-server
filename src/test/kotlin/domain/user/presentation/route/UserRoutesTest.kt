@@ -514,7 +514,6 @@ class UserRoutesTest {
 
     companion object {
         private val TestMyUserId = UserId(1L)
-        private val TestUserId = UserId(2L)
         private val TestDisplayId = DisplayId("did")
         private const val INVALID_USER_ID = "asd"
         private val TestUserPatchDto = UserPatchDto(
