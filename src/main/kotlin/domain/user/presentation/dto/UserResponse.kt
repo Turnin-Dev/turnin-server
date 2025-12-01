@@ -14,8 +14,8 @@ import kotlinx.serialization.Serializable
  * @property name 사용자 이름
  * @property profileImageUrl 사용자 프로필 이미지 url
  * @property introduce 사용자 소개 글
- * @property isActive 사용자 활성 여부
  * @property lastLoginAt 마지막 로그인 일시
+ * @property isActive 사용자 활성 여부
  */
 @Serializable
 data class UserResponse(
@@ -27,8 +27,8 @@ data class UserResponse(
     val name: String,
     val profileImageUrl: String?,
     val introduce: String?,
-    val isActive: Boolean,
     val lastLoginAt: Long?,
+    val isActive: Boolean,
 ) {
     companion object {
         val sample = UserResponse(
@@ -40,8 +40,8 @@ data class UserResponse(
             name = "honggd",
             profileImageUrl = "https://www.example.com/image.jpg",
             introduce = "hello world!",
-            isActive = true,
             lastLoginAt = 1697875200000L,
+            isActive = true,
         )
     }
 }
