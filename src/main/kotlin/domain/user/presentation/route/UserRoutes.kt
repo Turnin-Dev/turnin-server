@@ -132,15 +132,12 @@ private fun RouteConfig.getMyProfileDocs() {
         code(HttpStatusCode.OK) {
             body<MyProfileResponse> {
                 description = "나의 프로필"
-                example("MyProfileResponse") {
-                    value = MyProfileResponse.sample
-                }
             }
         }
         code(HttpStatusCode.NotFound) {
             body<ErrorResponse> {
                 description = "사용자가 존재하지 않는 경우"
-                example("UserResponse") {
+                example("UserNotFound") {
                     value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
                 }
             }
@@ -163,15 +160,12 @@ private fun RouteConfig.getUserProfileDocs() {
         code(HttpStatusCode.OK) {
             body<UserProfileResponse> {
                 description = "사용자 프로필"
-                example("UserProfileResponse") {
-                    value = UserProfileResponse.sample
-                }
             }
         }
         code(HttpStatusCode.NotFound) {
             body<ErrorResponse> {
                 description = "사용자가 존재하지 않는 경우"
-                example("UserResponse") {
+                example("UserNotFound") {
                     value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
                 }
             }

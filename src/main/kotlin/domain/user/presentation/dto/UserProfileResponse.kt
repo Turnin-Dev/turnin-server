@@ -11,10 +11,10 @@ import kotlinx.serialization.Serializable
  * @property name 사용자 이름
  * @property profileImageUrl 사용자 프로필 이미지 url
  * @property introduce 사용자 소개 글
- * @property isActive 사용자 활성 여부
  * @property lastLoginAt 마지막 로그인 일시
  * @property friendsCount 친구 수
  * @property friendshipStatus 친구 관계 상태
+ * @property isActive 사용자 활성 여부
  */
 @Serializable
 data class UserProfileResponse(
@@ -22,10 +22,10 @@ data class UserProfileResponse(
     val name: String,
     val profileImageUrl: String?,
     val introduce: String?,
-    val isActive: Boolean,
     val lastLoginAt: Long?,
     val friendsCount: Long,
     val friendshipStatus: FriendshipStatus,
+    val isActive: Boolean,
 ) {
     companion object {
         val sample = UserProfileResponse(
@@ -33,10 +33,10 @@ data class UserProfileResponse(
             name = "honggd",
             profileImageUrl = "https://www.example.com/image.jpg",
             introduce = "hello world!",
-            isActive = true,
             lastLoginAt = 1697875200000L,
             friendsCount = 51L,
             friendshipStatus = FriendshipStatus.NOTHING,
+            isActive = true,
         )
     }
 }
