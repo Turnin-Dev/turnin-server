@@ -38,7 +38,7 @@ class GetUserKeywordsUseCaseTest {
         } returns TestExternalKeyword
 
         // when
-        val userKeywords = usecase(TestUserId)
+        val userKeywords = usecase(TestUserId.value)
 
         // then
         assertTrue(userKeywords.size == itemCount)
@@ -57,7 +57,7 @@ class GetUserKeywordsUseCaseTest {
 
         // when
         val exception = runCatching {
-            usecase(TestUserId)
+            usecase(TestUserId.value)
         }.exceptionOrNull()
 
         // then

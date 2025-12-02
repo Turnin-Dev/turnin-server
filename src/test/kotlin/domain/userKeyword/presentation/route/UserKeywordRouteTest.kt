@@ -58,7 +58,7 @@ class UserKeywordRouteTest {
         val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
         val itemCount = 2
         coEvery {
-            userKeywordUseCases.get(TestUserId)
+            userKeywordUseCases.get(TestUserId.value)
         } returns List(itemCount) { TestUserKeywordDto }
 
         testPlugin(
@@ -67,6 +67,9 @@ class UserKeywordRouteTest {
 
         // when
         val response = client.get(route.ROUTE) {
+            url {
+                parameters.append("userId", TestUserId.value.toString())
+            }
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
         }
@@ -86,7 +89,7 @@ class UserKeywordRouteTest {
         val client = createTestClient()
         val itemCount = 2
         coEvery {
-            userKeywordUseCases.get(TestUserId)
+            userKeywordUseCases.get(TestUserId.value)
         } returns List(itemCount) { TestUserKeywordDto }
 
         testPlugin(
@@ -95,6 +98,9 @@ class UserKeywordRouteTest {
 
         // when
         val response = client.get(route.ROUTE) {
+            url {
+                parameters.append("userId", TestUserId.value.toString())
+            }
             contentType(ContentType.Application.Json)
         }
 
@@ -109,7 +115,7 @@ class UserKeywordRouteTest {
         val client = createTestClient()
         val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
         coEvery {
-            userKeywordUseCases.get(TestUserId)
+            userKeywordUseCases.get(TestUserId.value)
         } throws Exception("")
 
         testPlugin(
@@ -118,6 +124,9 @@ class UserKeywordRouteTest {
 
         // when
         val response = client.get(route.ROUTE) {
+            url {
+                parameters.append("userId", TestUserId.value.toString())
+            }
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
         }
@@ -135,7 +144,7 @@ class UserKeywordRouteTest {
         val expectedMessage = "error!"
         val expectedException = TestApiException(expectedMessage)
         coEvery {
-            userKeywordUseCases.get(TestUserId)
+            userKeywordUseCases.get(TestUserId.value)
         } throws expectedException
 
         testPlugin(
@@ -144,6 +153,9 @@ class UserKeywordRouteTest {
 
         // when
         val response = client.get(route.ROUTE) {
+            url {
+                parameters.append("userId", TestUserId.value.toString())
+            }
             header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
             contentType(ContentType.Application.Json)
         }

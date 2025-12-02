@@ -19,8 +19,9 @@ class GetUserKeywordsUseCase(
      *
      * @return [UserKeywordDto] 리스트를 반환한다.
      */
-    suspend operator fun invoke(userId: UserId): List<UserKeywordDto> =
-        userKeywordRepository.findByUserId(userId).map { userKeyword ->
+    suspend operator fun invoke(userId: Long): List<UserKeywordDto> {
+        val userIdVO = UserId(userId)
+        return userKeywordRepository.findByUserId(userIdVO).map { userKeyword ->
             val keyword = keywordProvider.findById(userKeyword.keywordId)
             if (keyword != null) {
                 userKeyword.toDto(keyword.name)
@@ -28,4 +29,5 @@ class GetUserKeywordsUseCase(
                 throw UserKeywordException.NotExistsKeyword(null)
             }
         }
+    }
 }
