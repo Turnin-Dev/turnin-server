@@ -27,7 +27,7 @@ class GetUserProfileUseCaseTest {
 
     @BeforeTest
     fun setUp() {
-        coEvery { userRepository.findByDisplayId(TestDisplayId) } returns TestUser
+        coEvery { userRepository.findById(TestUserId) } returns TestUser
         coEvery { friendProvider.countFriends(TestUserId) } returns 10L
         coEvery {
             friendProvider.getFriendshipStatus(TestMyUserId, TestUserId)
@@ -36,7 +36,7 @@ class GetUserProfileUseCaseTest {
 
     @Test
     fun `사용자 프로필 조회 성공 테스트`() = runTest {
-        val userProfileDto = usecase(TestMyUserId, TestDisplayId.value)
+        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
 
         assertNotNull(userProfileDto)
         assertEquals(TestUser.displayId, userProfileDto.displayId)
@@ -46,10 +46,10 @@ class GetUserProfileUseCaseTest {
     @Test
     fun `사용자를 찾지 못하는 경우 null을 반환한다`() = runTest {
         // given
-        coEvery { userRepository.findByDisplayId(TestDisplayId) } returns null
+        coEvery { userRepository.findById(TestUserId) } returns null
 
         // when
-        val userProfileDto = usecase(TestMyUserId, TestDisplayId.value)
+        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
 
         // then
         assertNull(userProfileDto)

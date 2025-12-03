@@ -17,6 +17,7 @@ class GetMyProfileUseCase(
         val userDto = userRepository.findById(id)?.toDto() ?: return null
         val friendsCount = friendProvider.countFriends(id)
         return MyProfileDto(
+            userId = userDto.id.value,
             displayId = userDto.displayId,
             name = userDto.name,
             profileImageUrl = userDto.profileImageUrl,

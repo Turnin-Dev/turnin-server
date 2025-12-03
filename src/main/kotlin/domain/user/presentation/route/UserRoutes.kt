@@ -55,10 +55,12 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.PROFILE.byPathParam("displayId"), { getUserProfileDocs() }) {
+        get(route.PROFILE.byPathParam("userId"), { getUserProfileDocs() }) {
             val myUserId = extractUserIdWithToken()
-            val displayId = call.pathParameters["displayId"].inputValidationAndReturn("사용자 표시 ID")
-            val userProfileDto = usecase.getUserProfile(myUserId = myUserId, displayId = displayId)
+            val userId = call.pathParameters["userId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 ID")
+            val userProfileDto = usecase.getUserProfile(myUserId = myUserId, userId = userId)
             if (userProfileDto != null) {
                 call.respond(userProfileDto.toResponse())
             } else {
@@ -147,12 +149,12 @@ private fun RouteConfig.getMyProfileDocs() {
 
 private fun RouteConfig.getUserProfileDocs() {
     summary = "사용자 프로필 조회"
-    description = "사용자 표시 ID로 사용자 프로필을 조회한다."
+    description = "사용자 ID로 사용자 프로필을 조회한다."
     request {
-        pathParameter<String>("displayId") {
-            description = "사용자 표시 ID"
+        pathParameter<Long>("userId") {
+            description = "사용자 ID"
             example("Example") {
-                value = "display-id"
+                value = 1L
             }
         }
     }
