@@ -31,8 +31,9 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
         description = "User Keyword API"
     }) {
         get({ getUserKeywordsDocs() }) {
-            val userId = extractUserIdWithToken()
-            verifyAuthUserId(userId)
+            val userId = call.queryParameters["userId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 ID")
             val userKeywords = usecase.get(userId)
             call.respond(userKeywords.toResponse())
         }
@@ -121,6 +122,14 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
 private fun RouteConfig.getUserKeywordsDocs() {
     summary = "사용자 키워드 목록 조회"
     description = "사용자 ID로 사용자 키워드 목록을 조회한다."
+    request {
+        queryParameter<Long>("userId") {
+            description = "사용자 ID"
+            example("userId") {
+                value = 1
+            }
+        }
+    }
     response {
         code(HttpStatusCode.OK) {
             body<GetUserKeywordResponse> {

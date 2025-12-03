@@ -195,11 +195,11 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 성공 테스트`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId, TestDisplayId.value)
+            userUseCases.getUserProfile(TestMyUserId, TestUserId.value)
         } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestDisplayId.value}",
+            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -220,11 +220,11 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId, TestDisplayId.value)
+            userUseCases.getUserProfile(TestMyUserId, TestUserId.value)
         } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestDisplayId.value}",
+            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -239,11 +239,11 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId, TestDisplayId.value)
+            userUseCases.getUserProfile(TestMyUserId, TestUserId.value)
         } returns null
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestDisplayId.value}",
+            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -258,11 +258,11 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId, TestDisplayId.value)
+            userUseCases.getUserProfile(TestMyUserId, TestUserId.value)
         } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestDisplayId.value}",
+            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -282,11 +282,11 @@ class UserRoutesTest {
             message = "unexpected error",
         )
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId, TestDisplayId.value)
+            userUseCases.getUserProfile(TestMyUserId, TestUserId.value)
         } throws expectedApiException
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestDisplayId.value}",
+            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -514,6 +514,7 @@ class UserRoutesTest {
 
     companion object {
         private val TestMyUserId = UserId(1L)
+        private val TestUserId = UserId(2L)
         private val TestDisplayId = DisplayId("did")
         private const val INVALID_USER_ID = "asd"
         private val TestUserPatchDto = UserPatchDto(
@@ -529,6 +530,7 @@ class UserRoutesTest {
             introduce = TEST_INTRODUCE,
         )
         private val TestMyProfileDto = MyProfileDto(
+            userId = TestMyUserId.value,
             displayId = DisplayId("id"),
             name = Name("name"),
             profileImageUrl = null,
@@ -542,6 +544,7 @@ class UserRoutesTest {
             introduce = TEST_INTRODUCE,
         )
         private val TestUserProfileDto = UserProfileDto(
+            userId = TestUserId.value,
             displayId = TestDisplayId,
             name = Name("honggd"),
             profileImageUrl = "https://www.example.com/image.jpg",

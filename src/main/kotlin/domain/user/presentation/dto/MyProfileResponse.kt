@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 /**
  * 나의 프로필 조회 응답 바디
  *
+ * @property userId 사용자 ID
  * @property displayId 사용자 표시 ID
  * @property name 사용자 이름
  * @property profileImageUrl 사용자 프로필 이미지 url
@@ -16,6 +17,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class MyProfileResponse(
+    val userId: Long,
     val displayId: String,
     val name: String,
     val profileImageUrl: String?,
@@ -26,6 +28,7 @@ data class MyProfileResponse(
 ) {
     companion object {
         val sample = MyProfileResponse(
+            userId = 1L,
             displayId = "hong_gd_123",
             name = "honggd",
             profileImageUrl = "https://www.example.com/image.jpg",
@@ -38,6 +41,7 @@ data class MyProfileResponse(
 }
 
 fun MyProfileDto.toResponse(): MyProfileResponse = MyProfileResponse(
+    userId = userId,
     displayId = displayId.value,
     name = name.value,
     profileImageUrl = profileImageUrl,

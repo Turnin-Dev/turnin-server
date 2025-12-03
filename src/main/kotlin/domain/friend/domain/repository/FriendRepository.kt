@@ -19,7 +19,7 @@ interface FriendRepository {
     /**
      * 친구 목록 조회
      *
-     * @param userId 사용자(본인) ID
+     * @param userId 사용자 ID
      */
     suspend fun getFriends(userId: UserId): List<Friend>
 

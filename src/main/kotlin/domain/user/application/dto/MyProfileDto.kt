@@ -7,6 +7,7 @@ import com.peekr.common.model.id.DisplayId
 /**
  * 나의 프로필 DTO
  *
+ * @property userId 사용자 ID
  * @property displayId 사용자 표시 ID
  * @property name 사용자 이름
  * @property profileImageUrl 사용자 프로필 이미지 url
@@ -16,6 +17,7 @@ import com.peekr.common.model.id.DisplayId
  * @property friendsCount 사용자 친구 수
  */
 data class MyProfileDto(
+    val userId: Long,
     val displayId: DisplayId,
     val name: Name,
     val profileImageUrl: String?,

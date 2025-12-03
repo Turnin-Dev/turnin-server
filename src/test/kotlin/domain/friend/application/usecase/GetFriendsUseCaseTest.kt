@@ -23,7 +23,7 @@ class GetFriendsUseCaseTest {
         } returns listOf(TestFriend)
 
         // when
-        val result = usecase(TestFriend.requesterId)
+        val result = usecase(TestFriend.requesterId.value)
 
         // then
         assertTrue(result.isNotEmpty())

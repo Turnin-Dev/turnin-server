@@ -14,6 +14,8 @@ class GetFriendsUseCase(private val friendRepository: FriendRepository) {
      *
      * @param userId 사용자 ID
      */
-    suspend operator fun invoke(userId: UserId): List<FriendDto> =
-        friendRepository.getFriends(userId).map { it.toDto() }
+    suspend operator fun invoke(userId: Long): List<FriendDto> {
+        val userIdVO = UserId(userId)
+        return friendRepository.getFriends(userIdVO).map { it.toDto() }
+    }
 }
