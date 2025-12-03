@@ -199,6 +199,7 @@ class ReportRouteTest {
         private const val INVALID_USER_ID = "asd"
         private const val TEST_REASON_DESC = "test reason desc"
         private val TestReportReasonDto = ReportReasonDto(
+            id = 1L,
             code = "code",
             description = TEST_REASON_DESC,
         )
