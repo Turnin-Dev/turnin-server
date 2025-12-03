@@ -2,6 +2,7 @@ package com.peekr.domain.friend.presentation.route
 
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
+import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
 import com.peekr.domain.friend.presentation.dto.DeleteFriendRequest
@@ -26,7 +27,9 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
     }) {
         // TODO: 페이지네이션 필요
         get(route.FRIENDS, { getFriendsDocs() }) {
-            val userId = extractUserIdWithToken()
+            val userId = call.queryParameters["userId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 ID")
             val friends = usecase.getFriends(userId)
             call.respond(friends.toResponse())
         }
@@ -99,8 +102,15 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
 }
 
 private fun RouteConfig.getFriendsDocs() {
-    summary = "친구 목록 조회"
-    description = "친구 목록을 조회한다."
+    summary = "사용자 ID로 친구 목록 조회"
+    description = "사용자 ID로 친구 목록을 조회한다."
+    request {
+        queryParameter<Long>("userId") {
+            example("User ID") {
+                value = 1L
+            }
+        }
+    }
     response {
         code(HttpStatusCode.OK) {
             description = "친구 목록"

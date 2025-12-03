@@ -63,7 +63,7 @@ class FriendUseCaseIntegrationTest {
         assertTrue(result)
 
         // then: 사용자 B 친구 목록 조회
-        val userBFriends = getFriendsUseCase(userB)
+        val userBFriends = getFriendsUseCase(userB.value)
         assertTrue(userBFriends.isNotEmpty())
         assertTrue(
             userBFriends.first().requesterId == userA.value ||
@@ -92,8 +92,8 @@ class FriendUseCaseIntegrationTest {
         assertTrue(result)
 
         // then: 사용자 A, 사용자 B 친구 목록 조회 시 전부 비어있어야 한다.
-        val userBFriends = getFriendsUseCase(userB)
-        val userAFriends = getFriendsUseCase(userA)
+        val userBFriends = getFriendsUseCase(userB.value)
+        val userAFriends = getFriendsUseCase(userA.value)
         assertTrue(userAFriends.isEmpty())
         assertTrue(userBFriends.isEmpty())
     }
@@ -113,8 +113,8 @@ class FriendUseCaseIntegrationTest {
         assertTrue(updateResult)
 
         // 2. 서로 친구 인지 확인
-        val userAFriends = getFriendsUseCase(userA)
-        val userBFriends = getFriendsUseCase(userB)
+        val userAFriends = getFriendsUseCase(userA.value)
+        val userBFriends = getFriendsUseCase(userB.value)
         assertTrue(userAFriends.isNotEmpty())
         assertTrue(userBFriends.isNotEmpty())
 
@@ -123,8 +123,8 @@ class FriendUseCaseIntegrationTest {
         assertTrue(deleteResult)
 
         // then: 서로 친구 데이터가 삭제됐는지 확인
-        val userAFriends2 = getFriendsUseCase(userA)
-        val userBFriends2 = getFriendsUseCase(userB)
+        val userAFriends2 = getFriendsUseCase(userA.value)
+        val userBFriends2 = getFriendsUseCase(userB.value)
         assertTrue(userAFriends2.isEmpty())
         assertTrue(userBFriends2.isEmpty())
     }
