@@ -69,6 +69,9 @@ private fun RouteConfig.createReportDocs() {
         code(HttpStatusCode.Created) {
             description = "신고 요청 성공 시"
         }
+        code(HttpStatusCode.Conflict) {
+            description = "중복 신고 요청 시 (클라이언트에서 이를 별도로 처리해줘야 한다.)"
+        }
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 신고자 ID가 일치하지 않는 경우 혹은 인증 오류 시"
         }
