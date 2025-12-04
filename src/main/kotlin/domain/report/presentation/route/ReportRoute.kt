@@ -1,5 +1,6 @@
 package com.peekr.domain.report.presentation.route
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.domain.report.application.usecase.ReportUseCases
@@ -28,8 +29,12 @@ fun AuthenticatedRoute.reportRoutes(route: Api.V1.Report, usecase: ReportUseCase
         post({ createReportDocs() }) {
             val ownerId = extractUserIdWithToken()
             val reportRequest = call.receive<ReportRequest>()
-            usecase.createReport(ownerId, reportRequest.toDto())
-            call.respond(HttpStatusCode.Created)
+            try {
+                usecase.createReport(ownerId, reportRequest.toDto())
+                call.respond(HttpStatusCode.Created)
+            } catch (_: DatabaseException.DuplicatedDataException) {
+                call.respond(HttpStatusCode.Conflict)
+            }
         }
     }
 }

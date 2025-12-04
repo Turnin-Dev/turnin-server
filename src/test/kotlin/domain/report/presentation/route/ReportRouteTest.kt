@@ -1,5 +1,6 @@
 package com.peekr.domain.report.presentation.route
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.exception.common.CommonException
@@ -191,6 +192,26 @@ class ReportRouteTest {
             },
             tokenSubject = INVALID_USER_ID,
             expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `신고 생성 - 중복 신고 시 HTTP 상태코드 Conflict를 반환한다`() = testApplication {
+        coEvery {
+            usecase.createReport(TestUserId, any())
+        } throws DatabaseException.DuplicatedDataException(Throwable())
+
+        testPostEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestReportRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { reportRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.Conflict,
         )
     }
 
