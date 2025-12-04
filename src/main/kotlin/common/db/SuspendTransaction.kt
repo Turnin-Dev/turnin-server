@@ -24,28 +24,20 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
  * @throws DatabaseException.ForeignKeyViolationException 외래키 제약조건 위반 시
  */
 suspend fun <T> suspendTransaction(block: suspend () -> T): T =
-    if (TransactionManager.currentOrNull() != null) {
-        try {
+    try {
+        if (TransactionManager.currentOrNull() != null) {
             block()
-        } catch (e: SQLException) {
-            LOGGER.error("Database query failed: ${e.message}")
-            throw handleSqlException(e)
-        } catch (e: ExposedSQLException) {
-            LOGGER.error("Database query failed: ${e.message}")
-            throw handleSqlException(e)
-        }
-    } else {
-        newSuspendedTransaction(ioDispatcher) {
-            try {
+        } else {
+            newSuspendedTransaction(ioDispatcher) {
                 block()
-            } catch (e: SQLException) {
-                LOGGER.error("Database query failed: ${e.message}")
-                throw handleSqlException(e)
-            } catch (e: ExposedSQLException) {
-                LOGGER.error("Database query failed: ${e.message}")
-                throw handleSqlException(e)
             }
         }
+    } catch (e: SQLException) {
+        LOGGER.error("Database query failed: ${e.message}")
+        throw handleSqlException(e)
+    } catch (e: ExposedSQLException) {
+        LOGGER.error("Database query failed: ${e.message}")
+        throw handleSqlException(e)
     }
 
 /**
