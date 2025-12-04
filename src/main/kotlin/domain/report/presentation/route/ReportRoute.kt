@@ -1,5 +1,6 @@
 package com.peekr.domain.report.presentation.route
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.domain.report.application.usecase.ReportUseCases
@@ -28,8 +29,12 @@ fun AuthenticatedRoute.reportRoutes(route: Api.V1.Report, usecase: ReportUseCase
         post({ createReportDocs() }) {
             val ownerId = extractUserIdWithToken()
             val reportRequest = call.receive<ReportRequest>()
-            usecase.createReport(ownerId, reportRequest.toDto())
-            call.respond(HttpStatusCode.Created)
+            try {
+                usecase.createReport(ownerId, reportRequest.toDto())
+                call.respond(HttpStatusCode.Created)
+            } catch (_: DatabaseException.DuplicatedDataException) {
+                call.respond(HttpStatusCode.Conflict)
+            }
         }
     }
 }
@@ -63,6 +68,9 @@ private fun RouteConfig.createReportDocs() {
     response {
         code(HttpStatusCode.Created) {
             description = "신고 요청 성공 시"
+        }
+        code(HttpStatusCode.Conflict) {
+            description = "중복 신고 요청 시 (클라이언트에서 이를 별도로 처리해줘야 한다.)"
         }
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 신고자 ID가 일치하지 않는 경우 혹은 인증 오류 시"

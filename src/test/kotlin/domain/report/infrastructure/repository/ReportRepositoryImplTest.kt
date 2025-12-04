@@ -1,5 +1,6 @@
 package com.peekr.domain.report.infrastructure.repository
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.Reports
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.Role
@@ -99,6 +100,44 @@ class ReportRepositoryImplTest {
         assertNull(exception)
         assertEquals(1, report.size)
         assertEquals(TEST_CUSTOM_REASON, report.first())
+    }
+
+    @Test
+    fun `신고 중복 생성 시 예외가 발생한다`() = runTest {
+        // given
+        val user1 = insertUserAndReturnId("1")
+        val user2 = insertUserAndReturnId("2")
+        val reportReason = repository.createReportReason(
+            code = TEST_REPORT_REASON_CODE,
+            description = TEST_REPORT_REASON_DESCRIPTION,
+        )
+        assertNotNull(reportReason)
+
+        // when: 중복 신고
+        val exception = runCatching {
+            // 첫 번째 신고는 성공
+            repository.createReport(
+                ReportDetail(
+                    reporterId = user1,
+                    reportedId = user2,
+                    reasonId = reportReason.id,
+                    customReason = TEST_CUSTOM_REASON,
+                ),
+            )
+
+            // 두 번째 신고는 중복 신고이므로 예외 발생
+            repository.createReport(
+                ReportDetail(
+                    reporterId = user1,
+                    reportedId = user2,
+                    reasonId = reportReason.id,
+                    customReason = TEST_CUSTOM_REASON,
+                ),
+            )
+        }.exceptionOrNull()
+
+        // then
+        assertTrue(exception is DatabaseException.DuplicatedDataException)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
