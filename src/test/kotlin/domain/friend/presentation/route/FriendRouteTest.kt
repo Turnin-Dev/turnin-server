@@ -8,7 +8,6 @@ import com.peekr.common.route.Api
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
-import com.peekr.domain.friend.presentation.dto.DeleteFriendRequest
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
 import com.peekr.util.testDeleteEndpoint
 import com.peekr.util.testGetEndpoint
@@ -302,8 +301,10 @@ class FriendRouteTest {
     fun `친구 삭제 - 성공 테스트`() = testApplication {
         testDeleteEndpoint(
             endpoint = route.ROUTE,
-            queryParameters = null,
-            requestBody = TestDeleteFriendRequest,
+            queryParameters = mapOf(
+                "requesterId" to "${TestRequesterId.value}",
+                "receiverId" to "${TestReceiverId.value}",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -318,8 +319,10 @@ class FriendRouteTest {
     fun `친구 삭제 - 인증된 사용자 ID가 requesterId, receiveId 둘 중 아무와도 일치하지 않는 경우 Forbidden을 반환한다`() = testApplication {
         testDeleteEndpoint(
             endpoint = route.ROUTE,
-            queryParameters = null,
-            requestBody = TestDeleteFriendRequest.copy(requesterId = 10L, receiverId = 11L),
+            queryParameters = mapOf(
+                "requesterId" to "10",
+                "receiverId" to "11",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -343,8 +346,10 @@ class FriendRouteTest {
 
         testDeleteEndpoint(
             endpoint = route.ROUTE,
-            queryParameters = null,
-            requestBody = TestDeleteFriendRequest,
+            queryParameters = mapOf(
+                "requesterId" to "${TestRequesterId.value}",
+                "receiverId" to "${TestReceiverId.value}",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -365,8 +370,10 @@ class FriendRouteTest {
     fun `친구 삭제 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         testDeleteEndpoint(
             endpoint = route.ROUTE,
-            queryParameters = null,
-            requestBody = TestDeleteFriendRequest,
+            queryParameters = mapOf(
+                "requesterId" to "${TestRequesterId.value}",
+                "receiverId" to "${TestReceiverId.value}",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -385,8 +392,10 @@ class FriendRouteTest {
 
         testDeleteEndpoint(
             endpoint = route.ROUTE,
-            queryParameters = null,
-            requestBody = TestDeleteFriendRequest,
+            queryParameters = mapOf(
+                "requesterId" to "${TestRequesterId.value}",
+                "receiverId" to "${TestReceiverId.value}",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -418,10 +427,6 @@ class FriendRouteTest {
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
             status = FriendStatus.ACCEPTED,
-        )
-        private val TestDeleteFriendRequest = DeleteFriendRequest(
-            requesterId = TestRequesterId.value,
-            receiverId = TestReceiverId.value,
         )
     }
 }
