@@ -5,7 +5,6 @@ import com.peekr.common.route.Api
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
-import com.peekr.domain.friend.presentation.dto.DeleteFriendRequest
 import com.peekr.domain.friend.presentation.dto.FriendResponse
 import com.peekr.domain.friend.presentation.dto.FriendsResponse
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
@@ -78,19 +77,22 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
 
         delete({ deleteFriendDocs() }) {
             val userId = extractUserIdWithToken()
-            val deleteFriendRequest = call.receive<DeleteFriendRequest>()
+            val requesterId = call.queryParameters["requesterId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("요청자 ID")
+            val receiverId = call.queryParameters["receiverId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("삭제할 친구 ID")
 
             // 인증된 사용자가 requesterId 또는 receiveId와 일치하는지 검증
-            if (userId.value != deleteFriendRequest.requesterId &&
-                userId.value != deleteFriendRequest.receiverId
-            ) {
+            if (userId.value != requesterId && userId.value != receiverId) {
                 call.respond(HttpStatusCode.Forbidden)
                 return@delete
             }
 
             val result = usecase.delete(
-                userId1 = deleteFriendRequest.requesterId,
-                userId2 = deleteFriendRequest.receiverId,
+                userId1 = requesterId,
+                userId2 = receiverId,
             )
             if (result) {
                 call.respond(HttpStatusCode.OK)
@@ -184,10 +186,16 @@ private fun RouteConfig.deleteFriendDocs() {
     summary = "친구 삭제"
     description = "친구를 삭제한다."
     request {
-        body<DeleteFriendRequest> {
-            description = "친구 삭제 요청 바디"
-            example("DeleteFriendRequest") {
-                value = DeleteFriendRequest.sample
+        queryParameter<Long>("requesterId") {
+            description = "삭제 요청한 사용자 ID"
+            example("UserID") {
+                value = 1L
+            }
+        }
+        queryParameter<Long>("receiverId") {
+            description = "삭제할 친구의 사용자 ID"
+            example("UserID") {
+                value = 2L
             }
         }
     }
