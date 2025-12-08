@@ -28,7 +28,7 @@ class GetUserProfileUseCase(
         val userIdVO = UserId(userId)
         val userDto = userRepository.findById(userIdVO)?.toDto() ?: return null
         val friendsCount = friendProvider.countFriends(userDto.id)
-        val friendshipStatus = friendProvider.getFriendshipStatus(myUserId, userDto.id)
+        val friendshipStatus = friendProvider.getFriendStatus(myUserId, userDto.id)
         return UserProfileDto(
             userId = userDto.id.value,
             displayId = userDto.displayId,
@@ -38,7 +38,7 @@ class GetUserProfileUseCase(
             isActive = userDto.isActive,
             lastLoginAt = userDto.lastLoginAt,
             friendsCount = friendsCount,
-            friendshipStatus = friendshipStatus,
+            friendStatus = friendshipStatus,
         )
     }
 }

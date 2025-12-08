@@ -3,7 +3,7 @@ package com.peekr.domain.user
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.Role
@@ -32,7 +32,7 @@ object UserTestDoubles {
     fun saveFriendEntity(
         requesterId: Long,
         receiverId: Long,
-        status: FriendStatus,
+        status: FriendRequestStatus,
     ) {
         FriendEntity.new {
             this.requesterId = EntityID(requesterId, Users)

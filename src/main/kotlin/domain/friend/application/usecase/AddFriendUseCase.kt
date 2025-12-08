@@ -18,7 +18,6 @@ class AddFriendUseCase(
     /**
      * 친구 추가(요청)
      *
-     * @param ownerId 실제로 친구 요청한 사용자 ID
      * @param requesterId 친구 요청한 사용자 ID
      * @param receiverId 친구 요청받을 사용자 ID
      *

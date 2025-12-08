@@ -1,7 +1,7 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.db.DatabaseException
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
@@ -97,7 +97,7 @@ class AddFriendUseCaseTest {
             id = FriendId(1L),
             requesterId = TestRequesterId,
             receiverId = TestReceiverId,
-            status = FriendStatus.ACCEPTED,
+            requestStatus = FriendRequestStatus.ACCEPTED,
             respondedAt = null,
             createdAt = 1000,
             updatedAt = 1000,

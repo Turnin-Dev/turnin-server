@@ -3,7 +3,7 @@ package com.peekr.domain.friend.infrastructure.repository
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
@@ -41,7 +41,7 @@ class FriendRepositoryImplTest {
         val userId1 = insertUserAndReturnId("a")
         val userId2 = insertUserAndReturnId("b")
         repository.createFriend(userId1, userId2)
-        repository.updateFriendStatus(userId2, userId1, FriendStatus.ACCEPTED)
+        repository.updateFriendRequestStatus(userId2, userId1, FriendRequestStatus.ACCEPTED)
 
         // when
         val user1Friends = repository.getFriends(userId1)
@@ -106,7 +106,7 @@ class FriendRepositoryImplTest {
         // then
         assertEquals(friend.requesterId, userId1)
         assertEquals(friend.receiverId, userId2)
-        assertEquals(friend.status, FriendStatus.PENDING)
+        assertEquals(friend.requestStatus, FriendRequestStatus.PENDING)
         assertTrue(friend.createdAt in (nowInSeconds - 1)..(nowInSeconds + 1))
     }
 
@@ -146,10 +146,10 @@ class FriendRepositoryImplTest {
                 .singleOrNull()
         }
         assertNotNull(friend)
-        assertEquals(FriendStatus.PENDING, friend[Friends.status])
+        assertEquals(FriendRequestStatus.PENDING, friend[Friends.status])
 
         // 2. ACCEPTED
-        repository.updateFriendStatus(userId2, userId1, FriendStatus.ACCEPTED)
+        repository.updateFriendRequestStatus(userId2, userId1, FriendRequestStatus.ACCEPTED)
         val friend2 = TestDatabaseFactory.dbQuery {
             Friends
                 .selectAll()
@@ -157,7 +157,7 @@ class FriendRepositoryImplTest {
                 .singleOrNull()
         }
         assertNotNull(friend2)
-        assertEquals(FriendStatus.ACCEPTED, friend2[Friends.status])
+        assertEquals(FriendRequestStatus.ACCEPTED, friend2[Friends.status])
     }
 
     @Test
@@ -166,7 +166,7 @@ class FriendRepositoryImplTest {
         val userId1 = insertUserAndReturnId("a")
 
         // when
-        val result = repository.updateFriendStatus(userId1, UserId(10L), FriendStatus.ACCEPTED)
+        val result = repository.updateFriendRequestStatus(userId1, UserId(10L), FriendRequestStatus.ACCEPTED)
 
         // then
         assertFalse(result)
@@ -208,7 +208,7 @@ class FriendRepositoryImplTest {
         val userId1 = insertUserAndReturnId("a")
         val userId2 = insertUserAndReturnId("b")
         repository.createFriend(userId1, userId2)
-        repository.updateFriendStatus(userId2, userId1, FriendStatus.ACCEPTED)
+        repository.updateFriendRequestStatus(userId2, userId1, FriendRequestStatus.ACCEPTED)
 
         // when
         val count = repository.countFriends(userId1)

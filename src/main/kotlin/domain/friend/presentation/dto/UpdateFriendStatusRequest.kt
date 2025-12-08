@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.presentation.dto
 
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import kotlinx.serialization.Serializable
 
 /**
@@ -8,19 +8,19 @@ import kotlinx.serialization.Serializable
  *
  * @property requesterId 친구 상태 수정을 요청한 사용자 ID
  * @property receiverId 친구 상태 수정 대상 사용자 ID
- * @property status 수정할 친구 상태
+ * @property requestStatus 수정할 친구 요청 상태
  */
 @Serializable
 data class UpdateFriendStatusRequest(
     val requesterId: Long,
     val receiverId: Long,
-    val status: FriendStatus,
+    val requestStatus: FriendRequestStatus,
 ) {
     companion object {
         val sample = UpdateFriendStatusRequest(
             requesterId = 1,
             receiverId = 2,
-            status = FriendStatus.ACCEPTED,
+            requestStatus = FriendRequestStatus.ACCEPTED,
         )
     }
 }

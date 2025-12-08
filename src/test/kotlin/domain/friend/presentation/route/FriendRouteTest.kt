@@ -2,7 +2,7 @@ package com.peekr.domain.friend.presentation.route
 
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.friend.application.dto.FriendDto
@@ -35,7 +35,7 @@ class FriendRouteTest {
             usecase.updateStatus(
                 userId1 = TestRequesterId.value,
                 userId2 = TestReceiverId.value,
-                status = FriendStatus.ACCEPTED,
+                requestStatus = FriendRequestStatus.ACCEPTED,
             )
         } returns true
         coEvery {
@@ -59,7 +59,7 @@ class FriendRouteTest {
                 containsAll(
                     TestFriendDto.requesterId.toString(),
                     TestFriendDto.receiverId.toString(),
-                    TestFriendDto.status.toString(),
+                    TestFriendDto.requestStatus.toString(),
                 )
             },
         )
@@ -125,7 +125,7 @@ class FriendRouteTest {
                 containsAll(
                     TestFriendDto.requesterId.toString(),
                     TestFriendDto.receiverId.toString(),
-                    TestFriendDto.status.toString(),
+                    TestFriendDto.requestStatus.toString(),
                 )
             },
         )
@@ -201,7 +201,7 @@ class FriendRouteTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.STATUS}",
             queryParameters = null,
-            requestBody = TestUpdateFriendStatusRequest,
+            requestBody = TestUpdateFriendRequestStatusRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -219,7 +219,7 @@ class FriendRouteTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.STATUS}",
             queryParameters = null,
-            requestBody = TestUpdateFriendStatusRequest.copy(requesterId = invalidRequesterId),
+            requestBody = TestUpdateFriendRequestStatusRequest.copy(requesterId = invalidRequesterId),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -238,13 +238,13 @@ class FriendRouteTest {
             message = "unexpected error",
         )
         coEvery {
-            usecase.updateStatus(TestRequesterId.value, TestReceiverId.value, FriendStatus.ACCEPTED)
+            usecase.updateStatus(TestRequesterId.value, TestReceiverId.value, FriendRequestStatus.ACCEPTED)
         } throws expectedApiException
 
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.STATUS}",
             queryParameters = null,
-            requestBody = TestUpdateFriendStatusRequest,
+            requestBody = TestUpdateFriendRequestStatusRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -266,7 +266,7 @@ class FriendRouteTest {
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.STATUS}",
             queryParameters = null,
-            requestBody = TestUpdateFriendStatusRequest,
+            requestBody = TestUpdateFriendRequestStatusRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -280,13 +280,13 @@ class FriendRouteTest {
     @Test
     fun `친구 상태 수정 - 수정 실패 시 수정할 데이터가 없다는 것으로 간주하고 NotFound를 반환한다`() = testApplication {
         coEvery {
-            usecase.updateStatus(TestRequesterId.value, TestReceiverId.value, FriendStatus.ACCEPTED)
+            usecase.updateStatus(TestRequesterId.value, TestReceiverId.value, FriendRequestStatus.ACCEPTED)
         } returns false
 
         testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.STATUS}",
             queryParameters = null,
-            requestBody = TestUpdateFriendStatusRequest,
+            requestBody = TestUpdateFriendRequestStatusRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -414,7 +414,7 @@ class FriendRouteTest {
             id = 1L,
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
-            status = FriendStatus.ACCEPTED,
+            requestStatus = FriendRequestStatus.ACCEPTED,
             respondedAt = null,
             createdAt = 1000,
             updatedAt = 1000,
@@ -423,10 +423,10 @@ class FriendRouteTest {
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
         )
-        private val TestUpdateFriendStatusRequest = UpdateFriendStatusRequest(
+        private val TestUpdateFriendRequestStatusRequest = UpdateFriendStatusRequest(
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
-            status = FriendStatus.ACCEPTED,
+            requestStatus = FriendRequestStatus.ACCEPTED,
         )
     }
 }

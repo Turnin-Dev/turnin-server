@@ -1,6 +1,6 @@
 package com.peekr.domain.user.presentation.dto
 
-import com.peekr.common.model.FriendshipStatus
+import com.peekr.common.model.FriendStatus
 import com.peekr.domain.user.application.dto.UserProfileDto
 import kotlinx.serialization.Serializable
 
@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
  * @property introduce 사용자 소개 글
  * @property lastLoginAt 마지막 로그인 일시
  * @property friendsCount 친구 수
- * @property friendshipStatus 친구 관계 상태
+ * @property friendStatus 친구 관계 상태
  * @property isActive 사용자 활성 여부
  */
 @Serializable
@@ -26,7 +26,7 @@ data class UserProfileResponse(
     val introduce: String?,
     val lastLoginAt: Long?,
     val friendsCount: Long,
-    val friendshipStatus: FriendshipStatus,
+    val friendStatus: FriendStatus,
     val isActive: Boolean,
 ) {
     companion object {
@@ -38,7 +38,7 @@ data class UserProfileResponse(
             introduce = "hello world!",
             lastLoginAt = 1697875200000L,
             friendsCount = 51L,
-            friendshipStatus = FriendshipStatus.NOTHING,
+            friendStatus = FriendStatus.NOTHING,
             isActive = true,
         )
     }
@@ -53,5 +53,5 @@ fun UserProfileDto.toResponse(): UserProfileResponse = UserProfileResponse(
     isActive = isActive,
     lastLoginAt = lastLoginAt,
     friendsCount = friendsCount,
-    friendshipStatus = friendshipStatus,
+    friendStatus = friendStatus,
 )

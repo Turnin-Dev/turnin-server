@@ -1,8 +1,8 @@
 package com.peekr.domain.friend.application.provider
 
-import com.peekr.common.model.FriendshipStatus
+import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.application.usecase.GetFriendshipStatusUseCase
+import com.peekr.domain.friend.application.usecase.GetFriendStatusUseCase
 import com.peekr.domain.friend.domain.repository.FriendRepository
 
 /**
@@ -10,7 +10,7 @@ import com.peekr.domain.friend.domain.repository.FriendRepository
  */
 class FriendProviderApi(
     private val friendRepository: FriendRepository,
-    private val getFriendshipStatusUseCase: GetFriendshipStatusUseCase,
+    private val getFriendStatusUseCase: GetFriendStatusUseCase,
 ) {
     /**
      * 친구 수 조회
@@ -31,6 +31,6 @@ class FriendProviderApi(
     suspend fun getFriendshipStatus(
         userId: UserId,
         otherUserId: UserId,
-    ): FriendshipStatus =
-        getFriendshipStatusUseCase(userId, otherUserId)
+    ): FriendStatus =
+        getFriendStatusUseCase(userId, otherUserId)
 }

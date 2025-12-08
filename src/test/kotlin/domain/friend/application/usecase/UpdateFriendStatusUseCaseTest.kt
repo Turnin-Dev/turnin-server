@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.application.usecase
 
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -16,21 +16,21 @@ import org.junit.jupiter.api.assertThrows
 class UpdateFriendStatusUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
     private val userProvider: UserProvider = mockk()
-    private val usecase = UpdateFriendStatusUseCase(friendRepository, userProvider)
+    private val usecase = UpdateFriendRequestStatusUseCase(friendRepository, userProvider)
 
     @BeforeTest
     fun setUp() {
         coEvery { userProvider.existsUser(TestUserId1) } returns true
         coEvery { userProvider.existsUser(TestUserId2) } returns true
         coEvery {
-            friendRepository.updateFriendStatus(TestUserId1, TestUserId2, any())
+            friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any())
         } returns true
     }
 
     @Test
     fun `친구 상태 수정 성공 테스트`() = runTest {
         // when
-        val result = usecase(TestUserId1.value, TestUserId2.value, FriendStatus.ACCEPTED)
+        val result = usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
 
         // then
         assertTrue(result)
@@ -39,7 +39,7 @@ class UpdateFriendStatusUseCaseTest {
     @Test
     fun `요청한 사용자 ID와 요청받은 사용자 ID가 같으면 예외가 발생한다`() = runTest {
         assertThrows<FriendException.SelfRequestException> {
-            usecase(1L, 1L, FriendStatus.ACCEPTED)
+            usecase(1L, 1L, FriendRequestStatus.ACCEPTED)
         }
     }
 
@@ -50,7 +50,7 @@ class UpdateFriendStatusUseCaseTest {
 
         // when, then
         assertThrows<FriendException.UserNotFoundException> {
-            usecase(TestUserId1.value, TestUserId2.value, FriendStatus.ACCEPTED)
+            usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
         }
     }
 

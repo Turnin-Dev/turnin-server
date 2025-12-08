@@ -1,7 +1,7 @@
 package com.peekr.domain.friend.application.usecase
 
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.FriendshipStatus
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 
 class GetFriendshipStatusUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
-    private val usecase = GetFriendshipStatusUseCase(friendRepository)
+    private val usecase = GetFriendStatusUseCase(friendRepository)
 
     @Test
     fun `친구 데이터가 존재하지 않는다면 FriendshipStatus(NOTHING)을 반환한다`() = runTest {
@@ -27,13 +27,13 @@ class GetFriendshipStatusUseCaseTest {
         val friendshipStatus = usecase(TestUserId, TestOtherUserId)
 
         // then
-        assertEquals(FriendshipStatus.NOTHING, friendshipStatus)
+        assertEquals(FriendStatus.NOTHING, friendshipStatus)
     }
 
     @Test
     fun `서로 요청자, 수신자 관계이고 친구 상태가 ACCEPTED면 FriendshipStatus(Friends)을 반환한다`() = runTest {
         // given
-        val friend = createFriend(TestUserId, TestOtherUserId, FriendStatus.ACCEPTED)
+        val friend = createFriend(TestUserId, TestOtherUserId, FriendRequestStatus.ACCEPTED)
         coEvery {
             friendRepository.findByIds(TestUserId, TestOtherUserId)
         } returns friend
@@ -42,13 +42,13 @@ class GetFriendshipStatusUseCaseTest {
         val friendshipStatus = usecase(TestUserId, TestOtherUserId)
 
         // then
-        assertEquals(FriendshipStatus.FRIENDS, friendshipStatus)
+        assertEquals(FriendStatus.FRIENDS, friendshipStatus)
     }
 
     @Test
     fun `요청자가 본인, 수신자가 다른 사용자이고 친구 상태가 PENDING이면 FriendshipStatus(REQUESTED)을 반환한다`() = runTest {
         // given
-        val friend = createFriend(TestUserId, TestOtherUserId, FriendStatus.PENDING)
+        val friend = createFriend(TestUserId, TestOtherUserId, FriendRequestStatus.PENDING)
         coEvery {
             friendRepository.findByIds(TestUserId, TestOtherUserId)
         } returns friend
@@ -57,13 +57,13 @@ class GetFriendshipStatusUseCaseTest {
         val friendshipStatus = usecase(TestUserId, TestOtherUserId)
 
         // then
-        assertEquals(FriendshipStatus.REQUESTED, friendshipStatus)
+        assertEquals(FriendStatus.REQUESTED, friendshipStatus)
     }
 
     @Test
     fun `요청자가 다른 사용자, 수신자가 본인이고 친구 상태가 PENDING이면 FriendshipStatus(RECEIVED)을 반환한다`() = runTest {
         // given
-        val friend = createFriend(TestOtherUserId, TestUserId, FriendStatus.PENDING)
+        val friend = createFriend(TestOtherUserId, TestUserId, FriendRequestStatus.PENDING)
         coEvery {
             friendRepository.findByIds(TestUserId, TestOtherUserId)
         } returns friend
@@ -72,7 +72,7 @@ class GetFriendshipStatusUseCaseTest {
         val friendshipStatus = usecase(TestUserId, TestOtherUserId)
 
         // then
-        assertEquals(FriendshipStatus.RECEIVED, friendshipStatus)
+        assertEquals(FriendStatus.RECEIVED, friendshipStatus)
     }
 
     companion object {
@@ -82,12 +82,12 @@ class GetFriendshipStatusUseCaseTest {
         private fun createFriend(
             requesterId: UserId,
             receiverId: UserId,
-            status: FriendStatus,
+            status: FriendRequestStatus,
         ) = Friend(
             id = FriendId(1L),
             requesterId = requesterId,
             receiverId = receiverId,
-            status = status,
+            requestStatus = status,
             respondedAt = null,
             createdAt = 1000,
             updatedAt = 1000,
