@@ -12,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 
-class GetFriendshipStatusUseCaseTest {
+class GetFriendStatusUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
     private val usecase = GetFriendStatusUseCase(friendRepository)
 

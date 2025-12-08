@@ -23,12 +23,12 @@ class FriendProviderApi(
         friendRepository.countFriends(userId)
 
     /**
-     * 친구 관계 조회
+     * 친구 상태 조회
      *
      * @param userId 사용자(본인) ID
      * @param otherUserId 다른 사용자 ID
      */
-    suspend fun getFriendshipStatus(
+    suspend fun getFriendStatus(
         userId: UserId,
         otherUserId: UserId,
     ): FriendStatus =

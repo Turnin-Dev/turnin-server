@@ -13,5 +13,5 @@ class FriendProviderImpl(private val friendProviderApi: FriendProviderApi) : Fri
         userId: UserId,
         otherUserId: UserId,
     ): FriendStatus =
-        friendProviderApi.getFriendshipStatus(userId, otherUserId)
+        friendProviderApi.getFriendStatus(userId, otherUserId)
 }
