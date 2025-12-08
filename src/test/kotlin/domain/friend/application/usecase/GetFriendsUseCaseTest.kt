@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.application.usecase
 
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
@@ -34,7 +34,7 @@ class GetFriendsUseCaseTest {
             id = FriendId(1L),
             requesterId = UserId(1L),
             receiverId = UserId(2L),
-            status = FriendStatus.ACCEPTED,
+            requestStatus = FriendRequestStatus.ACCEPTED,
             respondedAt = null,
             createdAt = 1000,
             updatedAt = 1000,

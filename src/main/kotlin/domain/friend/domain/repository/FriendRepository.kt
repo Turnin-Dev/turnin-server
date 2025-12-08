@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.domain.repository
 
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 
@@ -46,18 +46,18 @@ interface FriendRepository {
     ): Friend
 
     /**
-     * 친구 상태 수정
+     * 친구 요청 상태 수정
      *
      * @param userId1 사용자 ID (수정 요청 주체)
      * @param userId2 사용자 ID (수정 대상 친구)
-     * @param status 친구 상태
+     * @param requestStatus 친구 요청 상태
      *
      * @return 성공 시 `true`, 실패 시 `false` 반환
      */
-    suspend fun updateFriendStatus(
+    suspend fun updateFriendRequestStatus(
         userId1: UserId,
         userId2: UserId,
-        status: FriendStatus,
+        requestStatus: FriendRequestStatus,
     ): Boolean
 
     /**

@@ -5,7 +5,7 @@ import com.peekr.common.db.BaseEntityClass
 import com.peekr.common.db.BaseLongIdTable
 import com.peekr.common.db.DatabaseUtils.customPostgresEnum
 import com.peekr.common.db.DatabaseUtils.timestamptz
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.ReferenceOption
 object Friends : BaseLongIdTable("friend") {
     val requesterId = reference("requester_id", Users, onDelete = ReferenceOption.RESTRICT)
     val receiverId = reference("receiver_id", Users, onDelete = ReferenceOption.RESTRICT)
-    val status = customPostgresEnum<FriendStatus>("status", "friend_status").default(FriendStatus.PENDING)
+    val status = customPostgresEnum<FriendRequestStatus>("status", "friend_status").default(FriendRequestStatus.PENDING)
     val respondedAt = timestamptz("responded_at").nullable()
 
     init {

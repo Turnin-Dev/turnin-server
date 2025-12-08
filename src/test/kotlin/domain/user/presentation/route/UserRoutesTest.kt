@@ -2,7 +2,7 @@ package com.peekr.domain.user.presentation.route
 
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.model.FriendshipStatus
+import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.id.DisplayId
@@ -552,7 +552,7 @@ class UserRoutesTest {
             isActive = true,
             lastLoginAt = 1697875200000L,
             friendsCount = 51L,
-            friendshipStatus = FriendshipStatus.NOTHING,
+            friendStatus = FriendStatus.NOTHING,
         )
     }
 }

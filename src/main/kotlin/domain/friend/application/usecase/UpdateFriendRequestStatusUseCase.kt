@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.application.usecase
 
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -9,7 +9,7 @@ import com.peekr.domain.friend.exception.FriendException
 /**
  * 친구 상태 수정
  */
-class UpdateFriendStatusUseCase(
+class UpdateFriendRequestStatusUseCase(
     private val friendRepository: FriendRepository,
     private val userProvider: UserProvider,
 ) {
@@ -18,14 +18,14 @@ class UpdateFriendStatusUseCase(
      *
      * @param userId1 사용자 ID (수정 요청 주체)
      * @param userId2 사용자 ID (수정 대상 친구)
-     * @param status 친구 상태
+     * @param requestStatus 요청 상태
      *
      * @return 성공 시 `true`, 실패 시 `false` 반환
      */
     suspend operator fun invoke(
         userId1: Long,
         userId2: Long,
-        status: FriendStatus,
+        requestStatus: FriendRequestStatus,
     ): Boolean {
         val userId1VO = UserId(userId1)
         val userId2VO = UserId(userId2)
@@ -42,6 +42,6 @@ class UpdateFriendStatusUseCase(
             throw FriendException.UserNotFoundException()
         }
 
-        return friendRepository.updateFriendStatus(userId1VO, userId2VO, status)
+        return friendRepository.updateFriendRequestStatus(userId1VO, userId2VO, requestStatus)
     }
 }

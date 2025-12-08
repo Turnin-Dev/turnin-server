@@ -4,7 +4,7 @@ import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.toOffsetDateTime
@@ -24,7 +24,7 @@ import org.jetbrains.exposed.sql.update
 class FriendRepositoryImpl : FriendRepository {
     override suspend fun getFriends(userId: UserId): List<Friend> = suspendTransaction {
         val friendCondition = Op.Companion.build {
-            (Friends.status eq FriendStatus.ACCEPTED) and
+            (Friends.status eq FriendRequestStatus.ACCEPTED) and
                 (
                     (Friends.requesterId eq userId.value) or
                         (Friends.receiverId eq userId.value)
@@ -53,7 +53,7 @@ class FriendRepositoryImpl : FriendRepository {
         FriendEntity.count(
             (
                 ((Friends.requesterId eq userId.value) or (Friends.receiverId eq userId.value)) and
-                    (Friends.status eq FriendStatus.ACCEPTED)
+                    (Friends.status eq FriendRequestStatus.ACCEPTED)
             ),
         )
     }
@@ -65,24 +65,24 @@ class FriendRepositoryImpl : FriendRepository {
         val savedFriend = FriendEntity.new {
             this.requesterId = EntityID(requesterId.value, Users)
             this.receiverId = EntityID(receiverId.value, Users)
-            this.status = FriendStatus.PENDING
+            this.status = FriendRequestStatus.PENDING
             this.respondedAt = null
         }
 
         savedFriend.toDomain()
     }
 
-    override suspend fun updateFriendStatus(
+    override suspend fun updateFriendRequestStatus(
         userId1: UserId,
         userId2: UserId,
-        status: FriendStatus,
+        requestStatus: FriendRequestStatus,
     ): Boolean = suspendTransaction {
         val updateCondition = Op.build {
             ((Friends.requesterId eq userId1.value) and (Friends.receiverId eq userId2.value)) or
                 ((Friends.requesterId eq userId2.value) and (Friends.receiverId eq userId1.value))
         }
         Friends.update({ updateCondition }) {
-            it[this.status] = status
+            it[this.status] = requestStatus
             it[this.respondedAt] = PeekrDateTime.now().toOffsetDateTime()
         } > 0
     }

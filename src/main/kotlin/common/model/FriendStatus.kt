@@ -1,13 +1,20 @@
 package com.peekr.common.model
 
 /**
- * 친구 관계 상태.
- * - PENDING: 친구 요청이 생성된 상태(승인 대기)
- * - ACCEPTED: 친구 요청이 수락된 상태
- * - REJECTED: 친구 요청이 거절(또는 취소)된 상태
+ * 친구 상태
+ *
+ * 친구 추가/수정/삭제 요청이 요청자, 피요청자 관점 모두를 고려한 명확한 값으로 나타낸다.
  */
 enum class FriendStatus {
-    PENDING,
-    ACCEPTED,
-    REJECTED,
+    /** 아무 관계도 아닌 상태 */
+    NOTHING,
+
+    /** 친구 관계인 상태 */
+    FRIENDS,
+
+    /** 친구 요청 상태 */
+    REQUESTED,
+
+    /** 친구 요청을 받은 상태 */
+    RECEIVED,
 }

@@ -1,14 +1,14 @@
 package com.peekr.domain.friend.application.usecase.e2e
 
 import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.model.FriendStatus
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
 import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
-import com.peekr.domain.friend.application.usecase.UpdateFriendStatusUseCase
+import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.provider.UserProviderImpl
@@ -33,7 +33,7 @@ class FriendUseCaseIntegrationTest {
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
     private val getFriendsUseCase = GetFriendsUseCase(friendRepository)
     private val addFriendUseCase = AddFriendUseCase(friendRepository, userProvider)
-    private val updateFriendStatusUseCase = UpdateFriendStatusUseCase(friendRepository, userProvider)
+    private val updateFriendRequestStatusUseCase = UpdateFriendRequestStatusUseCase(friendRepository, userProvider)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
 
     @BeforeTest
@@ -59,7 +59,7 @@ class FriendUseCaseIntegrationTest {
         assertTrue(friendDto.receiverId == userB.value)
 
         // 2. 사용자 B가 친구 요청 수락
-        val result = updateFriendStatusUseCase(userB.value, userA.value, FriendStatus.ACCEPTED)
+        val result = updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
         assertTrue(result)
 
         // then: 사용자 B 친구 목록 조회
@@ -109,7 +109,7 @@ class FriendUseCaseIntegrationTest {
         val friendDto = addFriendUseCase(userA.value, userB.value)
         assertTrue(friendDto.requesterId == userA.value)
         assertTrue(friendDto.receiverId == userB.value)
-        val updateResult = updateFriendStatusUseCase(userB.value, userA.value, FriendStatus.ACCEPTED)
+        val updateResult = updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
         assertTrue(updateResult)
 
         // 2. 서로 친구 인지 확인
@@ -164,7 +164,7 @@ class FriendUseCaseIntegrationTest {
 
         // 2. 사용자 A가 친구 요청을 취소하고 사용자 B가 요청을 수락한다.
         val deleteResult1 = deleteFriendUseCase(userA.value, userB.value)
-        val updateResult = updateFriendStatusUseCase(userB.value, userA.value, FriendStatus.ACCEPTED)
+        val updateResult = updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
 
         // then: 사용자 B는 false를 반환 받는다
         assertTrue(deleteResult1)

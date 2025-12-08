@@ -1,6 +1,6 @@
 package com.peekr.domain.user.application.usecase
 
-import com.peekr.common.model.FriendshipStatus
+import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
 import com.peekr.common.model.Role
@@ -30,8 +30,8 @@ class GetUserProfileUseCaseTest {
         coEvery { userRepository.findById(TestUserId) } returns TestUser
         coEvery { friendProvider.countFriends(TestUserId) } returns 10L
         coEvery {
-            friendProvider.getFriendshipStatus(TestMyUserId, TestUserId)
-        } returns FriendshipStatus.FRIENDS
+            friendProvider.getFriendStatus(TestMyUserId, TestUserId)
+        } returns FriendStatus.FRIENDS
     }
 
     @Test

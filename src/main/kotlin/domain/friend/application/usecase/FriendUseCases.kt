@@ -5,8 +5,8 @@ data class FriendUseCases(
     val getFriends: GetFriendsUseCase,
     /** @see AddFriendUseCase */
     val add: AddFriendUseCase,
-    /** @see UpdateFriendStatusUseCase */
-    val updateStatus: UpdateFriendStatusUseCase,
+    /** @see UpdateFriendRequestStatusUseCase */
+    val updateStatus: UpdateFriendRequestStatusUseCase,
     /** @see DeleteFriendUseCase */
     val delete: DeleteFriendUseCase,
 )
