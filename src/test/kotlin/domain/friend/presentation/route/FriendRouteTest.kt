@@ -25,7 +25,6 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.parameters
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
