@@ -5,7 +5,9 @@ import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
+import com.peekr.common.util.pagination.PagingData
 import com.peekr.domain.friend.application.dto.FriendDto
+import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
@@ -27,7 +29,9 @@ class FriendRouteTest {
 
     @Before
     fun setUp() {
-        coEvery { usecase.getFriends(TestUserId.value, any()) } returns listOf(TestFriendDto)
+        coEvery {
+            usecase.getFriends(TestUserId.value, any(), any())
+        } returns TestFriendsPagingDataDto
         coEvery {
             usecase.add(TestRequesterId.value, TestReceiverId.value)
         } returns TestFriendDto
@@ -76,7 +80,7 @@ class FriendRouteTest {
             status = HttpStatusCode.InternalServerError,
             message = "unexpected error",
         )
-        coEvery { usecase.getFriends(TestUserId.value, any()) } throws expectedApiException
+        coEvery { usecase.getFriends(TestUserId.value, any(), any()) } throws expectedApiException
 
         testGetEndpoint(
             endpoint = "${route.ROUTE}${route.FRIENDS}",
@@ -439,6 +443,14 @@ class FriendRouteTest {
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
             requestStatus = FriendRequestStatus.ACCEPTED,
+        )
+        private val TestFriendsPagingDataDto = FriendsPagingDataDto(
+            pagingData = PagingData(
+                pageNumber = 1,
+                pageSize = 10,
+                totalSize = 100,
+            ),
+            friends = listOf(TestFriendDto),
         )
     }
 }

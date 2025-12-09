@@ -7,9 +7,9 @@ import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
+import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
@@ -25,8 +25,10 @@ import org.jetbrains.exposed.sql.update
 class FriendRepositoryImpl : FriendRepository {
     override suspend fun getFriendsPagination(
         userId: UserId,
-        paginationParams: PaginationParams,
-    ): List<Friend> = suspendTransaction {
+        offset: Long,
+        size: Int,
+    ): FriendsPagingData = suspendTransaction {
+        // 1) 친구 조회 쿼리 선언
         val friendCondition = Op.Companion.build {
             (Friends.status eq FriendRequestStatus.ACCEPTED) and
                 (
@@ -34,12 +36,23 @@ class FriendRepositoryImpl : FriendRepository {
                         (Friends.receiverId eq userId.value)
                 )
         }
-        Friends
+
+        // 2) 전체 항목(친구) 개수 조회
+        val totalCount = Friends
+            .select(Friends.id)
+            .where(friendCondition)
+            .count()
+
+        // 3) 현재 페이지 목록 조회
+        val friends = Friends
             .selectAll()
             .where(friendCondition)
-            .limit(count = paginationParams.size)
-            .offset(start = paginationParams.offset)
+            .limit(count = size)
+            .offset(start = offset)
             .map { it.toDomain() }
+
+        // 4) 결과 반환
+        FriendsPagingData(totalCount, friends)
     }
 
     override suspend fun findByIds(

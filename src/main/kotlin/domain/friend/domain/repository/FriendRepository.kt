@@ -2,10 +2,23 @@ package com.peekr.domain.friend.domain.repository
 
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.domain.friend.domain.model.Friend
+import com.peekr.domain.friend.domain.model.FriendsPagingData
 
 interface FriendRepository {
+    /**
+     * 친구 목록 조회 (페이지네이션 적용)
+     *
+     * @param userId 사용자 ID
+     * @param offset 페이지 오프셋
+     * @param size 페이지 사이즈
+     */
+    suspend fun getFriendsPagination(
+        userId: UserId,
+        offset: Long,
+        size: Int,
+    ): FriendsPagingData
+
     /**
      * 사용자(본인) ID와 다른 사용자 ID로 친구 데이터를 조회한다.
      *
@@ -16,17 +29,6 @@ interface FriendRepository {
         userId: UserId,
         otherUserId: UserId,
     ): Friend?
-
-    /**
-     * 친구 목록 조회 (페이지네이션 적용)
-     *
-     * @param userId 사용자 ID
-     * @param paginationParams 페이지네이션 파라미터
-     */
-    suspend fun getFriendsPagination(
-        userId: UserId,
-        paginationParams: PaginationParams,
-    ): List<Friend>
 
     /**
      * 친구 수 조회
