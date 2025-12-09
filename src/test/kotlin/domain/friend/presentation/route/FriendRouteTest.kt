@@ -27,7 +27,7 @@ class FriendRouteTest {
 
     @Before
     fun setUp() {
-        coEvery { usecase.getFriends(TestUserId.value) } returns listOf(TestFriendDto)
+        coEvery { usecase.getFriends(TestUserId.value, any()) } returns listOf(TestFriendDto)
         coEvery {
             usecase.add(TestRequesterId.value, TestReceiverId.value)
         } returns TestFriendDto
@@ -47,7 +47,11 @@ class FriendRouteTest {
     fun `친구 목록 조회 - 성공 테스트`() = testApplication {
         testGetEndpoint(
             endpoint = "${route.ROUTE}${route.FRIENDS}",
-            queryParameters = mapOf("userId" to "${TestUserId.value}"),
+            queryParameters = mapOf(
+                "userId" to "${TestUserId.value}",
+                "page" to "1",
+                "size" to "10",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -72,11 +76,15 @@ class FriendRouteTest {
             status = HttpStatusCode.InternalServerError,
             message = "unexpected error",
         )
-        coEvery { usecase.getFriends(TestUserId.value) } throws expectedApiException
+        coEvery { usecase.getFriends(TestUserId.value, any()) } throws expectedApiException
 
         testGetEndpoint(
             endpoint = "${route.ROUTE}${route.FRIENDS}",
-            queryParameters = mapOf("userId" to "${TestUserId.value}"),
+            queryParameters = mapOf(
+                "userId" to "${TestUserId.value}",
+                "page" to "1",
+                "size" to "10",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },
@@ -97,7 +105,11 @@ class FriendRouteTest {
     fun `친구 목록 조회 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         testGetEndpoint(
             endpoint = "${route.ROUTE}${route.FRIENDS}",
-            queryParameters = mapOf("userId" to "${TestUserId.value}"),
+            queryParameters = mapOf(
+                "userId" to "${TestUserId.value}",
+                "page" to "1",
+                "size" to "10",
+            ),
             testPlugin = {
                 testPlugin(
                     authRouting = { friendRoutes(route, usecase) },

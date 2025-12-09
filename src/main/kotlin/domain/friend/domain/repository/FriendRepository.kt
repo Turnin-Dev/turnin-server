@@ -2,6 +2,7 @@ package com.peekr.domain.friend.domain.repository
 
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.domain.friend.domain.model.Friend
 
 interface FriendRepository {
@@ -17,11 +18,15 @@ interface FriendRepository {
     ): Friend?
 
     /**
-     * 친구 목록 조회
+     * 친구 목록 조회 (페이지네이션 적용)
      *
      * @param userId 사용자 ID
+     * @param paginationParams 페이지네이션 파라미터
      */
-    suspend fun getFriends(userId: UserId): List<Friend>
+    suspend fun getFriendsPagination(
+        userId: UserId,
+        paginationParams: PaginationParams,
+    ): List<Friend>
 
     /**
      * 친구 수 조회

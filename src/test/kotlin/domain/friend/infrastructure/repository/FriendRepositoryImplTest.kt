@@ -7,6 +7,7 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.AfterTest
@@ -44,8 +45,8 @@ class FriendRepositoryImplTest {
         repository.updateFriendRequestStatus(userId2, userId1, FriendRequestStatus.ACCEPTED)
 
         // when
-        val user1Friends = repository.getFriends(userId1)
-        val user2Friends = repository.getFriends(userId2)
+        val user1Friends = repository.getFriendsPagination(userId1, PaginationParams(0, 10))
+        val user2Friends = repository.getFriendsPagination(userId2, PaginationParams(0, 10))
 
         // then: 사용자1, 사용자2가 서로 친구 사이이기 때문에 두 사용자 모두 친구 수는 1이다.
         assertEquals(1, user1Friends.size)
@@ -60,7 +61,7 @@ class FriendRepositoryImplTest {
         val userId = insertUserAndReturnId("a")
 
         // when
-        val friends = repository.getFriends(userId)
+        val friends = repository.getFriendsPagination(userId, PaginationParams(1, 10))
 
         // then
         assertTrue(friends.isEmpty())
@@ -181,8 +182,8 @@ class FriendRepositoryImplTest {
 
         // when
         val result = repository.deleteFriend(userId1, userId2)
-        val user1Friends = repository.getFriends(userId1)
-        val user2Friends = repository.getFriends(userId2)
+        val user1Friends = repository.getFriendsPagination(userId1, PaginationParams(1, 10))
+        val user2Friends = repository.getFriendsPagination(userId2, PaginationParams(1, 10))
 
         // then: 사용자1, 사용자2 모두 서로에 대한 친구 관계 데이터가 존재하지 않는다.
         assertTrue(result)

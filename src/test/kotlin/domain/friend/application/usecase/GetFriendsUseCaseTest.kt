@@ -3,6 +3,7 @@ package com.peekr.domain.friend.application.usecase
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import io.mockk.coEvery
@@ -19,11 +20,11 @@ class GetFriendsUseCaseTest {
     fun `친구 목록 조회 성공 테스트`() = runTest {
         // given
         coEvery {
-            friendRepository.getFriends(TestFriend.requesterId)
+            friendRepository.getFriendsPagination(TestFriend.requesterId, TestPaginationParams)
         } returns listOf(TestFriend)
 
         // when
-        val result = usecase(TestFriend.requesterId.value)
+        val result = usecase(TestFriend.requesterId.value, TestPaginationParams)
 
         // then
         assertTrue(result.isNotEmpty())
@@ -39,5 +40,6 @@ class GetFriendsUseCaseTest {
             createdAt = 1000,
             updatedAt = 1000,
         )
+        private val TestPaginationParams = PaginationParams(1, 10)
     }
 }

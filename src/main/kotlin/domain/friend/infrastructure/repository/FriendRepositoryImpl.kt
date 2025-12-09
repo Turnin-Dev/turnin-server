@@ -7,6 +7,7 @@ import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
+import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -22,7 +23,10 @@ import org.jetbrains.exposed.sql.update
 
 // TODO: 친구 기능은 이미 취소된 즉, 이미 데이터 지워진 상태에서 쿼리될 확률이 높다. -> 대처해야함
 class FriendRepositoryImpl : FriendRepository {
-    override suspend fun getFriends(userId: UserId): List<Friend> = suspendTransaction {
+    override suspend fun getFriendsPagination(
+        userId: UserId,
+        paginationParams: PaginationParams,
+    ): List<Friend> = suspendTransaction {
         val friendCondition = Op.Companion.build {
             (Friends.status eq FriendRequestStatus.ACCEPTED) and
                 (
@@ -33,6 +37,8 @@ class FriendRepositoryImpl : FriendRepository {
         Friends
             .selectAll()
             .where(friendCondition)
+//            .limit(count = paginationParams.pageSize)
+//            .offset(start = paginationParams.offset)
             .map { it.toDomain() }
     }
 

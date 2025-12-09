@@ -1,6 +1,7 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.dto.toDto
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -14,8 +15,11 @@ class GetFriendsUseCase(private val friendRepository: FriendRepository) {
      *
      * @param userId 사용자 ID
      */
-    suspend operator fun invoke(userId: Long): List<FriendDto> {
+    suspend operator fun invoke(
+        userId: Long,
+        paginationParams: PaginationParams,
+    ): List<FriendDto> {
         val userIdVO = UserId(userId)
-        return friendRepository.getFriends(userIdVO).map { it.toDto() }
+        return friendRepository.getFriendsPagination(userIdVO, paginationParams).map { it.toDto() }
     }
 }
