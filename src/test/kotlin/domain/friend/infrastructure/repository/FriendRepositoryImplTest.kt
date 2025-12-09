@@ -8,6 +8,7 @@ import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
 import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.testPagination
 import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -33,6 +34,30 @@ class FriendRepositoryImplTest {
     @AfterTest
     fun teardown() {
         TestDatabaseFactory.cleanUp()
+    }
+
+    @Test
+    fun `친구 목록 페이지네이션 조회 성공 테스트`() = runTest {
+        // given: 테스트 기준 사용자 제외 100명의 사용자 생성 후 친구 관계로 세팅
+        val totalSize = 100
+        val pageSize = 10
+
+        val userId = insertUserAndReturnId("User 1")
+        repeat(totalSize) {
+            val testUserId = insertUserAndReturnId("test$it")
+            repository.createFriend(userId, testUserId)
+            repository.updateFriendRequestStatus(testUserId, userId, FriendRequestStatus.ACCEPTED)
+        }
+
+        // when, then
+        testPagination(
+            totalSize = totalSize,
+            pageSize = pageSize,
+            fetcher = { offset, limit ->
+                val friendsPagingData = repository.getFriendsPagination(userId, offset, limit)
+                friendsPagingData.friends
+            },
+        )
     }
 
     @Test

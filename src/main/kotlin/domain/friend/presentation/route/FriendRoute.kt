@@ -30,7 +30,7 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
             val paginationParams = getPaginationParams()
-            val friendsPagingDataDto = usecase.getFriends(userId, paginationParams.offset, paginationParams.size)
+            val friendsPagingDataDto = usecase.getFriendsPagination(userId, paginationParams)
             call.respond(friendsPagingDataDto.toResponse())
         }
 

@@ -17,10 +17,8 @@ fun RoutingContext.getPaginationParams(): PaginationParams {
     if (page < 1) throw IllegalArgumentException("Page number must be positive.")
     if (size < 1) throw IllegalArgumentException("Page size number must be positive.")
 
-    val offset = (page - 1) * size
-
     return PaginationParams(
-        offset = offset,
+        page = page,
         size = size,
     )
 }

@@ -14,9 +14,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 
-class GetFriendsUseCaseTest {
+class GetFriendsPaginationUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
-    private val usecase = GetFriendsUseCase(friendRepository)
+    private val usecase = GetFriendsPaginationUseCase(friendRepository)
 
     @Test
     fun `친구 목록 조회 성공 테스트`() = runTest {
@@ -32,8 +32,7 @@ class GetFriendsUseCaseTest {
         // when
         val result = usecase(
             userId = TestFriend.requesterId.value,
-            offset = TestPaginationParams.offset,
-            size = TestPaginationParams.size,
+            paginationParams = TestPaginationParams,
         )
 
         // then
