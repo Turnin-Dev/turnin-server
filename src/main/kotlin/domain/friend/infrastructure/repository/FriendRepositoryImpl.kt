@@ -37,8 +37,8 @@ class FriendRepositoryImpl : FriendRepository {
         Friends
             .selectAll()
             .where(friendCondition)
-//            .limit(count = paginationParams.pageSize)
-//            .offset(start = paginationParams.offset)
+            .limit(count = paginationParams.size)
+            .offset(start = paginationParams.offset)
             .map { it.toDomain() }
     }
 
