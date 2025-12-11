@@ -2,6 +2,7 @@ package com.peekr.domain.friend.presentation.route
 
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
+import com.peekr.common.util.pagination.getPaginationParams
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
@@ -24,13 +25,13 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
         tags = setOf(route.TAG)
         description = "Friend API"
     }) {
-        // TODO: 페이지네이션 필요
         get(route.FRIENDS, { getFriendsDocs() }) {
             val userId = call.queryParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
-            val friends = usecase.getFriends(userId)
-            call.respond(friends.toResponse())
+            val paginationParams = getPaginationParams()
+            val friendsPagingDataDto = usecase.getFriendsPagination(userId, paginationParams)
+            call.respond(friendsPagingDataDto.toResponse())
         }
 
         post({ addFriendDocs() }) {
@@ -104,13 +105,20 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
 }
 
 private fun RouteConfig.getFriendsDocs() {
-    summary = "사용자 ID로 친구 목록 조회"
-    description = "사용자 ID로 친구 목록을 조회한다."
+    summary = "사용자 ID로 친구 목록 조회 (페이지네이션)"
+    description = "사용자 ID로 친구 목록을 조회한다. (페이지네이션)"
     request {
         queryParameter<Long>("userId") {
+            description = "사용자 ID"
             example("User ID") {
                 value = 1L
             }
+        }
+        queryParameter<Long>("page") {
+            description = "페이지네이션에 필요한 페이지 번호"
+        }
+        queryParameter<Int>("size") {
+            description = "페이지네이션에 필요한 페이지 크기"
         }
     }
     response {

@@ -5,9 +5,10 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
-import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
+import com.peekr.domain.friend.application.usecase.GetFriendsPaginationUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -31,7 +32,7 @@ class FriendUseCaseIntegrationTest {
     // UserBC의 API
     private val userProvider: UserProvider = UserProviderImpl(UserProviderApi(UserRepositoryImpl()))
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
-    private val getFriendsUseCase = GetFriendsUseCase(friendRepository)
+    private val getFriendsPaginationUseCase = GetFriendsPaginationUseCase(friendRepository)
     private val addFriendUseCase = AddFriendUseCase(friendRepository, userProvider)
     private val updateFriendRequestStatusUseCase = UpdateFriendRequestStatusUseCase(friendRepository, userProvider)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
@@ -63,15 +64,15 @@ class FriendUseCaseIntegrationTest {
         assertTrue(result)
 
         // then: 사용자 B 친구 목록 조회
-        val userBFriends = getFriendsUseCase(userB.value)
-        assertTrue(userBFriends.isNotEmpty())
+        val userBFriends = getFriendsPaginationUseCase(userB.value, PaginationParams(1, 10))
+        assertTrue(userBFriends.friends.isNotEmpty())
         assertTrue(
-            userBFriends.first().requesterId == userA.value ||
-                userBFriends.first().receiverId == userA.value,
+            userBFriends.friends.first().requesterId == userA.value ||
+                userBFriends.friends.first().receiverId == userA.value,
         )
         assertTrue(
-            userBFriends.first().requesterId == userB.value ||
-                userBFriends.first().receiverId == userB.value,
+            userBFriends.friends.first().requesterId == userB.value ||
+                userBFriends.friends.first().receiverId == userB.value,
         )
     }
 
@@ -92,10 +93,10 @@ class FriendUseCaseIntegrationTest {
         assertTrue(result)
 
         // then: 사용자 A, 사용자 B 친구 목록 조회 시 전부 비어있어야 한다.
-        val userBFriends = getFriendsUseCase(userB.value)
-        val userAFriends = getFriendsUseCase(userA.value)
-        assertTrue(userAFriends.isEmpty())
-        assertTrue(userBFriends.isEmpty())
+        val userBFriends = getFriendsPaginationUseCase(userB.value, PaginationParams(1, 10))
+        val userAFriends = getFriendsPaginationUseCase(userA.value, PaginationParams(1, 10))
+        assertTrue(userAFriends.friends.isEmpty())
+        assertTrue(userBFriends.friends.isEmpty())
     }
 
     @Test
@@ -113,20 +114,20 @@ class FriendUseCaseIntegrationTest {
         assertTrue(updateResult)
 
         // 2. 서로 친구 인지 확인
-        val userAFriends = getFriendsUseCase(userA.value)
-        val userBFriends = getFriendsUseCase(userB.value)
-        assertTrue(userAFriends.isNotEmpty())
-        assertTrue(userBFriends.isNotEmpty())
+        val userAFriends = getFriendsPaginationUseCase(userA.value, PaginationParams(1, 10))
+        val userBFriends = getFriendsPaginationUseCase(userB.value, PaginationParams(1, 10))
+        assertTrue(userAFriends.friends.isNotEmpty())
+        assertTrue(userBFriends.friends.isNotEmpty())
 
         // 3. 사용자 A가 사용자 B와 친구 관계 끊기(삭제)
         val deleteResult = deleteFriendUseCase(userA.value, userB.value)
         assertTrue(deleteResult)
 
         // then: 서로 친구 데이터가 삭제됐는지 확인
-        val userAFriends2 = getFriendsUseCase(userA.value)
-        val userBFriends2 = getFriendsUseCase(userB.value)
-        assertTrue(userAFriends2.isEmpty())
-        assertTrue(userBFriends2.isEmpty())
+        val userAFriends2 = getFriendsPaginationUseCase(userA.value, PaginationParams(1, 10))
+        val userBFriends2 = getFriendsPaginationUseCase(userB.value, PaginationParams(1, 10))
+        assertTrue(userAFriends2.friends.isEmpty())
+        assertTrue(userBFriends2.friends.isEmpty())
     }
 
     @Test
