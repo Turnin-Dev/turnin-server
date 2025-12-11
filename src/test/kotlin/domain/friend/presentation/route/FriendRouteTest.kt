@@ -12,28 +12,17 @@ import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
-import com.peekr.domain.friend.presentation.dto.FriendsResponse
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
-import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testDeleteEndpoint
 import com.peekr.util.testGetEndpoint
+import com.peekr.util.testPaginationRoute
 import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
 import com.peekr.util.testPostEndpoint
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
-import kotlinx.serialization.json.Json
 import org.junit.Before
 import org.junit.Test
 
@@ -60,79 +49,89 @@ class FriendRouteTest {
 
     @Test
     fun `친구 목록 조회 - 페이지네이션 테스트`() = testApplication {
-        // given: 데이터 모킹
-        val pageSize = 10
-        val totalSize = 100L
-        repeat(10) { pageNumber ->
-            val testFriendsPagingDataDto = FriendsPagingDataDto(
-                pagingData = PagingData(
-                    pageNumber = (pageNumber + 1).toLong(),
-                    pageSize = pageSize,
-                    totalSize = totalSize,
-                ),
-                friends = List(pageSize) { TestFriendDto },
-            )
-            val testPaginationParams = PaginationParams((pageNumber + 1).toLong(), pageSize)
-            coEvery {
-                usecase.getFriendsPagination(TestUserId.value, testPaginationParams)
-            } returns testFriendsPagingDataDto
-        }
-        // 마지막 페이지는 빈 리스트 반환
-        coEvery {
-            usecase.getFriendsPagination(TestUserId.value, PaginationParams(11, pageSize))
-        } returns FriendsPagingDataDto(
-            pagingData = PagingData(
-                pageNumber = 11,
-                pageSize = pageSize,
-                totalSize = totalSize,
-            ),
-            friends = emptyList(),
-        )
-
-        // given: 설정
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
         testPlugin(
             authRouting = { friendRoutes(route, usecase) },
         )
 
-        // when, then: 10번의 요청을 하고 매번 검증을 수행한다.
-        repeat(11) { idx ->
-            val pageNumber = idx + 1
-            // when
-            val response = client.get("${route.ROUTE}${route.FRIENDS}") {
-                // 쿼리 파라미터
-                url {
-                    mapOf(
-                        "userId" to "${TestUserId.value}",
-                        "page" to "$pageNumber",
-                        "size" to "$pageSize",
-                    ).forEach { (key, value) ->
-                        parameters.append(key, value)
-                    }
-                }
-                // 인증 헤더
-                header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            }
+        // given: 설정
+        val pageSize = 10
+        val totalItems = 100L // 전체 아이템 수 (10페이지 분량)
+        val totalPages = (totalItems / pageSize).toInt() // 총 페이지 수: 10
+        val testUserId = TestUserId.value
+        val token = JWTTestDoubles.getMockJWTToken(testUserId.toString())
 
-            // then
-            val responseBody = response.bodyAsText()
-            val friendsResponse = Json.decodeFromString<FriendsResponse>(responseBody)
-
-            if (pageNumber < 11) {
-                assertEquals(pageSize, friendsResponse.friends.size)
-                if (pageNumber == 10) {
-                    assertFalse(friendsResponse.hasNext, "hasNext should be false: $responseBody")
-                } else {
-                    assertTrue(friendsResponse.hasNext, "hasNext should be true: $responseBody")
-                }
-            }
-
-            if (pageNumber == 11) {
-                assertTrue(friendsResponse.friends.isEmpty())
-                assertFalse(friendsResponse.hasNext, "hasNext should be false: $responseBody")
-            }
+        // given: 데이터 Mocking
+        // 1. 일반 페이지 (1페이지 ~ 10페이지) Mocking
+        repeat(totalPages) { pageIndex ->
+            val pageNumber = pageIndex + 1L
+            val testFriendsPagingDataDto = FriendsPagingDataDto(
+                pagingData = PagingData(
+                    pageNumber = pageNumber,
+                    pageSize = pageSize,
+                    totalSize = totalItems,
+                ),
+                friends = List(pageSize) { TestFriendDto },
+            )
+            val paginationParams = PaginationParams(pageNumber, pageSize)
+            coEvery {
+                usecase.getFriendsPagination(testUserId, paginationParams)
+            } returns testFriendsPagingDataDto
         }
+
+        // 2. 마지막 페이지를 넘어서는 요청 (11페이지) Mocking
+        val lastPageNumber = (totalPages + 1).toLong()
+        coEvery {
+            usecase.getFriendsPagination(testUserId, PaginationParams(lastPageNumber, pageSize))
+        } returns FriendsPagingDataDto(
+            pagingData = PagingData(
+                pageNumber = lastPageNumber,
+                pageSize = pageSize,
+                totalSize = totalItems,
+            ),
+            friends = emptyList(),
+        )
+
+        // when, then: 페이지네이션 시나리오 테스트
+        // 1. 일반 페이지 (1 ~ 9페이지) 검증
+        (1 until totalPages).forEach { pageNumber ->
+            testPaginationRoute(
+                endpoint = "${route.ROUTE}${route.FRIENDS}",
+                queryParameters = mapOf(
+                    "userId" to "$testUserId",
+                    "page" to "$pageNumber",
+                    "size" to "$pageSize",
+                ),
+                token = token,
+                expectedSize = pageSize,
+                expectedHasNext = true,
+            )
+        }
+
+        // 2. 마지막 페이지 (10페이지) 검증
+        testPaginationRoute(
+            endpoint = "${route.ROUTE}${route.FRIENDS}",
+            queryParameters = mapOf(
+                "userId" to "$testUserId",
+                "page" to "$totalPages",
+                "size" to "$pageSize",
+            ),
+            token = token,
+            expectedSize = pageSize,
+            expectedHasNext = false,
+        )
+
+        // 3. 존재하지 않는 페이지 (11페이지) 검증
+        testPaginationRoute(
+            endpoint = "${route.ROUTE}${route.FRIENDS}",
+            queryParameters = mapOf(
+                "userId" to "$testUserId",
+                "page" to "${totalPages + 1}",
+                "size" to "$pageSize",
+            ),
+            token = token,
+            expectedSize = 0,
+            expectedHasNext = false,
+        )
     }
 
     @Test
