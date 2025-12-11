@@ -30,11 +30,12 @@ fun <T> testPagination(
 ) = runTest {
     // ------------------------------ Given ------------------------------
     // 예상 페이지 개수
-    val expectedPageCount = totalSize / pageSize
+    val expectedPageCount = (totalSize + pageSize - 1) / pageSize
     var currentPage = 1L
     var offset: Long
     // 성공적으로 데이터가 조회된 횟수 (페이지 수)
     var actualFetchedCount = 0
+    var totalFetchedItems = 0
 
     // ------------------------------ When, Then ------------------------------
     for (i in 0 until expectedPageCount) {
@@ -49,8 +50,16 @@ fun <T> testPagination(
             fail("예상보다 일찍 빈 목록이 반환되었습니다. (조회 횟수: $actualFetchedCount)")
         }
 
-        // 4) 검증
-        assertEquals(pageSize, items.size)
+        // 4) 검증: 마지막 페이지가 아니면 pageSize, 마지막 페이지면 나머지로 처리
+        val isLastPage = (i == expectedPageCount - 1)
+        val expectedItemCount =
+            if (isLastPage && totalSize % pageSize != 0) {
+                totalSize % pageSize
+            } else {
+                pageSize
+            }
+        assertEquals(expectedItemCount, items.size)
+        totalFetchedItems += items.size
 
         // 5) 다음 페이지
         currentPage++
@@ -62,6 +71,7 @@ fun <T> testPagination(
     val finalItems = fetcher(finalOffset, pageSize)
     assertTrue(finalItems.isEmpty())
     assertEquals(expectedPageCount, actualFetchedCount)
+    assertEquals(totalSize, totalFetchedItems)
 }
 
 /**

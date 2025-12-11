@@ -39,8 +39,8 @@ class FriendRepositoryImplTest {
     @Test
     fun `친구 목록 페이지네이션 조회 성공 테스트`() = runTest {
         // given: 테스트 기준 사용자 제외 100명의 사용자 생성 후 친구 관계로 세팅
-        val totalSize = 100
-        val pageSize = 10
+        val totalSize = 86
+        val pageSize = 13
 
         val userId = insertUserAndReturnId("User 1")
         repeat(totalSize) {
@@ -85,7 +85,7 @@ class FriendRepositoryImplTest {
         val userId = insertUserAndReturnId("a")
 
         // when
-        val friends = repository.getFriendsPagination(userId, 1, 10)
+        val friends = repository.getFriendsPagination(userId, 0, 10)
 
         // then
         assertTrue(friends.friends.isEmpty())

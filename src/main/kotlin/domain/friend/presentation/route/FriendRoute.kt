@@ -105,8 +105,8 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
 }
 
 private fun RouteConfig.getFriendsDocs() {
-    summary = "사용자 ID로 친구 목록 조회"
-    description = "사용자 ID로 친구 목록을 조회한다."
+    summary = "사용자 ID로 친구 목록 조회 (페이지네이션)"
+    description = "사용자 ID로 친구 목록을 조회한다. (페이지네이션)"
     request {
         queryParameter<Long>("userId") {
             description = "사용자 ID"
