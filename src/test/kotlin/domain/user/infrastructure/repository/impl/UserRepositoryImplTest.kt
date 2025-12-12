@@ -48,6 +48,28 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    fun `findByIds 성공 테스트`() = runTest {
+        // given: 10명의 테스트 사용자를 생성
+        val savedUserId = mutableListOf<UserId>()
+        val userTotalCount = 10
+        TestDatabaseFactory.dbQuery {
+            repeat(userTotalCount) {
+                UserTestDoubles.saveAndGetUserEntity("pid$it", "did$it").let {
+                    savedUserId.add(UserId(it.id.value))
+                }
+            }
+        }
+
+        // when
+        val users = repository.findByIds(savedUserId)
+
+        // then
+        assertTrue(users.isNotEmpty())
+        assertEquals(userTotalCount, users.size)
+        assertEquals(savedUserId, users.map { it.id })
+    }
+
+    @Test
     fun `findById 실패 테스트 - 사용자를 찾지 못하는 경우 null를 반환한다`() = runTest {
         // when
         val userEntity = repository.findById(UserId(1L))

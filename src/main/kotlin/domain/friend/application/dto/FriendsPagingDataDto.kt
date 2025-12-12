@@ -10,5 +10,5 @@ import com.peekr.common.util.pagination.PagingData
  */
 data class FriendsPagingDataDto(
     val pagingData: PagingData,
-    val friends: List<FriendDto>,
+    val friends: List<FriendInfoDto>,
 )

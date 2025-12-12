@@ -10,4 +10,9 @@ interface UserProvider {
      * 사용자 ID를 통해 사용자가 있는지 확인한다.
      */
     suspend fun existsUser(userId: UserId): Boolean
+
+    /**
+     * 사용자들의 ID를 통해 사용자 정보 일부 목록을 조회한다.
+     */
+    suspend fun getUserInfos(userIds: List<UserId>): List<ExternalUserInfo>
 }
