@@ -17,6 +17,15 @@ interface UserRepository {
     suspend fun findById(id: UserId): User?
 
     /**
+     * ID 목록을 통해 사용자 목록을 조회한다.
+     *
+     * @param ids 사용자 ID 목록
+     *
+     * @return 사용자 목록
+     */
+    suspend fun findByIds(ids: List<UserId>): List<User>
+
+    /**
      * 사용자 표시 ID를 통해 사용자를 조회한다.
      *
      * @param id 사용자 표시 ID
