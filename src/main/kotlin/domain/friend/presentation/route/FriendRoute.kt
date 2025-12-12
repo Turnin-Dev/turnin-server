@@ -6,7 +6,6 @@ import com.peekr.common.util.pagination.getPaginationParams
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
-import com.peekr.domain.friend.presentation.dto.FriendInfosResponse
 import com.peekr.domain.friend.presentation.dto.FriendResponse
 import com.peekr.domain.friend.presentation.dto.FriendsResponse
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
@@ -126,8 +125,8 @@ private fun RouteConfig.getFriendsDocs() {
         code(HttpStatusCode.OK) {
             description = "친구 정보 목록"
             body<FriendsResponse> {
-                example("FriendsInfoResponse") {
-                    value = FriendInfosResponse.sample
+                example("FriendsResponse") {
+                    value = FriendsResponse.sample
                 }
             }
         }
