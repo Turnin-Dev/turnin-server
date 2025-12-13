@@ -541,6 +541,7 @@ class FriendRouteTest {
         private val TestFriendInfoDto = FriendInfoDto(
             id = 1L,
             userId = 1L,
+            displayId = "did",
             name = "name",
             profileImageUrl = null,
             respondedAt = 1000,

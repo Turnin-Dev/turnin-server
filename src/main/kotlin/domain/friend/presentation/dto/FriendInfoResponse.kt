@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
  *
  * @property id 친구 ID
  * @property userId 사용자(친구) ID
+ * @property displayId 사용자(친구) 표시 ID
  * @property name 사용자(친구) 이름
  * @property profileImageUrl 사용자(친구) 프로필 사진 url
  * @property respondedAt 요청 응답 일자
@@ -18,6 +19,7 @@ import kotlinx.serialization.Serializable
 data class FriendInfoResponse(
     val id: Long,
     val userId: Long,
+    val displayId: String,
     val name: String,
     val profileImageUrl: String?,
     val respondedAt: Long?,
@@ -28,6 +30,7 @@ data class FriendInfoResponse(
         val sample = FriendInfoResponse(
             id = 1L,
             userId = 1L,
+            displayId = "hong123",
             name = "honggd",
             profileImageUrl = "https://image-server.com/123123.jpg",
             respondedAt = 1682870400000,
@@ -41,6 +44,7 @@ fun FriendInfoDto.toResponse(): FriendInfoResponse =
     FriendInfoResponse(
         id = id,
         userId = userId,
+        displayId = displayId,
         name = name,
         profileImageUrl = profileImageUrl,
         respondedAt = respondedAt,

@@ -5,6 +5,7 @@ package com.peekr.domain.friend.application.dto
  *
  * @property id 친구 ID
  * @property userId 사용자(친구) ID
+ * @property displayId 사용자(친구) 표시 ID
  * @property name 사용자(친구) 이름
  * @property profileImageUrl 사용자(친구) 프로필 사진 url
  * @property respondedAt 요청 응답 일자
@@ -14,6 +15,7 @@ package com.peekr.domain.friend.application.dto
 data class FriendInfoDto(
     val id: Long,
     val userId: Long,
+    val displayId: String,
     val name: String,
     val profileImageUrl: String?,
     val respondedAt: Long?,

@@ -2,6 +2,7 @@ package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Name
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.pagination.PaginationParams
@@ -34,7 +35,7 @@ class GetFriendsPaginationUseCaseTest {
         coEvery { userProvider.getUserInfos(any()) } answers {
             val ids = firstArg<List<UserId>>()
             ids.map { id ->
-                TestExternalUserInfo.copy(id = id)
+                TestExternalUserInfo.copy(userId = id)
             }
         }
 
@@ -118,7 +119,8 @@ class GetFriendsPaginationUseCaseTest {
             updatedAt = 1000,
         )
         private val TestExternalUserInfo = ExternalUserInfo(
-            id = UserId(1L),
+            userId = UserId(1L),
+            displayId = DisplayId("did"),
             name = Name("name"),
             profileImageUrl = null,
         )
