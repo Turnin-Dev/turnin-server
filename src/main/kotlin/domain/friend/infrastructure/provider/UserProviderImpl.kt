@@ -13,7 +13,8 @@ class UserProviderImpl(private val userProviderApi: UserProviderApi) : UserProvi
         val users = userProviderApi.findByIds(userIds)
         return users.map { user ->
             ExternalUserInfo(
-                id = user.id,
+                userId = user.id,
+                displayId = user.displayId,
                 name = user.name,
                 profileImageUrl = user.profileImageUrl,
             )

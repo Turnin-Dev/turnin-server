@@ -60,7 +60,7 @@ class GetFriendsPaginationUseCase(
         }
         val friendInfoMap = userProvider
             .getUserInfos(friendIds)
-            .associateBy { it.id }
+            .associateBy { it.userId }
 
         // 3) FriendInfoDto 목록 생성
         val friends = friendsPagingData.friends.map { friend ->
@@ -74,7 +74,8 @@ class GetFriendsPaginationUseCase(
 
             FriendInfoDto(
                 id = friend.id.value,
-                userId = friendInfo.id.value,
+                userId = friendInfo.userId.value,
+                displayId = friendInfo.displayId.value,
                 name = friendInfo.name.value,
                 profileImageUrl = friendInfo.profileImageUrl,
                 respondedAt = friend.respondedAt,
