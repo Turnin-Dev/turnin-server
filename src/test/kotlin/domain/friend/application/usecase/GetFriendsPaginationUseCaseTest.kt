@@ -31,7 +31,12 @@ class GetFriendsPaginationUseCaseTest {
         val expectedPageSize = (totalSize / pageSize).toLong()
 
         // 0. 사용자 정보 조회 데이터
-        coEvery { userProvider.getUserInfos(any()) } returns List(totalSize) { TestExternalUserInfo }
+        coEvery { userProvider.getUserInfos(any()) } answers {
+            val ids = firstArg<List<UserId>>()
+            ids.map { id ->
+                TestExternalUserInfo.copy(id = id)
+            }
+        }
 
         // 1. 10개 페이지에 대한 데이터
         repeat(expectedPageSize.toInt()) {
@@ -74,6 +79,7 @@ class GetFriendsPaginationUseCaseTest {
 
             assertEquals(pageNumber, result.pagingData.pageNumber)
             assertTrue(result.pagingData.hasNext, "[1 ~ 9페이지]: 페이지 hasNext 불일치")
+            assertEquals(pageSize, result.friends.size)
         }
 
         // 2. 10 페이지

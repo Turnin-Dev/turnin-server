@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
  * @property updatedAt 요청 수정 일자
  */
 @Serializable
-data class FriendInfosResponse(
+data class FriendInfoResponse(
     val id: Long,
     val userId: Long,
     val name: String,
@@ -25,7 +25,7 @@ data class FriendInfosResponse(
     val updatedAt: Long,
 ) {
     companion object {
-        val sample = FriendInfosResponse(
+        val sample = FriendInfoResponse(
             id = 1L,
             userId = 1L,
             name = "honggd",
@@ -37,8 +37,8 @@ data class FriendInfosResponse(
     }
 }
 
-fun FriendInfoDto.toResponse(): FriendInfosResponse =
-    FriendInfosResponse(
+fun FriendInfoDto.toResponse(): FriendInfoResponse =
+    FriendInfoResponse(
         id = id,
         userId = userId,
         name = name,
