@@ -18,4 +18,14 @@ class UserProviderApi(private val userRepository: UserRepository) {
      */
     suspend fun findById(userId: UserId): UserDto? =
         userRepository.findById(userId)?.toDto()
+
+    /**
+     * 사용자 ID 목록으로 사용자 목록을 조회한다.
+     *
+     * @param userIds 사용자 ID 목록
+     *
+     * @return 사용자 목록
+     */
+    suspend fun findByIds(userIds: List<UserId>): List<UserDto> =
+        userRepository.findByIds(userIds).map { it.toDto() }
 }

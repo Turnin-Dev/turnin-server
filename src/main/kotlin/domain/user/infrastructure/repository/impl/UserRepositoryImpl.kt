@@ -19,6 +19,12 @@ class UserRepositoryImpl : UserRepository {
             ?.toDomain()
     }
 
+    override suspend fun findByIds(ids: List<UserId>): List<User> = suspendTransaction {
+        UserEntity
+            .find { Users.id inList ids.map { it.value } }
+            .map { it.toDomain() }
+    }
+
     override suspend fun findByDisplayId(id: DisplayId): User? = suspendTransaction {
         UserEntity
             .find { Users.displayId eq id.value }

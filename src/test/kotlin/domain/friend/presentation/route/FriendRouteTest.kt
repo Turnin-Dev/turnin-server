@@ -9,6 +9,7 @@ import com.peekr.common.route.Api
 import com.peekr.common.util.pagination.PaginationParams
 import com.peekr.common.util.pagination.PagingData
 import com.peekr.domain.friend.application.dto.FriendDto
+import com.peekr.domain.friend.application.dto.FriendInfoDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
@@ -70,7 +71,7 @@ class FriendRouteTest {
                     pageSize = pageSize,
                     totalSize = totalItems,
                 ),
-                friends = List(pageSize) { TestFriendDto },
+                friends = List(pageSize) { TestFriendInfoDto },
             )
             val paginationParams = PaginationParams(pageNumber, pageSize)
             coEvery {
@@ -158,9 +159,9 @@ class FriendRouteTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 containsAll(
-                    TestFriendDto.requesterId.toString(),
-                    TestFriendDto.receiverId.toString(),
-                    TestFriendDto.requestStatus.toString(),
+                    TestFriendInfoDto.id.toString(),
+                    TestFriendInfoDto.userId.toString(),
+                    TestFriendInfoDto.name,
                 )
             },
         )
@@ -537,13 +538,22 @@ class FriendRouteTest {
             receiverId = TestReceiverId.value,
             requestStatus = FriendRequestStatus.ACCEPTED,
         )
+        private val TestFriendInfoDto = FriendInfoDto(
+            id = 1L,
+            userId = 1L,
+            name = "name",
+            profileImageUrl = null,
+            respondedAt = 1000,
+            createdAt = 1000,
+            updatedAt = 1000,
+        )
         private val TestFriendsPagingDataDto = FriendsPagingDataDto(
             pagingData = PagingData(
                 pageNumber = 1,
                 pageSize = 10,
                 totalSize = 100,
             ),
-            friends = listOf(TestFriendDto),
+            friends = listOf(TestFriendInfoDto),
         )
     }
 }

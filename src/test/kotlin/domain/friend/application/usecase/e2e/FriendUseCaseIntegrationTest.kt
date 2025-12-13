@@ -32,7 +32,7 @@ class FriendUseCaseIntegrationTest {
     // UserBC의 API
     private val userProvider: UserProvider = UserProviderImpl(UserProviderApi(UserRepositoryImpl()))
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
-    private val getFriendsPaginationUseCase = GetFriendsPaginationUseCase(friendRepository)
+    private val getFriendsPaginationUseCase = GetFriendsPaginationUseCase(friendRepository, userProvider)
     private val addFriendUseCase = AddFriendUseCase(friendRepository, userProvider)
     private val updateFriendRequestStatusUseCase = UpdateFriendRequestStatusUseCase(friendRepository, userProvider)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
@@ -66,14 +66,7 @@ class FriendUseCaseIntegrationTest {
         // then: 사용자 B 친구 목록 조회
         val userBFriends = getFriendsPaginationUseCase(userB.value, PaginationParams(1, 10))
         assertTrue(userBFriends.friends.isNotEmpty())
-        assertTrue(
-            userBFriends.friends.first().requesterId == userA.value ||
-                userBFriends.friends.first().receiverId == userA.value,
-        )
-        assertTrue(
-            userBFriends.friends.first().requesterId == userB.value ||
-                userBFriends.friends.first().receiverId == userB.value,
-        )
+        assertTrue(userBFriends.friends.first().userId == userA.value)
     }
 
     @Test

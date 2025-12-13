@@ -123,7 +123,7 @@ private fun RouteConfig.getFriendsDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            description = "친구 목록"
+            description = "친구 정보 목록"
             body<FriendsResponse> {
                 example("FriendsResponse") {
                     value = FriendsResponse.sample

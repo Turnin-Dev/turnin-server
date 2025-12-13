@@ -18,7 +18,7 @@ data class FriendsResponse(
     val pageSize: Int,
     val totalSize: Long,
     val hasNext: Boolean,
-    val friends: List<FriendResponse>,
+    val friends: List<FriendInfoResponse>,
 ) {
     companion object {
         val sample = FriendsResponse(
@@ -26,7 +26,7 @@ data class FriendsResponse(
             pageSize = 10,
             totalSize = 100,
             hasNext = true,
-            friends = listOf(FriendResponse.sample),
+            friends = listOf(FriendInfoResponse.sample),
         )
     }
 }

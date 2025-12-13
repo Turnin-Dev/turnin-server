@@ -22,7 +22,7 @@ val friendModule = module {
     single<UserProvider> { UserProviderImpl(get()) }
 
     // Usecase
-    factory { GetFriendsPaginationUseCase(get()) }
+    factory { GetFriendsPaginationUseCase(get(), get()) }
     factory { AddFriendUseCase(get(), get()) }
     factory { UpdateFriendRequestStatusUseCase(get(), get()) }
     factory { DeleteFriendUseCase(get()) }
