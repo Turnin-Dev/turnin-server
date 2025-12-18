@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.keywordGraph.domain.model.SharedKeywordInfo
 import com.peekr.domain.keywordGraph.domain.repository.KeywordGraphRepository
 import org.jetbrains.exposed.sql.SortOrder
@@ -17,7 +18,7 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
         userId: UserId,
         cursor: Long,
         pageSize: Int,
-    ): List<SharedKeywordInfo> = suspendTransaction {
+    ): CursorPage<SharedKeywordInfo> = suspendTransaction {
         val uk1 = UserKeywords.alias("uk1")
         val uk2 = UserKeywords.alias("uk2")
 
@@ -41,10 +42,10 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
                     (uk2[UserKeywords.userId] less cursor)
             }.groupBy(uk2[UserKeywords.userId])
             .orderBy(uk2[UserKeywords.userId] to SortOrder.DESC)
-            .limit(pageSize)
+            .limit(pageSize + 1)
 
         // 3) 결과 매핑
-        val result = query.map { row ->
+        val items = query.map { row ->
             val otherUserId = row[uk2[UserKeywords.userId]].value
             val keywordIds = row[sharedKeywords]?.split(",")?.map { it.toLong() }
                 ?: emptyList()
@@ -54,6 +55,16 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
                 keywordIds = keywordIds.map { KeywordId(it) },
             )
         }
-        result
+
+        // 4) 다음 커서 계산
+        val hasNext = items.size > pageSize
+        val nextCursor = if (hasNext) items[pageSize - 1].userId.value else null
+        val resultItems = if (hasNext) items.take(pageSize) else items
+
+        // 5) 최종 반환
+        CursorPage(
+            items = resultItems,
+            nextCursor = nextCursor,
+        )
     }
 }

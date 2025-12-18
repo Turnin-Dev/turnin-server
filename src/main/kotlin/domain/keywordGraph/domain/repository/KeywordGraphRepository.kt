@@ -1,6 +1,7 @@
 package com.peekr.domain.keywordGraph.domain.repository
 
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.keywordGraph.domain.model.SharedKeywordInfo
 
 /**
@@ -14,5 +15,5 @@ interface KeywordGraphRepository {
         userId: UserId,
         cursor: Long,
         pageSize: Int,
-    ): List<SharedKeywordInfo>
+    ): CursorPage<SharedKeywordInfo>
 }
