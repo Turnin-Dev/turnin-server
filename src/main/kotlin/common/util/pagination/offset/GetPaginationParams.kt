@@ -1,4 +1,4 @@
-package com.peekr.common.util.pagination.default
+package com.peekr.common.util.pagination.offset
 
 import com.peekr.common.validator.inputValidationAndReturn
 import io.ktor.server.routing.RoutingContext

@@ -1,4 +1,4 @@
-package com.peekr.common.util.pagination.default
+package com.peekr.common.util.pagination.offset
 
 /**
  * 공통 페이징 데이터

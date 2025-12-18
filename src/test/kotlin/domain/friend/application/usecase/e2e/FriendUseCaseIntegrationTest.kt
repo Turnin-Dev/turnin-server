@@ -5,7 +5,7 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.default.PaginationParams
+import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
 import com.peekr.domain.friend.application.usecase.GetFriendsPaginationUseCase

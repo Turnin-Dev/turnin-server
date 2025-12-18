@@ -5,7 +5,7 @@ import com.peekr.common.model.Name
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.default.PaginationParams
+import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.provider.ExternalUserInfo

@@ -6,8 +6,8 @@ import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
-import com.peekr.common.util.pagination.default.PaginationParams
-import com.peekr.common.util.pagination.default.PagingData
+import com.peekr.common.util.pagination.offset.PaginationParams
+import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.dto.FriendInfoDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
