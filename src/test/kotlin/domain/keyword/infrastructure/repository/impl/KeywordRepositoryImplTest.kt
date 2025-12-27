@@ -78,11 +78,11 @@ class KeywordRepositoryImplTest {
         }
 
         // when
-        val actualKeywordIds = repository.findNameByIds(expectedKeywordIds.map { it.id })
+        val actualKeywords = repository.findNameByIds(expectedKeywordIds.map { it.id })
 
         // then
-        assertEquals(expectedKeywordIds.size, actualKeywordIds.size)
-        assertEquals(expectedKeywordIds.map { it.name }, actualKeywordIds)
+        assertEquals(expectedKeywordIds.size, actualKeywords.size)
+        assertEquals(expectedKeywordIds, actualKeywords)
     }
 
     @Test

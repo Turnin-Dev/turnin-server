@@ -12,18 +12,17 @@ import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 
 class KeywordRepositoryImpl : KeywordRepository {
     override suspend fun findById(id: KeywordId): Keyword? = suspendTransaction {
         KeywordEntity.findById(id.value)?.toDomain()
     }
 
-    override suspend fun findNameByIds(ids: List<KeywordId>): List<KeywordName> = suspendTransaction {
-        Keywords
-            .select(Keywords.keyword)
-            .where { Keywords.id inList ids.map { it.value } }
-            .toList()
-            .map { KeywordName(it[Keywords.keyword]) }
+    override suspend fun findNameByIds(ids: List<KeywordId>): List<Keyword> = suspendTransaction {
+        KeywordEntity
+            .find { Keywords.id inList ids.map { it.value } }
+            .map { it.toDomain() }
     }
 
     override suspend fun findByName(keywordName: KeywordName): Keyword? = suspendTransaction {
