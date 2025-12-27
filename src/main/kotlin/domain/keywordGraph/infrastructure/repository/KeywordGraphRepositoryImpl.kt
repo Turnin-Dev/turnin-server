@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
+import com.peekr.common.model.id.UserKeywordId
 import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.keywordGraph.domain.model.SharedKeywordInfo
 import com.peekr.domain.keywordGraph.domain.repository.KeywordGraphRepository
@@ -23,7 +24,13 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
         val uk2 = UserKeywords.alias("uk2")
 
         // 1) 집계 함수 인스턴스 생성
-        val sharedKeywords = StringAgg(
+        val sharedUserKeywordIds = StringAgg(
+            expr = uk2[UserKeywords.id],
+            delimiter = ",",
+            orderBy = uk2[UserKeywords.keywordId],
+        )
+
+        val sharedKeywordIds = StringAgg(
             expr = uk2[UserKeywords.keywordId],
             delimiter = ",",
             orderBy = uk2[UserKeywords.keywordId],
@@ -35,7 +42,7 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
                 otherTable = uk2,
                 onColumn = { uk1[UserKeywords.keywordId] },
                 otherColumn = { uk2[UserKeywords.keywordId] },
-            ).select(uk2[UserKeywords.userId], sharedKeywords)
+            ).select(uk2[UserKeywords.userId], sharedUserKeywordIds, sharedKeywordIds)
             .where {
                 (uk1[UserKeywords.userId] eq userId.value) and
                     (uk2[UserKeywords.userId] neq userId.value) and
@@ -47,11 +54,14 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
         // 3) 결과 매핑
         val items = query.map { row ->
             val otherUserId = row[uk2[UserKeywords.userId]].value
-            val keywordIds = row[sharedKeywords]?.split(",")?.map { it.toLong() }
+            val userKeywordIds = row[sharedUserKeywordIds]?.split(",")?.map { it.toLong() }
+                ?: emptyList()
+            val keywordIds = row[sharedKeywordIds]?.split(",")?.map { it.toLong() }
                 ?: emptyList()
 
             SharedKeywordInfo(
                 userId = UserId(otherUserId),
+                userKeywordIds = userKeywordIds.map { UserKeywordId(it) },
                 keywordIds = keywordIds.map { KeywordId(it) },
             )
         }

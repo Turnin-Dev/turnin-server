@@ -52,9 +52,15 @@ class KeywordGraphRepositoryImplTest {
             .find { it.userId.value == 3L }
             ?.keywordIds
             ?.map { it.value }
+        val actualUserKeywordIds = result
+            .items
+            .find { it.userId.value == 3L }
+            ?.userKeywordIds
+            ?.map { it.value }
 
         // then
         assertTrue(result.items.isNotEmpty())
         assertEquals(expectedKeywordIds, actualKeywordIds)
+        assertEquals(actualKeywordIds?.size, actualUserKeywordIds?.size)
     }
 }
