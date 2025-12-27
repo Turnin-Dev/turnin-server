@@ -70,6 +70,22 @@ class KeywordRepositoryImplTest {
     }
 
     @Test
+    fun `findNameByIds 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val expectedKeywordIds = List(5) {
+            repository.create(KeywordName(it.toString()), userId)
+        }
+
+        // when
+        val actualKeywordIds = repository.findNameByIds(expectedKeywordIds.map { it.id })
+
+        // then
+        assertEquals(expectedKeywordIds.size, actualKeywordIds.size)
+        assertEquals(expectedKeywordIds.map { it.name }, actualKeywordIds)
+    }
+
+    @Test
     fun `findByName 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
