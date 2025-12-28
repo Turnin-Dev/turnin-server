@@ -1,5 +1,6 @@
 package com.peekr.domain.keywordGraph.presentation.dto
 
+import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.keywordGraph.application.dto.NodeContextDto
 import kotlinx.serialization.Serializable
 
@@ -13,7 +14,29 @@ import kotlinx.serialization.Serializable
 data class NodeContextResponse(
     val userNode: UserNodeResponse,
     val keywordNodes: List<KeywordNodeResponse>,
-)
+) {
+    companion object {
+        val sample = CursorPage(
+            items = List(2) {
+                NodeContextResponse(
+                    userNode = UserNodeResponse(
+                        userId = it.toLong(),
+                        userName = "user1",
+                        profileImageUrl = null,
+                    ),
+                    keywordNodes = listOf(
+                        KeywordNodeResponse(
+                            userKeywordId = it.toLong(),
+                            keywordId = it.toLong(),
+                            keywordName = "keyword$it",
+                        ),
+                    ),
+                )
+            },
+            nextCursor = 2L,
+        )
+    }
+}
 
 fun NodeContextDto.toResponse(): NodeContextResponse =
     NodeContextResponse(
