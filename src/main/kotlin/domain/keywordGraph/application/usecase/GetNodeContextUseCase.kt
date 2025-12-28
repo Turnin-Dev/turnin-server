@@ -2,6 +2,7 @@ package com.peekr.domain.keywordGraph.application.usecase
 
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.keywordGraph.application.dto.KeywordNodeDto
 import com.peekr.domain.keywordGraph.application.dto.NodeContextDto
@@ -50,7 +51,8 @@ class GetNodeContextUseCase(
         val userKeywordIds = sharedKeywordInfos.map { it.userKeywordIds }
         val keywordIds = sharedKeywordInfos.map { it.keywordIds }
 
-        if (userKeywordIds.size != keywordIds.size) {
+        if (userKeywordIds.flatten().size != keywordIds.flatten().size) {
+            LOGGER.error("userKeywordIds and keywordIds size is not equal.")
             throw KeywordGraphException.KeywordIdPairingFailed()
         }
 
@@ -92,3 +94,5 @@ class GetNodeContextUseCase(
         CursorPage(nodeContexts, cursorPage.nextCursor)
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger<GetNodeContextUseCase>()
