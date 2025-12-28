@@ -12,7 +12,6 @@ import com.peekr.domain.keyword.domain.repository.KeywordRepository
 import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 
 class KeywordRepositoryImpl : KeywordRepository {
     override suspend fun findById(id: KeywordId): Keyword? = suspendTransaction {
