@@ -3,9 +3,10 @@ package com.peekr.domain.keywordGraph.application.usecase
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.keywordGraph.domain.model.KeywordNode
+import com.peekr.domain.keywordGraph.application.dto.KeywordNodeDto
+import com.peekr.domain.keywordGraph.application.dto.NodeContextDto
+import com.peekr.domain.keywordGraph.application.dto.UserNodeDto
 import com.peekr.domain.keywordGraph.domain.model.NodeContext
-import com.peekr.domain.keywordGraph.domain.model.UserNode
 import com.peekr.domain.keywordGraph.domain.provider.KeywordProvider
 import com.peekr.domain.keywordGraph.domain.provider.UserProvider
 import com.peekr.domain.keywordGraph.domain.repository.KeywordGraphRepository
@@ -33,12 +34,15 @@ class GetNodeContextUseCase(
      * @param pageSize 페이지 사이즈
      */
     suspend operator fun invoke(
-        userId: UserId,
+        userId: Long,
         cursor: Long,
         pageSize: Int,
-    ): CursorPage<NodeContext> = suspendTransaction {
+    ): CursorPage<NodeContextDto> = suspendTransaction {
+        // 0) VO 객체 변환
+        val userIdVO = UserId(userId)
+
         // 1) 공유 키워드 정보 페이지네이션 조회
-        val cursorPage = keywordGraphRepository.getSharedKeywordInfos(userId, cursor, pageSize)
+        val cursorPage = keywordGraphRepository.getSharedKeywordInfos(userIdVO, cursor, pageSize)
 
         // 2) 데이터 전처리
         val sharedKeywordInfos = cursorPage.items
@@ -65,7 +69,7 @@ class GetNodeContextUseCase(
         // 5) 각 노드 매핑, NodeContext 생성
         val nodeContexts = cursorPage.items.map { sharedKeywordInfo ->
             val sUserId = sharedKeywordInfo.userId
-            val userNode = UserNode(
+            val userNode = UserNodeDto(
                 userId = sUserId,
                 userName = userMap[sUserId]?.name?.value ?: throw KeywordGraphException.UserNotFound(),
                 profileImageUrl = userMap[sUserId]?.profileImageUrl ?: throw KeywordGraphException.UserNotFound(),
@@ -73,7 +77,7 @@ class GetNodeContextUseCase(
 
             val keywordNodes = sharedKeywordInfo.userKeywordIds
                 .zip(sharedKeywordInfo.keywordIds) { userKeywordId, keywordId ->
-                    KeywordNode(
+                    KeywordNodeDto(
                         userKeywordId = userKeywordId,
                         keywordId = keywordId,
                         keywordName = keywordMap[keywordId]?.value
@@ -81,7 +85,7 @@ class GetNodeContextUseCase(
                     )
                 }
 
-            NodeContext(userNode, keywordNodes)
+            NodeContextDto(userNode, keywordNodes)
         }
 
         // 6) 최종 반환
