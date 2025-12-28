@@ -11,8 +11,10 @@ import com.peekr.domain.keywordGraph.domain.model.SharedKeywordInfo
 import com.peekr.domain.keywordGraph.domain.repository.KeywordGraphRepository
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.TextColumnType
 import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.castTo
 import org.jetbrains.exposed.sql.innerJoin
 
 class KeywordGraphRepositoryImpl : KeywordGraphRepository {
@@ -26,13 +28,13 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
 
         // 1) 집계 함수 인스턴스 생성
         val sharedUserKeywordIds = StringAgg(
-            expr = uk2[UserKeywords.id],
+            expr = uk2[UserKeywords.id].castTo(TextColumnType()),
             delimiter = ",",
             orderBy = uk2[UserKeywords.keywordId],
         )
 
         val sharedKeywordIds = StringAgg(
-            expr = uk2[UserKeywords.keywordId],
+            expr = uk2[UserKeywords.keywordId].castTo(TextColumnType()),
             delimiter = ",",
             orderBy = uk2[UserKeywords.keywordId],
         )

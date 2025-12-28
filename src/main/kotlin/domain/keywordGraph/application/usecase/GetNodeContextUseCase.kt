@@ -71,10 +71,11 @@ class GetNodeContextUseCase(
         // 5) 각 노드 매핑, NodeContext 생성
         val nodeContexts = cursorPage.items.map { sharedKeywordInfo ->
             val sUserId = sharedKeywordInfo.userId
+            val foundedUser = userMap[sUserId] ?: throw KeywordGraphException.UserNotFound()
             val userNode = UserNodeDto(
                 userId = sUserId,
-                userName = userMap[sUserId]?.name?.value ?: throw KeywordGraphException.UserNotFound(),
-                profileImageUrl = userMap[sUserId]?.profileImageUrl ?: throw KeywordGraphException.UserNotFound(),
+                userName = foundedUser.name.value,
+                profileImageUrl = foundedUser.profileImageUrl,
             )
 
             val keywordNodes = sharedKeywordInfo.userKeywordIds

@@ -2,6 +2,7 @@ package com.peekr.domain.keywordGraph.presentation.route
 
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.common.util.pagination.cursor.getCursorPaginationParams
 import com.peekr.common.util.pagination.cursor.toResponse
@@ -14,6 +15,7 @@ import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
+import kotlin.time.measureTimedValue
 
 fun AuthenticatedRoute.keywordGraphRoutes(route: Api.V1.KeywordGraph, usecase: KeywordGraphUseCases) {
     route(route.ROUTE, {
@@ -25,18 +27,26 @@ fun AuthenticatedRoute.keywordGraphRoutes(route: Api.V1.KeywordGraph, usecase: K
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
             val cursorPaginationParams = getCursorPaginationParams()
-            val cursorPage = usecase.getNodeContextUseCase(
-                userId = userId,
-                cursor = cursorPaginationParams.cursor,
-                pageSize = cursorPaginationParams.size,
-            )
+            val timedResult = measureTimedValue {
+                usecase.getNodeContextUseCase(
+                    userId = userId,
+                    cursor = cursorPaginationParams.cursor,
+                    pageSize = cursorPaginationParams.size,
+                )
+            }
+            val cursorPage = timedResult.value
             val response = cursorPage.toResponse { nodeContextDto ->
                 nodeContextDto.toResponse()
             }
+
+            val duration = timedResult.duration
+            LOGGER.debug("공유 키워드 노드 조회에 걸린 시간: $duration")
             call.respond(HttpStatusCode.OK, response)
         }
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger("KeywordGraphRoute")
 
 private fun RouteConfig.getNodeContextDocs() {
     summary = "사용자 ID로 사용자 키워드 노드 목록 조회 (페이지네이션)"
