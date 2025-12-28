@@ -2,7 +2,6 @@ package com.peekr.domain.keywordGraph.exception
 
 import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
-import com.peekr.domain.keywordGraph.exception.domain.keywordGraph.exception.KeywordGraphErrorCode
 import io.ktor.http.HttpStatusCode
 
 /**

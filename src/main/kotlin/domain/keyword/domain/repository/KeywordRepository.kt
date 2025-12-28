@@ -20,7 +20,7 @@ interface KeywordRepository {
      *
      * @param ids 키워드 ID 리스트
      */
-    suspend fun findNameByIds(ids: List<KeywordId>): List<Keyword>
+    suspend fun findByIds(ids: List<KeywordId>): List<Keyword>
 
     /**
      * 키워드 명을 통해 키워드가 존재하는지 찾는다.

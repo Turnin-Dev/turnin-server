@@ -70,7 +70,7 @@ class KeywordRepositoryImplTest {
     }
 
     @Test
-    fun `findNameByIds 성공 테스트`() = runTest {
+    fun `findByIds 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
         val expectedKeywordIds = List(5) {
@@ -78,7 +78,7 @@ class KeywordRepositoryImplTest {
         }
 
         // when
-        val actualKeywords = repository.findNameByIds(expectedKeywordIds.map { it.id })
+        val actualKeywords = repository.findByIds(expectedKeywordIds.map { it.id })
 
         // then
         assertEquals(expectedKeywordIds.size, actualKeywords.size)

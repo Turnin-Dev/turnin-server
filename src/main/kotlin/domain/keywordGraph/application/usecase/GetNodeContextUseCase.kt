@@ -65,7 +65,7 @@ class GetNodeContextUseCase(
 
         // 4) 키워드 ID Set 리스트를 통해 키워드 리스트 조회, 키워드 Map 생성
         val keywordMap = keywordProvider
-            .findNameByIds(keywordIdsSet.toList())
+            .findByIds(keywordIdsSet.toList())
             .associate { it.id to it.name }
 
         // 5) 각 노드 매핑, NodeContext 생성

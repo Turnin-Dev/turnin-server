@@ -7,8 +7,8 @@ import com.peekr.domain.keywordGraph.domain.provider.ExternalKeyword
 import com.peekr.domain.keywordGraph.domain.provider.KeywordProvider
 
 class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : KeywordProvider {
-    override suspend fun findNameByIds(ids: List<KeywordId>): List<ExternalKeyword> =
-        keywordProviderApi.findNameByIds(ids).map {
+    override suspend fun findByIds(ids: List<KeywordId>): List<ExternalKeyword> =
+        keywordProviderApi.findByIds(ids).map {
             ExternalKeyword(
                 id = it.id,
                 name = KeywordName(it.name),

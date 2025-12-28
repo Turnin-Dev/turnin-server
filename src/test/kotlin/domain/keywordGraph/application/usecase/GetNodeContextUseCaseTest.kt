@@ -69,7 +69,7 @@ class GetNodeContextUseCaseTest {
             userProvider.findByIds(any())
         } returns users
         coEvery {
-            keywordProvider.findNameByIds(any())
+            keywordProvider.findByIds(any())
         } returns keywords
 
         // when
@@ -114,7 +114,7 @@ class GetNodeContextUseCaseTest {
             userProvider.findByIds(any())
         } returns users
         coEvery {
-            keywordProvider.findNameByIds(any())
+            keywordProvider.findByIds(any())
         } returns keywords
 
         // when
@@ -149,7 +149,7 @@ class GetNodeContextUseCaseTest {
             userProvider.findByIds(any())
         } returns emptyList()
         coEvery {
-            keywordProvider.findNameByIds(any())
+            keywordProvider.findByIds(any())
         } returns keywords
 
         // when
@@ -166,7 +166,7 @@ class GetNodeContextUseCaseTest {
     fun `키워드 Map 에서 키워드를 찾지 못하는 경우 예외가 발생한다`() = runTest {
         // given: 키워드 정보를 조회할 때 빈 리스트를 반환하도록 구성
         val userKeywordIds = createUserKeywordIds(2)
-        val keywordIds = createKeywordIds(4)
+        val keywordIds = createKeywordIds(2)
         val sharedKeywordInfos = List(PAGE_SIZE) {
             createSharedKeywordInfo(
                 userId = UserId((it + 1).toLong()),
@@ -184,7 +184,7 @@ class GetNodeContextUseCaseTest {
             userProvider.findByIds(any())
         } returns users
         coEvery {
-            keywordProvider.findNameByIds(any())
+            keywordProvider.findByIds(any())
         } returns emptyList()
 
         // when

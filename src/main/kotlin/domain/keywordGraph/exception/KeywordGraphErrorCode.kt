@@ -1,4 +1,4 @@
-package com.peekr.domain.keywordGraph.exception.domain.keywordGraph.exception
+package com.peekr.domain.keywordGraph.exception
 
 import com.peekr.common.exception.ApiErrorCode
 

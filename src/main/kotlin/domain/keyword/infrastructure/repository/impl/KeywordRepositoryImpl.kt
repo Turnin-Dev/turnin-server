@@ -18,7 +18,8 @@ class KeywordRepositoryImpl : KeywordRepository {
         KeywordEntity.findById(id.value)?.toDomain()
     }
 
-    override suspend fun findNameByIds(ids: List<KeywordId>): List<Keyword> = suspendTransaction {
+    override suspend fun findByIds(ids: List<KeywordId>): List<Keyword> = suspendTransaction {
+        if (ids.isEmpty()) return@suspendTransaction emptyList()
         KeywordEntity
             .find { Keywords.id inList ids.map { it.value } }
             .map { it.toDomain() }
