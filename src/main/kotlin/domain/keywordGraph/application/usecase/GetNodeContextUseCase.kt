@@ -36,7 +36,7 @@ class GetNodeContextUseCase(
      */
     suspend operator fun invoke(
         userId: Long,
-        cursor: Long,
+        cursor: Long?,
         pageSize: Int,
     ): CursorPage<NodeContextDto> = suspendTransaction {
         // 0) VO 객체 변환

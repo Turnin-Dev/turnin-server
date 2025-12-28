@@ -9,6 +9,7 @@ import com.peekr.common.model.id.UserKeywordId
 import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.keywordGraph.domain.model.SharedKeywordInfo
 import com.peekr.domain.keywordGraph.domain.repository.KeywordGraphRepository
+import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.and
@@ -17,7 +18,7 @@ import org.jetbrains.exposed.sql.innerJoin
 class KeywordGraphRepositoryImpl : KeywordGraphRepository {
     override suspend fun getSharedKeywordInfos(
         userId: UserId,
-        cursor: Long,
+        cursor: Long?,
         pageSize: Int,
     ): CursorPage<SharedKeywordInfo> = suspendTransaction {
         val uk1 = UserKeywords.alias("uk1")
@@ -44,9 +45,14 @@ class KeywordGraphRepositoryImpl : KeywordGraphRepository {
                 otherColumn = { uk2[UserKeywords.keywordId] },
             ).select(uk2[UserKeywords.userId], sharedUserKeywordIds, sharedKeywordIds)
             .where {
-                (uk1[UserKeywords.userId] eq userId.value) and
-                    (uk2[UserKeywords.userId] neq userId.value) and
-                    (uk2[UserKeywords.userId] less cursor)
+                val conditions = mutableListOf<Op<Boolean>>()
+                conditions.add(uk1[UserKeywords.userId] eq userId.value)
+                conditions.add(uk2[UserKeywords.userId] neq userId.value)
+                cursor?.let {
+                    conditions.add(uk2[UserKeywords.userId] less cursor)
+                }
+
+                conditions.reduce { acc, op -> acc and op }
             }.groupBy(uk2[UserKeywords.userId])
             .orderBy(uk2[UserKeywords.userId] to SortOrder.DESC)
             .limit(pageSize + 1)

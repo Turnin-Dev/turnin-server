@@ -45,8 +45,8 @@ private fun RouteConfig.getNodeContextDocs() {
         queryParameter<Long>("userId") {
             description = "사용자 ID"
         }
-        queryParameter<Long>("cursor") {
-            description = "페이지네이션에 필요한 커서 값"
+        queryParameter<Long?>("cursor") {
+            description = "페이지네이션에 필요한 커서 값 (초기 호출 시 null 로 요청)"
         }
         queryParameter<Int>("size") {
             description = "페이지네이션에 필요한 페이지 크기"

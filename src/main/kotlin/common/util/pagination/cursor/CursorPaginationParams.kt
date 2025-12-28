@@ -7,6 +7,6 @@ package com.peekr.common.util.pagination.cursor
  * @property size 페이지 크기
  */
 data class CursorPaginationParams<T>(
-    val cursor: T,
+    val cursor: T?,
     val size: Int,
 )
