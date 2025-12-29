@@ -22,7 +22,7 @@ data class NodeContextResponse(
                     userNode = UserNodeResponse(
                         userId = it.toLong(),
                         userName = "user1",
-                        profileImageUrl = null,
+                        profileImageUrl = "https://image-server-1.com/image$it.jpg",
                     ),
                     keywordNodes = listOf(
                         KeywordNodeResponse(
