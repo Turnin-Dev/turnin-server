@@ -45,6 +45,8 @@ class GetNodeContextUseCase(
         // 1) 공유 키워드 정보 페이지네이션 조회
         val cursorPage = keywordGraphRepository.getSharedKeywordInfos(userIdVO, cursor, pageSize)
 
+        if (cursorPage.items.isEmpty()) return@suspendTransaction CursorPage(emptyList(), null)
+
         // 2) 데이터 전처리
         val sharedKeywordInfos = cursorPage.items
         val userIds = sharedKeywordInfos.map { it.userId }
@@ -71,7 +73,10 @@ class GetNodeContextUseCase(
         // 5) 각 노드 매핑, NodeContext 생성
         val nodeContexts = cursorPage.items.map { sharedKeywordInfo ->
             val sUserId = sharedKeywordInfo.userId
-            val foundedUser = userMap[sUserId] ?: throw KeywordGraphException.UserNotFound()
+            val foundedUser = userMap[sUserId] ?: run {
+                LOGGER.error("User not found. userId: $sUserId")
+                throw KeywordGraphException.UserNotFound()
+            }
             val userNode = UserNodeDto(
                 userId = sUserId,
                 userName = foundedUser.name.value,
@@ -84,7 +89,17 @@ class GetNodeContextUseCase(
                         userKeywordId = userKeywordId,
                         keywordId = keywordId,
                         keywordName = keywordMap[keywordId]?.value
-                            ?: throw KeywordGraphException.KeywordIdPairingFailed(),
+                            ?: run {
+                                LOGGER.error(
+                                    """
+                                    Keyword not found.
+                                    - User ID: ${sUserId.value}
+                                    - Keyword ID: ${keywordId.value}
+                                    - UserKeyword ID: ${userKeywordId.value}
+                                    """.trimIndent(),
+                                )
+                                throw KeywordGraphException.KeywordIdPairingFailed()
+                            },
                     )
                 }
 

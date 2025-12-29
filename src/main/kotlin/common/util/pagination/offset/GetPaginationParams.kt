@@ -16,9 +16,9 @@ fun RoutingContext.getPaginationParams(): PaginationParams {
         .inputValidationAndReturn("PaginationParams(pageSize)")
 
     when {
-        page < 1 -> BadRequestException("Page number must be positive.")
-        size < 1 -> BadRequestException("Page size number must be positive.")
-        size > 25 -> BadRequestException("Page size number too large.")
+        page < 1 -> throw BadRequestException("Page number must be positive.")
+        size < 1 -> throw BadRequestException("Page size number must be positive.")
+        size > 25 -> throw BadRequestException("Page size number too large.")
     }
 
     return PaginationParams(

@@ -37,8 +37,6 @@ class GetNodeContextUseCaseTest {
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
-
-        // Mock Data
     }
 
     @After
@@ -195,6 +193,22 @@ class GetNodeContextUseCaseTest {
         // then
         assertNotNull(exception)
         assertTrue(exception is KeywordGraphException.KeywordIdPairingFailed)
+    }
+
+    @Test
+    fun `페이지네이션 조회 시 빈 리스트를 반환하는 경우 즉시 빈 리스트를 반환한다`() = runTest {
+        // given
+        val cursorPage = CursorPage(emptyList<SharedKeywordInfo>(), null)
+
+        coEvery {
+            keywordGraphRepository.getSharedKeywordInfos(TestUserId, any(), any())
+        } returns cursorPage
+
+        // when
+        val actualCursorPage = usecase(TestUserId.value, 1L, PAGE_SIZE)
+
+        // then
+        assertTrue(actualCursorPage.items.isEmpty())
     }
 
     companion object {
