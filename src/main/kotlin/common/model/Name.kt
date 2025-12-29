@@ -4,6 +4,9 @@ import com.peekr.common.validator.ValidatorException
 
 class NameValidationException(message: String) : ValidatorException(message)
 
+/**
+ * 사용자 이름 VO
+ */
 @JvmInline
 value class Name private constructor(val value: String) {
     /**

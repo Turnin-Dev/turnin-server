@@ -9,6 +9,8 @@ import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.route.friendRoutes
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.route.keywordRoutes
+import com.peekr.domain.keywordGraph.application.usecase.KeywordGraphUseCases
+import com.peekr.domain.keywordGraph.presentation.route.keywordGraphRoutes
 import com.peekr.domain.report.application.usecase.ReportUseCases
 import com.peekr.domain.report.presentation.route.reportRoutes
 import com.peekr.domain.user.application.usecase.UserUseCases
@@ -31,6 +33,7 @@ fun Application.configureRouting() {
     val userKeywordUseCases by inject<UserKeywordUseCases>()
     val reportUseCases by inject<ReportUseCases>()
     val friendUseCases by inject<FriendUseCases>()
+    val keywordGraphUseCases by inject<KeywordGraphUseCases>()
 
     routing {
         customRoutingOption()
@@ -46,6 +49,7 @@ fun Application.configureRouting() {
                     userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
                     reportRoutes(route = Api.V1.Report, usecase = reportUseCases)
                     friendRoutes(route = Api.V1.Friend, usecase = friendUseCases)
+                    keywordGraphRoutes(route = Api.V1.KeywordGraph, usecase = keywordGraphUseCases)
                 }
             }
         }

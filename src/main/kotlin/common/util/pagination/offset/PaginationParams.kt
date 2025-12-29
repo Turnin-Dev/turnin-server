@@ -1,4 +1,4 @@
-package com.peekr.common.util.pagination
+package com.peekr.common.util.pagination.offset
 
 /**
  * 페이지네이션(오프셋 기반) 파라미터

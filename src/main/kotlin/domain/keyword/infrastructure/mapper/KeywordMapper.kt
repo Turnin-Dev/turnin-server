@@ -9,13 +9,13 @@ import com.peekr.domain.keyword.domain.model.Keyword
 import org.jetbrains.exposed.sql.ResultRow
 
 object KeywordMapper {
-    fun toDomain(row: ResultRow): Keyword =
+    fun ResultRow.toDomain(): Keyword =
         Keyword(
-            id = KeywordId(row[Keywords.id].value),
-            name = KeywordName(row[Keywords.keyword]),
-            createdBy = UserId(row[Keywords.createdBy].value),
-            createdAt = row[Keywords.createdAt].toEpochSecond(),
-            updatedAt = row[Keywords.updatedAt].toEpochSecond(),
+            id = KeywordId(this[Keywords.id].value),
+            name = KeywordName(this[Keywords.keyword]),
+            createdBy = UserId(this[Keywords.createdBy].value),
+            createdAt = this[Keywords.createdAt].toEpochSecond(),
+            updatedAt = this[Keywords.updatedAt].toEpochSecond(),
         )
 
     fun KeywordEntity.toDomain(): Keyword =

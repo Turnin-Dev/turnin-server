@@ -2,7 +2,7 @@ package com.peekr.domain.friend.presentation.route
 
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
-import com.peekr.common.util.pagination.getPaginationParams
+import com.peekr.common.util.pagination.offset.getPaginationParams
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest

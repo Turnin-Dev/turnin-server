@@ -1,6 +1,7 @@
-package com.peekr.common.util.pagination
+package com.peekr.common.util.pagination.offset
 
 import com.peekr.common.validator.inputValidationAndReturn
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.routing.RoutingContext
 
 /**
@@ -14,8 +15,11 @@ fun RoutingContext.getPaginationParams(): PaginationParams {
         ?.toIntOrNull()
         .inputValidationAndReturn("PaginationParams(pageSize)")
 
-    if (page < 1) throw IllegalArgumentException("Page number must be positive.")
-    if (size < 1) throw IllegalArgumentException("Page size number must be positive.")
+    when {
+        page < 1 -> throw BadRequestException("Page number must be positive.")
+        size < 1 -> throw BadRequestException("Page size number must be positive.")
+        size > 25 -> throw BadRequestException("Page size number too large.")
+    }
 
     return PaginationParams(
         page = page,

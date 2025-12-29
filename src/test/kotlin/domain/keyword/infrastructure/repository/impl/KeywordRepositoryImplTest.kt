@@ -10,6 +10,7 @@ import com.peekr.util.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -67,6 +68,31 @@ class KeywordRepositoryImplTest {
 
         // then
         assertNull(keyword)
+    }
+
+    @Test
+    fun `findByIds 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val expectedKeywords = List(5) {
+            repository.create(KeywordName(it.toString()), userId)
+        }
+
+        // when
+        val actualKeywords = repository.findByIds(expectedKeywords.map { it.id })
+
+        // then
+        assertEquals(expectedKeywords.size, actualKeywords.size)
+        assertEquals(expectedKeywords, actualKeywords)
+    }
+
+    @Test
+    fun `findByIds 실패 테스트 - 빈 리스트를 입력 시 빈 리스트를 즉시 반환한다`() = runTest {
+        // when
+        val actualKeywords = repository.findByIds(emptyList())
+
+        // then
+        assertTrue(actualKeywords.isEmpty())
     }
 
     @Test
