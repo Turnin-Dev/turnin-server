@@ -42,7 +42,6 @@ interface UserKeywordRepository {
      *
      * @param keywordId 키워드 ID
      * @param userId 사용자 ID
-     * @param offset UI 좌표 상에서의 위치(오프셋)
      * @param description 키워드 개인 설명
      *
      * @return 생성된 [UserKeyword]를 반환한다.
