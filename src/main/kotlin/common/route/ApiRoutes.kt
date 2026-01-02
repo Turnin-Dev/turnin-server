@@ -65,11 +65,6 @@ object Api {
             const val FRIENDS = "/list"
             const val STATUS = "/status"
         }
-
-        object KeywordGraph {
-            const val ROUTE = "/keyword-graph"
-            const val TAG = "KeywordGraph"
-        }
     }
 
     /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */
