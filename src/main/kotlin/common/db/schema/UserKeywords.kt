@@ -10,8 +10,6 @@ import org.jetbrains.exposed.sql.ReferenceOption
 object UserKeywords : BaseLongIdTable("user_keyword") {
     val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
     val keywordId = reference("keyword_id", Keywords, onDelete = ReferenceOption.CASCADE)
-    val offsetX = double("offset_x")
-    val offsetY = double("offset_y")
     val description = text("description").nullable()
 
     init {
@@ -26,8 +24,6 @@ class UserKeywordEntity(id: EntityID<Long>) : BaseEntity(id, UserKeywords) {
 
     var userId by UserKeywords.userId
     var keywordId by UserKeywords.keywordId
-    var offsetX by UserKeywords.offsetX
-    var offsetY by UserKeywords.offsetY
     var description by UserKeywords.description
 
     val keywordEntity by KeywordEntity referencedOn UserKeywords.keywordId

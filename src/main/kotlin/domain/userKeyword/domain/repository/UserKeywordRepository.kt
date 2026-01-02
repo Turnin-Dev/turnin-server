@@ -4,7 +4,6 @@ import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.Description
-import com.peekr.domain.userKeyword.domain.model.Offset
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 
 interface UserKeywordRepository {
@@ -51,24 +50,8 @@ interface UserKeywordRepository {
     suspend fun create(
         keywordId: KeywordId,
         userId: UserId,
-        offset: Offset,
         description: Description,
     ): UserKeyword
-
-    /**
-     * 사용자별 키워드 오프셋을 업데이트한다.
-     *
-     * @param ownerId 사용자 ID
-     * @param userKeywordId 사용자별 키워드 ID
-     * @param patch [Offset]
-     *
-     * @return 성공 시 `true`, 실패 시 `false` 반환
-     */
-    suspend fun updateOffset(
-        ownerId: UserId,
-        userKeywordId: UserKeywordId,
-        patch: Offset,
-    ): Boolean
 
     /**
      * 사용자별 키워드 설명을 업데이트한다.

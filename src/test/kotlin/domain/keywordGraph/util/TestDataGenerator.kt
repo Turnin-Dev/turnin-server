@@ -58,8 +58,6 @@ object TestDataGenerator {
             UserKeywords.batchInsert(ukRelation) { (uid, kid) ->
                 this[UserKeywords.userId] = uid
                 this[UserKeywords.keywordId] = kid
-                this[UserKeywords.offsetX] = 0.0
-                this[UserKeywords.offsetY] = 0.0
             }
         }
     }

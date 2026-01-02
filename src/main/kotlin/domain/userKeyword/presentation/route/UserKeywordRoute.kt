@@ -10,8 +10,6 @@ import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.DescriptionResponse
 import com.peekr.domain.userKeyword.presentation.dto.GetUserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
-import com.peekr.domain.userKeyword.presentation.dto.UpdateOffsetRequest
-import com.peekr.domain.userKeyword.presentation.dto.UpdateOffsetResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.toDto
 import com.peekr.domain.userKeyword.presentation.dto.toResponse
@@ -60,26 +58,6 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             val addUserKeywordRequestDto = createUserKeywordRequest.toDto().copy(userId = ownerId)
             val userKeywordDto = usecase.create(addUserKeywordRequestDto)
             call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
-        }
-
-        patch(route.PATCH_OFFSET, { updateOffsetDocs() }) {
-            val userKeywordIdParam = call.queryParameters["userKeywordId"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("사용자 키워드 ID")
-            val ownerId = extractUserIdWithToken()
-            verifyAuthUserId(ownerId)
-            val userKeywordId = UserKeywordId(userKeywordIdParam)
-            val offsetDto = call.receive<UpdateOffsetRequest>().toDto()
-            val result = usecase.updateOffset(
-                ownerId = ownerId,
-                userKeywordId = userKeywordId,
-                patch = offsetDto,
-            )
-            if (result != null) {
-                call.respond(HttpStatusCode.OK, result.toResponse())
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
         }
 
         patch(route.PATCH_DESCRIPTION, { updateDescriptionDocs() }) {
@@ -186,38 +164,6 @@ private fun RouteConfig.createUserKeywordDocs() {
                     value = UserKeywordResponse.sample
                 }
             }
-        }
-    }
-}
-
-private fun RouteConfig.updateOffsetDocs() {
-    summary = "사용자 키워드 오프셋 수정"
-    description = "사용자 키워드 오프셋을 수정한다."
-    request {
-        queryParameter<Long>("userKeywordId") {
-            description = "사용자 키워드 ID"
-            example("userKeywordId") {
-                value = 1
-            }
-        }
-        body<UpdateOffsetRequest> {
-            description = "사용자 키워드 오프셋 수정 요청 바디"
-            example("UpdateOffsetRequest") {
-                value = UpdateOffsetRequest.sample
-            }
-        }
-    }
-    response {
-        code(HttpStatusCode.OK) {
-            body<UpdateOffsetResponse> {
-                description = "사용자 키워드 오프셋 수정 응답 결과 (성공)"
-                example("UpdateOffsetResponse") {
-                    value = UpdateOffsetResponse.sample
-                }
-            }
-        }
-        code(HttpStatusCode.NotFound) {
-            description = "사용자 키워드 오프셋 수정 응답 결과 (실패)"
         }
     }
 }
