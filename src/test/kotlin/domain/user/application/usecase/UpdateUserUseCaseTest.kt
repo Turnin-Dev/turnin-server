@@ -2,7 +2,6 @@ package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Name
-import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.application.dto.UserPatchDto
 import com.peekr.domain.user.domain.model.UserPatch
@@ -34,13 +33,11 @@ class UpdateUserUseCaseTest {
     companion object {
         private val TestUserId = UserId(1L)
         private val TestUserPatchDto = UserPatchDto(
-            displayId = DisplayId("ididid"),
             name = Name("name"),
             profileImageUrl = null,
             introduce = Introduce("introduce"),
         )
         private val TestUserPatch = UserPatch(
-            displayId = DisplayId("ididid"),
             name = Name("name"),
             profileImageUrl = null,
             introduce = Introduce("introduce"),

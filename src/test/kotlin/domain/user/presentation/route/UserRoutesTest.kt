@@ -518,13 +518,11 @@ class UserRoutesTest {
         private val TestDisplayId = DisplayId("did")
         private const val INVALID_USER_ID = "asd"
         private val TestUserPatchDto = UserPatchDto(
-            displayId = DisplayId("id"),
             name = Name("name"),
             profileImageUrl = null,
             introduce = Introduce(TEST_INTRODUCE),
         )
         private val TestUserPatchRequest = UserPatchRequest(
-            displayId = "id",
             name = "name",
             profileImageUrl = null,
             introduce = TEST_INTRODUCE,

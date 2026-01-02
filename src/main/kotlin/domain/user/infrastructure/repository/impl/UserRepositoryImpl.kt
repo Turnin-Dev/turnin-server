@@ -37,7 +37,6 @@ class UserRepositoryImpl : UserRepository {
         patch: UserPatch,
     ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
-            row[displayId] = patch.displayId.value
             row[name] = patch.name.value
             row[profileImageUrl] = patch.profileImageUrl
             patch.introduce?.let { row[introduce] = it.value }
