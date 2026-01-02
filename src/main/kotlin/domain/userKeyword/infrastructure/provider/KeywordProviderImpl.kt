@@ -20,6 +20,19 @@ class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : 
         }
     }
 
+    override suspend fun findByIds(keywordIds: List<KeywordId>): List<ExternalKeyword> {
+        val keywordDtoList = keywordProviderApi.findByIds(keywordIds)
+        return keywordDtoList.map {
+            ExternalKeyword(
+                id = it.id,
+                name = it.name,
+                createdBy = it.createdBy,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+            )
+        }
+    }
+
     override suspend fun findByName(keywordName: String): ExternalKeyword? {
         val keywordDto = keywordProviderApi.findByName(keywordName)
         return keywordDto?.let {

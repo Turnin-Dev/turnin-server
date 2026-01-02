@@ -17,6 +17,7 @@ import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -37,6 +38,99 @@ class UserKeywordRepositoryImplTest {
     @After
     fun teardown() {
         TestDatabaseFactory.cleanUp()
+    }
+
+    @Test
+    fun `findById 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when
+        val actualUserKeyword = repository.findById(userKeyword.id)
+
+        // then
+        assertNotNull(actualUserKeyword)
+        assertEquals(userKeyword, actualUserKeyword)
+    }
+
+    @Test
+    fun `findById 실패 테스트 - 데이터가 없으면 null을 반환한다`() = runTest {
+        // when
+        val actualUserKeyword = repository.findById(UserKeywordId(1L))
+
+        // then
+        assertNull(actualUserKeyword)
+    }
+
+    @Test
+    fun `findListByUserId 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when
+        val userKeywords = repository.findListByUserId(userId)
+
+        // then
+        assertEquals(userKeywords.size, 1)
+        assertEquals(userKeywords.first().id, userKeyword.id)
+        assertEquals(userKeywords.first().keywordId, keywordId)
+    }
+
+    @Test
+    fun `findListByUserId 성공 테스트 - 키워드 설명 필드가 길면 텍스트 일부만 가져온다`() = runTest {
+        // given
+        val expectedDescriptionLength = 300
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = Description("a".repeat(expectedDescriptionLength)),
+        )
+
+        // when
+        val userKeywords = repository.findListByUserId(userId)
+
+        // then
+        assertEquals(userKeywords.size, 1)
+        assertNotEquals(
+            expectedDescriptionLength,
+            userKeywords
+                .first()
+                .description.value
+                ?.length,
+        )
+    }
+
+    @Test
+    fun `findListByUserId 성공 테스트 - 등록된 키워드가 없는 상태에서 조회 시 빈 리스트를 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+
+        // when
+        val userKeywords = repository.findListByUserId(userId)
+
+        // then
+        assertTrue(userKeywords.isEmpty())
+    }
+
+    @Test
+    fun `findListByUserId 실패 테스트 - 존재하지 않는 사용자의 사용자 키워드 조회 시 빈 리스트를 반환한다`() = runTest {
+        val userKeywords = repository.findListByUserId(UserId(10))
+
+        assertTrue(userKeywords.isEmpty())
     }
 
     @Test
@@ -66,45 +160,6 @@ class UserKeywordRepositoryImplTest {
                 description = TestDescription,
             )
         }
-    }
-
-    @Test
-    fun `findByUserId 성공 테스트`() = runTest {
-        // given
-        val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
-        val userKeyword = repository.create(
-            keywordId = keywordId,
-            userId = userId,
-            description = TestDescription,
-        )
-
-        // when
-        val userKeywords = repository.findByUserId(userId)
-
-        // then
-        assertTrue(userKeywords.size == 1)
-        assertEquals(userKeywords.first().id, userKeyword.id)
-        assertEquals(userKeywords.first().keywordId, keywordId)
-    }
-
-    @Test
-    fun `findByUserId 성공 테스트 - 등록된 키워드가 없는 상태에서 조회 시 빈 리스트를 반환한다`() = runTest {
-        // given
-        val userId = insertUserAndReturnId()
-
-        // when
-        val userKeywords = repository.findByUserId(userId)
-
-        // then
-        assertTrue(userKeywords.isEmpty())
-    }
-
-    @Test
-    fun `findByUserId 실패 테스트 - 존재하지 않는 사용자의 사용자 키워드 조회 시 빈 리스트를 반환한다`() = runTest {
-        val userKeywords = repository.findByUserId(UserId(10))
-
-        assertTrue(userKeywords.isEmpty())
     }
 
     @Test

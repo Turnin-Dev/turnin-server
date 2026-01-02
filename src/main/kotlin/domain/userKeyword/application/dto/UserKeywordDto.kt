@@ -14,18 +14,20 @@ import com.peekr.domain.userKeyword.domain.model.UserKeyword
  */
 data class UserKeywordDto(
     val id: Long,
+    val userId: Long,
     val keywordId: Long,
     val keywordName: String,
-    val userId: Long,
+    val description: String?,
     val createdAt: Long,
     val updatedAt: Long,
 )
 
 fun UserKeyword.toDto(keywordName: String): UserKeywordDto = UserKeywordDto(
     id = id.value,
+    userId = userId.value,
     keywordId = keywordId.value,
     keywordName = keywordName,
-    userId = userId.value,
+    description = description.value,
     createdAt = createdAt,
     updatedAt = updatedAt,
 )

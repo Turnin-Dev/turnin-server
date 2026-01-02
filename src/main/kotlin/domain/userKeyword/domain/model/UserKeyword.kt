@@ -17,6 +17,14 @@ data class UserKeyword(
     val id: UserKeywordId,
     val keywordId: KeywordId,
     val userId: UserId,
+    val description: Description,
     val createdAt: Long,
     val updatedAt: Long,
-)
+) {
+    companion object {
+        /**
+         * 사용자 키워드를 생성할 수 있는 최대 개수
+         */
+        const val COUNT_LIMIT = 5
+    }
+}

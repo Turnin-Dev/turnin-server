@@ -8,9 +8,9 @@ import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.DescriptionResponse
-import com.peekr.domain.userKeyword.presentation.dto.GetUserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
+import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
 import com.peekr.domain.userKeyword.presentation.dto.toDto
 import com.peekr.domain.userKeyword.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -110,10 +110,10 @@ private fun RouteConfig.getUserKeywordsDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            body<GetUserKeywordResponse> {
+            body<UserKeywordsResponse> {
                 description = "사용자 키워드 목록"
-                example("NonEmpty") { value = GetUserKeywordResponse.sample }
-                example("Empty") { value = GetUserKeywordResponse.sample.copy(emptyList()) }
+                example("NonEmpty") { value = UserKeywordsResponse.sample }
+                example("Empty") { value = UserKeywordsResponse.sample.copy(emptyList()) }
             }
         }
     }

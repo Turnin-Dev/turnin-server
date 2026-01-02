@@ -13,22 +13,50 @@ import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.Case
+import org.jetbrains.exposed.sql.Coalesce
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
+import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.charLength
+import org.jetbrains.exposed.sql.count
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.stringLiteral
+import org.jetbrains.exposed.sql.substring
 import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
-    override suspend fun findByUserId(userId: UserId): List<UserKeyword> = suspendTransaction {
+    override suspend fun findById(userKeywordId: UserKeywordId): UserKeyword? = suspendTransaction {
+        UserKeywordEntity.findById(userKeywordId.value)?.toDomain()
+    }
+
+    override suspend fun findListByUserId(userId: UserId): List<UserKeyword> = suspendTransaction {
+        val descriptionAlias = UserKeywords.description
+            .charLength()
+            .let { length ->
+                Case()
+                    .When(length.isNull(), stringLiteral(""))
+                    // 500자 이상이면 200자만 추출
+                    .When(length greaterEq 500, UserKeywords.description.substring(1, 200))
+                    // 200자 ~ 500자 사이면 100자만 추출
+                    .When(length greaterEq 200, UserKeywords.description.substring(1, 100))
+                    // 그 미만은 전체 추출
+                    .Else(Coalesce(UserKeywords.description, stringLiteral("")))
+            }.alias("description_alias")
+
         UserKeywords
             .select(
                 UserKeywords.id,
                 UserKeywords.userId,
                 UserKeywords.keywordId,
+                descriptionAlias,
                 UserKeywords.createdAt,
                 UserKeywords.updatedAt,
             ).where(UserKeywords.userId eq userId.value)
-            .map { row -> row.toDomain() }
+            .map { row -> row.toDomain(descriptionAlias = descriptionAlias) }
     }
 
     override suspend fun findByKeywordIdAndUserId(
@@ -40,6 +68,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 UserKeywords.id,
                 UserKeywords.userId,
                 UserKeywords.keywordId,
+                UserKeywords.description,
                 UserKeywords.createdAt,
                 UserKeywords.updatedAt,
             ).where(
@@ -61,6 +90,13 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                     Description(it)
                 }
             }.singleOrNull()
+    }
+
+    override suspend fun countByUserId(userId: UserId): Long = suspendTransaction {
+        UserKeywords
+            .selectAll()
+            .where { UserKeywords.userId eq userId.value }
+            .count()
     }
 
     override suspend fun create(
