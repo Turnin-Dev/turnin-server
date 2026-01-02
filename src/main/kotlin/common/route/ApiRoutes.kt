@@ -50,7 +50,6 @@ object Api {
             const val ROUTE = "/user-keyword"
             const val TAG = "UserKeyword"
             const val GET_DESCRIPTION = "/description"
-            const val PATCH_OFFSET = "/offset"
             const val PATCH_DESCRIPTION = "/description"
         }
 
@@ -65,11 +64,6 @@ object Api {
             const val TAG = "Friend"
             const val FRIENDS = "/list"
             const val STATUS = "/status"
-        }
-
-        object KeywordGraph {
-            const val ROUTE = "/keyword-graph"
-            const val TAG = "KeywordGraph"
         }
     }
 

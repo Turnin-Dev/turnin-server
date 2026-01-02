@@ -3,7 +3,6 @@ package com.peekr.domain.userKeyword.presentation.dto
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.DescriptionDto
-import com.peekr.domain.userKeyword.application.dto.OffsetDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -11,24 +10,18 @@ import kotlinx.serialization.Serializable
  *
  * @property userId 사용자 ID
  * @property keywordName 키워드 명
- * @property offsetX UI 좌표 상에서의 X 위치
- * @property offsetY UI 좌표 상에서의 Y 위치
  * @property description 키워드 개인 설명
  */
 @Serializable
 data class CreateUserKeywordRequest(
     val userId: Long,
     val keywordName: String,
-    val offsetX: Float,
-    val offsetY: Float,
     val description: String?,
 ) {
     companion object {
         val sample = CreateUserKeywordRequest(
             userId = 1,
             keywordName = "sample",
-            offsetX = 0f,
-            offsetY = 0f,
             description = "샘플 키워드",
         )
     }
@@ -37,6 +30,5 @@ data class CreateUserKeywordRequest(
 fun CreateUserKeywordRequest.toDto(): CreateUserKeywordDto = CreateUserKeywordDto(
     userId = UserId(this.userId),
     keywordName = keywordName,
-    offset = OffsetDto(offsetX, offsetY),
     description = DescriptionDto(description),
 )
