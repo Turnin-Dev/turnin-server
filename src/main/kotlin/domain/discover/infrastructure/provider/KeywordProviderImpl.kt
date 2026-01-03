@@ -1,7 +1,6 @@
 package com.peekr.domain.discover.infrastructure.provider
 
 import com.peekr.common.model.KeywordName
-import com.peekr.common.model.KeywordName.Companion.invoke
 import com.peekr.common.model.id.KeywordId
 import com.peekr.domain.discover.domain.provider.ExternalKeyword
 import com.peekr.domain.discover.domain.provider.KeywordProvider
