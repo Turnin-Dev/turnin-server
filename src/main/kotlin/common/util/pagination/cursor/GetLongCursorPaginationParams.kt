@@ -6,6 +6,7 @@ import io.ktor.server.routing.RoutingContext
 
 fun RoutingContext.getCursorPaginationParams(): CursorPaginationParams<Long> {
     val cursor = call.request.queryParameters["cursor"]
+        ?.takeIf { it.isNotBlank() }
         ?.toLongOrNull()
     val size = call.request.queryParameters["size"]
         ?.toIntOrNull()

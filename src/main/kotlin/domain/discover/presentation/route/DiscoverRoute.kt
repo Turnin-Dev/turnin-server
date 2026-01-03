@@ -17,11 +17,11 @@ import io.ktor.server.response.respond
 import kotlin.text.toLongOrNull
 
 fun AuthenticatedRoute.discoverRoutes(route: Api.V1.Discover, usecase: DiscoverUseCases) {
-    route(route.ROUTE, {
+    route({
         tags = setOf(route.TAG)
         description = "Discover API"
     }) {
-        get(route.SHARED_KEYWORDS, { getDiscoverContextDocs() }) {
+        get(route.ROUTE, { getDiscoverContextDocs() }) {
             val userId = call.queryParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
@@ -40,8 +40,8 @@ fun AuthenticatedRoute.discoverRoutes(route: Api.V1.Discover, usecase: DiscoverU
 }
 
 private fun RouteConfig.getDiscoverContextDocs() {
-    summary = "사용자 ID로 공유 키워드 탐색 목록 조회 (페이지네이션)"
-    description = "사용자 ID로 공유 키워드 탐색 목록을 커서 기반 페이지네이션으로 조회한다."
+    summary = "사용자 ID로 탐색 컨텍스트(공유 키워드 정보) 목록 조회 (페이지네이션)"
+    description = "사용자 ID로 탐색 컨텍스트(공유 키워드 정보) 목록을 커서 기반 페이지네이션으로 조회한다."
     request {
         queryParameter<Long>("userId") {
             description = "사용자 ID"
@@ -55,7 +55,7 @@ private fun RouteConfig.getDiscoverContextDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            description = "탐색 컨텍스트 응답 바디"
+            description = "탐색 컨텍스트(공유 키워드 정보) 응답 바디"
             body<CursorPage<DiscoverContextResponse>> {
                 example("CursorPage(DiscoverContextResponse)") {
                     value = DiscoverContextResponse.sample
