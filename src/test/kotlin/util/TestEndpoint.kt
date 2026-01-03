@@ -71,7 +71,7 @@ class ResponseValidator(
  * @param additionalAssertions 추가 검증 블록
  * @param responseValidator 응답 바디 검증
  */
-suspend fun ApplicationTestBuilder.testEndpoint(
+private suspend fun ApplicationTestBuilder.testEndpoint(
     method: HttpMethod,
     endpoint: String,
     queryParameters: Map<String, String>?,
