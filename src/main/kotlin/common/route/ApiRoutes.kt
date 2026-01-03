@@ -69,7 +69,7 @@ object Api {
         object Discover {
             const val ROUTE = "/discover"
             const val TAG = "Discover"
-            const val KEYWORDS = "/keywords"
+            const val SHARED_KEYWORDS = "/shared-keywords"
         }
     }
 

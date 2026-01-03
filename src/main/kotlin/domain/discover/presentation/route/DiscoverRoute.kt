@@ -21,7 +21,7 @@ fun AuthenticatedRoute.discoverRoutes(route: Api.V1.Discover, usecase: DiscoverU
         tags = setOf(route.TAG)
         description = "Discover API"
     }) {
-        get({ getDiscoverContextDocs() }) {
+        get(route.SHARED_KEYWORDS, { getDiscoverContextDocs() }) {
             val userId = call.queryParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
