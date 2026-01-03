@@ -1,12 +1,15 @@
 package com.peekr.domain.userKeyword.application.usecase
 
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.domain.userKeyword.application.dto.toDto
+import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.userKeyword.exception.UserKeywordException
 
 /**
  * 사용자별 키워드를 추가한다.
@@ -28,12 +31,21 @@ class CreateUserKeywordUseCase(
      * @return [UserKeywordDto] 사용자별 키워드 DTO
      */
     suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto = suspendTransaction {
+        // 1) 사용자 키워드 개수 제한 확인
+        val userKeywordCount = userKeywordRepository.countByUserId(createUserKeywordDto.userId)
+        if (userKeywordCount >= UserKeyword.COUNT_LIMIT) {
+            LOGGER.error("user keyword count exceed: userId=${createUserKeywordDto.userId}")
+            throw UserKeywordException.CountLimitReached()
+        }
+
+        // 2) 키워드가 기존에 존재하는지 확인하고 없으면 생성 후 키워드 ID를 반환한다.
         val keyword = keywordProvider.findByName(createUserKeywordDto.keywordName)
             ?: keywordProvider.create(
                 keywordName = createUserKeywordDto.keywordName,
                 createdBy = createUserKeywordDto.userId,
             )
 
+        // 3) 사용자 키워드 생성
         userKeywordRepository
             .create(
                 keyword.id,
@@ -42,3 +54,5 @@ class CreateUserKeywordUseCase(
             ).toDto(keyword.name)
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger<CreateUserKeywordUseCase>()

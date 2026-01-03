@@ -20,4 +20,10 @@ sealed class UserKeywordException(
             status = HttpStatusCode.NotFound,
             cause = cause,
         )
+
+    class CountLimitReached :
+        UserKeywordException(
+            code = UserKeywordErrorCode.CountLimitReached,
+            status = HttpStatusCode.BadRequest,
+        )
 }

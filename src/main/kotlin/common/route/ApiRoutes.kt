@@ -65,6 +65,12 @@ object Api {
             const val FRIENDS = "/list"
             const val STATUS = "/status"
         }
+
+        object Discover {
+            const val ROUTE = "/discover"
+            const val TAG = "Discover"
+            const val SHARED_KEYWORDS = "/shared-keywords"
+        }
     }
 
     /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */

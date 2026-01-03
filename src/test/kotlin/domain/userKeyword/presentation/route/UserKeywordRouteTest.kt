@@ -14,8 +14,8 @@ import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
-import com.peekr.domain.userKeyword.presentation.dto.GetUserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
+import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
 import io.ktor.client.request.delete
@@ -71,7 +71,7 @@ class UserKeywordRouteTest {
             contentType(ContentType.Application.Json)
         }
         val responseBody = response.bodyAsText()
-        val userKeywords = Json.decodeFromString<GetUserKeywordResponse>(responseBody)
+        val userKeywords = Json.decodeFromString<UserKeywordsResponse>(responseBody)
 
         // then
         assertTrue(userKeywords.keywords.size == itemCount)
@@ -641,6 +641,7 @@ class UserKeywordRouteTest {
             keywordId = TestKeywordId.value,
             keywordName = TEST_KEYWORD,
             userId = TestUserId.value,
+            description = TestDescription.value,
             createdAt = 1000,
             updatedAt = 1000,
         )

@@ -16,6 +16,13 @@ interface KeywordProvider {
     suspend fun findById(keywordId: KeywordId): ExternalKeyword?
 
     /**
+     * 키워드 ID 리스트로 키워드 리스트 조회
+     *
+     * @param keywordIds 키워드 ID 리스트
+     */
+    suspend fun findByIds(keywordIds: List<KeywordId>): List<ExternalKeyword>
+
+    /**
      * 키워드 명으로 키워드 조회
      *
      * @param keywordName 키워드 명

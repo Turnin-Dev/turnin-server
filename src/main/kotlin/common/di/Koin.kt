@@ -2,6 +2,7 @@ package com.peekr.common.di
 
 import com.peekr.common.jwt.di.jwtModule
 import com.peekr.domain.auth.di.authModule
+import com.peekr.domain.discover.di.discoverModule
 import com.peekr.domain.file.di.fileModule
 import com.peekr.domain.friend.di.friendModule
 import com.peekr.domain.keyword.di.keywordModule
@@ -28,6 +29,7 @@ fun Application.configureKoin() {
             userKeywordModule,
             reportModule,
             friendModule,
+            discoverModule,
         )
     }
 }

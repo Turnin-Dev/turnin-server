@@ -29,7 +29,7 @@ class UpdateDescriptionUseCase(private val userKeywordRepository: UserKeywordRep
         )
 
         return if (result) {
-            return patch
+            patch
         } else {
             null
         }

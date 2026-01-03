@@ -8,11 +8,20 @@ import com.peekr.domain.userKeyword.domain.model.UserKeyword
 
 interface UserKeywordRepository {
     /**
+     * 사용자 키워드 ID로 사용자 키워드 조회
+     *
+     * @param userKeywordId 사용자 키워드 ID
+     */
+    suspend fun findById(userKeywordId: UserKeywordId): UserKeyword?
+
+    /**
      * 사용자 ID를 통해 사용자별 키워드 리스트를 조회한다.
+     *
+     * 리스트 조회 시에는 키워드 내용의 일부만 가져온다.
      *
      * @param userId 사용자 ID
      */
-    suspend fun findByUserId(userId: UserId): List<UserKeyword>
+    suspend fun findListByUserId(userId: UserId): List<UserKeyword>
 
     /**
      * 키워드 ID와 사용자 ID를 통해 사용자별 키워드를 찾는다.
@@ -36,6 +45,13 @@ interface UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
     ): Description?
+
+    /**
+     * 사용자 키워드 개수 카운트
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun countByUserId(userId: UserId): Long
 
     /**
      * 사용자별 키워드를 생성한다.

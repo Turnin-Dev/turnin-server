@@ -10,10 +10,12 @@ import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.userKeyword.exception.UserKeywordException
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -27,6 +29,16 @@ class CreateUserKeywordUseCaseTest {
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
+
+        coEvery { userKeywordRepository.countByUserId(TestUserId) } returns 3
+        coEvery {
+            userKeywordRepository.create(
+                keywordId = TestUserKeyword.keywordId,
+                userId = TestUserKeyword.userId,
+                description = TestDescription,
+            )
+        } returns TestUserKeyword
+
         usecase = CreateUserKeywordUseCase(userKeywordRepository, keywordProviderImpl)
     }
 
@@ -38,13 +50,6 @@ class CreateUserKeywordUseCaseTest {
     @Test
     fun `이미 키워드가 존재하는 경우 해당 키워드 ID로 사용자 키워드를 저장한다`() = runTest {
         // given
-        coEvery {
-            userKeywordRepository.create(
-                keywordId = TestUserKeyword.keywordId,
-                userId = TestUserKeyword.userId,
-                description = TestDescription,
-            )
-        } returns TestUserKeyword
         coEvery { keywordProviderImpl.findByName(any()) } returns TestExternalKeyword
 
         // when
@@ -58,13 +63,6 @@ class CreateUserKeywordUseCaseTest {
     fun `키워드가 존재하지 않는 경우 저장하고 저장된 키워드 ID로 사용자 키워드를 저장한다`() = runTest {
         // given
         coEvery { keywordProviderImpl.create(TEST_KEYWORD_NAME, TestUserId) } returns TestExternalKeyword
-        coEvery {
-            userKeywordRepository.create(
-                keywordId = TestUserKeyword.keywordId,
-                userId = TestUserKeyword.userId,
-                description = TestDescription,
-            )
-        } returns TestUserKeyword
         coEvery { keywordProviderImpl.findByName(TEST_KEYWORD_NAME) } returns null
 
         // when
@@ -72,6 +70,20 @@ class CreateUserKeywordUseCaseTest {
 
         // then
         assertEquals(userKeyword, TestUserKeyword.toDto(TEST_KEYWORD_NAME))
+    }
+
+    @Test
+    fun `사용자 키워드 개수 제한 도달 시 예외가 발생한다`() = runTest {
+        // given
+        coEvery { userKeywordRepository.countByUserId(TestUserId) } returns UserKeyword.COUNT_LIMIT + 1L
+
+        // when
+        val exception = runCatching {
+            usecase(TestCreateUserKeywordDto)
+        }.exceptionOrNull()
+
+        // then
+        assertTrue(exception is UserKeywordException.CountLimitReached)
     }
 
     companion object {
@@ -84,6 +96,7 @@ class CreateUserKeywordUseCaseTest {
             id = TestUserKeywordId,
             userId = TestUserId,
             keywordId = TestKeywordId,
+            description = TestDescription,
             createdAt = 1000,
             updatedAt = 1000,
         )

@@ -16,18 +16,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserKeywordResponse(
     val id: Long,
+    val userId: Long,
     val keywordId: Long,
     val keywordName: String,
-    val userId: Long,
+    val description: String?,
     val createdAt: Long,
     val updatedAt: Long,
 ) {
     companion object {
         val sample = UserKeywordResponse(
             id = 1,
+            userId = 1,
             keywordId = 1,
             keywordName = "sample",
-            userId = 1,
+            description = "description sample",
             createdAt = 0,
             updatedAt = 0,
         )
@@ -36,9 +38,10 @@ data class UserKeywordResponse(
 
 fun UserKeywordDto.toResponse() = UserKeywordResponse(
     id = id,
+    userId = userId,
     keywordId = keywordId,
     keywordName = keywordName,
-    userId = userId,
+    description = description,
     createdAt = createdAt,
     updatedAt = updatedAt,
 )
