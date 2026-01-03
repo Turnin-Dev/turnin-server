@@ -1,0 +1,45 @@
+package com.peekr.domain.discover.presentation.dto
+
+import com.peekr.common.util.pagination.cursor.CursorPage
+import com.peekr.domain.discover.application.dto.DiscoverContextDto
+import kotlinx.serialization.Serializable
+
+/**
+ * NodeContext 응답 바디
+ *
+ * @property user 사용자 노드 응답 바디
+ * @property keywords 키워드 노드 응답 바디 리스트
+ */
+@Serializable
+data class DiscoverContextResponse(
+    val user: DiscoverUserResponse,
+    val keywords: List<DiscoverKeywordResponse>,
+) {
+    companion object {
+        val sample = CursorPage(
+            items = List(2) {
+                DiscoverContextResponse(
+                    user = DiscoverUserResponse(
+                        userId = (it + 1).toLong(),
+                        userName = "name",
+                        profileImageUrl = "https://image-server-1.com/image$it.jpg",
+                    ),
+                    keywords = listOf(
+                        DiscoverKeywordResponse(
+                            userKeywordId = (it + 1).toLong(),
+                            keywordId = (it + 1).toLong(),
+                            keywordName = "Keyword ${(it + 1).toLong()}",
+                        ),
+                    ),
+                )
+            },
+            nextCursor = 2L,
+        )
+    }
+}
+
+fun DiscoverContextDto.toResponse() =
+    DiscoverContextResponse(
+        user = user.toResponse(),
+        keywords = keywords.map { it.toResponse() },
+    )
