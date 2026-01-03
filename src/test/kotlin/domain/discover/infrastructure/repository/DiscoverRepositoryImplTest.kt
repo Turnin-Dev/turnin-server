@@ -44,7 +44,7 @@ class DiscoverRepositoryImplTest {
         // when
         val result = repository.getSharedKeywords(
             userId = targetUser,
-            cursor = 10,
+            cursor = null,
             pageSize = 10,
         )
         val actualKeywordIds = result

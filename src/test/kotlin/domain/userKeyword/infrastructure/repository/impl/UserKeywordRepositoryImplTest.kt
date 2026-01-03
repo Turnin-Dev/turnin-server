@@ -83,7 +83,7 @@ class UserKeywordRepositoryImplTest {
         val userKeywords = repository.findListByUserId(userId)
 
         // then
-        assertEquals(userKeywords.size, 1)
+        assertEquals(1, userKeywords.size)
         assertEquals(userKeywords.first().id, userKeyword.id)
         assertEquals(userKeywords.first().keywordId, keywordId)
     }
@@ -104,7 +104,7 @@ class UserKeywordRepositoryImplTest {
         val userKeywords = repository.findListByUserId(userId)
 
         // then
-        assertEquals(userKeywords.size, 1)
+        assertEquals(1, userKeywords.size)
         assertNotEquals(
             expectedDescriptionLength,
             userKeywords

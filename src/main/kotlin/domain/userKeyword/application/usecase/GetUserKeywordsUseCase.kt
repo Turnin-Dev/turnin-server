@@ -34,10 +34,6 @@ class GetUserKeywordsUseCase(
         // 2) 키워드 명 조회 후 Map 생성
         val keywords = userKeywords.map { it.keywordId }
         val keywordMap = keywordProvider.findByIds(keywords).associateBy { it.id }
-        if (keywordMap.size != keywords.size) {
-            LOGGER.error("keyword not found: userId=$userId, keywords=$keywords, keywordMap=$keywordMap")
-            throw UserKeywordException.NotExistsKeyword(null)
-        }
 
         // 3) 사용자 키워드에 키워드 명 매핑
         return userKeywords.map { userKeyword ->
