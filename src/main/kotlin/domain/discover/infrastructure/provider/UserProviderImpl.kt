@@ -14,7 +14,7 @@ class UserProviderImpl(private val userProviderApi: UserProviderApi) : UserProvi
                 provider = it.provider,
                 providerId = it.providerId,
                 displayId = it.displayId,
-                userName = it.userName,
+                name = it.userName,
                 profileImageUrl = it.profileImageUrl,
                 introduce = it.introduce,
                 isActive = it.isActive,

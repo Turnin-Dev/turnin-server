@@ -1,5 +1,6 @@
 package com.peekr.domain.userKeyword.infrastructure.provider
 
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.keyword.application.provider.KeywordProviderApi
@@ -12,7 +13,7 @@ class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : 
         return keywordDto?.let {
             ExternalKeyword(
                 id = it.id,
-                name = it.name,
+                name = KeywordName(it.name),
                 createdBy = it.createdBy,
                 createdAt = it.createdAt,
                 updatedAt = it.updatedAt,
@@ -25,7 +26,7 @@ class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : 
         return keywordDtoList.map {
             ExternalKeyword(
                 id = it.id,
-                name = it.name,
+                name = KeywordName(it.name),
                 createdBy = it.createdBy,
                 createdAt = it.createdAt,
                 updatedAt = it.updatedAt,
@@ -38,7 +39,7 @@ class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : 
         return keywordDto?.let {
             ExternalKeyword(
                 id = it.id,
-                name = it.name,
+                name = KeywordName(it.name),
                 createdBy = it.createdBy,
                 createdAt = it.createdAt,
                 updatedAt = it.updatedAt,
@@ -53,7 +54,7 @@ class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : 
         val savedKeyword = keywordProviderApi.create(keywordName, createdBy)
         return ExternalKeyword(
             id = savedKeyword.id,
-            name = savedKeyword.name,
+            name = KeywordName(savedKeyword.name),
             createdBy = savedKeyword.createdBy,
             createdAt = savedKeyword.createdAt,
             updatedAt = savedKeyword.updatedAt,

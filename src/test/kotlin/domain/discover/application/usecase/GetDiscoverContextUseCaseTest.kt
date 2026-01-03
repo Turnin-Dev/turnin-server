@@ -243,7 +243,7 @@ class GetDiscoverContextUseCaseTest {
                 provider = SocialLoginProvider.GOOGLE,
                 providerId = "providerId",
                 displayId = DisplayId("displayId"),
-                userName = UserName("name"),
+                name = UserName("name"),
                 profileImageUrl = "profileImageUrl",
                 introduce = Introduce("introduce"),
                 isActive = true,

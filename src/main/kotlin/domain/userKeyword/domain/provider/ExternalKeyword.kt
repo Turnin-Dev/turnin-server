@@ -1,5 +1,6 @@
 package com.peekr.domain.userKeyword.domain.provider
 
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 
@@ -14,7 +15,7 @@ import com.peekr.common.model.id.UserId
  */
 data class ExternalKeyword(
     val id: KeywordId,
-    val name: String,
+    val name: KeywordName,
     val createdBy: UserId,
     val createdAt: Long,
     val updatedAt: Long,

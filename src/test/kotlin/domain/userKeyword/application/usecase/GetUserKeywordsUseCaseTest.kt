@@ -1,5 +1,6 @@
 package com.peekr.domain.userKeyword.application.usecase
 
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
@@ -46,7 +47,7 @@ class GetUserKeywordsUseCaseTest {
         // then
         assertTrue(userKeywords.size == itemCount)
         assertEquals(
-            expectedUserKeywords.map { it.toDto(TEST_KEYWORD) },
+            expectedUserKeywords.map { it.toDto(TestKeywordName.value) },
             userKeywords,
         )
     }
@@ -75,7 +76,7 @@ class GetUserKeywordsUseCaseTest {
         private val TestUserId = UserId(1)
         private val TestKeywordId = KeywordId(1)
         private val TestUserKeywordId = UserKeywordId(1)
-        private const val TEST_KEYWORD = "TestKeyword"
+        private val TestKeywordName = KeywordName("keyword")
         private val TestUserKeyword = UserKeyword(
             id = TestUserKeywordId,
             userId = TestUserId,
@@ -86,7 +87,7 @@ class GetUserKeywordsUseCaseTest {
         )
         private val TestExternalKeyword = ExternalKeyword(
             id = TestKeywordId,
-            name = TEST_KEYWORD,
+            name = TestKeywordName,
             createdBy = TestUserId,
             createdAt = 1000,
             updatedAt = 1000,

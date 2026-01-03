@@ -1,5 +1,6 @@
 package com.peekr.domain.userKeyword.application.usecase
 
+import com.peekr.common.model.KeywordName
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
@@ -56,20 +57,20 @@ class CreateUserKeywordUseCaseTest {
         val userKeyword = usecase(TestCreateUserKeywordDto)
 
         // then
-        assertEquals(userKeyword, TestUserKeyword.toDto(TEST_KEYWORD_NAME))
+        assertEquals(userKeyword, TestUserKeyword.toDto(TestKeywordName.value))
     }
 
     @Test
     fun `키워드가 존재하지 않는 경우 저장하고 저장된 키워드 ID로 사용자 키워드를 저장한다`() = runTest {
         // given
-        coEvery { keywordProviderImpl.create(TEST_KEYWORD_NAME, TestUserId) } returns TestExternalKeyword
-        coEvery { keywordProviderImpl.findByName(TEST_KEYWORD_NAME) } returns null
+        coEvery { keywordProviderImpl.create(TestKeywordName.value, TestUserId) } returns TestExternalKeyword
+        coEvery { keywordProviderImpl.findByName(TestKeywordName.value) } returns null
 
         // when
         val userKeyword = usecase(TestCreateUserKeywordDto)
 
         // then
-        assertEquals(userKeyword, TestUserKeyword.toDto(TEST_KEYWORD_NAME))
+        assertEquals(userKeyword, TestUserKeyword.toDto(TestKeywordName.value))
     }
 
     @Test
@@ -90,7 +91,7 @@ class CreateUserKeywordUseCaseTest {
         private val TestUserId = UserId(1)
         private val TestKeywordId = KeywordId(1)
         private val TestUserKeywordId = UserKeywordId(1)
-        private const val TEST_KEYWORD_NAME = "sample"
+        private val TestKeywordName = KeywordName("keyword")
         private val TestDescription = Description("test")
         private val TestUserKeyword = UserKeyword(
             id = TestUserKeywordId,
@@ -102,12 +103,12 @@ class CreateUserKeywordUseCaseTest {
         )
         private val TestCreateUserKeywordDto = CreateUserKeywordDto(
             userId = TestUserKeyword.userId,
-            keywordName = TEST_KEYWORD_NAME,
+            keywordName = TestKeywordName.value,
             description = TestDescription.toDto(),
         )
         private val TestExternalKeyword = ExternalKeyword(
             id = TestKeywordId,
-            name = TEST_KEYWORD_NAME,
+            name = TestKeywordName,
             createdBy = TestUserId,
             createdAt = 1000,
             updatedAt = 1000,

@@ -15,7 +15,7 @@ import com.peekr.common.model.id.UserId
  * @param provider 소셜로그인 플랫폼
  * @param providerId 소셜로그인 ID
  * @param displayId 사용자 표시 ID
- * @param userName 사용자 이름
+ * @param name 사용자 이름
  * @param profileImageUrl 사용자 프로필 이미지 url
  * @param introduce 사용자 소개 글
  * @param isActive 사용자 활성 여부
@@ -27,7 +27,7 @@ data class ExternalUser(
     val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: DisplayId,
-    val userName: UserName,
+    val name: UserName,
     val profileImageUrl: String?,
     val introduce: Introduce?,
     val isActive: Boolean,
