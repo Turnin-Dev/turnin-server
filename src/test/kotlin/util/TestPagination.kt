@@ -19,8 +19,8 @@ import kotlinx.serialization.json.Json
  *
  * 오프셋 기반 페이지네이션을 테스트한다.
  *
- * @param totalSize 전체 항목 크기
- * @param pageSize 페이지 크기
+ * @param totalSize 기대하는 전체 데이터 개수
+ * @param pageSize 한 페이지당 조회할 크기
  * @param fetcher 페이지네이션 조회를 수행하는 람다 함수
  */
 fun <T> testPagination(
