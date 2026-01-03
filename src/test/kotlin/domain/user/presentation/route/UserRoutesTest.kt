@@ -4,7 +4,7 @@ import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
@@ -44,7 +44,7 @@ class UserRoutesTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 containsAll(
-                    MockUserDto.name.value,
+                    MockUserDto.userName.value,
                     MockUserDto.displayId.value,
                     MockUserDto.role.name,
                 )
@@ -211,7 +211,7 @@ class UserRoutesTest {
             responseValidator = {
                 containsAll(
                     TestUserProfileDto.displayId.value,
-                    TestUserProfileDto.name.value,
+                    TestUserProfileDto.userName.value,
                 )
             },
         )
@@ -518,7 +518,7 @@ class UserRoutesTest {
         private val TestDisplayId = DisplayId("did")
         private const val INVALID_USER_ID = "asd"
         private val TestUserPatchDto = UserPatchDto(
-            name = Name("name"),
+            userName = UserName("name"),
             profileImageUrl = null,
             introduce = Introduce(TEST_INTRODUCE),
         )
@@ -530,7 +530,7 @@ class UserRoutesTest {
         private val TestMyProfileDto = MyProfileDto(
             userId = TestMyUserId.value,
             displayId = DisplayId("id"),
-            name = Name("name"),
+            userName = UserName("name"),
             profileImageUrl = null,
             introduce = Introduce(TEST_INTRODUCE),
             isActive = true,
@@ -544,7 +544,7 @@ class UserRoutesTest {
         private val TestUserProfileDto = UserProfileDto(
             userId = TestUserId.value,
             displayId = TestDisplayId,
-            name = Name("honggd"),
+            userName = UserName("honggd"),
             profileImageUrl = "https://www.example.com/image.jpg",
             introduce = Introduce("hello world!"),
             isActive = true,

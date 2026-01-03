@@ -1,9 +1,9 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
@@ -56,7 +56,7 @@ class FindUserUseCaseTest {
             provider = SocialLoginProvider.GOOGLE,
             providerId = TEST_PROVIDER_ID,
             displayId = DisplayId("hong_gd_123"),
-            name = Name("honggd"),
+            userName = UserName("honggd"),
             profileImageUrl = "http://example.com/profile.jpg",
             introduce = Introduce("Hello!"),
             isActive = true,

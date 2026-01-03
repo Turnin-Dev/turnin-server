@@ -4,9 +4,9 @@ import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
@@ -113,7 +113,7 @@ class RefreshTokenUseCaseTest {
             provider = SocialLoginProvider.GOOGLE,
             providerId = "providerIDDDDD",
             displayId = DisplayId("hong_gd_123"),
-            name = Name("honggd"),
+            userName = UserName("honggd"),
             profileImageUrl = "http://example.com/profile.jpg",
             introduce = Introduce("Hello!"),
             isActive = true,

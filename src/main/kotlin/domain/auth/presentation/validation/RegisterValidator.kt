@@ -1,6 +1,6 @@
 package com.peekr.domain.auth.presentation.validation
 
-import com.peekr.common.model.Name
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.validator.PeekrValidator.validation
 
@@ -19,11 +19,11 @@ internal fun String.validateDisplayId() {
 internal fun String.validateName() {
     validation(
         this.isNotBlank() &&
-            this.length in Name.MIN_LENGTH..Name.MAX_LENGTH,
+            this.length in UserName.MIN_LENGTH..UserName.MAX_LENGTH,
     ) {
         "이름은 1~30자 이내여야 합니다."
     }
-    validation(this.matches(Name.RegexRule)) {
+    validation(this.matches(UserName.RegexRule)) {
         "이름은 영문/숫자/한글만 허용됩니다."
     }
 }

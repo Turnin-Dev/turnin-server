@@ -79,7 +79,7 @@ class GetDiscoverContextUseCase(
             }
             val discoverUserDto = DiscoverUserDto(
                 userId = sUserId,
-                userName = foundedUser.name.value,
+                userName = foundedUser.userName.value,
                 profileImageUrl = foundedUser.profileImageUrl,
             )
 

@@ -2,8 +2,8 @@ package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
@@ -154,7 +154,7 @@ class AuthRepositoryImplTest {
             provider = SocialLoginProvider.GOOGLE,
             providerId = "providerIDDDDD",
             displayId = DisplayId("hong_gd_123"),
-            name = Name("honggd"),
+            userName = UserName("honggd"),
             profileImageUrl = "http://example.com/profile.jpg",
             introduce = Introduce("Hello!"),
         )

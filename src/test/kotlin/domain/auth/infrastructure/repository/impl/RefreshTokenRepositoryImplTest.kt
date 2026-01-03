@@ -4,9 +4,9 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
@@ -45,7 +45,7 @@ class RefreshTokenRepositoryImplTest {
                 this.provider = TestAuthUser.provider
                 this.providerId = TestAuthUser.providerId
                 this.displayId = TestAuthUser.displayId.value
-                this.name = TestAuthUser.name.value
+                this.name = TestAuthUser.userName.value
                 this.profileImageUrl = TestAuthUser.profileImageUrl
                 this.introduce = TestAuthUser.introduce?.value
             }
@@ -84,7 +84,7 @@ class RefreshTokenRepositoryImplTest {
                 this.provider = TestAuthUser.provider
                 this.providerId = TestAuthUser.providerId
                 this.displayId = TestAuthUser.displayId.value
-                this.name = TestAuthUser.name.value
+                this.name = TestAuthUser.userName.value
                 this.profileImageUrl = TestAuthUser.profileImageUrl
                 this.introduce = TestAuthUser.introduce?.value
             }
@@ -116,7 +116,7 @@ class RefreshTokenRepositoryImplTest {
             provider = SocialLoginProvider.GOOGLE,
             providerId = "123123123",
             displayId = DisplayId("hong_gd_123"),
-            name = Name("honggd"),
+            userName = UserName("honggd"),
             profileImageUrl = "https://example.com/image.jpg",
             introduce = Introduce("hello world!"),
             isActive = true,

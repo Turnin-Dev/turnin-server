@@ -8,7 +8,7 @@ class NameValidationException(message: String) : ValidatorException(message)
  * 사용자 이름 VO
  */
 @JvmInline
-value class Name private constructor(val value: String) {
+value class UserName private constructor(val value: String) {
     /**
      * 사용자 이름 VO
      *
@@ -19,9 +19,9 @@ value class Name private constructor(val value: String) {
         const val MAX_LENGTH = 30
         val RegexRule = Regex("^[a-zA-Z0-9가-힣]+$")
 
-        fun from(value: String): Name = Name(value)
+        fun from(value: String): UserName = UserName(value)
 
-        operator fun invoke(value: String): Name = from(value)
+        operator fun invoke(value: String): UserName = from(value)
     }
 
     init {

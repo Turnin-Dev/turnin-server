@@ -1,7 +1,7 @@
 package com.peekr.domain.user.application.dto
 
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 
 /**
@@ -9,7 +9,7 @@ import com.peekr.common.model.id.DisplayId
  *
  * @property userId 사용자 ID
  * @property displayId 사용자 표시 ID
- * @property name 사용자 이름
+ * @property userName 사용자 이름
  * @property profileImageUrl 사용자 프로필 이미지 url
  * @property introduce 사용자 소개 글
  * @property isActive 사용자 활성 여부
@@ -19,7 +19,7 @@ import com.peekr.common.model.id.DisplayId
 data class MyProfileDto(
     val userId: Long,
     val displayId: DisplayId,
-    val name: Name,
+    val userName: UserName,
     val profileImageUrl: String?,
     val introduce: Introduce?,
     val isActive: Boolean,

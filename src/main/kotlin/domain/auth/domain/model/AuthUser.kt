@@ -1,9 +1,9 @@
 package com.peekr.domain.auth.domain.model
 
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import java.time.Instant
@@ -16,7 +16,7 @@ import java.time.Instant
  * @param provider 소셜로그인 플랫폼
  * @param providerId 소셜로그인 ID
  * @param displayId 사용자 표시 ID
- * @param name 사용자 이름
+ * @param userName 사용자 이름
  * @param profileImageUrl 사용자 프로필 이미지 url
  * @param introduce 사용자 소개 글
  * @param isActive 사용자 활성 여부
@@ -28,7 +28,7 @@ data class AuthUser(
     val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: DisplayId,
-    val name: Name,
+    val userName: UserName,
     val profileImageUrl: String?,
     val introduce: Introduce?,
     val isActive: Boolean,
@@ -41,7 +41,7 @@ data class AuthUser(
             provider = SocialLoginProvider.GOOGLE,
             providerId = "123123123",
             displayId = DisplayId("hong_gd_123"),
-            name = Name("honggd"),
+            userName = UserName("honggd"),
             profileImageUrl = "https://example.com/image.jpg",
             introduce = Introduce("hello world!"),
             isActive = true,

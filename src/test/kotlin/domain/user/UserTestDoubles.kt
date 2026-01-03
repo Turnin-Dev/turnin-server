@@ -5,9 +5,9 @@ import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.toOffsetDateTime
@@ -48,7 +48,7 @@ object UserTestDoubles {
         provider = SocialLoginProvider.GOOGLE,
         providerId = "123901239",
         displayId = DisplayId("hong_gd_123"),
-        name = Name("honggd"),
+        userName = UserName("honggd"),
         profileImageUrl = "https://example.com/image.jpg",
         introduce = Introduce("hello world!"),
         isActive = true,
