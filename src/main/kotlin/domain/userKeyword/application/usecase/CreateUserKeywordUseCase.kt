@@ -51,7 +51,7 @@ class CreateUserKeywordUseCase(
                 keyword.id,
                 createUserKeywordDto.userId,
                 createUserKeywordDto.description.toDomain(),
-            ).toDto(keyword.name)
+            ).toDto(keyword.name.value)
     }
 }
 

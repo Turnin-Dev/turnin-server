@@ -15,7 +15,7 @@ class UserProviderImpl(private val userProviderApi: UserProviderApi) : UserProvi
             ExternalUserInfo(
                 userId = user.id,
                 displayId = user.displayId,
-                name = user.name,
+                userName = user.userName,
                 profileImageUrl = user.profileImageUrl,
             )
         }

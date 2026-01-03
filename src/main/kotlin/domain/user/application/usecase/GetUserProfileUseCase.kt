@@ -32,7 +32,7 @@ class GetUserProfileUseCase(
         return UserProfileDto(
             userId = userDto.id.value,
             displayId = userDto.displayId,
-            name = userDto.name,
+            userName = userDto.userName,
             profileImageUrl = userDto.profileImageUrl,
             introduce = userDto.introduce,
             isActive = userDto.isActive,

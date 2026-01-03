@@ -1,7 +1,7 @@
 package com.peekr.domain.user.presentation.dto
 
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
+import com.peekr.common.model.UserName
 import com.peekr.domain.user.application.dto.UserPatchDto
 import kotlinx.serialization.Serializable
 
@@ -29,7 +29,7 @@ data class UserPatchRequest(
 
 fun UserPatchRequest.toDto(): UserPatchDto =
     UserPatchDto(
-        name = Name(name),
+        userName = UserName(name),
         profileImageUrl = profileImageUrl,
         introduce = Introduce(introduce),
     )

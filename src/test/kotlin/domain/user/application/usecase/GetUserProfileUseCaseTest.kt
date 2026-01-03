@@ -2,9 +2,9 @@ package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.domain.model.User
@@ -40,7 +40,7 @@ class GetUserProfileUseCaseTest {
 
         assertNotNull(userProfileDto)
         assertEquals(TestUser.displayId, userProfileDto.displayId)
-        assertEquals(TestUser.name, userProfileDto.name)
+        assertEquals(TestUser.userName, userProfileDto.userName)
     }
 
     @Test
@@ -65,7 +65,7 @@ class GetUserProfileUseCaseTest {
             provider = SocialLoginProvider.GOOGLE,
             providerId = "providerId",
             displayId = TestDisplayId,
-            name = Name("name"),
+            userName = UserName("name"),
             profileImageUrl = "profileImageUrl",
             introduce = Introduce("introduce"),
             isActive = true,

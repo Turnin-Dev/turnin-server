@@ -47,7 +47,7 @@ data class UserProfileResponse(
 fun UserProfileDto.toResponse(): UserProfileResponse = UserProfileResponse(
     userId = userId,
     displayId = displayId.value,
-    name = name.value,
+    name = userName.value,
     profileImageUrl = profileImageUrl,
     introduce = introduce?.value,
     isActive = isActive,

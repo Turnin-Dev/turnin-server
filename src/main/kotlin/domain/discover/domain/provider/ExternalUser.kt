@@ -1,9 +1,9 @@
 package com.peekr.domain.discover.domain.provider
 
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 
@@ -27,7 +27,7 @@ data class ExternalUser(
     val provider: SocialLoginProvider,
     val providerId: String,
     val displayId: DisplayId,
-    val name: Name,
+    val name: UserName,
     val profileImageUrl: String?,
     val introduce: Introduce?,
     val isActive: Boolean,

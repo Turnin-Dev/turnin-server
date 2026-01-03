@@ -1,7 +1,7 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.model.FriendRequestStatus
-import com.peekr.common.model.Name
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
@@ -121,7 +121,7 @@ class GetFriendsPaginationUseCaseTest {
         private val TestExternalUserInfo = ExternalUserInfo(
             userId = UserId(1L),
             displayId = DisplayId("did"),
-            name = Name("name"),
+            userName = UserName("name"),
             profileImageUrl = null,
         )
     }

@@ -40,7 +40,7 @@ class RegisterUseCase(
         refreshTokenRepository.save(savedAuthUser.userId, jwtTokenDto.refreshToken)
 
         // 회원가입 성공 후 결과 반환
-        LOGGER.debug("register successful, username: ${savedAuthUser.name}")
+        LOGGER.debug("register successful, username: ${savedAuthUser.userName}")
         RegisterResultDto(savedAuthUser.userId, jwtTokenDto)
     }
 

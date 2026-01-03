@@ -1,5 +1,6 @@
 package com.peekr.domain.discover.domain.model
 
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.UserId
 
 /**
@@ -11,6 +12,6 @@ import com.peekr.common.model.id.UserId
  */
 data class DiscoverUser(
     val userId: UserId,
-    val userName: String,
+    val userName: UserName,
     val profileImageUrl: String?,
 )

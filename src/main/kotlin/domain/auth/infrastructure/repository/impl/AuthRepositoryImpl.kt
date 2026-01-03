@@ -47,7 +47,7 @@ class AuthRepositoryImpl : AuthRepository {
             this.role = role
             this.provider = register.provider
             this.providerId = register.providerId
-            this.name = register.name.value
+            this.name = register.userName.value
             this.displayId = register.displayId.value
             this.profileImageUrl = register.profileImageUrl
             this.introduce = register.introduce?.value

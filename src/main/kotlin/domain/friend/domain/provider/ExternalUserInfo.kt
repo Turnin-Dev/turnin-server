@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.domain.provider
 
-import com.peekr.common.model.Name
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 
@@ -9,12 +9,12 @@ import com.peekr.common.model.id.UserId
  *
  * @property userId 사용자 ID
  * @property displayId 사용자 표시 ID
- * @property name 사용자 이름
+ * @property userName 사용자 이름
  * @property profileImageUrl 사용자 프로필 사진 url
  */
 data class ExternalUserInfo(
     val userId: UserId,
     val displayId: DisplayId,
-    val name: Name,
+    val userName: UserName,
     val profileImageUrl: String?,
 )

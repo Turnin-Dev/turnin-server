@@ -76,7 +76,7 @@ class GetFriendsPaginationUseCase(
                 id = friend.id.value,
                 userId = friendInfo.userId.value,
                 displayId = friendInfo.displayId.value,
-                name = friendInfo.name.value,
+                name = friendInfo.userName.value,
                 profileImageUrl = friendInfo.profileImageUrl,
                 respondedAt = friend.respondedAt,
                 createdAt = friend.createdAt,

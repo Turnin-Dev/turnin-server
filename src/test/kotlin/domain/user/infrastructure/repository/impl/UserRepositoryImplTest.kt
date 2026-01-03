@@ -1,7 +1,7 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.model.Introduce
-import com.peekr.common.model.Name
+import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.UserTestDoubles
@@ -142,7 +142,7 @@ class UserRepositoryImplTest {
 
     companion object {
         private val TestUserPatch = UserPatch(
-            name = Name("name"),
+            userName = UserName("name"),
             profileImageUrl = null,
             introduce = Introduce("introduce"),
         )

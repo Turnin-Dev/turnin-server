@@ -47,7 +47,7 @@ class GetUserKeywordsUseCase(
                 id = userKeyword.id.value,
                 userId = userKeyword.userId.value,
                 keywordId = userKeyword.keywordId.value,
-                keywordName = keywordName.name,
+                keywordName = keywordName.name.value,
                 description = userKeyword.description.value,
                 createdAt = userKeyword.createdAt,
                 updatedAt = userKeyword.updatedAt,
