@@ -17,6 +17,8 @@ mockk-version = "1.14.2"
 swagger-codegen-version = "1.0.56"
 smiley-openapi-version = "5.0.2"
 aws-s3 = "2.32.26"
+onnx-runtime = "1.23.2"
+huggingface-tokenizers = "0.36.0"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -73,6 +75,9 @@ ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-vers
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor-version" }
 # AWS S3
 amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-s3" }
+# ONNX, Tokenizers
+onnx-runtime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnx-runtime" }
+huggingface-tokenizers = { module = "ai.djl.huggingface:tokenizers", version.ref = "huggingface-tokenizers" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

@@ -111,11 +111,6 @@ dependencies {
     implementation(libs.ktor.server.resources)
     implementation(libs.smiley4.swagger.ui)
     implementation(libs.smiley4.openapi)
-//    implementation(libs.ktor.server.swagger)
-//    implementation(libs.swagger.codegen.generator)
-//    constraints {
-//        implementation("commons-codec:commons-codec:1.18.0")
-//    }
 
     // CORS
     implementation(libs.ktor.server.cors)
@@ -155,4 +150,8 @@ dependencies {
 
     // AWS S3
     implementation(libs.amazon.awssdk.s3)
+
+    // ONNX, Tokenizers
+    implementation(libs.onnx.runtime)
+    implementation(libs.huggingface.tokenizers)
 }
