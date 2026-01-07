@@ -8,8 +8,6 @@ import com.peekr.domain.discover.application.dto.DiscoverContextDto
 import com.peekr.domain.discover.application.dto.DiscoverKeywordDto
 import com.peekr.domain.discover.application.dto.DiscoverUserDto
 import com.peekr.domain.discover.domain.model.DiscoverContext
-import com.peekr.domain.discover.domain.provider.KeywordProvider
-import com.peekr.domain.discover.domain.provider.UserProvider
 import com.peekr.domain.discover.domain.repository.DiscoverRepository
 import com.peekr.domain.discover.exception.DiscoverException
 
@@ -19,11 +17,7 @@ import com.peekr.domain.discover.exception.DiscoverException
  * @see invoke
  * @see DiscoverContext
  */
-class GetDiscoverContextUseCase(
-    private val discoverRepository: DiscoverRepository,
-    private val userProvider: UserProvider,
-    private val keywordProvider: KeywordProvider,
-) {
+class GetDiscoverContextUseCase(private val discoverRepository: DiscoverRepository) {
     /**
      * 탐색 컨텍스트를 조회한다.
      *
@@ -40,66 +34,63 @@ class GetDiscoverContextUseCase(
         cursor: Long?,
         pageSize: Int,
     ): CursorPage<DiscoverContextDto> = suspendTransaction {
-        // 0) VO 객체 변환
+        // 0) 데이터 전처리
         val userIdVO = UserId(userId)
 
-        // 1) 공유 키워드 정보 페이지네이션 조회
-        val cursorPage = discoverRepository.getSharedKeywords(userIdVO, cursor, pageSize)
-        if (cursorPage.items.isEmpty()) return@suspendTransaction CursorPage(emptyList(), null)
+        // 1) 유사한 키워드를 가지고 있는 사용자 ID 리스트를 조회 (Native SQL)
+        val matchedUserIdsWithOneExtra = discoverRepository.findUserIdsWithSimilarKeywords(userIdVO, cursor, pageSize)
 
-        // 2) 데이터 전처리
-        val sharedKeywordInfos = cursorPage.items
-        val userIds = sharedKeywordInfos.map { it.userId }
-        val userKeywordIds = sharedKeywordInfos.map { it.userKeywordIds }
-        val keywordIds = sharedKeywordInfos.map { it.keywordIds }
-
-        if (userKeywordIds.flatten().size != keywordIds.flatten().size) {
-            LOGGER.error("userKeywordIds and keywordIds size is not equal.")
-            throw DiscoverException.KeywordIdPairingFailed()
+        if (matchedUserIdsWithOneExtra.isEmpty()) {
+            return@suspendTransaction CursorPage(emptyList(), null)
         }
 
-        val keywordIdsSet = keywordIds.flatten().toSet()
+        // 2) 다음 페이지 존재 여부 확인 및 실제 반환할 ID 리스트 추출
+        val hasNext = matchedUserIdsWithOneExtra.size > pageSize
+        val matchedUserIds = if (hasNext) {
+            matchedUserIdsWithOneExtra.take(pageSize)
+        } else {
+            matchedUserIdsWithOneExtra
+        }
 
-        // 3) 사용자 정보 조회, 사용자 Map 생성
-        val userMap = userProvider
-            .findByIds(userIds)
-            .associateBy { it.id }
+        // 3) 조회된 사용자 ID 리스트를 통해 사용자 키워드 상세 정보 조회
+        val sharedUserKeywords = discoverRepository.fetchSharedUserKeywords(matchedUserIds)
 
-        // 4) 키워드 ID Set 리스트를 통해 키워드 리스트 조회, 키워드 Map 생성
-        val keywordMap = keywordProvider
-            .findByIds(keywordIdsSet.toList())
-            .associate { it.id to it.name }
-
-        // 5) 각 노드 매핑, NodeContext 생성
-        val discoverContextDtoList = cursorPage.items.map { sharedKeywordInfo ->
-            val sUserId = sharedKeywordInfo.userId
-            val foundedUser = userMap[sUserId] ?: run {
-                LOGGER.error("User not found in map. userId: $sUserId")
-                throw DiscoverException.UserNotFound()
+        // 4) 반환할 정보 매핑
+        val sharedUserKeywordMap = sharedUserKeywords.groupBy { it.userId }
+        val discoverContextDtoList = matchedUserIds.map { targetUserId ->
+            val keywords = sharedUserKeywordMap[targetUserId] ?: run {
+                LOGGER.error(
+                    "SharedUserKeyword not found: " +
+                        "targetUserId=$targetUserId, userKeywordIds=${sharedUserKeywords.map { it.userKeywordId }}",
+                )
+                throw DiscoverException.KeywordIdPairingFailed()
             }
+            val first = keywords.first()
+
             val discoverUserDto = DiscoverUserDto(
-                userId = sUserId,
-                userName = foundedUser.name.value,
-                profileImageUrl = foundedUser.profileImageUrl,
+                id = targetUserId,
+                name = first.userName.value,
+                displayId = first.userDisplayId.value,
+                profileImageUrl = first.userProfileImageUrl,
             )
-
-            val discoverKeywordDto = sharedKeywordInfo.userKeywordIds
-                .zip(sharedKeywordInfo.keywordIds) { userKeywordId, keywordId ->
-                    DiscoverKeywordDto(
-                        userKeywordId = userKeywordId,
-                        keywordId = keywordId,
-                        keywordName = keywordMap[keywordId]?.value ?: run {
-                            LOGGER.error("Keyword not found in map. keywordId: $keywordId")
-                            throw DiscoverException.KeywordIdPairingFailed()
-                        },
-                    )
-                }
-
-            DiscoverContextDto(discoverUserDto, discoverKeywordDto)
+            val discoverKeywordDtoList = keywords.map {
+                DiscoverKeywordDto(
+                    userKeywordId = it.userKeywordId,
+                    keywordId = it.keywordId,
+                    keywordName = it.keywordName.value,
+                )
+            }
+            DiscoverContextDto(
+                user = discoverUserDto,
+                keywords = discoverKeywordDtoList,
+            )
         }
+
+        // 5) 다음 커서 결정
+        val nextCursor = if (hasNext) matchedUserIds.last() else null
 
         // 6) 최종 반환
-        CursorPage(discoverContextDtoList, cursorPage.nextCursor)
+        CursorPage(discoverContextDtoList, nextCursor?.value)
     }
 }
 

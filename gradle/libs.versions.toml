@@ -19,6 +19,7 @@ smiley-openapi-version = "5.0.2"
 aws-s3 = "2.32.26"
 onnx-runtime = "1.23.2"
 huggingface-tokenizers = "0.36.0"
+test-container-pg = "1.21.4"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -78,6 +79,8 @@ amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-s3
 # ONNX, Tokenizers
 onnx-runtime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnx-runtime" }
 huggingface-tokenizers = { module = "ai.djl.huggingface:tokenizers", version.ref = "huggingface-tokenizers" }
+# PostgreSQL Test Container
+test-container-postgresql = { module = "org.testcontainers:postgresql", version.ref = "test-container-pg" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

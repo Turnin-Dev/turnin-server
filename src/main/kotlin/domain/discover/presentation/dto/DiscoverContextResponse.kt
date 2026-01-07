@@ -20,8 +20,9 @@ data class DiscoverContextResponse(
             items = List(2) {
                 DiscoverContextResponse(
                     user = DiscoverUserResponse(
-                        userId = (it + 1).toLong(),
-                        userName = "name",
+                        id = (it + 1).toLong(),
+                        name = "name",
+                        displayId = "displayId",
                         profileImageUrl = "https://image-server-1.com/image$it.jpg",
                     ),
                     keywords = listOf(

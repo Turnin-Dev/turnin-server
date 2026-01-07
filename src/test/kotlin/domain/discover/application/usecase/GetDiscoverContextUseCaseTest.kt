@@ -1,28 +1,18 @@
 package com.peekr.domain.discover.application.usecase
 
-import com.peekr.common.model.Introduce
 import com.peekr.common.model.KeywordName
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.discover.domain.model.SharedKeywords
-import com.peekr.domain.discover.domain.provider.ExternalKeyword
-import com.peekr.domain.discover.domain.provider.ExternalUser
-import com.peekr.domain.discover.domain.provider.KeywordProvider
-import com.peekr.domain.discover.domain.provider.UserProvider
+import com.peekr.domain.discover.domain.model.SharedUserKeyword
 import com.peekr.domain.discover.domain.repository.DiscoverRepository
-import com.peekr.domain.discover.exception.DiscoverException
 import com.peekr.util.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -30,15 +20,11 @@ import org.junit.Test
 
 class GetDiscoverContextUseCaseTest {
     private val discoverRepository: DiscoverRepository = mockk()
-    private val userProvider: UserProvider = mockk()
-    private val keywordProvider: KeywordProvider = mockk()
-    private val usecase = GetDiscoverContextUseCase(discoverRepository, userProvider, keywordProvider)
+    private val usecase = GetDiscoverContextUseCase(discoverRepository)
 
     @Before
     fun setUp() {
         TestDatabaseFactory.init()
-
-        // Mock Data
     }
 
     @After
@@ -48,214 +34,78 @@ class GetDiscoverContextUseCaseTest {
 
     @Test
     fun `DiscoverContext 페이지네이션 조회 성공 테스트`() = runTest {
-        // given
-        val userKeywordIds = createUserKeywordIds(2)
-        val keywordIds = createKeywordIds(2)
-        val sharedKeywordsList = List(PAGE_SIZE) {
-            createSharedKeywords(
-                userId = UserId((it + 1).toLong()),
-                userKeywordIds = userKeywordIds,
-                keywordIds = keywordIds,
-            )
-        }
-        val cursorPage = CursorPage(sharedKeywordsList, null)
-        val users = sharedKeywordsList.map { createExternalUser(it.userId) }
-        val keywords = keywordIds.map { createExternalKeyword(it) }
+        // given: 3명의 사용자, 사용자 당 3개의 키워드 준비
+        val targetUserId = UserId(1L)
+        val keywordCount = 3 // 각 사용자가 등록한 키워드 개수
+        val userCount = 3 // 사용자 개수
+        val pageSize = 2
 
+        val sharedUserKeywords = List(userCount) { userIdx ->
+            val userId = userIdx + 1L
+            List(keywordCount) { keywordIdx ->
+                val keywordId = keywordIdx + 1L
+                val userKeywordId = (userId * 10) + keywordId // 사용자 키워드 ID는 임의 생성
+                createSharedUserKeyword(userId, userKeywordId, keywordId)
+            }
+        }.flatten()
+
+        // findUserIdsWithSimilarKeywords 조회는 실제로 (pageSize + 1)개가 조회되기 때문에 3명이 조회되었다고 가정
+        val matchedUserIds = listOf(UserId(1L), UserId(2L), UserId(3L))
         coEvery {
-            discoverRepository.getSharedKeywords(TestUserId, any(), any())
-        } returns cursorPage
+            discoverRepository.findUserIdsWithSimilarKeywords(
+                targetUserId = targetUserId,
+                cursor = null,
+                pageSize = pageSize,
+            )
+        } returns matchedUserIds
+
+        // fetchSharedUserKeywords는 1, 2번 유저의 키워드만 요청받음 (pageSize가 2기 때문에)
+        val requestedIds = listOf(UserId(1L), UserId(2L))
         coEvery {
-            userProvider.findByIds(any())
-        } returns users
-        coEvery {
-            keywordProvider.findByIds(any())
-        } returns keywords
+            discoverRepository.fetchSharedUserKeywords(any())
+        } returns sharedUserKeywords
 
         // when
-        val actualCursorPage = usecase(TestUserId.value, 1L, PAGE_SIZE)
+        val result = usecase(targetUserId.value, null, pageSize)
 
         // then
-        assertEquals(PAGE_SIZE, actualCursorPage.items.size)
+        // 페이지네이션 크기 검증
+        assertEquals(pageSize, result.items.size)
+
+        // 데이터 순서 검증 (1, 2, 3) 순서이므로 순서 1, 2가 유지되어야 함
         assertEquals(
-            sharedKeywordsList.map { it.userId },
-            actualCursorPage.items.map { it.user.userId },
-        )
-        assertEquals(
-            sharedKeywordsList.map { it.userKeywordIds },
-            actualCursorPage.items.map {
-                it.keywords.map { it2 ->
-                    it2.userKeywordId
-                }
-            },
-        )
-    }
-
-    @Test
-    fun `사용자 키워드 ID 리스트 사이즈와 키워드 ID 리스트 사이즈가 다른 경우 예외가 발생한다`() = runTest {
-        // given: userKeywordIds와 keywordIds 사이즈가 다르도록 구성
-        val userKeywordIds = createUserKeywordIds(2)
-        val keywordIds = createKeywordIds(4)
-        val sharedKeywordsList = List(PAGE_SIZE) {
-            createSharedKeywords(
-                userId = UserId((it + 1).toLong()),
-                userKeywordIds = userKeywordIds,
-                keywordIds = keywordIds,
-            )
-        }
-        val cursorPage = CursorPage(sharedKeywordsList, null)
-        val users = sharedKeywordsList.map { createExternalUser(it.userId) }
-        val keywords = keywordIds.map { createExternalKeyword(it) }
-
-        coEvery {
-            discoverRepository.getSharedKeywords(TestUserId, any(), any())
-        } returns cursorPage
-        coEvery {
-            userProvider.findByIds(any())
-        } returns users
-        coEvery {
-            keywordProvider.findByIds(any())
-        } returns keywords
-
-        // when
-        val exception = runCatching {
-            usecase(TestUserId.value, 1L, PAGE_SIZE)
-        }.exceptionOrNull()
-
-        // then
-        assertNotNull(exception)
-        assertTrue(exception is DiscoverException.KeywordIdPairingFailed)
-    }
-
-    @Test
-    fun `사용자 Map 에서 사용자를 찾지 못하는 경우 예외가 발생한다`() = runTest {
-        // given: 사용자 정보를 조회할 때 빈 리스트를 반환하도록 구성
-        val userKeywordIds = createUserKeywordIds(2)
-        val keywordIds = createKeywordIds(2)
-        val sharedKeywordsList = List(PAGE_SIZE) {
-            createSharedKeywords(
-                userId = UserId((it + 1).toLong()),
-                userKeywordIds = userKeywordIds,
-                keywordIds = keywordIds,
-            )
-        }
-        val cursorPage = CursorPage(sharedKeywordsList, null)
-        val keywords = keywordIds.map { createExternalKeyword(it) }
-
-        coEvery {
-            discoverRepository.getSharedKeywords(TestUserId, any(), any())
-        } returns cursorPage
-        coEvery {
-            userProvider.findByIds(any())
-        } returns emptyList()
-        coEvery {
-            keywordProvider.findByIds(any())
-        } returns keywords
-
-        // when
-        val exception = runCatching {
-            usecase(TestUserId.value, 1L, PAGE_SIZE)
-        }.exceptionOrNull()
-
-        // then
-        assertNotNull(exception)
-        assertTrue(exception is DiscoverException.UserNotFound)
-    }
-
-    @Test
-    fun `키워드 Map 에서 키워드를 찾지 못하는 경우 예외가 발생한다`() = runTest {
-        // given: 키워드 정보를 조회할 때 빈 리스트를 반환하도록 구성
-        val userKeywordIds = createUserKeywordIds(2)
-        val keywordIds = createKeywordIds(2)
-        val sharedKeywordsList = List(PAGE_SIZE) {
-            createSharedKeywords(
-                userId = UserId((it + 1).toLong()),
-                userKeywordIds = userKeywordIds,
-                keywordIds = keywordIds,
-            )
-        }
-        val cursorPage = CursorPage(sharedKeywordsList, null)
-        val users = sharedKeywordsList.map { createExternalUser(it.userId) }
-
-        coEvery {
-            discoverRepository.getSharedKeywords(TestUserId, any(), any())
-        } returns cursorPage
-        coEvery {
-            userProvider.findByIds(any())
-        } returns users
-        coEvery {
-            keywordProvider.findByIds(any())
-        } returns emptyList()
-
-        // when
-        val exception = runCatching {
-            usecase(TestUserId.value, 1L, PAGE_SIZE)
-        }.exceptionOrNull()
-
-        // then
-        assertNotNull(exception)
-        assertTrue(exception is DiscoverException.KeywordIdPairingFailed)
-    }
-
-    @Test
-    fun `페이지네이션 조회 시 빈 리스트를 반환하는 경우 즉시 빈 리스트를 반환한다`() = runTest {
-        // given
-        val cursorPage = CursorPage(emptyList<SharedKeywords>(), null)
-
-        coEvery {
-            discoverRepository.getSharedKeywords(TestUserId, any(), any())
-        } returns cursorPage
-
-        // when
-        val actualCursorPage = usecase(
-            TestUserId.value,
             1L,
-            PAGE_SIZE,
+            result.items[0]
+                .user.id.value,
+        )
+        assertEquals(
+            2L,
+            result.items[1]
+                .user.id.value,
         )
 
-        // then
-        assertTrue(actualCursorPage.items.isEmpty())
+        // 키워드 그룹핑 검증
+        assertEquals(keywordCount, result.items[0].keywords.size)
+        assertEquals(keywordCount, result.items[1].keywords.size)
+
+        // 다음 커서 및 페이지 존재 여부 검증
+        assertNotNull(result.nextCursor, "데이터가 더 남아있으므로 nextCursor가 존재해야 한다.")
+        assertEquals(2L, result.nextCursor, "nextCursor는 현재 페이지의 마지막 유저 ID인 2여야 한다.")
     }
 
     companion object {
-        private const val PAGE_SIZE = 5
-
-        private val TestUserId = UserId(1)
-
-        private fun createUserKeywordIds(count: Int) = List(count) { UserKeywordId((it + 1).toLong()) }
-
-        private fun createKeywordIds(count: Int) = List(count) { KeywordId((it + 1).toLong()) }
-
-        private fun createSharedKeywords(
-            userId: UserId,
-            userKeywordIds: List<UserKeywordId>,
-            keywordIds: List<KeywordId>,
-        ) = SharedKeywords(
-            userId = userId,
-            userKeywordIds = userKeywordIds,
-            keywordIds = keywordIds,
-        )
-
-        private fun createExternalUser(userId: UserId) =
-            ExternalUser(
-                id = userId,
-                role = Role.USER,
-                provider = SocialLoginProvider.GOOGLE,
-                providerId = "providerId",
-                displayId = DisplayId("displayId"),
-                name = UserName("name"),
-                profileImageUrl = "profileImageUrl",
-                introduce = Introduce("introduce"),
-                isActive = true,
-                lastLoginAt = 1000L,
-            )
-
-        private fun createExternalKeyword(keywordId: KeywordId) = ExternalKeyword(
-            id = keywordId,
-            name = KeywordName("keywordName"),
-            createdBy = UserId(1L),
-            createdAt = 1000L,
-            updatedAt = 1000L,
+        private fun createSharedUserKeyword(
+            userId: Long,
+            userKeywordId: Long,
+            keywordId: Long,
+        ) = SharedUserKeyword(
+            userId = UserId(userId),
+            userName = UserName("user"),
+            userDisplayId = DisplayId("did"),
+            userProfileImageUrl = null,
+            userKeywordId = UserKeywordId(userKeywordId),
+            keywordId = KeywordId(keywordId),
+            keywordName = KeywordName("keyword"),
         )
     }
 }

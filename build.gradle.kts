@@ -117,6 +117,7 @@ dependencies {
 
     // PostgreSQL JDBC Driver
     implementation(libs.postgresql)
+    testImplementation(libs.test.container.postgresql)
 
     // Exposed
     implementation(libs.exposed.core)
