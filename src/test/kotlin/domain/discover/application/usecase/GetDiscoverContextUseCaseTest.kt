@@ -63,7 +63,7 @@ class GetDiscoverContextUseCaseTest {
         val requestedIds = listOf(UserId(1L), UserId(2L))
         coEvery {
             discoverRepository.fetchSharedUserKeywords(any())
-        } returns sharedUserKeywords
+        } returns sharedUserKeywords.filter { it.userId in requestedIds }
 
         // when
         val result = usecase(targetUserId.value, null, pageSize)
