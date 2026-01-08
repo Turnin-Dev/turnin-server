@@ -1,6 +1,7 @@
 package com.peekr.common.di
 
 import com.peekr.common.jwt.di.jwtModule
+import com.peekr.common.ml.embeddingModule
 import com.peekr.domain.auth.di.authModule
 import com.peekr.domain.discover.di.discoverModule
 import com.peekr.domain.file.di.fileModule
@@ -30,6 +31,8 @@ fun Application.configureKoin() {
             reportModule,
             friendModule,
             discoverModule,
+            // 3rd service
+            embeddingModule,
         )
     }
 }

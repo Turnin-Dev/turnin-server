@@ -12,8 +12,14 @@ import kotlin.math.sqrt
 
 /**
  * 임베딩 서비스
+ *
+ * @property modelPath ONNX 모델 파일 경로
+ * @property tokenizerPath 토큰나이저 파일 경로
  */
-object EmbeddingService {
+class EmbeddingService(
+    private val modelPath: String,
+    private val tokenizerPath: String,
+) {
     private lateinit var env: OrtEnvironment
     private lateinit var session: OrtSession
     private lateinit var tokenizer: HuggingFaceTokenizer
@@ -25,15 +31,12 @@ object EmbeddingService {
      * ONNX, Tokenizer 초기화
      */
     @Synchronized
-    fun init(
-        onnxModelPath: String,
-        tokenizerPath: String,
-    ) {
+    fun init() {
         if (initialized) return
 
         try {
             env = OrtEnvironment.getEnvironment()
-            initOnnx(onnxModelPath)
+            initOnnx(modelPath)
             initTokenizer(tokenizerPath)
             initialized = true
         } catch (e: Exception) {
@@ -71,6 +74,8 @@ object EmbeddingService {
      * @param text 벡터를 생성할 텍스트
      */
     fun embed(text: String): String {
+        check(initialized) { "EmbeddingService is not initialized." }
+
         val encoding = try {
             if (text.isEmpty() || text.isBlank()) throw EmbeddingServiceException.TokenizationFailed()
             tokenizer.encode(text)
