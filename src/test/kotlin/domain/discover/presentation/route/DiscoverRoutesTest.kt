@@ -32,8 +32,9 @@ class DiscoverRoutesTest {
                 val pageNumber = pageIndex + 1L
                 DiscoverContextDto(
                     user = DiscoverUserDto(
-                        userId = UserId(pageNumber),
-                        userName = "$pageNumber",
+                        id = UserId(pageNumber),
+                        name = "$pageNumber",
+                        displayId = "did$pageNumber",
                         profileImageUrl = "image",
                     ),
                     keywords = listOf(
@@ -81,8 +82,9 @@ class DiscoverRoutesTest {
                 val pageNumber = pageIndex + 1L
                 DiscoverContextDto(
                     user = DiscoverUserDto(
-                        userId = UserId(pageNumber),
-                        userName = "$pageNumber",
+                        id = UserId(pageNumber),
+                        name = "$pageNumber",
+                        displayId = "did$pageNumber",
                         profileImageUrl = "image",
                     ),
                     keywords = listOf(

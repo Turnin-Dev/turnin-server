@@ -7,7 +7,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.UserTestDoubles
 import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import kotlin.test.AfterTest
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

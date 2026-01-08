@@ -35,9 +35,14 @@ interface KeywordRepository {
      * 키워드를 생성하고 성공 시 키워드를 반환한다.
      *
      * @param keywordName 키워드명
+     * @param embeddedKeyword 임베드된 키워드
      * @param createdBy 키워드 최초 등록자
      *
      * @return 생성된 [Keyword] 키워드를 반환한다.
      */
-    suspend fun create(keywordName: KeywordName, createdBy: UserId): Keyword
+    suspend fun create(
+        keywordName: KeywordName,
+        embeddedKeyword: String,
+        createdBy: UserId,
+    ): Keyword
 }

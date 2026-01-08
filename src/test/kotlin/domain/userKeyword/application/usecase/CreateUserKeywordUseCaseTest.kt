@@ -12,7 +12,7 @@ import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.exception.UserKeywordException
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals

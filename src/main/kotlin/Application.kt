@@ -6,6 +6,7 @@ import com.peekr.ApplicationUtils.printServerSettings
 import com.peekr.common.di.configureKoin
 import com.peekr.common.exception.configureExceptionHandler
 import com.peekr.common.jwt.configureJwtSecurity
+import com.peekr.common.ml.embeddingResourceAutoCleanup
 import com.peekr.common.plugin.configureAPIDocuments
 import com.peekr.common.plugin.configureCallLogging
 import com.peekr.common.plugin.configureContentNegotiation
@@ -42,4 +43,7 @@ fun Application.module() {
     printSection {
         printServerSettings()
     }
+
+    // ------------------------------ Embedding Service cleanup ------------------------------
+    embeddingResourceAutoCleanup()
 }

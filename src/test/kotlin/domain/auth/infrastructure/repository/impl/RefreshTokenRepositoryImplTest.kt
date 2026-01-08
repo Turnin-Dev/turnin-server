@@ -10,7 +10,7 @@ import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.Test

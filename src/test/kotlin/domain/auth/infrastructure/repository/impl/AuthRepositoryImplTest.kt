@@ -8,7 +8,7 @@ import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.auth.domain.model.Register
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import junit.framework.TestCase.assertFalse
 import kotlin.test.AfterTest
 import kotlin.test.Test

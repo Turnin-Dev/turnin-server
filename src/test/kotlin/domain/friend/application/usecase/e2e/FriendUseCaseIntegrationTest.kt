@@ -16,7 +16,7 @@ import com.peekr.domain.friend.infrastructure.provider.UserProviderImpl
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import com.peekr.domain.user.application.provider.UserProviderApi
 import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest

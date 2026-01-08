@@ -12,7 +12,7 @@ import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.DescriptionDto
 import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.domain.userKeyword.domain.model.Description
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -313,6 +313,7 @@ class UserKeywordRepositoryImplTest {
     ): KeywordId = TestDatabaseFactory.dbQuery {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keyword
+            this.embedding = "embedding"
             this.createdBy = EntityID(userId.value, Users)
         }
         KeywordId(savedKeyword.id.value)

@@ -14,7 +14,7 @@ import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test

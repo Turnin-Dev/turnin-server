@@ -9,7 +9,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.application.dto.toDto
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.repository.UserRepository
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant

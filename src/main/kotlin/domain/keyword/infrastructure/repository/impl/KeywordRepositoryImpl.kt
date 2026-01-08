@@ -34,10 +34,12 @@ class KeywordRepositoryImpl : KeywordRepository {
 
     override suspend fun create(
         keywordName: KeywordName,
+        embeddedKeyword: String,
         createdBy: UserId,
     ): Keyword = suspendTransaction {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keywordName.value
+            this.embedding = embeddedKeyword
             this.createdBy = EntityID(createdBy.value, Users)
         }
         savedKeyword.toDomain()

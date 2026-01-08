@@ -1,6 +1,6 @@
 package com.peekr.common.db
 
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
