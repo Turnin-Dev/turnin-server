@@ -1,4 +1,4 @@
-package com.peekr.util
+package com.peekr.util.db
 
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.Friends
@@ -14,7 +14,11 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
-/** 테스트에서 사용할 H2 DB */
+/**
+ * 테스트에서 사용할 H2 DB
+ *
+ * 대부분의 테스트에서 사용된다.
+ */
 object TestDatabaseFactory {
     fun init() {
         Database.connect(

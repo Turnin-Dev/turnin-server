@@ -9,29 +9,20 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.discover.util.DiscoverTestDataGenerator.setupKeywordRelations
 import com.peekr.domain.discover.util.TestVectorFixture
 import com.peekr.domain.discover.util.TestVectorFixture.toPgVectorString
-import com.peekr.util.TestDBContainerFactory
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.PostgresRule
 import junit.framework.TestCase.assertTrue
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
-import org.junit.After
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class DiscoverRepositoryImplTest {
+    @get:Rule
+    val dbRule = PostgresRule()
+
     private val repository = DiscoverRepositoryImpl()
-
-    @Before
-    fun setUp() {
-        TestDBContainerFactory.init()
-    }
-
-    @After
-    fun teardown() {
-        TestDBContainerFactory.cleanUp()
-    }
 
     @Test
     fun `findUserIdsWithSimilarKeywords - 유사도가 0_7 이상인 유저만 정확히 조회되어야 한다`() = runTest {
@@ -67,13 +58,11 @@ class DiscoverRepositoryImplTest {
         )
 
         // when
-        val result = TestDatabaseFactory.dbQuery {
-            repository.findUserIdsWithSimilarKeywords(
-                targetUserId = targetUserId,
-                cursor = null,
-                pageSize = 10,
-            )
-        }
+        val result = repository.findUserIdsWithSimilarKeywords(
+            targetUserId = targetUserId,
+            cursor = null,
+            pageSize = 10,
+        )
 
         // then
         assertEquals(1, result.size, "조회된 유저 수는 1명이어야 합니다.")
@@ -84,7 +73,7 @@ class DiscoverRepositoryImplTest {
     fun `fetchSharedUserKeywords - 사용자 ID 리스트를 전달하면 해당 사용자들의 상세 정보와 키워드 목록을 최신순으로 반환한다`() = runTest {
         // given: 데이터 세팅
         val fakeVector = TestVectorFixture.unitVector(1.0f)
-        val (user1, user2) = TestDatabaseFactory.dbQuery {
+        val (user1, user2) = dbRule.dbQuery {
             // 사용자 생성
             val u1 = Users.insertAndGetId {
                 it[name] = "테스트유저1"
@@ -133,9 +122,7 @@ class DiscoverRepositoryImplTest {
         val targetIds = listOf(UserId(user1.value), UserId(user2.value))
 
         // when
-        val result = TestDatabaseFactory.dbQuery {
-            repository.fetchSharedUserKeywords(targetIds)
-        }
+        val result = repository.fetchSharedUserKeywords(targetIds)
 
         // then
         // 유저 1은 키워드 2개, 유저 2는 1개이므로 총 3개의 행이 반환되어야 함

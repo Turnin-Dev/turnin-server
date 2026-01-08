@@ -3,6 +3,7 @@ package com.peekr.domain.discover.infrastructure.repository
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.KeywordName
 import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
@@ -11,16 +12,19 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.discover.domain.model.SharedUserKeyword
 import com.peekr.domain.discover.domain.repository.DiscoverRepository
+import org.jetbrains.exposed.sql.DoubleColumnType
+import org.jetbrains.exposed.sql.IntegerColumnType
+import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 class DiscoverRepositoryImpl : DiscoverRepository {
-    override fun findUserIdsWithSimilarKeywords(
+    override suspend fun findUserIdsWithSimilarKeywords(
         targetUserId: UserId,
         cursor: Long?,
         pageSize: Int,
-    ): List<UserId> {
+    ): List<UserId> = suspendTransaction {
         val cursorCondition = if (cursor != null) "AND uk_other.user_id < $cursor" else ""
         val limitPlusOne = pageSize + 1
 
@@ -28,28 +32,36 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             SELECT DISTINCT uk_other.user_id
             FROM user_keyword uk_mine
             JOIN keyword k_mine ON uk_mine.keyword_id = k_mine.id
-            JOIN keyword k_other ON (1 - (k_other.embedding <=> k_mine.embedding)) >= ${SharedUserKeyword.HIGH_SIMILARITY_THRESHOLD}
+            JOIN keyword k_other ON (1 - (k_other.embedding <=> k_mine.embedding)) >= ?
             JOIN user_keyword uk_other ON k_other.id = uk_other.keyword_id
-            WHERE uk_mine.user_id = ${targetUserId.value}
-              AND uk_other.user_id != ${targetUserId.value}
+            WHERE uk_mine.user_id = ?
+              AND uk_other.user_id != ?
               $cursorCondition
             ORDER BY uk_other.user_id DESC
-            LIMIT $limitPlusOne;
+            LIMIT ?;
         """.trimIndent()
 
+        val params = buildList {
+            add(DoubleColumnType() to SharedUserKeyword.HIGH_SIMILARITY_THRESHOLD)
+            add(LongColumnType() to targetUserId.value)
+            add(LongColumnType() to targetUserId.value)
+            cursor?.let { add(LongColumnType() to it) }
+            add(IntegerColumnType() to limitPlusOne)
+        }
+
         val ids = mutableListOf<UserId>()
-        TransactionManager.current().exec(sql) { rs ->
+        TransactionManager.current().exec(sql, params) { rs ->
             while (rs.next()) {
                 ids.add(UserId(rs.getLong("user_id")))
             }
         }
 
-        return ids
+        ids
     }
 
-    override fun fetchSharedUserKeywords(
+    override suspend fun fetchSharedUserKeywords(
         matchedUserIds: List<UserId>,
-    ): List<SharedUserKeyword> {
+    ): List<SharedUserKeyword> = suspendTransaction {
         val matchedUserIdsValue = matchedUserIds.map { it.value }
 
         val joinQuery = Users
@@ -63,7 +75,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 otherColumn = { Keywords.id },
             )
 
-        return joinQuery
+        joinQuery
             .select(
                 Users.id,
                 Users.name,

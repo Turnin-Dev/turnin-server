@@ -20,7 +20,7 @@ import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.infrastructure.repository.impl.AuthRepositoryImpl
 import com.peekr.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

@@ -11,7 +11,11 @@ sealed class EmbeddingServiceErrorCode(
 
     data object TokenizationFailed :
         EmbeddingServiceErrorCode(EMB002, "키워드를 토큰화하는 과정에서 실패했습니다.")
+
+    data object InitializationFailed :
+        EmbeddingServiceErrorCode(EMB003, "임베딩 서비스 초기화 과정에서 에러가 발생했습니다.")
 }
 
 private const val EMB001 = "EMB001"
 private const val EMB002 = "EMB002"
+private const val EMB003 = "EMB003"

@@ -18,7 +18,7 @@ interface DiscoverRepository {
      * @param cursor 커서 (사용자 ID)
      * @param pageSize 페이지 크기
      */
-    fun findUserIdsWithSimilarKeywords(
+    suspend fun findUserIdsWithSimilarKeywords(
         targetUserId: UserId,
         cursor: Long?,
         pageSize: Int,
@@ -29,7 +29,7 @@ interface DiscoverRepository {
      *
      * @param matchedUserIds (나와 유사한 키워드를 공유하고 있는) 사용자 ID 리스트
      */
-    fun fetchSharedUserKeywords(
+    suspend fun fetchSharedUserKeywords(
         matchedUserIds: List<UserId>,
     ): List<SharedUserKeyword>
 }

@@ -48,8 +48,8 @@ fun Application.module() {
 
     // ------------------------------ Embedding Service ------------------------------
     EmbeddingService.init(
-        onnxModelPath = "",
-        tokenizerPath = "",
+        onnxModelPath = "src/main/resources/ml/model_int8.onnx",
+        tokenizerPath = "src/main/resources/ml/tokenizer.json",
     )
 
     // ------------------------------ Clean up ------------------------------

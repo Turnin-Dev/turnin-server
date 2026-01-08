@@ -14,7 +14,7 @@ import com.peekr.domain.auth.domain.model.LoginResult
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.domain.auth.exception.AuthException
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just

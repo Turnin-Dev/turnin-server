@@ -1,29 +1,52 @@
-package com.peekr.util
+package com.peekr.util.db
 
+import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect
 import org.jetbrains.exposed.sql.vendors.currentDialect
+import org.junit.rules.ExternalResource
 import org.testcontainers.containers.PostgreSQLContainer
+
+class PostgresRule : ExternalResource() {
+    override fun before() {
+        TestDBContainerFactory.init()
+    }
+
+    override fun after() {
+        TestDBContainerFactory.cleanUp()
+    }
+
+    suspend fun <T> dbQuery(block: () -> T): T =
+        TestDBContainerFactory.dbQuery(block)
+}
 
 /**
  * 실제 PostgreSQL 도커 컨테이너를 사용하여 테스트하기 위해 사용한다.
+ *
+ * 실제 DB 작업이 필요한 테스트에서 극히 일부 사용한다.
  */
-object TestDBContainerFactory {
-    private val container = PostgreSQLContainer<Nothing>("pgvector/pgvector:pg16").apply {
-        withDatabaseName("testdb2")
-        withUsername("test")
-        withPassword("test")
-        start()
-    }
+private object TestDBContainerFactory {
+    private var database: Database? = null
 
     fun init() {
+        if (database != null) return
+
+        val container = PostgreSQLContainer<Nothing>("pgvector/pgvector:pg16").apply {
+            withDatabaseName("testdb2")
+            withUsername("test")
+            withPassword("test")
+            start()
+        }
+
         Database.connect(
             url = container.jdbcUrl,
             driver = "org.postgresql.Driver",
@@ -31,7 +54,7 @@ object TestDBContainerFactory {
             password = container.password,
         )
 
-        transaction {
+        transaction(database) {
             // pgvector 확장 기능 활성화 (매우 중요)
             exec("CREATE EXTENSION IF NOT EXISTS vector;")
 
@@ -63,9 +86,20 @@ object TestDBContainerFactory {
     }
 
     fun cleanUp() {
-        transaction {
+        transaction(database) {
             SchemaUtils.drop(Users, Keywords, UserKeywords)
             SchemaUtils.create(Users, Keywords, UserKeywords)
         }
     }
+
+    suspend fun <T> dbQuery(block: () -> T): T =
+        newSuspendedTransaction(db = database) {
+            try {
+                block()
+            } catch (e: ExposedSQLException) {
+                throw DatabaseException.DBQueryException(e)
+            } catch (e: Exception) {
+                throw e
+            }
+        }
 }

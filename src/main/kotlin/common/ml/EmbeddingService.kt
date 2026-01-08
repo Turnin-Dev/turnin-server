@@ -14,19 +14,35 @@ import kotlin.math.sqrt
  * 임베딩 서비스
  */
 object EmbeddingService {
-    private var env: OrtEnvironment = OrtEnvironment.getEnvironment()
+    private lateinit var env: OrtEnvironment
     private lateinit var session: OrtSession
     private lateinit var tokenizer: HuggingFaceTokenizer
+
+    @Volatile
+    private var initialized = false
 
     /**
      * ONNX, Tokenizer 초기화
      */
+    @Synchronized
     fun init(
         onnxModelPath: String,
         tokenizerPath: String,
     ) {
-        initOnnx(onnxModelPath)
-        initTokenizer(tokenizerPath)
+        if (initialized) return
+
+        try {
+            env = OrtEnvironment.getEnvironment()
+            initOnnx(onnxModelPath)
+            initTokenizer(tokenizerPath)
+            initialized = true
+        } catch (e: Exception) {
+            LOGGER.error("embedding service initialization failed: ${e.message}")
+            if (::session.isInitialized) {
+                session.close()
+            }
+            throw EmbeddingServiceException.InitializationFailed()
+        }
     }
 
     private fun initOnnx(modelPath: String) {
@@ -162,10 +178,17 @@ object EmbeddingService {
         return vector
     }
 
+    @Synchronized
     fun close() {
-        session.close()
-        tokenizer.close()
-        env.close()
+        if (!initialized) return
+
+        try {
+            if (::session.isInitialized) session.close()
+            if (::tokenizer.isInitialized) tokenizer.close()
+            env.close()
+        } finally {
+            initialized = false
+        }
     }
 }
 

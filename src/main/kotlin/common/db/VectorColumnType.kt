@@ -28,5 +28,6 @@ class VectorColumnType(private val dim: Int) : ColumnType<String>() {
             value
         }
 
-    override fun nonNullValueToString(value: String): String = "'$value'"
+    override fun nonNullValueToString(value: String): String =
+        "'${value.replace("'", "''")}'"
 }

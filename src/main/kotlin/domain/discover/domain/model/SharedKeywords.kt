@@ -8,7 +8,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 
 /**
- * 유사한 키워드를 공유하고 있는 사용자 정부 일부와 키워드 정보 일부를 담고 있다.
+ * 유사한 키워드를 공유하고 있는 사용자 정보 일부와 키워드 정보 일부를 담고 있다.
  *
  * @property userId 사용자 ID
  * @property userName 사용자 명

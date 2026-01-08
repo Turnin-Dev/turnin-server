@@ -8,7 +8,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.discover.domain.model.SharedUserKeyword
 import com.peekr.domain.discover.domain.repository.DiscoverRepository
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals
@@ -36,12 +36,12 @@ class GetDiscoverContextUseCaseTest {
     fun `DiscoverContext 페이지네이션 조회 성공 테스트`() = runTest {
         // given: 3명의 사용자, 사용자 당 3개의 키워드 준비
         val targetUserId = UserId(1L)
-        val keywordCount = 3 // 각 사용자가 등록한 키워드 개수
-        val userCount = 3 // 사용자 개수
+        val keywordCount = 3 // 추가할 키워드 개수
+        val userCount = 3 // 추가할 사용자 개수 (사용자 ID는 2부터 시작)
         val pageSize = 2
 
         val sharedUserKeywords = List(userCount) { userIdx ->
-            val userId = userIdx + 1L
+            val userId = userIdx + 1L + 1L // 타겟 사용자 ID 제외하려면 2L 부터 생성해야 함
             List(keywordCount) { keywordIdx ->
                 val keywordId = keywordIdx + 1L
                 val userKeywordId = (userId * 10) + keywordId // 사용자 키워드 ID는 임의 생성
@@ -50,7 +50,7 @@ class GetDiscoverContextUseCaseTest {
         }.flatten()
 
         // findUserIdsWithSimilarKeywords 조회는 실제로 (pageSize + 1)개가 조회되기 때문에 3명이 조회되었다고 가정
-        val matchedUserIds = listOf(UserId(1L), UserId(2L), UserId(3L))
+        val matchedUserIds = listOf(UserId(2L), UserId(3L), UserId(4L))
         coEvery {
             discoverRepository.findUserIdsWithSimilarKeywords(
                 targetUserId = targetUserId,
@@ -60,7 +60,7 @@ class GetDiscoverContextUseCaseTest {
         } returns matchedUserIds
 
         // fetchSharedUserKeywords는 1, 2번 유저의 키워드만 요청받음 (pageSize가 2기 때문에)
-        val requestedIds = listOf(UserId(1L), UserId(2L))
+        val requestedIds = listOf(UserId(2L), UserId(3L))
         coEvery {
             discoverRepository.fetchSharedUserKeywords(any())
         } returns sharedUserKeywords.filter { it.userId in requestedIds }
@@ -72,14 +72,14 @@ class GetDiscoverContextUseCaseTest {
         // 페이지네이션 크기 검증
         assertEquals(pageSize, result.items.size)
 
-        // 데이터 순서 검증 (1, 2, 3) 순서이므로 순서 1, 2가 유지되어야 함
+        // 데이터 순서 검증 (2, 3, 4) 순서이므로 순서 2, 3이 유지되어야 함
         assertEquals(
-            1L,
+            2L,
             result.items[0]
                 .user.id.value,
         )
         assertEquals(
-            2L,
+            3L,
             result.items[1]
                 .user.id.value,
         )
@@ -90,7 +90,7 @@ class GetDiscoverContextUseCaseTest {
 
         // 다음 커서 및 페이지 존재 여부 검증
         assertNotNull(result.nextCursor, "데이터가 더 남아있으므로 nextCursor가 존재해야 한다.")
-        assertEquals(2L, result.nextCursor, "nextCursor는 현재 페이지의 마지막 유저 ID인 2여야 한다.")
+        assertEquals(3L, result.nextCursor, "nextCursor는 현재 페이지의 마지막 유저 ID인 2여야 한다.")
     }
 
     companion object {

@@ -1,6 +1,6 @@
 package com.peekr.common.util
 
-import com.peekr.util.TestDatabaseFactory
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.every
 import io.mockk.mockkObject
 import java.sql.SQLException
