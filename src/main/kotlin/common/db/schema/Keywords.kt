@@ -19,6 +19,6 @@ class KeywordEntity(id: EntityID<Long>) : BaseEntity(id, Keywords) {
     companion object : BaseEntityClass<KeywordEntity>(Keywords)
 
     var keyword by Keywords.keyword
-    val embedding by Keywords.embedding
+    var embedding by Keywords.embedding
     var createdBy by Keywords.createdBy
 }

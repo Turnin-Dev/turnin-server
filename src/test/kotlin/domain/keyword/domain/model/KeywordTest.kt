@@ -15,6 +15,7 @@ class KeywordTest {
             Keyword(
                 id = KeywordId(1),
                 name = KeywordName("test"),
+                embedding = "[0,1,0]",
                 createdBy = UserId(1),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),
@@ -28,6 +29,7 @@ class KeywordTest {
             Keyword(
                 id = KeywordId(1),
                 name = KeywordName("a".repeat(KeywordName.MAX_LENGTH + 1)),
+                embedding = "[0,1,0]",
                 createdBy = UserId(1),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),
@@ -41,6 +43,7 @@ class KeywordTest {
             Keyword(
                 id = KeywordId(1),
                 name = KeywordName(""),
+                embedding = "[0,1,0]",
                 createdBy = UserId(1),
                 createdAt = System.currentTimeMillis(),
                 updatedAt = System.currentTimeMillis(),

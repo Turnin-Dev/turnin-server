@@ -66,6 +66,7 @@ class GetKeywordByNameUseCaseTest {
         private val TestKeyword = Keyword(
             id = KeywordId(1L),
             name = TestKeywordName,
+            embedding = "[0,1,0]",
             createdBy = TestUserId,
             createdAt = 1000,
             updatedAt = 1000,

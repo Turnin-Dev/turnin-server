@@ -72,6 +72,9 @@ class EmbeddingService(
      * **[kotlinx.coroutines.Dispatchers.Default]에서 실행하는 것을 권장한다.**
      *
      * @param text 벡터를 생성할 텍스트
+     *
+     * @throws EmbeddingServiceException.TokenizationFailed 토큰화 실패시 예외가 발생한다.
+     * @throws EmbeddingServiceException.InferenceException 임베딩 과정에서 실패시 예외가 발생한다.
      */
     fun embed(text: String): String {
         check(initialized) { "EmbeddingService is not initialized." }

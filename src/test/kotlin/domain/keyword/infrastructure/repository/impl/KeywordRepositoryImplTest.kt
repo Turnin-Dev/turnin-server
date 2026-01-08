@@ -36,7 +36,11 @@ class KeywordRepositoryImplTest {
         val userId = insertUserAndReturnId()
 
         // when
-        val keyword = repository.create(TestKeywordName, userId)
+        val keyword = repository.create(
+            TestKeywordName,
+            TEST_EMBEDDED_KEYWORD,
+            userId,
+        )
 
         // then
         assertEquals(TestKeywordName, keyword.name)
@@ -47,7 +51,11 @@ class KeywordRepositoryImplTest {
     fun `findById 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val savedKeyword = repository.create(TestKeywordName, userId)
+        val savedKeyword = repository.create(
+            TestKeywordName,
+            TEST_EMBEDDED_KEYWORD,
+            userId,
+        )
 
         // when
         val keyword = repository.findById(savedKeyword.id)
@@ -75,7 +83,11 @@ class KeywordRepositoryImplTest {
         // given
         val userId = insertUserAndReturnId()
         val expectedKeywords = List(5) {
-            repository.create(KeywordName(it.toString()), userId)
+            repository.create(
+                KeywordName(it.toString()),
+                TEST_EMBEDDED_KEYWORD,
+                userId,
+            )
         }
 
         // when
@@ -99,7 +111,11 @@ class KeywordRepositoryImplTest {
     fun `findByName 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
-        val savedKeyword = repository.create(TestKeywordName, userId)
+        val savedKeyword = repository.create(
+            TestKeywordName,
+            TEST_EMBEDDED_KEYWORD,
+            userId,
+        )
 
         // when
         val keyword = repository.findByName(savedKeyword.name)
@@ -139,5 +155,6 @@ class KeywordRepositoryImplTest {
 
     companion object {
         private val TestKeywordName = KeywordName("keyword")
+        private const val TEST_EMBEDDED_KEYWORD = "[1,0,1]"
     }
 }

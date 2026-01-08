@@ -313,6 +313,7 @@ class UserKeywordRepositoryImplTest {
     ): KeywordId = TestDatabaseFactory.dbQuery {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keyword
+            this.embedding = "embedding"
             this.createdBy = EntityID(userId.value, Users)
         }
         KeywordId(savedKeyword.id.value)

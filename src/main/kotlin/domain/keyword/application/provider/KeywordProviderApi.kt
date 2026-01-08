@@ -5,12 +5,17 @@ import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.keyword.application.dto.KeywordDto
 import com.peekr.domain.keyword.application.dto.toDto
+import com.peekr.domain.keyword.application.usecase.CreateKeywordUseCase
 import com.peekr.domain.keyword.domain.repository.KeywordRepository
+import com.peekr.domain.keyword.exception.KeywordException
 
 /**
  * 외부로 제공할 키워드 API
  */
-class KeywordProviderApi(private val keywordRepository: KeywordRepository) {
+class KeywordProviderApi(
+    private val keywordRepository: KeywordRepository,
+    private val createKeywordUseCase: CreateKeywordUseCase,
+) {
     /**
      * 키워드 ID를 통해 키워드 DTO를 조회한다.
      *
@@ -48,13 +53,12 @@ class KeywordProviderApi(private val keywordRepository: KeywordRepository) {
      * @param createdBy 키워드를 생성한 사용자 ID
      *
      * @return [KeywordDto] 키워드 DTO
+     *
+     * @throws KeywordException.EmbeddingFailed 임베딩 과정에서 에러 발생 시 예외가 발생한다.
      */
     suspend fun create(
         keywordName: String,
         createdBy: UserId,
-    ): KeywordDto {
-        val keywordNameVO = KeywordName(keywordName)
-        val savedKeyword = keywordRepository.create(keywordNameVO, createdBy)
-        return savedKeyword.toDto()
-    }
+    ): KeywordDto =
+        createKeywordUseCase(keywordName, createdBy)
 }
