@@ -44,7 +44,7 @@ class EmbeddingService(
             if (::session.isInitialized) {
                 session.close()
             }
-            throw EmbeddingServiceException.InitializationFailed()
+            throw EmbeddingServiceException.InitializationFailed(e)
         }
     }
 
@@ -84,7 +84,7 @@ class EmbeddingService(
             tokenizer.encode(text)
         } catch (e: Exception) {
             LOGGER.error("text tokenization failed: $text, cause: ${e.message}")
-            throw EmbeddingServiceException.TokenizationFailed()
+            throw EmbeddingServiceException.TokenizationFailed(e)
         }
 
         val inputIds = encoding.ids
@@ -137,7 +137,7 @@ class EmbeddingService(
             }
         } catch (e: Exception) {
             LOGGER.error("embedding inference failed: $text, cause: ${e.message}")
-            throw EmbeddingServiceException.InferenceException()
+            throw EmbeddingServiceException.InferenceException(e)
         } finally {
             closeables.forEach { it.close() }
         }

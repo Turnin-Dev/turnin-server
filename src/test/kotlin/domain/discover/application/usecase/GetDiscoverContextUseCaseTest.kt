@@ -59,7 +59,7 @@ class GetDiscoverContextUseCaseTest {
             )
         } returns matchedUserIds
 
-        // fetchSharedUserKeywords는 1, 2번 유저의 키워드만 요청받음 (pageSize가 2기 때문에)
+        // fetchSharedUserKeywords는 2, 3번 유저의 키워드만 요청받음 (pageSize가 2기 때문에)
         val requestedIds = listOf(UserId(2L), UserId(3L))
         coEvery {
             discoverRepository.fetchSharedUserKeywords(any())
