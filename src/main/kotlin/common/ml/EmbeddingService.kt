@@ -80,9 +80,13 @@ class EmbeddingService(
         check(initialized) { "EmbeddingService is not initialized." }
 
         val encoding = try {
-            if (text.isEmpty() || text.isBlank()) throw EmbeddingServiceException.TokenizationFailed()
+            if (text.isEmpty() || text.isBlank()) {
+                LOGGER.error("text is empty or blank")
+                throw EmbeddingServiceException.TokenizationFailed()
+            }
             tokenizer.encode(text)
         } catch (e: Exception) {
+            if (e is EmbeddingServiceException.TokenizationFailed) throw e
             LOGGER.error("text tokenization failed: $text, cause: ${e.message}")
             throw EmbeddingServiceException.TokenizationFailed(e)
         }
