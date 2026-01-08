@@ -90,7 +90,7 @@ class GetDiscoverContextUseCaseTest {
 
         // 다음 커서 및 페이지 존재 여부 검증
         assertNotNull(result.nextCursor, "데이터가 더 남아있으므로 nextCursor가 존재해야 한다.")
-        assertEquals(3L, result.nextCursor, "nextCursor는 현재 페이지의 마지막 유저 ID인 2여야 한다.")
+        assertEquals(3L, result.nextCursor, "nextCursor는 현재 페이지의 마지막 유저 ID인 3이어야 한다.")
     }
 
     companion object {

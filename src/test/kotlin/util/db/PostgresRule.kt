@@ -23,6 +23,7 @@ class PostgresRule : ExternalResource() {
 
     override fun after() {
         TestDBContainerFactory.cleanUp()
+        TestDBContainerFactory.shutdown()
     }
 
     suspend fun <T> dbQuery(block: () -> T): T =
@@ -36,18 +37,19 @@ class PostgresRule : ExternalResource() {
  */
 private object TestDBContainerFactory {
     private var database: Database? = null
+    private lateinit var container: PostgreSQLContainer<Nothing>
 
     fun init() {
         if (database != null) return
 
-        val container = PostgreSQLContainer<Nothing>("pgvector/pgvector:pg16").apply {
+        container = PostgreSQLContainer<Nothing>("pgvector/pgvector:pg16").apply {
             withDatabaseName("testdb2")
             withUsername("test")
             withPassword("test")
             start()
         }
 
-        Database.connect(
+        database = Database.connect(
             url = container.jdbcUrl,
             driver = "org.postgresql.Driver",
             user = container.username,
@@ -90,6 +92,11 @@ private object TestDBContainerFactory {
             SchemaUtils.drop(Users, Keywords, UserKeywords)
             SchemaUtils.create(Users, Keywords, UserKeywords)
         }
+    }
+
+    fun shutdown() {
+        container.stop()
+        database = null
     }
 
     suspend fun <T> dbQuery(block: () -> T): T =

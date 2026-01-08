@@ -24,7 +24,7 @@ sealed class EmbeddingServiceException(
     class TokenizationFailed :
         EmbeddingServiceException(
             code = EmbeddingServiceErrorCode.TokenizationFailed,
-            status = HttpStatusCode.BadRequest,
+            status = HttpStatusCode.InternalServerError,
         )
 
     /** 임베딩 서비스 초기화 실패 예외 */

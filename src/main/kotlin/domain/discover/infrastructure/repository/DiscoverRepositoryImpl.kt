@@ -25,7 +25,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         cursor: Long?,
         pageSize: Int,
     ): List<UserId> = suspendTransaction {
-        val cursorCondition = if (cursor != null) "AND uk_other.user_id < $cursor" else ""
+        val cursorCondition = if (cursor != null) "AND uk_other.user_id < ?" else ""
         val limitPlusOne = pageSize + 1
 
         val sql = """

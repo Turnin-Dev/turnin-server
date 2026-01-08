@@ -13,7 +13,6 @@ import com.peekr.common.plugin.configureContentNegotiation
 import com.peekr.common.plugin.configureCors
 import com.peekr.common.plugin.configureResources
 import com.peekr.common.plugin.configureRouting
-import com.peekr.common.util.AppLoggerFactory
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
 
@@ -48,5 +47,3 @@ fun Application.module() {
     // ------------------------------ Embedding Service cleanup ------------------------------
     embeddingResourceAutoCleanup()
 }
-
-private val LOGGER = AppLoggerFactory.createLogger("Application")
