@@ -17,8 +17,6 @@ interface UserKeywordRepository {
     /**
      * 사용자 ID를 통해 사용자별 키워드 리스트를 조회한다.
      *
-     * 리스트 조회 시에는 키워드 내용의 일부만 가져온다.
-     *
      * @param userId 사용자 ID
      */
     suspend fun findListByUserId(userId: UserId): List<UserKeyword>

@@ -49,8 +49,10 @@ object Api {
         object UserKeyword {
             const val ROUTE = "/user-keyword"
             const val TAG = "UserKeyword"
-            const val GET_DESCRIPTION = "/description"
-            const val PATCH_DESCRIPTION = "/description"
+            const val GET_DESCRIPTION = "$ROUTE/description"
+            const val PATCH_DESCRIPTION = "$ROUTE/description"
+
+            fun detail(pathParamName: String): String = "$ROUTE/$pathParamName/detail"
         }
 
         object Report {
