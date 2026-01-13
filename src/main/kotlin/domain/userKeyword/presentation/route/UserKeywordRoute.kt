@@ -9,6 +9,7 @@ import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.DescriptionResponse
 import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
+import com.peekr.domain.userKeyword.presentation.dto.UserKeywordDetailResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
 import com.peekr.domain.userKeyword.presentation.dto.toDto
@@ -51,7 +52,19 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        get(route.detail(pathParamName = "userKeywordId"), { }) {
+        get(route.detail(pathParam = "{userKeywordId}"), { getUserKeywordDetailDocs() }) {
+            val userKeywordIdParam = call.parameters["userKeywordId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 키워드 ID")
+            val withUserInfoParam = call.queryParameters["withUserInfo"]
+                ?.toBooleanStrictOrNull()
+                .inputValidationAndReturn("사용자 정보 포함 여부")
+            val userKeywordDto = usecase.getDetail(userKeywordIdParam, withUserInfoParam)
+            if (userKeywordDto != null) {
+                call.respond(userKeywordDto.toResponse())
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
         }
 
         post(route.ROUTE, { createUserKeywordDocs() }) {
@@ -117,6 +130,29 @@ private fun RouteConfig.getUserKeywordsDocs() {
                 description = "사용자 키워드 목록"
                 example("NonEmpty") { value = UserKeywordsResponse.sample }
                 example("Empty") { value = UserKeywordsResponse.sample.copy(emptyList()) }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getUserKeywordDetailDocs() {
+    summary = "사용자 키워드 상세 정보 조회"
+    description = "사용자 키워드 상세 정보를 조회한다.\n" +
+        "상세 정보에는 키워드 정보, 사용자 정보 일부가 포함되어있다."
+    request {
+        pathParameter<Long>("userKeywordId") {
+            description = "사용자 키워드 일부"
+        }
+        queryParameter<Boolean>("withUserInfo") {
+            description = "사용자 정보 포함 여부"
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<UserKeywordDetailResponse> {
+                description = "사용자 키워드 상세 정보 응답바디"
+                example("With UserInfo") { value = UserKeywordDetailResponse.sample }
+                example("Without UserInfo") { value = UserKeywordDetailResponse.sample.copy(userInfo = null) }
             }
         }
     }

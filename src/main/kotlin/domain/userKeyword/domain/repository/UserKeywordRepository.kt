@@ -5,6 +5,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
 
 interface UserKeywordRepository {
     /**
@@ -30,6 +31,19 @@ interface UserKeywordRepository {
      * @return 사용자별 키워드를 찾으면 [UserKeyword]를 반환하고 만약 없다면 `null`을 반환한다.
      */
     suspend fun findByKeywordIdAndUserId(keywordId: KeywordId, userId: UserId): UserKeyword?
+
+    /**
+     * 사용자 키워드 상세 정보를 조회한다.
+     *
+     * @param userKeywordId 사용자 키워드 ID
+     * @param withUserInfo 사용자 정보 포함 여부
+     *
+     * @return [UserKeywordDetail]
+     */
+    suspend fun findUserKeywordDetail(
+        userKeywordId: UserKeywordId,
+        withUserInfo: Boolean,
+    ): UserKeywordDetail?
 
     /**
      * 사용자 키워드 ID를 통해 사용자 키워드 설명을 조회한다.

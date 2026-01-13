@@ -52,7 +52,7 @@ object Api {
             const val GET_DESCRIPTION = "$ROUTE/description"
             const val PATCH_DESCRIPTION = "$ROUTE/description"
 
-            fun detail(pathParamName: String): String = "$ROUTE/$pathParamName/detail"
+            fun detail(pathParam: String): String = "$ROUTE/$pathParam/detail"
         }
 
         object Report {

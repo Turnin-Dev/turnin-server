@@ -26,4 +26,13 @@ sealed class UserKeywordException(
             code = UserKeywordErrorCode.CountLimitReached,
             status = HttpStatusCode.BadRequest,
         )
+
+    class DataNotFound(
+        field: String,
+        message: String,
+    ) : UserKeywordException(
+            code = UserKeywordErrorCode.DataNotFound(field),
+            status = HttpStatusCode.NotFound,
+            message = message,
+        )
 }

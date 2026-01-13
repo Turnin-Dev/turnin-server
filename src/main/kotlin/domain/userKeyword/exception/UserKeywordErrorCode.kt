@@ -13,7 +13,10 @@ sealed class UserKeywordErrorCode(
     data object NotExistsKeyword : UserKeywordErrorCode(UK001, "존재하지 않은 키워드입니다.")
 
     data object CountLimitReached : UserKeywordErrorCode(UK002, "키워드 개수 제한을 초과했습니다.")
+
+    data class DataNotFound(val field: String) : UserKeywordErrorCode(UK003, "$field 항목을 찾을 수 없습니다.")
 }
 
 private const val UK001 = "UK001"
 private const val UK002 = "UK002"
+private const val UK003 = "UK003"

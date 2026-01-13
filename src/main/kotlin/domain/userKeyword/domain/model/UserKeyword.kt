@@ -5,7 +5,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 
 /**
- * 사용자별 키워드
+ * 사용자 키워드 기본 모델
  *
  * @property id 사용자별 키워드 ID
  * @property keywordId 키워드 ID

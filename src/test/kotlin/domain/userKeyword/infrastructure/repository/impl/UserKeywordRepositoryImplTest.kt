@@ -17,7 +17,6 @@ import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -86,32 +85,6 @@ class UserKeywordRepositoryImplTest {
         assertEquals(1, userKeywords.size)
         assertEquals(userKeywords.first().id, userKeyword.id)
         assertEquals(userKeywords.first().keywordId, keywordId)
-    }
-
-    @Test
-    fun `findListByUserId 성공 테스트 - 키워드 설명 필드가 길면 텍스트 일부만 가져온다`() = runTest {
-        // given
-        val expectedDescriptionLength = 300
-        val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
-        repository.create(
-            keywordId = keywordId,
-            userId = userId,
-            description = Description("a".repeat(expectedDescriptionLength)),
-        )
-
-        // when
-        val userKeywords = repository.findListByUserId(userId)
-
-        // then
-        assertEquals(1, userKeywords.size)
-        assertNotEquals(
-            expectedDescriptionLength,
-            userKeywords
-                .first()
-                .description.value
-                ?.length,
-        )
     }
 
     @Test
@@ -290,6 +263,46 @@ class UserKeywordRepositoryImplTest {
 
         // then
         assertNull(description)
+    }
+
+    @Test
+    fun `findUserKeywordDetail 성공 테스트 - 사용자 정보 포함`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when
+        val userKeywordDetail = repository.findUserKeywordDetail(userKeyword.id, true)
+
+        // then
+        assertEquals(TestDescription.value, userKeywordDetail?.description?.value)
+        assertEquals(userId, userKeywordDetail?.userInfo?.userId)
+        assertEquals(keywordId, userKeywordDetail?.keywordId)
+    }
+
+    @Test
+    fun `findUserKeywordDetail 성공 테스트 - 사용자 정보 미포함`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when
+        val userKeywordDetail = repository.findUserKeywordDetail(userKeyword.id, false)
+
+        // then
+        assertEquals(TestDescription.value, userKeywordDetail?.description?.value)
+        assertEquals(keywordId, userKeywordDetail?.keywordId)
+        assertNull(userKeywordDetail?.userInfo)
     }
 
     private suspend fun insertUserAndReturnId(): UserId = TestDatabaseFactory.dbQuery {

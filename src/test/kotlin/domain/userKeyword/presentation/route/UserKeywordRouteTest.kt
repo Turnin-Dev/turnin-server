@@ -3,12 +3,16 @@ package com.peekr.domain.userKeyword.presentation.route
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.jwt.JWTTestDoubles
+import com.peekr.common.model.KeywordName.Companion.invoke
+import com.peekr.common.model.UserName.Companion.invoke
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.common.route.Api
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.DescriptionDto
+import com.peekr.domain.userKeyword.application.dto.UserInfoDto
+import com.peekr.domain.userKeyword.application.dto.UserKeywordDetailDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
@@ -16,7 +20,10 @@ import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
+import com.peekr.domain.userKeyword.presentation.dto.toResponse
+import com.peekr.domain.userKeyword.presentation.route.UserKeywordRouteTest.Companion.TestUserKeywordDetailDto
 import com.peekr.util.TestClientFactory.createTestClient
+import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPlugin
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -267,7 +274,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -305,7 +312,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -339,7 +346,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -375,7 +382,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.PATCH_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.patch(endpoint) {
             url {
                 parameters.append("ownerId", TestUserId.value.toString())
@@ -527,7 +534,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())
@@ -558,7 +565,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())
@@ -585,7 +592,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())
@@ -615,7 +622,7 @@ class UserKeywordRouteTest {
         )
 
         // when
-        val endpoint = "${route.ROUTE}${route.GET_DESCRIPTION}"
+        val endpoint = route.PATCH_DESCRIPTION
         val response = client.get(endpoint) {
             url {
                 parameters.append("userKeywordId", TestUserKeywordId.value.toString())
@@ -628,6 +635,59 @@ class UserKeywordRouteTest {
         // then
         assertEquals(expectedException.status, response.status)
         assertTrue(responseBody.contains(expectedException.errorCode.code))
+    }
+
+    @Test
+    fun `사용자 키워드 상세 정보 조회 - 사용자 정보 포함 요청 성공 테스트`() = testApplication {
+        // given
+        val route = Api.V1.UserKeyword
+        coEvery {
+            userKeywordUseCases.getDetail(TestUserKeywordId.value, true)
+        } returns TestUserKeywordDetailDto
+
+        // when, then
+        testGetEndpoint(
+            endpoint = route.detail(TestUserKeywordId.value.toString()),
+            queryParameters = mapOf("withUserInfo" to "true"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                val expectedResponse = Json.encodeToString(TestUserKeywordDetailDto.toResponse())
+                containsAll(expectedResponse)
+            },
+        )
+    }
+
+    @Test
+    fun `사용자 키워드 상세 정보 조회 - 사용자 정보 미포함 요청 성공 테스트`() = testApplication {
+        // given
+        val route = Api.V1.UserKeyword
+        val expectedDetail = TestUserKeywordDetailDto.copy(userInfo = null)
+        coEvery {
+            userKeywordUseCases.getDetail(TestUserKeywordId.value, false)
+        } returns expectedDetail
+
+        // when, then
+        testGetEndpoint(
+            endpoint = route.detail(TestUserKeywordId.value.toString()),
+            queryParameters = mapOf("withUserInfo" to "false"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                val expectedResponse = Json.encodeToString(expectedDetail.toResponse())
+                containsAll(expectedResponse)
+            },
+        )
     }
 
     companion object {
@@ -657,5 +717,18 @@ class UserKeywordRouteTest {
         )
         private val TestDescriptionDto = DescriptionDto(value = TestDescription.value)
         private val TestUpdateDescriptionRequest = UpdateDescriptionRequest(description = TestDescription.value)
+        private val TestUserKeywordDetailDto = UserKeywordDetailDto(
+            userKeywordId = TestUserKeywordId.value,
+            keywordId = 1L,
+            keywordName = "keyword",
+            description = "description",
+            userInfo = UserInfoDto(
+                userId = 1L,
+                userName = "user",
+                profileImageUrl = "https://image.com/image.jpg",
+            ),
+            createdAt = 1000,
+            updatedAt = 1000,
+        )
     }
 }

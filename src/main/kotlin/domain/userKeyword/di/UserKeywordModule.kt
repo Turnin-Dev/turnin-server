@@ -31,6 +31,7 @@ val userKeywordModule = module {
             get(),
             get(),
             get(),
+            get(),
         )
     }
 }

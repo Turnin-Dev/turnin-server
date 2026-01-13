@@ -10,12 +10,15 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDetail
 import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 
@@ -53,6 +56,41 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 (UserKeywords.keywordId eq keywordId.value) and
                     (UserKeywords.userId eq userId.value),
             ).map { it.toDomain() }
+            .singleOrNull()
+    }
+
+    override suspend fun findUserKeywordDetail(
+        userKeywordId: UserKeywordId,
+        withUserInfo: Boolean,
+    ): UserKeywordDetail? = suspendTransaction {
+        val joinQuery = UserKeywords
+            .innerJoin(
+                otherTable = Keywords,
+                onColumn = { UserKeywords.keywordId },
+                otherColumn = { Keywords.id },
+            ).let {
+                if (withUserInfo) {
+                    it.innerJoin(
+                        otherTable = Users,
+                        onColumn = { UserKeywords.userId },
+                        otherColumn = { Users.id },
+                    )
+                } else {
+                    it
+                }
+            }
+
+        joinQuery
+            .select(
+                UserKeywords.id,
+                UserKeywords.keywordId,
+                UserKeywords.description,
+                UserKeywords.createdAt,
+                UserKeywords.updatedAt,
+                Keywords.keyword,
+                *(if (withUserInfo) arrayOf(Users.id, Users.name, Users.profileImageUrl) else emptyArray()),
+            ).where { UserKeywords.id eq userKeywordId.value }
+            .map { it.toDetail(withUserInfo) }
             .singleOrNull()
     }
 
