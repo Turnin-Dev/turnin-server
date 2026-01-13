@@ -59,7 +59,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             .singleOrNull()
     }
 
-    override suspend fun findUserKeywordDetail(
+    override suspend fun getDetailById(
         userKeywordId: UserKeywordId,
         withUserInfo: Boolean,
     ): UserKeywordDetail? = suspendTransaction {
@@ -92,6 +92,23 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             ).where { UserKeywords.id eq userKeywordId.value }
             .map { it.toDetail(withUserInfo) }
             .singleOrNull()
+    }
+
+    override suspend fun getDetailsByUserId(userId: UserId): List<UserKeywordDetail> = suspendTransaction {
+        UserKeywords
+            .innerJoin(
+                otherTable = Keywords,
+                onColumn = { UserKeywords.keywordId },
+                otherColumn = { Keywords.id },
+            ).select(
+                UserKeywords.id,
+                UserKeywords.keywordId,
+                UserKeywords.description,
+                UserKeywords.createdAt,
+                UserKeywords.updatedAt,
+                Keywords.keyword,
+            ).where { UserKeywords.userId eq userId.value }
+            .map { it.toDetail(withUserInfo = false) }
     }
 
     override suspend fun findDescriptionById(

@@ -266,7 +266,7 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
-    fun `findUserKeywordDetail 성공 테스트 - 사용자 정보 포함`() = runTest {
+    fun `getDetailById 성공 테스트 - 사용자 정보 포함`() = runTest {
         // given
         val userId = insertUserAndReturnId()
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
@@ -277,7 +277,7 @@ class UserKeywordRepositoryImplTest {
         )
 
         // when
-        val userKeywordDetail = repository.findUserKeywordDetail(userKeyword.id, true)
+        val userKeywordDetail = repository.getDetailById(userKeyword.id, true)
 
         // then
         assertEquals(TestDescription.value, userKeywordDetail?.description?.value)
@@ -286,7 +286,7 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
-    fun `findUserKeywordDetail 성공 테스트 - 사용자 정보 미포함`() = runTest {
+    fun `getDetailById 성공 테스트 - 사용자 정보 미포함`() = runTest {
         // given
         val userId = insertUserAndReturnId()
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
@@ -297,12 +297,41 @@ class UserKeywordRepositoryImplTest {
         )
 
         // when
-        val userKeywordDetail = repository.findUserKeywordDetail(userKeyword.id, false)
+        val userKeywordDetail = repository.getDetailById(userKeyword.id, false)
 
         // then
         assertEquals(TestDescription.value, userKeywordDetail?.description?.value)
         assertEquals(keywordId, userKeywordDetail?.keywordId)
         assertNull(userKeywordDetail?.userInfo)
+    }
+
+    @Test
+    fun `getDetailsByUserId 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when
+        val userKeywordDetails = repository.getDetailsByUserId(userId)
+
+        // then
+        assertEquals(1, userKeywordDetails.size)
+        assertEquals(userKeyword.id, userKeywordDetails.first().userKeywordId)
+        assertEquals(userKeyword.keywordId, userKeywordDetails.first().keywordId)
+    }
+
+    @Test
+    fun `getDetailsByUserId 성공 테스트 - 데이터가 없는 경우 빈 리스트를 반환한다`() = runTest {
+        // when
+        val userKeywordDetails = repository.getDetailsByUserId(UserId(100L))
+
+        // then
+        assertTrue(userKeywordDetails.isEmpty())
     }
 
     private suspend fun insertUserAndReturnId(): UserId = TestDatabaseFactory.dbQuery {

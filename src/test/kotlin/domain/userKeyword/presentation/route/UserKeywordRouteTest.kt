@@ -3,8 +3,6 @@ package com.peekr.domain.userKeyword.presentation.route
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.jwt.JWTTestDoubles
-import com.peekr.common.model.KeywordName.Companion.invoke
-import com.peekr.common.model.UserName.Companion.invoke
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
@@ -21,7 +19,6 @@ import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
 import com.peekr.domain.userKeyword.presentation.dto.toResponse
-import com.peekr.domain.userKeyword.presentation.route.UserKeywordRouteTest.Companion.TestUserKeywordDetailDto
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPlugin

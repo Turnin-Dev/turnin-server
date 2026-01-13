@@ -33,17 +33,24 @@ interface UserKeywordRepository {
     suspend fun findByKeywordIdAndUserId(keywordId: KeywordId, userId: UserId): UserKeyword?
 
     /**
-     * 사용자 키워드 상세 정보를 조회한다.
+     * 사용자 키워드 ID로 사용자 키워드 상세 정보를 조회한다.
      *
      * @param userKeywordId 사용자 키워드 ID
      * @param withUserInfo 사용자 정보 포함 여부
      *
      * @return [UserKeywordDetail]
      */
-    suspend fun findUserKeywordDetail(
+    suspend fun getDetailById(
         userKeywordId: UserKeywordId,
         withUserInfo: Boolean,
     ): UserKeywordDetail?
+
+    /**
+     * 사용자 ID로 사용자의 키워드 상세 정보 리스트를 조회한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun getDetailsByUserId(userId: UserId): List<UserKeywordDetail>
 
     /**
      * 사용자 키워드 ID를 통해 사용자 키워드 설명을 조회한다.

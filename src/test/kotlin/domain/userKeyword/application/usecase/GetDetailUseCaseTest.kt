@@ -18,15 +18,15 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 
-class GetUserKeywordDetailUseCaseTest {
+class GetDetailUseCaseTest {
     private val userKeywordRepository = mockk<UserKeywordRepository>()
-    private val usecase = GetUserKeywordDetailUseCase(userKeywordRepository)
+    private val usecase = GetDetailUseCase(userKeywordRepository)
 
     @Test
     fun `사용자 정보를 포함하여 사용자 키워드 상세 정보 조회 시 정상적으로 값을 반환한다`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.findUserKeywordDetail(TestUserKeywordId, true)
+            userKeywordRepository.getDetailById(TestUserKeywordId, true)
         } returns TestUserKeywordDetail
 
         // when
@@ -42,7 +42,7 @@ class GetUserKeywordDetailUseCaseTest {
         // given
         val expectedDetail = TestUserKeywordDetail.copy(userInfo = null)
         coEvery {
-            userKeywordRepository.findUserKeywordDetail(TestUserKeywordId, false)
+            userKeywordRepository.getDetailById(TestUserKeywordId, false)
         } returns expectedDetail
 
         // when
@@ -57,7 +57,7 @@ class GetUserKeywordDetailUseCaseTest {
     fun `리포지토리에서 값을 찾지 못할 때 NULL을 반환한다`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.findUserKeywordDetail(TestUserKeywordId, false)
+            userKeywordRepository.getDetailById(TestUserKeywordId, false)
         } returns null
 
         // when

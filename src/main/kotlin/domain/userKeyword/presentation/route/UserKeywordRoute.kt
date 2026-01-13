@@ -52,7 +52,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        get(route.detail(pathParam = "{userKeywordId}"), { getUserKeywordDetailDocs() }) {
+        get(route.detail(pathParam = "{userKeywordId}"), { getDetailDocs() }) {
             val userKeywordIdParam = call.parameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
@@ -135,7 +135,7 @@ private fun RouteConfig.getUserKeywordsDocs() {
     }
 }
 
-private fun RouteConfig.getUserKeywordDetailDocs() {
+private fun RouteConfig.getDetailDocs() {
     summary = "사용자 키워드 상세 정보 조회"
     description = "사용자 키워드 상세 정보를 조회한다.\n" +
         "상세 정보에는 키워드 정보, 사용자 정보 일부가 포함되어있다."
