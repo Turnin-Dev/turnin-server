@@ -115,7 +115,9 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
 
 private fun RouteConfig.getUserKeywordsDocs() {
     summary = "사용자 키워드 목록 조회"
-    description = "사용자 ID로 사용자 키워드 목록을 조회한다."
+    deprecated = true
+    description = "(사용자 ID로 사용자 키워드 목록을 조회한다.)\n" +
+        "이 API는 더 이상 사용되지 않습니다. 대신 /api/v1/user/{userId}/keywords를 사용하세요."
     request {
         queryParameter<Long>("userId") {
             description = "사용자 ID"
