@@ -35,6 +35,16 @@ fun AuthenticatedRoute.externalUserKeywordRoutes(
             call.respond(userKeywordDetailsDto.map { it.toResponse() })
         }
     }
+
+    route({
+        tags = setOf(route.TAG)
+    }) {
+        get("${route.ROUTE}/me/keywords", { getMyDetailsDocs() }) {
+            val userId = extractUserIdWithToken()
+            val userKeywordDetailsDto = usecase.getDetails(userId.value)
+            call.respond(userKeywordDetailsDto.map { it.toResponse() })
+        }
+    }
 }
 
 private fun RouteConfig.getDetailsDocs() {
@@ -45,6 +55,22 @@ private fun RouteConfig.getDetailsDocs() {
             description = "사용자 ID"
         }
     }
+    response {
+        code(HttpStatusCode.OK) {
+            body<List<UserKeywordDetailResponse>> {
+                example("UserKeywordDetailsResponse") {
+                    value = List(2) {
+                        UserKeywordDetailResponse.sample.copy(userInfo = null)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getMyDetailsDocs() {
+    summary = "나의 사용자 키워드 상세 정보 리스트 조회"
+    description = "나의 사용자 키워드 상세 정보 리스트를 조회한다."
     response {
         code(HttpStatusCode.OK) {
             body<List<UserKeywordDetailResponse>> {

@@ -143,7 +143,7 @@ private fun RouteConfig.getDetailDocs() {
         "상세 정보에는 키워드 정보, 사용자 정보 일부가 포함되어있다."
     request {
         pathParameter<Long>("userKeywordId") {
-            description = "사용자 키워드 일부"
+            description = "사용자 키워드 ID"
         }
         queryParameter<Boolean>("withUserInfo") {
             description = "사용자 정보 포함 여부"

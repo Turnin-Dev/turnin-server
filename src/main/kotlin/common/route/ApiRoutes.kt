@@ -28,9 +28,11 @@ object Api {
         object User {
             const val ROUTE = "/user"
             const val TAG = "User"
-            const val MY_PROFILE = "/profile/me"
-            const val PROFILE = "/profile"
             const val INTRODUCE = "/introduce"
+
+            fun myProfile(): String = "/me/profile"
+
+            fun profile(pathParam: String): String = "/$pathParam/profile"
         }
 
         object File {
