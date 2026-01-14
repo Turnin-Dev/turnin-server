@@ -34,11 +34,7 @@ fun AuthenticatedRoute.externalUserKeywordRoutes(
             val userKeywordDetailsDto = usecase.getDetails(userId)
             call.respond(userKeywordDetailsDto.map { it.toResponse() })
         }
-    }
 
-    route({
-        tags = setOf(route.TAG)
-    }) {
         get("${route.ROUTE}/me/keywords", { getMyDetailsDocs() }) {
             val userId = extractUserIdWithToken()
             val userKeywordDetailsDto = usecase.getDetails(userId.value)
