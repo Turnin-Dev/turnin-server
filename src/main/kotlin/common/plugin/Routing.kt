@@ -16,6 +16,7 @@ import com.peekr.domain.report.presentation.route.reportRoutes
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.presentation.route.userRoutes
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
+import com.peekr.domain.userKeyword.presentation.route.externalUserKeywordRoutes
 import com.peekr.domain.userKeyword.presentation.route.userKeywordRoutes
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
@@ -50,6 +51,9 @@ fun Application.configureRouting() {
                     reportRoutes(route = Api.V1.Report, usecase = reportUseCases)
                     friendRoutes(route = Api.V1.Friend, usecase = friendUseCases)
                     discoverRoutes(route = Api.V1.Discover, usecase = discoverUseCases)
+
+                    // 도메인과 API 명세서에 표시되는 위치가 다른 라우트
+                    externalUserKeywordRoutes(route = Api.V1.User, usecase = userKeywordUseCases)
                 }
             }
         }

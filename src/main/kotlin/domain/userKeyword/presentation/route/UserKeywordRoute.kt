@@ -9,6 +9,7 @@ import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.DescriptionResponse
 import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
+import com.peekr.domain.userKeyword.presentation.dto.UserKeywordDetailResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
 import com.peekr.domain.userKeyword.presentation.dto.toDto
@@ -24,11 +25,11 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 
 fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: UserKeywordUseCases) {
-    route(route.ROUTE, {
+    route({
         tags = setOf(route.TAG)
         description = "User Keyword API"
     }) {
-        get({ getUserKeywordsDocs() }) {
+        get(route.ROUTE, { getUserKeywordsDocs() }) {
             val userId = call.queryParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
@@ -51,7 +52,22 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        post({ createUserKeywordDocs() }) {
+        get(route.detail(pathParam = "{userKeywordId}"), { getDetailDocs() }) {
+            val userKeywordIdParam = call.parameters["userKeywordId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 키워드 ID")
+            val withUserInfoParam = call.queryParameters["withUserInfo"]
+                ?.toBooleanStrictOrNull()
+                .inputValidationAndReturn("사용자 정보 포함 여부")
+            val userKeywordDto = usecase.getDetail(userKeywordIdParam, withUserInfoParam)
+            if (userKeywordDto != null) {
+                call.respond(userKeywordDto.toResponse())
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
+
+        post(route.ROUTE, { createUserKeywordDocs() }) {
             val createUserKeywordRequest = call.receive<CreateUserKeywordRequest>()
             val ownerId = UserId(createUserKeywordRequest.userId)
             verifyAuthUserId(ownerId)
@@ -80,7 +96,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        delete({ deleteUserKeywordDocs() }) {
+        delete(route.ROUTE, { deleteUserKeywordDocs() }) {
             val userKeywordIdParam = call.queryParameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
@@ -99,7 +115,9 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
 
 private fun RouteConfig.getUserKeywordsDocs() {
     summary = "사용자 키워드 목록 조회"
-    description = "사용자 ID로 사용자 키워드 목록을 조회한다."
+    deprecated = true
+    description = "(사용자 ID로 사용자 키워드 목록을 조회한다.)\n" +
+        "이 API는 더 이상 사용되지 않습니다. 대신 /api/v1/user/{userId}/keywords를 사용하세요."
     request {
         queryParameter<Long>("userId") {
             description = "사용자 ID"
@@ -114,6 +132,29 @@ private fun RouteConfig.getUserKeywordsDocs() {
                 description = "사용자 키워드 목록"
                 example("NonEmpty") { value = UserKeywordsResponse.sample }
                 example("Empty") { value = UserKeywordsResponse.sample.copy(emptyList()) }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getDetailDocs() {
+    summary = "사용자 키워드 상세 정보 조회"
+    description = "사용자 키워드 상세 정보를 조회한다.\n" +
+        "상세 정보에는 키워드 정보, 사용자 정보 일부가 포함되어있다."
+    request {
+        pathParameter<Long>("userKeywordId") {
+            description = "사용자 키워드 ID"
+        }
+        queryParameter<Boolean>("withUserInfo") {
+            description = "사용자 정보 포함 여부"
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<UserKeywordDetailResponse> {
+                description = "사용자 키워드 상세 정보 응답바디"
+                example("With UserInfo") { value = UserKeywordDetailResponse.sample }
+                example("Without UserInfo") { value = UserKeywordDetailResponse.sample.copy(userInfo = null) }
             }
         }
     }

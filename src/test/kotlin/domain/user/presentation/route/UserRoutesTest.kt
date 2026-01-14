@@ -94,7 +94,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getMyProfile(TestMyUserId) } returns TestMyProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
+            endpoint = "${route.ROUTE}${route.myProfile()}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -118,7 +118,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getMyProfile(TestMyUserId) } returns TestMyProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
+            endpoint = "${route.ROUTE}${route.myProfile()}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -135,7 +135,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getMyProfile(TestMyUserId) } returns null
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
+            endpoint = "${route.ROUTE}${route.myProfile()}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -152,7 +152,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getMyProfile(TestMyUserId) } returns null
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
+            endpoint = "${route.ROUTE}${route.myProfile()}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -174,7 +174,7 @@ class UserRoutesTest {
         coEvery { userUseCases.getMyProfile(TestMyUserId) } throws expectedApiException
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.MY_PROFILE}",
+            endpoint = "${route.ROUTE}${route.myProfile()}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -199,7 +199,7 @@ class UserRoutesTest {
         } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -224,7 +224,7 @@ class UserRoutesTest {
         } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -243,7 +243,7 @@ class UserRoutesTest {
         } returns null
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -262,7 +262,7 @@ class UserRoutesTest {
         } returns TestUserProfileDto
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(
@@ -286,7 +286,7 @@ class UserRoutesTest {
         } throws expectedApiException
 
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${route.PROFILE}/${TestUserId.value}",
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
             queryParameters = null,
             testPlugin = {
                 testPlugin(

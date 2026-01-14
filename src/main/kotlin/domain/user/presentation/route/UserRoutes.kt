@@ -4,7 +4,6 @@ import com.peekr.common.exception.ErrorResponse
 import com.peekr.common.exception.toErrorResponse
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
-import com.peekr.common.route.Api.byPathParam
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
@@ -42,7 +41,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.MY_PROFILE, { getMyProfileDocs() }) {
+        get(route.myProfile(), { getMyProfileDocs() }) {
             val userId = extractUserIdWithToken()
             val user = usecase.getMyProfile(userId)
             if (user != null) {
@@ -55,7 +54,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.PROFILE.byPathParam("userId"), { getUserProfileDocs() }) {
+        get(route.profile("{userId}"), { getUserProfileDocs() }) {
             val myUserId = extractUserIdWithToken()
             val userId = call.pathParameters["userId"]
                 ?.toLongOrNull()

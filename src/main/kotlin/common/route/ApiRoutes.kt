@@ -28,9 +28,11 @@ object Api {
         object User {
             const val ROUTE = "/user"
             const val TAG = "User"
-            const val MY_PROFILE = "/profile/me"
-            const val PROFILE = "/profile"
             const val INTRODUCE = "/introduce"
+
+            fun myProfile(): String = "/me/profile"
+
+            fun profile(pathParam: String): String = "/$pathParam/profile"
         }
 
         object File {
@@ -49,8 +51,10 @@ object Api {
         object UserKeyword {
             const val ROUTE = "/user-keyword"
             const val TAG = "UserKeyword"
-            const val GET_DESCRIPTION = "/description"
-            const val PATCH_DESCRIPTION = "/description"
+            const val GET_DESCRIPTION = "$ROUTE/description"
+            const val PATCH_DESCRIPTION = "$ROUTE/description"
+
+            fun detail(pathParam: String): String = "$ROUTE/$pathParam/detail"
         }
 
         object Report {

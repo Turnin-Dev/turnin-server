@@ -10,21 +10,16 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDetail
 import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.Case
-import org.jetbrains.exposed.sql.Coalesce
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
-import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.charLength
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.stringLiteral
-import org.jetbrains.exposed.sql.substring
 import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
@@ -33,29 +28,16 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     }
 
     override suspend fun findListByUserId(userId: UserId): List<UserKeyword> = suspendTransaction {
-        val descriptionAlias = UserKeywords.description
-            .charLength()
-            .let { length ->
-                Case()
-                    .When(length.isNull(), stringLiteral(""))
-                    // 500자 이상이면 200자만 추출
-                    .When(length greaterEq 500, UserKeywords.description.substring(1, 200))
-                    // 200자 ~ 500자 사이면 100자만 추출
-                    .When(length greaterEq 200, UserKeywords.description.substring(1, 100))
-                    // 그 미만은 전체 추출
-                    .Else(Coalesce(UserKeywords.description, stringLiteral("")))
-            }.alias("description_alias")
-
         UserKeywords
             .select(
                 UserKeywords.id,
                 UserKeywords.userId,
                 UserKeywords.keywordId,
-                descriptionAlias,
+                UserKeywords.description,
                 UserKeywords.createdAt,
                 UserKeywords.updatedAt,
             ).where(UserKeywords.userId eq userId.value)
-            .map { row -> row.toDomain(descriptionAlias = descriptionAlias) }
+            .map { row -> row.toDomain() }
     }
 
     override suspend fun findByKeywordIdAndUserId(
@@ -75,6 +57,58 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                     (UserKeywords.userId eq userId.value),
             ).map { it.toDomain() }
             .singleOrNull()
+    }
+
+    override suspend fun getDetailById(
+        userKeywordId: UserKeywordId,
+        withUserInfo: Boolean,
+    ): UserKeywordDetail? = suspendTransaction {
+        val joinQuery = UserKeywords
+            .innerJoin(
+                otherTable = Keywords,
+                onColumn = { UserKeywords.keywordId },
+                otherColumn = { Keywords.id },
+            ).let {
+                if (withUserInfo) {
+                    it.innerJoin(
+                        otherTable = Users,
+                        onColumn = { UserKeywords.userId },
+                        otherColumn = { Users.id },
+                    )
+                } else {
+                    it
+                }
+            }
+
+        joinQuery
+            .select(
+                UserKeywords.id,
+                UserKeywords.keywordId,
+                UserKeywords.description,
+                UserKeywords.createdAt,
+                UserKeywords.updatedAt,
+                Keywords.keyword,
+                *(if (withUserInfo) arrayOf(Users.id, Users.name, Users.profileImageUrl) else emptyArray()),
+            ).where { UserKeywords.id eq userKeywordId.value }
+            .map { it.toDetail(withUserInfo) }
+            .singleOrNull()
+    }
+
+    override suspend fun getDetailsByUserId(userId: UserId): List<UserKeywordDetail> = suspendTransaction {
+        UserKeywords
+            .innerJoin(
+                otherTable = Keywords,
+                onColumn = { UserKeywords.keywordId },
+                otherColumn = { Keywords.id },
+            ).select(
+                UserKeywords.id,
+                UserKeywords.keywordId,
+                UserKeywords.description,
+                UserKeywords.createdAt,
+                UserKeywords.updatedAt,
+                Keywords.keyword,
+            ).where { UserKeywords.userId eq userId.value }
+            .map { it.toDetail(withUserInfo = false) }
     }
 
     override suspend fun findDescriptionById(
