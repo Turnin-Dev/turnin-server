@@ -277,32 +277,12 @@ class UserKeywordRepositoryImplTest {
         )
 
         // when
-        val userKeywordDetail = repository.getDetailById(userKeyword.id, true)
+        val userKeywordDetail = repository.getDetailById(userKeyword.id)
 
         // then
         assertEquals(TestDescription.value, userKeywordDetail?.description?.value)
         assertEquals(userId, userKeywordDetail?.userInfo?.userId)
         assertEquals(keywordId, userKeywordDetail?.keywordId)
-    }
-
-    @Test
-    fun `getDetailById 성공 테스트 - 사용자 정보 미포함`() = runTest {
-        // given
-        val userId = insertUserAndReturnId()
-        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
-        val userKeyword = repository.create(
-            keywordId = keywordId,
-            userId = userId,
-            description = TestDescription,
-        )
-
-        // when
-        val userKeywordDetail = repository.getDetailById(userKeyword.id, false)
-
-        // then
-        assertEquals(TestDescription.value, userKeywordDetail?.description?.value)
-        assertEquals(keywordId, userKeywordDetail?.keywordId)
-        assertNull(userKeywordDetail?.userInfo)
     }
 
     @Test

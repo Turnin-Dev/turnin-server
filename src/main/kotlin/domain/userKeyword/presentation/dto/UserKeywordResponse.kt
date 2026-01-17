@@ -9,14 +9,13 @@ import kotlinx.serialization.Serializable
  * @property id 사용자별 키워드 ID
  * @property keywordId 키워드 ID
  * @property keywordName 키워드 명
- * @property userId 사용자 ID
+ * @property description 키워드 내용
  * @property createdAt 생성 일자
  * @property updatedAt 수정 일자
  */
 @Serializable
 data class UserKeywordResponse(
     val id: Long,
-    val userId: Long,
     val keywordId: Long,
     val keywordName: String,
     val description: String?,
@@ -26,7 +25,6 @@ data class UserKeywordResponse(
     companion object {
         val sample = UserKeywordResponse(
             id = 1,
-            userId = 1,
             keywordId = 1,
             keywordName = "sample",
             description = "description sample",
@@ -38,7 +36,6 @@ data class UserKeywordResponse(
 
 fun UserKeywordDto.toResponse() = UserKeywordResponse(
     id = id,
-    userId = userId,
     keywordId = keywordId,
     keywordName = keywordName,
     description = description,

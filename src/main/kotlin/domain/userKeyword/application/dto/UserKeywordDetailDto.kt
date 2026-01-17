@@ -21,7 +21,7 @@ data class UserKeywordDetailDto(
     val keywordId: Long,
     val keywordName: String,
     val description: String,
-    val userInfo: UserInfoDto? = null,
+    val userInfo: UserInfoDto,
     val createdAt: Long,
     val updatedAt: Long,
 )
@@ -32,7 +32,7 @@ fun UserKeywordDetail.toDto(): UserKeywordDetailDto =
         keywordId = keywordId.value,
         keywordName = keywordName.value,
         description = description.value ?: "",
-        userInfo = userInfo?.toDto(),
+        userInfo = userInfo.toDto(),
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
