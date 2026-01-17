@@ -635,11 +635,11 @@ class UserKeywordRouteTest {
     }
 
     @Test
-    fun `사용자 키워드 상세 정보 조회 - 사용자 정보 포함 요청 성공 테스트`() = testApplication {
+    fun `사용자 키워드 상세 정보 조회 - 성공 테스트`() = testApplication {
         // given
         val route = Api.V1.UserKeyword
         coEvery {
-            userKeywordUseCases.getDetail(TestUserKeywordId.value, true)
+            userKeywordUseCases.getDetail(TestUserKeywordId.value)
         } returns TestUserKeywordDetailDto
 
         // when, then
@@ -655,33 +655,6 @@ class UserKeywordRouteTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 val expectedResponse = Json.encodeToString(TestUserKeywordDetailDto.toResponse())
-                containsAll(expectedResponse)
-            },
-        )
-    }
-
-    @Test
-    fun `사용자 키워드 상세 정보 조회 - 사용자 정보 미포함 요청 성공 테스트`() = testApplication {
-        // given
-        val route = Api.V1.UserKeyword
-        val expectedDetail = TestUserKeywordDetailDto.copy(userInfo = null)
-        coEvery {
-            userKeywordUseCases.getDetail(TestUserKeywordId.value, false)
-        } returns expectedDetail
-
-        // when, then
-        testGetEndpoint(
-            endpoint = route.detail(TestUserKeywordId.value.toString()),
-            queryParameters = mapOf("withUserInfo" to "false"),
-            testPlugin = {
-                testPlugin(
-                    authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
-                )
-            },
-            tokenSubject = TestUserId.value.toString(),
-            expectedStatus = HttpStatusCode.OK,
-            responseValidator = {
-                val expectedResponse = Json.encodeToString(expectedDetail.toResponse())
                 containsAll(expectedResponse)
             },
         )

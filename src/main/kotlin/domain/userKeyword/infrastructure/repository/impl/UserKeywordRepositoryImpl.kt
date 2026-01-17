@@ -61,24 +61,17 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
 
     override suspend fun getDetailById(
         userKeywordId: UserKeywordId,
-        withUserInfo: Boolean,
     ): UserKeywordDetail? = suspendTransaction {
         val joinQuery = UserKeywords
             .innerJoin(
                 otherTable = Keywords,
                 onColumn = { UserKeywords.keywordId },
                 otherColumn = { Keywords.id },
-            ).let {
-                if (withUserInfo) {
-                    it.innerJoin(
-                        otherTable = Users,
-                        onColumn = { UserKeywords.userId },
-                        otherColumn = { Users.id },
-                    )
-                } else {
-                    it
-                }
-            }
+            ).innerJoin(
+                otherTable = Users,
+                onColumn = { UserKeywords.userId },
+                otherColumn = { Users.id },
+            )
 
         joinQuery
             .select(
@@ -88,27 +81,39 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 UserKeywords.createdAt,
                 UserKeywords.updatedAt,
                 Keywords.keyword,
-                *(if (withUserInfo) arrayOf(Users.id, Users.name, Users.profileImageUrl) else emptyArray()),
+                Users.id,
+                Users.name,
+                Users.profileImageUrl,
             ).where { UserKeywords.id eq userKeywordId.value }
-            .map { it.toDetail(withUserInfo) }
+            .map { it.toDetail() }
             .singleOrNull()
     }
 
     override suspend fun getDetailsByUserId(userId: UserId): List<UserKeywordDetail> = suspendTransaction {
-        UserKeywords
+        val joinQuery = UserKeywords
             .innerJoin(
                 otherTable = Keywords,
                 onColumn = { UserKeywords.keywordId },
                 otherColumn = { Keywords.id },
-            ).select(
+            ).innerJoin(
+                otherTable = Users,
+                onColumn = { UserKeywords.userId },
+                otherColumn = { Users.id },
+            )
+
+        joinQuery
+            .select(
                 UserKeywords.id,
                 UserKeywords.keywordId,
                 UserKeywords.description,
                 UserKeywords.createdAt,
                 UserKeywords.updatedAt,
                 Keywords.keyword,
+                Users.id,
+                Users.name,
+                Users.profileImageUrl,
             ).where { UserKeywords.userId eq userId.value }
-            .map { it.toDetail(withUserInfo = false) }
+            .map { it.toDetail() }
     }
 
     override suspend fun findDescriptionById(

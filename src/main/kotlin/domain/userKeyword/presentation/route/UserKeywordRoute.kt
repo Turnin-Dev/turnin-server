@@ -56,10 +56,7 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             val userKeywordIdParam = call.parameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
-            val withUserInfoParam = call.queryParameters["withUserInfo"]
-                ?.toBooleanStrictOrNull()
-                .inputValidationAndReturn("사용자 정보 포함 여부")
-            val userKeywordDto = usecase.getDetail(userKeywordIdParam, withUserInfoParam)
+            val userKeywordDto = usecase.getDetail(userKeywordIdParam)
             if (userKeywordDto != null) {
                 call.respond(userKeywordDto.toResponse())
             } else {
@@ -145,16 +142,14 @@ private fun RouteConfig.getDetailDocs() {
         pathParameter<Long>("userKeywordId") {
             description = "사용자 키워드 ID"
         }
-        queryParameter<Boolean>("withUserInfo") {
-            description = "사용자 정보 포함 여부"
-        }
     }
     response {
         code(HttpStatusCode.OK) {
             body<UserKeywordDetailResponse> {
                 description = "사용자 키워드 상세 정보 응답바디"
-                example("With UserInfo") { value = UserKeywordDetailResponse.sample }
-                example("Without UserInfo") { value = UserKeywordDetailResponse.sample.copy(userInfo = null) }
+                example("UserKeywordDetailResponse") {
+                    value = UserKeywordDetailResponse.sample
+                }
             }
         }
     }

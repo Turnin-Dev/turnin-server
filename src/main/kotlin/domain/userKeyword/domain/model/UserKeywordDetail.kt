@@ -22,7 +22,7 @@ data class UserKeywordDetail(
     val keywordId: KeywordId,
     val keywordName: KeywordName,
     val description: Description,
-    val userInfo: UserInfo? = null,
+    val userInfo: UserInfo,
     val createdAt: Long,
     val updatedAt: Long,
 )

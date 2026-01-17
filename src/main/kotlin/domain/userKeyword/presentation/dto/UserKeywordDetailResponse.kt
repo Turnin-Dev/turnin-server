@@ -23,7 +23,7 @@ data class UserKeywordDetailResponse(
     val keywordId: Long,
     val keywordName: String,
     val description: String,
-    val userInfo: UserInfoResponse?,
+    val userInfo: UserInfoResponse,
     val createdAt: Long,
     val updatedAt: Long,
 ) {
@@ -50,7 +50,7 @@ fun UserKeywordDetailDto.toResponse(): UserKeywordDetailResponse =
         keywordId = keywordId,
         keywordName = keywordName,
         description = description,
-        userInfo = userInfo?.toResponse(),
+        userInfo = userInfo.toResponse(),
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

@@ -36,21 +36,17 @@ internal object UserKeywordMapper {
             updatedAt = this.updatedAt.toEpochSecond(),
         )
 
-    fun ResultRow.toDetail(withUserInfo: Boolean): UserKeywordDetail =
+    fun ResultRow.toDetail(): UserKeywordDetail =
         UserKeywordDetail(
             userKeywordId = UserKeywordId(this[UserKeywords.id].value),
             keywordId = KeywordId(this[UserKeywords.keywordId].value),
             keywordName = KeywordName(this[Keywords.keyword]),
             description = Description(this[UserKeywords.description]),
-            userInfo = if (withUserInfo) {
-                UserInfo(
-                    userId = UserId(this[Users.id].value),
-                    userName = UserName(this[Users.name]),
-                    profileImageUrl = this[Users.profileImageUrl],
-                )
-            } else {
-                null
-            },
+            userInfo = UserInfo(
+                userId = UserId(this[Users.id].value),
+                userName = UserName(this[Users.name]),
+                profileImageUrl = this[Users.profileImageUrl],
+            ),
             createdAt = this[UserKeywords.createdAt].toEpochSecond(),
             updatedAt = this[UserKeywords.updatedAt].toEpochSecond(),
         )

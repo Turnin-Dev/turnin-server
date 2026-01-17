@@ -56,7 +56,7 @@ private fun RouteConfig.getDetailsDocs() {
             body<List<UserKeywordDetailResponse>> {
                 example("UserKeywordDetailsResponse") {
                     value = List(2) {
-                        UserKeywordDetailResponse.sample.copy(userInfo = null)
+                        UserKeywordDetailResponse.sample
                     }
                 }
             }
@@ -72,7 +72,7 @@ private fun RouteConfig.getMyDetailsDocs() {
             body<List<UserKeywordDetailResponse>> {
                 example("UserKeywordDetailsResponse") {
                     value = List(2) {
-                        UserKeywordDetailResponse.sample.copy(userInfo = null)
+                        UserKeywordDetailResponse.sample
                     }
                 }
             }

@@ -36,13 +36,11 @@ interface UserKeywordRepository {
      * 사용자 키워드 ID로 사용자 키워드 상세 정보를 조회한다.
      *
      * @param userKeywordId 사용자 키워드 ID
-     * @param withUserInfo 사용자 정보 포함 여부
      *
      * @return [UserKeywordDetail]
      */
     suspend fun getDetailById(
         userKeywordId: UserKeywordId,
-        withUserInfo: Boolean,
     ): UserKeywordDetail?
 
     /**

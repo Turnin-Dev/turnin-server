@@ -5,6 +5,7 @@ import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.common.route.Api
+import com.peekr.domain.userKeyword.application.dto.UserInfoDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDetailDto
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.toResponse
@@ -100,7 +101,11 @@ class ExternalUserKeywordRoutesTest {
             keywordId = 1L,
             keywordName = "keyword",
             description = "description",
-            userInfo = null,
+            userInfo = UserInfoDto(
+                userId = TestUserId.value,
+                userName = "user",
+                profileImageUrl = null,
+            ),
             createdAt = 1000,
             updatedAt = 1000,
         )
