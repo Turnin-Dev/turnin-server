@@ -25,8 +25,8 @@ data class KeywordResponse(
             id = 1,
             keyword = "sample",
             createdBy = 1,
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis(),
+            createdAt = 1697875200L,
+            updatedAt = 1697875200L,
         )
     }
 }

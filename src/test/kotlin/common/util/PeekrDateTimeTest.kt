@@ -94,9 +94,9 @@ class PeekrDateTimeTest {
         // 모든 스레드 완료 대기
         threads.forEach { it.join() }
 
-        val firstInstant = results[0].toEpochMilli()
+        val firstInstant = results[0].epochSecond
         results.forEachIndexed { index, instant ->
-            assertEquals(instant.toEpochMilli(), firstInstant)
+            assertEquals(instant.epochSecond, firstInstant)
         }
 
         assertEquals(threadCount, results.size)

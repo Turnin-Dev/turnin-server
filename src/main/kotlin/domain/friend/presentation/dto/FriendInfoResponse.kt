@@ -33,9 +33,9 @@ data class FriendInfoResponse(
             displayId = "hong123",
             name = "honggd",
             profileImageUrl = "https://image-server.com/123123.jpg",
-            respondedAt = 1682870400000,
-            createdAt = 1682870400000,
-            updatedAt = 1682870400000,
+            respondedAt = 1697875200L,
+            createdAt = 1697875200L,
+            updatedAt = 1697875200L,
         )
     }
 }
