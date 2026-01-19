@@ -45,5 +45,5 @@ fun User.toDto(): UserDto = UserDto(
     profileImageUrl = profileImageUrl,
     introduce = introduce,
     isActive = isActive,
-    lastLoginAt = lastLoginAt?.toEpochMilli(),
+    lastLoginAt = lastLoginAt?.epochSecond,
 )

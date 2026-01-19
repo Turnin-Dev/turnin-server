@@ -32,8 +32,8 @@ data class FriendResponse(
             receiverId = 2,
             status = FriendRequestStatus.PENDING,
             respondedAt = null,
-            createdAt = 1682870400000,
-            updatedAt = 1682870400000,
+            createdAt = 1697875200L,
+            updatedAt = 1697875200L,
         )
     }
 }

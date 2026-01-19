@@ -33,7 +33,7 @@ data class MyProfileResponse(
             name = "honggd",
             profileImageUrl = "https://www.example.com/image.jpg",
             introduce = "hello world!",
-            lastLoginAt = 1697875200000L,
+            lastLoginAt = 1697875200L,
             friendsCount = 51L,
             isActive = true,
         )

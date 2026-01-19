@@ -28,8 +28,8 @@ data class UserKeywordResponse(
             keywordId = 1,
             keywordName = "sample",
             description = "description sample",
-            createdAt = 0,
-            updatedAt = 0,
+            createdAt = 1697875200L,
+            updatedAt = 1697875200L,
         )
     }
 }

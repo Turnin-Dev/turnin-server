@@ -38,8 +38,8 @@ data class UserKeywordDetailResponse(
                 userName = "user",
                 profileImageUrl = "https://www.example.com/image.jpg",
             ),
-            createdAt = 0L,
-            updatedAt = 0L,
+            createdAt = 1697875200L,
+            updatedAt = 1697875200L,
         )
     }
 }

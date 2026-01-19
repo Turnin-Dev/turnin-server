@@ -548,7 +548,7 @@ class UserRoutesTest {
             profileImageUrl = "https://www.example.com/image.jpg",
             introduce = Introduce("hello world!"),
             isActive = true,
-            lastLoginAt = 1697875200000L,
+            lastLoginAt = 1697875200L,
             friendsCount = 51L,
             friendStatus = FriendStatus.NOTHING,
         )
