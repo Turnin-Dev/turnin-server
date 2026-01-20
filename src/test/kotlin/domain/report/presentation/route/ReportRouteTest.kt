@@ -227,12 +227,14 @@ class ReportRouteTest {
         private val TestReportRequest = ReportRequest(
             reporterId = TestUserId.value,
             reportedId = 2L,
+            reportedUserKeywordId = 1L,
             reasonId = 5L,
             customReason = "custom reason",
         )
         private val TestInvalidReportRequest = ReportRequest(
             reporterId = 10L,
             reportedId = 2L,
+            reportedUserKeywordId = 1L,
             reasonId = 5L,
             customReason = "custom reason",
         )

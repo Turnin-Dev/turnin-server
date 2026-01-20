@@ -4,6 +4,7 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.exception.common.CommonException
 import com.peekr.common.model.id.ReportReasonId
 import com.peekr.common.model.id.UserId
+import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.report.application.dto.ReportDetailDto
 import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.domain.report.domain.repository.ReportRepository
@@ -30,9 +31,16 @@ class CreateReportUseCase(private val reportRepository: ReportRepository) {
             throw CommonException.AccessDenied()
         }
         val reporterId = UserId(reportDetailDto.reporterId)
-        val reportedId = UserId(reportDetailDto.reportedId)
+        val reportedId = reportDetailDto.reportedId?.let { UserId(it) }
+        val reportedUserKeywordId = reportDetailDto.reportedUserKeywordId?.let { UserKeywordId(it) }
         val reasonId = ReportReasonId(reportDetailDto.reasonId)
-        val report = ReportDetail(reporterId, reportedId, reasonId, reportDetailDto.customReason)
+        val report = ReportDetail.create(
+            reporterId = reporterId,
+            reportedId = reportedId,
+            reportedUserKeywordId = reportedUserKeywordId,
+            reasonId = reasonId,
+            customReason = reportDetailDto.customReason,
+        )
         reportRepository.createReport(report)
     }
 }

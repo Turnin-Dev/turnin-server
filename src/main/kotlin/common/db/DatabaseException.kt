@@ -18,4 +18,7 @@ sealed class DatabaseException(
 
     /** 외래키 제약 위반 예외 */
     class ForeignKeyViolationException(cause: Throwable) : DatabaseException("Foreign key constraint violation", cause)
+
+    /** 제약 조건 위반 예외 */
+    class ConstraintViolationException(cause: Throwable) : DatabaseException("Check constraint violation", cause)
 }

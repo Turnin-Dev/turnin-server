@@ -20,7 +20,7 @@ interface ReportRepository {
     suspend fun createReportReason(
         code: String,
         description: String,
-    ): ReportReason?
+    ): ReportReason
 
     /**
      * 신고 생성

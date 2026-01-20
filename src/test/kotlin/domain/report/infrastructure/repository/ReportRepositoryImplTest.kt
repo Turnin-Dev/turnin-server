@@ -1,11 +1,16 @@
 package com.peekr.domain.report.infrastructure.repository
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.KeywordEntity
+import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.Reports
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.UserKeywordEntity
+import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
+import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
@@ -14,6 +19,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.exposed.dao.id.EntityID
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -84,9 +90,10 @@ class ReportRepositoryImplTest {
         // when
         val exception = runCatching {
             repository.createReport(
-                ReportDetail(
+                ReportDetail.create(
                     reporterId = user1,
                     reportedId = user2,
+                    reportedUserKeywordId = null,
                     reasonId = reportReason.id,
                     customReason = TEST_CUSTOM_REASON,
                 ),
@@ -103,7 +110,7 @@ class ReportRepositoryImplTest {
     }
 
     @Test
-    fun `신고 중복 생성 시 예외가 발생한다`() = runTest {
+    fun `사용자 신고 중복 생성 시 예외가 발생한다`() = runTest {
         // given
         val user1 = insertUserAndReturnId("1")
         val user2 = insertUserAndReturnId("2")
@@ -117,9 +124,10 @@ class ReportRepositoryImplTest {
         val exception = runCatching {
             // 첫 번째 신고는 성공
             repository.createReport(
-                ReportDetail(
+                ReportDetail.create(
                     reporterId = user1,
                     reportedId = user2,
+                    reportedUserKeywordId = null,
                     reasonId = reportReason.id,
                     customReason = TEST_CUSTOM_REASON,
                 ),
@@ -127,9 +135,10 @@ class ReportRepositoryImplTest {
 
             // 두 번째 신고는 중복 신고이므로 예외 발생
             repository.createReport(
-                ReportDetail(
+                ReportDetail.create(
                     reporterId = user1,
                     reportedId = user2,
+                    reportedUserKeywordId = null,
                     reasonId = reportReason.id,
                     customReason = TEST_CUSTOM_REASON,
                 ),
@@ -138,6 +147,72 @@ class ReportRepositoryImplTest {
 
         // then
         assertTrue(exception is DatabaseException.DuplicatedDataException)
+    }
+
+    @Test
+    fun `키워드 신고 중복 생성 시 예외가 발생한다`() = runTest {
+        // given
+        val user1 = insertUserAndReturnId("1")
+        val userKeywordId = insertUserKeywordAndReturnId(user1.value)
+        val reportReason = repository.createReportReason(
+            code = TEST_REPORT_REASON_CODE,
+            description = TEST_REPORT_REASON_DESCRIPTION,
+        )
+        assertNotNull(reportReason)
+
+        // when: 중복 신고
+        val exception = runCatching {
+            // 첫 번째 신고는 성공
+            repository.createReport(
+                ReportDetail.create(
+                    reporterId = user1,
+                    reportedId = null,
+                    reportedUserKeywordId = userKeywordId,
+                    reasonId = reportReason.id,
+                    customReason = TEST_CUSTOM_REASON,
+                ),
+            )
+
+            // 두 번째 신고는 중복 신고이므로 예외 발생
+            repository.createReport(
+                ReportDetail.create(
+                    reporterId = user1,
+                    reportedId = null,
+                    reportedUserKeywordId = userKeywordId,
+                    reasonId = reportReason.id,
+                    customReason = TEST_CUSTOM_REASON,
+                ),
+            )
+        }.exceptionOrNull()
+
+        // then
+        assertTrue(exception is DatabaseException.DuplicatedDataException)
+    }
+
+    @Test
+    fun `신고 대상이 없는 경우 예외가 발생한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val reportReason = repository.createReportReason(
+            code = TEST_REPORT_REASON_CODE,
+            description = TEST_REPORT_REASON_DESCRIPTION,
+        )
+
+        // when
+        val exception = runCatching {
+            repository.createReport(
+                ReportDetail(
+                    reporterId = userId,
+                    reportedId = null,
+                    reportedUserKeywordId = null,
+                    reasonId = reportReason.id,
+                    customReason = TEST_CUSTOM_REASON,
+                ),
+            )
+        }.exceptionOrNull()
+
+        // then
+        assertTrue(exception is DatabaseException.ConstraintViolationException)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
@@ -154,6 +229,23 @@ class ReportRepositoryImplTest {
         }
 
         UserId(savedUser.id.value)
+    }
+
+    private suspend fun insertUserKeywordAndReturnId(userId: Long): UserKeywordId = TestDatabaseFactory.dbQuery {
+        val keywordId = KeywordEntity
+            .new {
+                this.keyword = "keyword"
+                this.embedding = "embedding"
+                this.createdBy = EntityID(userId, Users)
+            }.id.value
+
+        val savedUserKeyword = UserKeywordEntity.new {
+            this.userId = EntityID(userId, Users)
+            this.keywordId = EntityID(keywordId, Keywords)
+            this.description = "description"
+        }
+
+        UserKeywordId(savedUserKeyword.id.value)
     }
 
     companion object {

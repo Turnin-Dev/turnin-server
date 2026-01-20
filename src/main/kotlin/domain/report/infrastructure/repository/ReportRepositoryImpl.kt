@@ -3,6 +3,7 @@ package com.peekr.domain.report.infrastructure.repository
 import com.peekr.common.db.schema.ReportEntity
 import com.peekr.common.db.schema.ReportReasonEntity
 import com.peekr.common.db.schema.ReportReasons
+import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.domain.report.domain.model.ReportDetail
@@ -22,7 +23,7 @@ class ReportRepositoryImpl : ReportRepository {
     override suspend fun createReportReason(
         code: String,
         description: String,
-    ): ReportReason? = suspendTransaction {
+    ): ReportReason = suspendTransaction {
         ReportReasonEntity
             .new {
                 this.code = code
@@ -35,7 +36,12 @@ class ReportRepositoryImpl : ReportRepository {
     ): Unit = suspendTransaction {
         ReportEntity.new {
             this.reporterId = EntityID(reportDetail.reporterId.value, Users)
-            this.reportedId = EntityID(reportDetail.reportedId.value, Users)
+            this.reportedId = reportDetail.reportedId?.let {
+                EntityID(it.value, Users)
+            }
+            this.reportedUserKeywordId = reportDetail.reportedUserKeywordId?.let {
+                EntityID(it.value, UserKeywords)
+            }
             this.reasonId = EntityID(reportDetail.reasonId.value, ReportReasons)
             this.customReason = reportDetail.customReason
         }
