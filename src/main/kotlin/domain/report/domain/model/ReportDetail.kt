@@ -21,6 +21,9 @@ data class ReportDetail(
     val customReason: String?,
 ) {
     companion object {
+        /**
+         * @throws ReportDomainException 비즈니스 규칙 위반 시 예외가 발생한다.
+         */
         fun create(
             reporterId: UserId,
             reportedId: UserId?,

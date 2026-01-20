@@ -8,6 +8,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.domain.report.application.dto.ReportReasonDto
 import com.peekr.domain.report.application.usecase.ReportUseCases
+import com.peekr.domain.report.exception.ReportException
 import com.peekr.domain.report.presentation.dto.ReportRequest
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPlugin
@@ -212,6 +213,26 @@ class ReportRouteTest {
             },
             tokenSubject = TestUserId.value.toString(),
             expectedStatus = HttpStatusCode.Conflict,
+        )
+    }
+
+    @Test
+    fun `신고 생성 - 필수 신고 대상이 없는 경우 HTTP 상태코드 BadRequest를 반환한다`() = testApplication {
+        coEvery {
+            usecase.createReport(TestUserId, any())
+        } throws ReportException.MissingReportTargetException(null)
+
+        testPostEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestReportRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { reportRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.BadRequest,
         )
     }
 

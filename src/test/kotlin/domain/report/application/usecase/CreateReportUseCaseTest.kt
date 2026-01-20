@@ -4,8 +4,8 @@ import com.peekr.common.model.id.ReportReasonId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.report.application.dto.ReportDetailDto
-import com.peekr.domain.report.domain.model.ReportDomainException
 import com.peekr.domain.report.domain.repository.ReportRepository
+import com.peekr.domain.report.exception.ReportException
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just
@@ -56,7 +56,7 @@ class CreateReportUseCaseTest {
             reportedUserKeywordId = null,
         )
 
-        assertThrows<ReportDomainException> {
+        assertThrows<ReportException.MissingReportTargetException> {
             usecase(TestReporterId, reportDetailDto)
         }
     }
