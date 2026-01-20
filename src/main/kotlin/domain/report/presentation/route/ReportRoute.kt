@@ -76,5 +76,8 @@ private fun RouteConfig.createReportDocs() {
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 신고자 ID가 일치하지 않는 경우 혹은 인증 오류 시"
         }
+        code(HttpStatusCode.BadRequest) {
+            description = "필수 신고 대상이 누락된 경우 (신고 대상이 모두 null인 경우)"
+        }
     }
 }
