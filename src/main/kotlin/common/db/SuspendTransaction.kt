@@ -82,9 +82,9 @@ private fun handleSqlException(e: Throwable): DatabaseException {
         }
 
     // 제약조건 위반 검사 (PostgreSQL 기준)
-    val isConstraintViolation = sqlState == "23513" ||
+    val isConstraintViolation = sqlState == "23514" ||
         sequenceOf(message, causeMsg).any { msg ->
-            "Check constraint violation" in msg
+            "check constraint violation" in msg
         }
 
     return when {
@@ -99,7 +99,7 @@ private fun handleSqlException(e: Throwable): DatabaseException {
         }
 
         isConstraintViolation -> {
-            LOGGER.debug("Check constraint violation violation detected.", e)
+            LOGGER.debug("Check constraint violation detected.", e)
             DatabaseException.ConstraintViolationException(e)
         }
 
