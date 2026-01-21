@@ -56,7 +56,8 @@ private fun RouteConfig.getReportReasonsDocs() {
 
 private fun RouteConfig.createReportDocs() {
     summary = "신고 생성"
-    description = "신고 접수 요청을 하면 신고를 생성한다."
+    description = "신고 요청을 하면 신고를 생성한다.\n" +
+        "신고 대상(사용자, 키워드)중 하나를 반드시 신고해야 한다."
     request {
         body<ReportRequest> {
             description = "신고 요청 바디"
@@ -74,6 +75,9 @@ private fun RouteConfig.createReportDocs() {
         }
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 신고자 ID가 일치하지 않는 경우 혹은 인증 오류 시"
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = "필수 신고 대상이 누락된 경우 (신고 대상이 모두 null인 경우)"
         }
     }
 }

@@ -81,6 +81,12 @@ private fun handleSqlException(e: Throwable): DatabaseException {
                 "violates foreign key constraint" in msg
         }
 
+    // 제약조건 위반 검사 (PostgreSQL 기준)
+    val isConstraintViolation = sqlState == "23513" ||
+        sequenceOf(message, causeMsg).any { msg ->
+            "Check constraint violation" in msg
+        }
+
     return when {
         isDuplicate -> {
             LOGGER.debug("Duplicate data detected while saving data.", e)
@@ -90,6 +96,11 @@ private fun handleSqlException(e: Throwable): DatabaseException {
         isForeignKeyViolation -> {
             LOGGER.debug("Foreign key constraint violation detected.", e)
             DatabaseException.ForeignKeyViolationException(e)
+        }
+
+        isConstraintViolation -> {
+            LOGGER.debug("Check constraint violation violation detected.", e)
+            DatabaseException.ConstraintViolationException(e)
         }
 
         else -> {
