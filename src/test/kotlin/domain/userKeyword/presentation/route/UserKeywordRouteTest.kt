@@ -8,7 +8,6 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.common.route.Api
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
-import com.peekr.domain.userKeyword.application.dto.DescriptionDto
 import com.peekr.domain.userKeyword.application.dto.UserInfoDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDetailDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
@@ -34,7 +33,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.http.parameters
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -519,7 +517,6 @@ class UserKeywordRouteTest {
             keywordName = TEST_KEYWORD,
             description = TestDescription.value,
         )
-        private val TestDescriptionDto = DescriptionDto(value = TestDescription.value)
         private val TestUpdateUserKeywordRequest = UpdateUserKeywordRequest(
             ownerId = TestUserId.value,
             userKeywordId = TestUserKeywordId.value,
