@@ -6,6 +6,7 @@ import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
+import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 
 interface UserKeywordRepository {
     /**
@@ -86,18 +87,14 @@ interface UserKeywordRepository {
     ): UserKeyword
 
     /**
-     * 사용자별 키워드 설명을 업데이트한다.
+     * 사용자 키워드를 업데이트한다.
      *
-     * @param ownerId 사용자 ID
-     * @param userKeywordId 사용자별 키워드 ID
-     * @param patch [Description]
+     * @param patch [UserKeywordPatch]
      *
      * @return 성공 시 `true`, 실패 시 `false` 반환
      */
-    suspend fun updateDescription(
-        ownerId: UserId,
-        userKeywordId: UserKeywordId,
-        patch: Description,
+    suspend fun update(
+        patch: UserKeywordPatch,
     ): Boolean
 
     /**

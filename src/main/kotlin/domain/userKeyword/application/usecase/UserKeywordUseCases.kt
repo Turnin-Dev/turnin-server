@@ -7,12 +7,10 @@ data class UserKeywordUseCases(
     val getDetail: GetDetailUseCase,
     /** @see GetDetailsUseCase */
     val getDetails: GetDetailsUseCase,
-    /** @see GetDescriptionUseCase */
-    val getDescription: GetDescriptionUseCase,
     /** @see CreateUserKeywordUseCase */
     val create: CreateUserKeywordUseCase,
-    /** @see UpdateDescriptionUseCase */
-    val updateDescription: UpdateDescriptionUseCase,
+    /** @see UpdateUserKeywordUseCase */
+    val update: UpdateUserKeywordUseCase,
     /** @see DeleteUserKeywordUseCase */
     val delete: DeleteUserKeywordUseCase,
 )
