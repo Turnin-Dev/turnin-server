@@ -11,9 +11,16 @@ sealed class ReportException(
     cause: Throwable? = null,
 ) : ApiException(code, status, message, cause) {
     /** 필수 신고 대상이 빠진 경우 */
-    class MissingReportTargetException(cause: Throwable?) :
+    class MissingReportTargetException(cause: Throwable? = null) :
         ReportException(
             code = ReportErrorCode.MissingReportTarget,
+            status = HttpStatusCode.BadRequest,
+            cause = cause,
+        )
+
+    class CannotReportMySelf(cause: Throwable? = null) :
+        ReportException(
+            code = ReportErrorCode.CannotReportMySelf,
             status = HttpStatusCode.BadRequest,
             cause = cause,
         )

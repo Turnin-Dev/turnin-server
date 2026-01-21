@@ -3,6 +3,7 @@ package com.peekr.domain.report.domain.model
 import com.peekr.common.model.id.ReportReasonId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
+import com.peekr.domain.report.exception.ReportException
 
 /**
  * 신고 디테일 엔티티 모델
@@ -22,7 +23,7 @@ data class ReportDetail(
 ) {
     companion object {
         /**
-         * @throws ReportDomainException 비즈니스 규칙 위반 시 예외가 발생한다.
+         * @throws ReportException 비즈니스 규칙 위반 시 예외가 발생한다.
          */
         fun create(
             reporterId: UserId,
@@ -33,12 +34,12 @@ data class ReportDetail(
         ): ReportDetail {
             // 1) 신고자와 피신고자가 같으면 안된다.
             if (reporterId == reportedId) {
-                throw ReportDomainException("본인을 신고할 수 없습니다.")
+                throw ReportException.CannotReportMySelf()
             }
 
             // 2) 신고 대상은 반드시 1개 이상이어야 한다.
             if (reportedId == null && reportedUserKeywordId == null) {
-                throw ReportDomainException("반드시 신고 대상이 있어야 합니다.")
+                throw ReportException.MissingReportTargetException()
             }
 
             return ReportDetail(

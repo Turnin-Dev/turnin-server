@@ -7,7 +7,6 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.report.application.dto.ReportDetailDto
 import com.peekr.domain.report.domain.model.ReportDetail
-import com.peekr.domain.report.domain.model.ReportDomainException
 import com.peekr.domain.report.domain.repository.ReportRepository
 import com.peekr.domain.report.exception.ReportException
 
@@ -37,17 +36,13 @@ class CreateReportUseCase(private val reportRepository: ReportRepository) {
         val reportedId = reportDetailDto.reportedId?.let { UserId(it) }
         val reportedUserKeywordId = reportDetailDto.reportedUserKeywordId?.let { UserKeywordId(it) }
         val reasonId = ReportReasonId(reportDetailDto.reasonId)
-        val report = try {
-            ReportDetail.create(
-                reporterId = reporterId,
-                reportedId = reportedId,
-                reportedUserKeywordId = reportedUserKeywordId,
-                reasonId = reasonId,
-                customReason = reportDetailDto.customReason,
-            )
-        } catch (e: ReportDomainException) {
-            throw ReportException.MissingReportTargetException(e)
-        }
-        reportRepository.createReport(report)
+        val reportDetail = ReportDetail.create(
+            reporterId = reporterId,
+            reportedId = reportedId,
+            reportedUserKeywordId = reportedUserKeywordId,
+            reasonId = reasonId,
+            customReason = reportDetailDto.customReason,
+        )
+        reportRepository.createReport(reportDetail)
     }
 }

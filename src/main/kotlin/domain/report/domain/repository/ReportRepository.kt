@@ -15,7 +15,7 @@ interface ReportRepository {
      * @param code 신고 사유 코드
      * @param description 신고 사유 설명
      *
-     * @return [ReportReason] 성공 시 [ReportReason]을 반환하고 실패 시 `null`을 반환한다.
+     * @return [ReportReason]를 반환한다.
      */
     suspend fun createReportReason(
         code: String,
