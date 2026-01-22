@@ -8,24 +8,25 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.common.route.Api
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
-import com.peekr.domain.userKeyword.application.dto.DescriptionDto
 import com.peekr.domain.userKeyword.application.dto.UserInfoDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDetailDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.exception.UserKeywordException
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
-import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
+import com.peekr.domain.userKeyword.presentation.dto.toDto
 import com.peekr.domain.userKeyword.presentation.dto.toResponse
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testGetEndpoint
+import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -253,147 +254,102 @@ class UserKeywordRouteTest {
     }
 
     @Test
-    fun `사용자 키워드 설명 수정 - 요청 성공 테스트`() = testApplication {
+    fun `사용자 키워드 수정 - 요청 성공 테스트`() = testApplication {
         // given
         val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
         coEvery {
-            userKeywordUseCases.updateDescription(
-                ownerId = TestUserId,
-                userKeywordId = TestUserKeywordId,
-                patch = TestDescriptionDto,
-            )
-        } returns TestDescriptionDto
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
+        } returns Unit
 
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        // when, then
+        testPatchEndpoint(
+            endpoint = route.ROUTE,
+            requestBody = TestUpdateUserKeywordRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
         )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.patch(endpoint) {
-            url {
-                parameters.append("ownerId", TestUserId.value.toString())
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            contentType(ContentType.Application.Json)
-            setBody(TestUpdateDescriptionRequest)
-        }
-        val responseBody = response.bodyAsText()
-
-        // then
-        assertEquals(HttpStatusCode.OK, response.status)
-        TestUpdateDescriptionRequest.description?.let {
-            assertTrue(responseBody.contains(it))
-        }
     }
 
     @Test
-    fun `사용자 키워드 설명 수정 - 수정 실패한 경우 HTTP 상태코드 404를 반환한다`() = testApplication {
+    fun `사용자 키워드 수정 - 수정 실패한 경우 HTTP 상태코드 404를 반환한다`() = testApplication {
         // given
         val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        val expectedException = UserKeywordException.UpdateFailed()
         coEvery {
-            userKeywordUseCases.updateDescription(
-                ownerId = TestUserId,
-                userKeywordId = TestUserKeywordId,
-                patch = TestDescriptionDto,
-            )
-        } returns null
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
+        } throws expectedException
 
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        // when, then
+        testPatchEndpoint(
+            endpoint = route.ROUTE,
+            requestBody = TestUpdateUserKeywordRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = expectedException.status,
+            responseValidator = {
+                contains(expectedException.errorCode.code)
+                contains(expectedException.errorCode.description)
+            },
         )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.patch(endpoint) {
-            url {
-                parameters.append("ownerId", TestUserId.value.toString())
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            contentType(ContentType.Application.Json)
-            setBody(TestUpdateDescriptionRequest)
-        }
-
-        // then
-        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
-    fun `사용자 키워드 설명 수정 - 알 수 없는 예외가 발생하는 경우 HTTP 상태코드 500을 반환한다`() = testApplication {
+    fun `사용자 키워드 수정 - 알 수 없는 예외가 발생하는 경우 HTTP 상태코드 500을 반환한다`() = testApplication {
         // given
         val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
         coEvery {
-            userKeywordUseCases.updateDescription(
-                ownerId = TestUserId,
-                userKeywordId = TestUserKeywordId,
-                patch = TestDescriptionDto,
-            )
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
         } throws Exception()
 
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        // when, then
+        testPatchEndpoint(
+            endpoint = route.ROUTE,
+            requestBody = TestUpdateUserKeywordRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.InternalServerError,
         )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.patch(endpoint) {
-            url {
-                parameters.append("ownerId", TestUserId.value.toString())
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            contentType(ContentType.Application.Json)
-            setBody(TestUpdateDescriptionRequest)
-        }
-
-        // then
-        assertEquals(HttpStatusCode.InternalServerError, response.status)
     }
 
     @Test
-    fun `사용자 키워드 설명 수정 - 알려진 예외가 발생하는 경우 정해진 메시지를 반환할 수 있다`() = testApplication {
+    fun `사용자 키워드 수정 - 알려진 예외가 발생하는 경우 정해진 메시지를 반환할 수 있다`() = testApplication {
         // given
         val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
         val expectedMessage = "error!"
         val expectedException = TestApiException(expectedMessage)
         coEvery {
-            userKeywordUseCases.updateDescription(
-                ownerId = TestUserId,
-                userKeywordId = TestUserKeywordId,
-                patch = TestDescriptionDto,
-            )
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
         } throws expectedException
 
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+        // when, then
+        testPatchEndpoint(
+            endpoint = route.ROUTE,
+            requestBody = TestUpdateUserKeywordRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = expectedException.status,
+            responseValidator = {
+                contains(expectedException.errorCode.code)
+                contains(expectedException.errorCode.description)
+            },
         )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.patch(endpoint) {
-            url {
-                parameters.append("ownerId", TestUserId.value.toString())
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            contentType(ContentType.Application.Json)
-            setBody(TestUpdateDescriptionRequest)
-        }
-        val responseBody = response.bodyAsText()
-
-        // then
-        assertEquals(expectedException.status, response.status)
-        assertTrue(responseBody.contains(expectedException.errorCode.code))
     }
 
     @Test
@@ -517,124 +473,6 @@ class UserKeywordRouteTest {
     }
 
     @Test
-    fun `사용자 키워드 설명 조회 - 요청 성공 테스트`() = testApplication {
-        // given
-        val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
-        coEvery {
-            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
-        } returns TestDescriptionDto
-
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
-        )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.get(endpoint) {
-            url {
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            contentType(ContentType.Application.Json)
-        }
-        val responseBody = response.bodyAsText()
-
-        // then
-        assertEquals(HttpStatusCode.OK, response.status)
-        TestDescriptionDto.value?.let {
-            assertTrue(responseBody.contains(it))
-        }
-    }
-
-    @Test
-    fun `사용자 키워드 설명 조회 - 토큰 에러 발생 시 HTTP 상태코드 401을 반환한다`() = testApplication {
-        // given
-        val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        coEvery {
-            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
-        } returns TestDescriptionDto
-
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
-        )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.get(endpoint) {
-            url {
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            contentType(ContentType.Application.Json)
-        }
-
-        // then
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
-    }
-
-    @Test
-    fun `사용자 키워드 설명 조회 - 알 수 없는 예외가 발생하는 경우 HTTP 상태코드 500을 반환한다`() = testApplication {
-        // given
-        val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
-        coEvery {
-            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
-        } throws Exception("")
-
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
-        )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.get(endpoint) {
-            url {
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            contentType(ContentType.Application.Json)
-        }
-
-        // then
-        assertEquals(HttpStatusCode.InternalServerError, response.status)
-    }
-
-    @Test
-    fun `사용자 키워드 설명 조회 - 알려진 예외가 발생하는 경우 정해진 메시지를 반환할 수 있다`() = testApplication {
-        // given
-        val route = Api.V1.UserKeyword
-        val client = createTestClient()
-        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
-        val expectedMessage = "error!"
-        val expectedException = TestApiException(expectedMessage)
-        coEvery {
-            userKeywordUseCases.getDescription(TestUserId, TestUserKeywordId)
-        } throws expectedException
-
-        testPlugin(
-            authRouting = { userKeywordRoutes(route, userKeywordUseCases) },
-        )
-
-        // when
-        val endpoint = route.PATCH_DESCRIPTION
-        val response = client.get(endpoint) {
-            url {
-                parameters.append("userKeywordId", TestUserKeywordId.value.toString())
-            }
-            header(HttpHeaders.Authorization, "Bearer ${token.accessToken}")
-            contentType(ContentType.Application.Json)
-        }
-        val responseBody = response.bodyAsText()
-
-        // then
-        assertEquals(expectedException.status, response.status)
-        assertTrue(responseBody.contains(expectedException.errorCode.code))
-    }
-
-    @Test
     fun `사용자 키워드 상세 정보 조회 - 성공 테스트`() = testApplication {
         // given
         val route = Api.V1.UserKeyword
@@ -685,8 +523,11 @@ class UserKeywordRouteTest {
             keywordName = TEST_KEYWORD,
             description = TestDescription.value,
         )
-        private val TestDescriptionDto = DescriptionDto(value = TestDescription.value)
-        private val TestUpdateDescriptionRequest = UpdateDescriptionRequest(description = TestDescription.value)
+        private val TestUpdateUserKeywordRequest = UpdateUserKeywordRequest(
+            userKeywordId = TestUserKeywordId.value,
+            keywordName = "newKeywordName",
+            description = "newDescription",
+        )
         private val TestUserKeywordDetailDto = UserKeywordDetailDto(
             userKeywordId = TestUserKeywordId.value,
             keywordId = 1L,

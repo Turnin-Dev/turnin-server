@@ -9,6 +9,6 @@ import com.peekr.domain.userKeyword.domain.model.Description
  */
 data class DescriptionDto(val value: String?)
 
-fun Description.toDto(): DescriptionDto = DescriptionDto(value)
-
 fun DescriptionDto.toDomain(): Description = Description(value)
+
+fun Description.toDto(): DescriptionDto = DescriptionDto(value)

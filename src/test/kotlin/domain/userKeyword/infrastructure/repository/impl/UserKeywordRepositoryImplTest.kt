@@ -9,9 +9,8 @@ import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.application.dto.DescriptionDto
-import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test
@@ -162,7 +161,7 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
-    fun `updateDescription 성공 테스트`() = runTest {
+    fun `update 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId()
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
@@ -171,22 +170,34 @@ class UserKeywordRepositoryImplTest {
             userId = userId,
             description = TestDescription,
         )
-        val patch = DescriptionDto(value = "hello")
+
+        val newKeywordId = insertKeywordAndReturnId(userId, "newKeyword")
+        val newDescription = Description("newDescription")
+        val patch = UserKeywordPatch(
+            userKeywordId = userKeyword.id,
+            keywordId = newKeywordId,
+            description = newDescription,
+        )
 
         // when
-        val result = repository.updateDescription(userId, userKeyword.id, patch.toDomain())
-        val patchedUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
+        val result = repository.update(userId, patch)
+        val patchedUserKeyword = repository.findById(userKeyword.id)
 
         // then
         assertTrue(result)
         assertNotNull(patchedUserKeyword)
+        assertEquals(newKeywordId, patchedUserKeyword.keywordId)
+        assertEquals(newDescription, patchedUserKeyword.description)
     }
 
     @Test
-    fun `updateDescription 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
-        val patch = DescriptionDto(value = "hello")
-        val result =
-            repository.updateDescription(UserId(10), UserKeywordId(10), patch.toDomain())
+    fun `update 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
+        val patch = UserKeywordPatch(
+            userKeywordId = UserKeywordId(10),
+            keywordId = KeywordId(101L),
+            description = Description("newDescription"),
+        )
+        val result = repository.update(UserId(10), patch)
 
         assertFalse(result)
     }

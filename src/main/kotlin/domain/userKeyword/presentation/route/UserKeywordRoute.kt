@@ -7,8 +7,7 @@ import com.peekr.common.route.Api
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
-import com.peekr.domain.userKeyword.presentation.dto.DescriptionResponse
-import com.peekr.domain.userKeyword.presentation.dto.UpdateDescriptionRequest
+import com.peekr.domain.userKeyword.presentation.dto.UpdateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordDetailResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordResponse
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
@@ -37,21 +36,6 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             call.respond(userKeywords.toResponse())
         }
 
-        get(route.GET_DESCRIPTION, { getDescriptionDocs() }) {
-            val userKeywordIdParam = call.queryParameters["userKeywordId"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("사용자 키워드 ID")
-            val userKeywordId = UserKeywordId(userKeywordIdParam)
-            val ownerId = extractUserIdWithToken()
-            verifyAuthUserId(ownerId)
-            val descriptionDto = usecase.getDescription(ownerId, userKeywordId)
-            if (descriptionDto != null) {
-                call.respond(HttpStatusCode.OK, descriptionDto.toResponse())
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
-        }
-
         get(route.detail(pathParam = "{userKeywordId}"), { getDetailDocs() }) {
             val userKeywordIdParam = call.parameters["userKeywordId"]
                 ?.toLongOrNull()
@@ -73,24 +57,11 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
         }
 
-        patch(route.PATCH_DESCRIPTION, { updateDescriptionDocs() }) {
-            val userKeywordIdParam = call.queryParameters["userKeywordId"]
-                ?.toLongOrNull()
-                .inputValidationAndReturn("사용자 키워드 ID")
+        patch(route.ROUTE, { updateUserKeywordDocs() }) {
+            val updateUserKeywordRequest = call.receive<UpdateUserKeywordRequest>()
             val ownerId = extractUserIdWithToken()
-            verifyAuthUserId(ownerId)
-            val userKeywordId = UserKeywordId(userKeywordIdParam)
-            val descriptionDto = call.receive<UpdateDescriptionRequest>().toDto()
-            val result = usecase.updateDescription(
-                ownerId = ownerId,
-                userKeywordId = userKeywordId,
-                patch = descriptionDto,
-            )
-            if (result != null) {
-                call.respond(HttpStatusCode.OK, result.toResponse())
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+            usecase.update(ownerId.value, updateUserKeywordRequest.toDto())
+            call.respond(HttpStatusCode.OK)
         }
 
         delete(route.ROUTE, { deleteUserKeywordDocs() }) {
@@ -155,32 +126,6 @@ private fun RouteConfig.getDetailDocs() {
     }
 }
 
-private fun RouteConfig.getDescriptionDocs() {
-    summary = "사용자 키워드 설명 조회"
-    description = "사용자 키워드 ID를 통해 사용자 키워드 설명을 조회한다."
-    request {
-        queryParameter<Long>("userKeywordId") {
-            description = "사용자 키워드 ID"
-            example("userKeywordId") {
-                value = 1
-            }
-        }
-    }
-    response {
-        code(HttpStatusCode.OK) {
-            body<DescriptionResponse> {
-                description = "사용자 키워드 설명 응답 바디 (성공)"
-                example("DescriptionResponse") {
-                    value = DescriptionResponse.sample
-                }
-            }
-        }
-        code(HttpStatusCode.NotFound) {
-            description = "사용자 키워드 설명 응답 바디 (실패)"
-        }
-    }
-}
-
 private fun RouteConfig.createUserKeywordDocs() {
     summary = "사용자 키워드 생성"
     description = "사용자 키워드를 생성한다."
@@ -204,34 +149,23 @@ private fun RouteConfig.createUserKeywordDocs() {
     }
 }
 
-private fun RouteConfig.updateDescriptionDocs() {
-    summary = "사용자 키워드 설명 수정"
-    description = "사용자 키워드 설명을 수정한다."
+private fun RouteConfig.updateUserKeywordDocs() {
+    summary = "사용자 키워드 수정"
+    description = "사용자 키워드를 수정한다."
     request {
-        queryParameter<Long>("userKeywordId") {
-            description = "사용자 키워드 ID"
-            example("userKeywordId") {
-                value = 1
-            }
-        }
-        body<UpdateDescriptionRequest> {
-            description = "사용자 키워드 설명 수정 요청 바디"
-            example("UpdateDescriptionRequest") {
-                value = UpdateDescriptionRequest.sample
+        body<UpdateUserKeywordRequest> {
+            description = "사용자 키워드 수정 요청 바디"
+            example("UpdateUserKeywordRequest") {
+                value = UpdateUserKeywordRequest.sample
             }
         }
     }
     response {
         code(HttpStatusCode.OK) {
-            body<DescriptionResponse> {
-                description = "사용자 키워드 설명 수정 응답 결과 (성공)"
-                example("UpdateDescriptionResponse") {
-                    value = DescriptionResponse.sample
-                }
-            }
+            description = "사용자 키워드 수정 성공 시"
         }
         code(HttpStatusCode.NotFound) {
-            description = "사용자 키워드 설명 수정 응답 결과 (실패)"
+            description = "사용자 키워드를 찾지 못하는 경우"
         }
     }
 }

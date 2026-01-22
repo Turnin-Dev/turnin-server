@@ -1,0 +1,78 @@
+package com.peekr.domain.userKeyword.application.usecase.integration
+
+import com.peekr.common.db.schema.KeywordEntity
+import com.peekr.common.db.schema.Keywords
+import com.peekr.common.db.schema.Users
+import com.peekr.common.db.suspendTransaction
+import com.peekr.common.model.KeywordName
+import com.peekr.common.model.id.KeywordId
+import com.peekr.common.model.id.UserId
+import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
+import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.selectAll
+
+class FakeKeywordProvider : KeywordProvider {
+    override suspend fun findById(keywordId: KeywordId): ExternalKeyword? = suspendTransaction {
+        Keywords
+            .selectAll()
+            .where { Keywords.id eq keywordId.value }
+            .map {
+                ExternalKeyword(
+                    id = KeywordId(it[Keywords.id].value),
+                    name = KeywordName(it[Keywords.keyword]),
+                    createdBy = UserId(it[Keywords.createdBy].value),
+                    createdAt = it[Keywords.createdAt].toEpochSecond(),
+                    updatedAt = it[Keywords.updatedAt].toEpochSecond(),
+                )
+            }.singleOrNull()
+    }
+
+    override suspend fun findByIds(keywordIds: List<KeywordId>): List<ExternalKeyword> = suspendTransaction {
+        Keywords
+            .selectAll()
+            .where { Keywords.id inList keywordIds.map { it.value } }
+            .map {
+                ExternalKeyword(
+                    id = KeywordId(it[Keywords.id].value),
+                    name = KeywordName(it[Keywords.keyword]),
+                    createdBy = UserId(it[Keywords.createdBy].value),
+                    createdAt = it[Keywords.createdAt].toEpochSecond(),
+                    updatedAt = it[Keywords.updatedAt].toEpochSecond(),
+                )
+            }
+    }
+
+    override suspend fun findByName(keywordName: String): ExternalKeyword? = suspendTransaction {
+        Keywords
+            .selectAll()
+            .where { Keywords.keyword eq keywordName }
+            .map {
+                ExternalKeyword(
+                    id = KeywordId(it[Keywords.id].value),
+                    name = KeywordName(it[Keywords.keyword]),
+                    createdBy = UserId(it[Keywords.createdBy].value),
+                    createdAt = it[Keywords.createdAt].toEpochSecond(),
+                    updatedAt = it[Keywords.updatedAt].toEpochSecond(),
+                )
+            }.singleOrNull()
+    }
+
+    override suspend fun create(
+        keywordName: String,
+        createdBy: UserId,
+    ): ExternalKeyword = suspendTransaction {
+        val keyword = KeywordEntity.new {
+            this.keyword = keywordName
+            this.embedding = "embedding"
+            this.createdBy = EntityID(createdBy.value, Users)
+        }
+        ExternalKeyword(
+            id = KeywordId(keyword.id.value),
+            name = KeywordName(keyword.keyword),
+            createdBy = createdBy,
+            createdAt = keyword.createdAt.toEpochSecond(),
+            updatedAt = keyword.updatedAt.toEpochSecond(),
+        )
+    }
+}

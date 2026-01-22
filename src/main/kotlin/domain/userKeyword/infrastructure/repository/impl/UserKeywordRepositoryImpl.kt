@@ -11,6 +11,7 @@ import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
+import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDetail
 import com.peekr.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDomain
@@ -151,13 +152,16 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         savedUserKeywordEntity.toDomain()
     }
 
-    override suspend fun updateDescription(
+    override suspend fun update(
         ownerId: UserId,
-        userKeywordId: UserKeywordId,
-        patch: Description,
+        patch: UserKeywordPatch,
     ): Boolean = suspendTransaction {
-        UserKeywords.update({ (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) }) {
-            it[description] = patch.value
+        UserKeywords.update({
+            (UserKeywords.id eq patch.userKeywordId.value) and
+                (UserKeywords.userId eq ownerId.value)
+        }) {
+            it[keywordId] = patch.keywordId.value
+            it[description] = patch.description.value
         } > 0
     }
 
