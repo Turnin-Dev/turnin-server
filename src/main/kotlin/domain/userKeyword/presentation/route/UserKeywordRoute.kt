@@ -59,8 +59,8 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
 
         patch(route.ROUTE, { updateUserKeywordDocs() }) {
             val updateUserKeywordRequest = call.receive<UpdateUserKeywordRequest>()
-            verifyAuthUserId(UserId(updateUserKeywordRequest.ownerId))
-            val result = usecase.update(updateUserKeywordRequest.toDto())
+            val ownerId = extractUserIdWithToken()
+            val result = usecase.update(ownerId.value, updateUserKeywordRequest.toDto())
             if (result) {
                 call.respond(HttpStatusCode.OK)
             } else {

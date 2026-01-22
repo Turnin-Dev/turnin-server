@@ -30,14 +30,14 @@ class UpdateUserKeywordUseCaseTest {
     fun `사용자 키워드 수정 성공 테스트 - 키워드가 기존에 있는 경우`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.update(any())
+            userKeywordRepository.update(TestUserId, any())
         } returns true
         coEvery {
             keywordProvider.findByName(any())
         } returns TestExternalKeyword
 
         // when
-        val result = usecase(TestUserKeywordPatchDto)
+        val result = usecase(TestUserId.value, TestUserKeywordPatchDto)
 
         // then
         assertTrue(result)
@@ -47,7 +47,7 @@ class UpdateUserKeywordUseCaseTest {
     fun `사용자 키워드 수정 성공 테스트 - 키워드가 기존에 없는 경우`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.update(any())
+            userKeywordRepository.update(TestUserId, any())
         } returns true
         coEvery {
             keywordProvider.findByName(any())
@@ -57,7 +57,7 @@ class UpdateUserKeywordUseCaseTest {
         } returns TestExternalKeyword
 
         // when
-        val result = usecase(TestUserKeywordPatchDto)
+        val result = usecase(TestUserId.value, TestUserKeywordPatchDto)
 
         // then
         assertTrue(result)
@@ -67,14 +67,14 @@ class UpdateUserKeywordUseCaseTest {
     fun `사용자 키워드 수정에 실패한 경우 false를 반환한다`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.update(any())
+            userKeywordRepository.update(TestUserId, any())
         } returns false
         coEvery {
             keywordProvider.findByName(any())
         } returns TestExternalKeyword
 
         // when
-        val result = usecase(TestUserKeywordPatchDto)
+        val result = usecase(TestUserId.value, TestUserKeywordPatchDto)
 
         // then
         assertFalse(result)
@@ -84,7 +84,6 @@ class UpdateUserKeywordUseCaseTest {
         private val TestUserId = UserId(1)
         private val TestUserKeywordId = UserKeywordId(1)
         private val TestUserKeywordPatchDto = UserKeywordPatchDto(
-            ownerId = TestUserId.value,
             userKeywordId = TestUserKeywordId.value,
             keywordName = "newKeywordName",
             description = "newDescription",

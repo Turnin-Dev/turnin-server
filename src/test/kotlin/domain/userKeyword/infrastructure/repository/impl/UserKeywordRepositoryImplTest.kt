@@ -174,14 +174,13 @@ class UserKeywordRepositoryImplTest {
         val newKeywordId = insertKeywordAndReturnId(userId, "newKeyword")
         val newDescription = Description("newDescription")
         val patch = UserKeywordPatch(
-            ownerId = userId,
             userKeywordId = userKeyword.id,
             keywordId = newKeywordId,
             description = newDescription,
         )
 
         // when
-        val result = repository.update(patch)
+        val result = repository.update(userId, patch)
         val patchedUserKeyword = repository.findById(userKeyword.id)
 
         // then
@@ -194,12 +193,11 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `update 실패 테스트 - 존재하지 않는 사용자 ID 혹은 사용자 키워드 ID 조회 시 false 반환`() = runTest {
         val patch = UserKeywordPatch(
-            ownerId = UserId(10),
             userKeywordId = UserKeywordId(10),
             keywordId = KeywordId(101L),
             description = Description("newDescription"),
         )
-        val result = repository.update(patch)
+        val result = repository.update(UserId(10), patch)
 
         assertFalse(result)
     }

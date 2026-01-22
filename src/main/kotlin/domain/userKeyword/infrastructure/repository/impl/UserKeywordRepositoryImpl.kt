@@ -153,11 +153,12 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     }
 
     override suspend fun update(
+        ownerId: UserId,
         patch: UserKeywordPatch,
     ): Boolean = suspendTransaction {
         UserKeywords.update({
             (UserKeywords.id eq patch.userKeywordId.value) and
-                (UserKeywords.userId eq patch.ownerId.value)
+                (UserKeywords.userId eq ownerId.value)
         }) {
             it[keywordId] = patch.keywordId.value
             it[description] = patch.description.value

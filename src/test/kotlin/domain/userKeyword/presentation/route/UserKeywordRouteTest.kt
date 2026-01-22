@@ -257,7 +257,7 @@ class UserKeywordRouteTest {
         // given
         val route = Api.V1.UserKeyword
         coEvery {
-            userKeywordUseCases.update(TestUpdateUserKeywordRequest.toDto())
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
         } returns true
 
         // when, then
@@ -279,7 +279,7 @@ class UserKeywordRouteTest {
         // given
         val route = Api.V1.UserKeyword
         coEvery {
-            userKeywordUseCases.update(TestUpdateUserKeywordRequest.toDto())
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
         } returns false
 
         // when, then
@@ -301,7 +301,7 @@ class UserKeywordRouteTest {
         // given
         val route = Api.V1.UserKeyword
         coEvery {
-            userKeywordUseCases.update(TestUpdateUserKeywordRequest.toDto())
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
         } throws Exception()
 
         // when, then
@@ -325,7 +325,7 @@ class UserKeywordRouteTest {
         val expectedMessage = "error!"
         val expectedException = TestApiException(expectedMessage)
         coEvery {
-            userKeywordUseCases.update(TestUpdateUserKeywordRequest.toDto())
+            userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
         } throws expectedException
 
         // when, then
@@ -518,7 +518,6 @@ class UserKeywordRouteTest {
             description = TestDescription.value,
         )
         private val TestUpdateUserKeywordRequest = UpdateUserKeywordRequest(
-            ownerId = TestUserId.value,
             userKeywordId = TestUserKeywordId.value,
             keywordName = "newKeywordName",
             description = "newDescription",

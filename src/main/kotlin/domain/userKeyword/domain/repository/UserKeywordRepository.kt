@@ -89,11 +89,13 @@ interface UserKeywordRepository {
     /**
      * 사용자 키워드를 업데이트한다.
      *
+     * @param ownerId 사용자 ID
      * @param patch [UserKeywordPatch]
      *
      * @return 성공 시 `true`, 실패 시 `false` 반환
      */
     suspend fun update(
+        ownerId: UserId,
         patch: UserKeywordPatch,
     ): Boolean
 
