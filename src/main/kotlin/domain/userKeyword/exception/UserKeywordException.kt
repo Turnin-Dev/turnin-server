@@ -27,12 +27,9 @@ sealed class UserKeywordException(
             status = HttpStatusCode.BadRequest,
         )
 
-    class DataNotFound(
-        field: String,
-        message: String,
-    ) : UserKeywordException(
-            code = UserKeywordErrorCode.DataNotFound(field),
+    class UpdateFailed :
+        UserKeywordException(
+            code = UserKeywordErrorCode.UpdateFailed,
             status = HttpStatusCode.NotFound,
-            message = message,
         )
 }

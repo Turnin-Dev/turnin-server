@@ -14,6 +14,7 @@ import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDto
 import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
 import com.peekr.domain.userKeyword.domain.model.Description
+import com.peekr.domain.userKeyword.exception.UserKeywordException
 import com.peekr.domain.userKeyword.presentation.dto.CreateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.UpdateUserKeywordRequest
 import com.peekr.domain.userKeyword.presentation.dto.UserKeywordsResponse
@@ -258,7 +259,7 @@ class UserKeywordRouteTest {
         val route = Api.V1.UserKeyword
         coEvery {
             userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
-        } returns true
+        } returns Unit
 
         // when, then
         testPatchEndpoint(
@@ -278,9 +279,10 @@ class UserKeywordRouteTest {
     fun `사용자 키워드 수정 - 수정 실패한 경우 HTTP 상태코드 404를 반환한다`() = testApplication {
         // given
         val route = Api.V1.UserKeyword
+        val expectedException = UserKeywordException.UpdateFailed()
         coEvery {
             userKeywordUseCases.update(TestUserId.value, TestUpdateUserKeywordRequest.toDto())
-        } returns false
+        } throws expectedException
 
         // when, then
         testPatchEndpoint(
@@ -292,7 +294,11 @@ class UserKeywordRouteTest {
                 )
             },
             tokenSubject = TestUserId.value.toString(),
-            expectedStatus = HttpStatusCode.NotFound,
+            expectedStatus = expectedException.status,
+            responseValidator = {
+                contains(expectedException.errorCode.code)
+                contains(expectedException.errorCode.description)
+            },
         )
     }
 

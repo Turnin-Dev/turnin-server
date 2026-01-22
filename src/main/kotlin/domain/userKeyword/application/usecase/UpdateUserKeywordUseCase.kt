@@ -1,10 +1,12 @@
 package com.peekr.domain.userKeyword.application.usecase
 
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
 import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.peekr.domain.userKeyword.exception.UserKeywordException
 
 /**
  * 사용자 키워드 업데이트
@@ -21,12 +23,12 @@ class UpdateUserKeywordUseCase(
      * @param ownerId 사용자 ID
      * @param patch [UserKeywordPatchDto] 사용자 키워드 수정 DTO
      *
-     * @return 업데이트 성공 시 `true`를 반환하고 실패 시 `false`를 반환한다.
+     * @throws UserKeywordException.UpdateFailed 업데이트에 실패한 경우 예외가 발생한다.
      */
     suspend operator fun invoke(
         ownerId: Long,
         patch: UserKeywordPatchDto,
-    ): Boolean {
+    ): Unit = suspendTransaction {
         // 0) 데이터 준비
         val ownerIdVO = UserId(ownerId)
 
@@ -39,6 +41,11 @@ class UpdateUserKeywordUseCase(
 
         // 2) 사용자 키워드 업데이트
         val userKeywordPatch = patch.toDomain(keywordId = keyword.id)
-        return userKeywordRepository.update(ownerIdVO, userKeywordPatch)
+        val updated = userKeywordRepository.update(ownerIdVO, userKeywordPatch)
+
+        // 3) 결과 반환 및 실패 시 예외 발생(롤백 수행)
+        if (!updated) {
+            throw UserKeywordException.UpdateFailed()
+        }
     }
 }
