@@ -7,9 +7,7 @@ import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.KeywordId.Companion.invoke
 import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserId.Companion.invoke
 import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
 import com.peekr.domain.userKeyword.application.usecase.UpdateUserKeywordUseCase
 import com.peekr.domain.userKeyword.infrastructure.repository.impl.UserKeywordRepositoryImpl
