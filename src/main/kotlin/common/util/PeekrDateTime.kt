@@ -3,7 +3,7 @@ package com.peekr.common.util
 import io.ktor.util.logging.KtorSimpleLogger
 import java.time.Instant
 import java.time.OffsetDateTime
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Date
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.jetbrains.exposed.sql.javatime.CurrentTimestampBase
@@ -71,7 +71,7 @@ object PeekrDateTime {
 fun Instant.toDate(): Date = Date.from(this)
 
 fun Instant.toOffsetDateTime(): OffsetDateTime =
-    this.atOffset(ZoneId.systemDefault().rules.getOffset(this))
+    this.atOffset(ZoneOffset.UTC)
 
 /**
  * DB 시간 관련 유틸
