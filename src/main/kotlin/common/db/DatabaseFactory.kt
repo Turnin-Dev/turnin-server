@@ -64,7 +64,8 @@ object DatabaseFactory {
         val flyway = when (env) {
             RunEnvironment.Dev -> {
                 LOGGER.warn("Dev 환경에서 Flyway.clean()을 수행합니다. 모든 스키마가 초기화됩니다.")
-                flywayBuilder.cleanDisabled(false).load().also { it.clean() }
+//                flywayBuilder.cleanDisabled(false).load().also { it.clean() }
+                flywayBuilder.cleanDisabled(true).load()
             }
 
             RunEnvironment.Prod -> {
