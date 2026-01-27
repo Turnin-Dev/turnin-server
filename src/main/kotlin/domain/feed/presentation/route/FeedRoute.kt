@@ -49,6 +49,9 @@ private fun RouteConfig.getFeedsDocs() {
         queryParameter<Long>("cursorUserKeywordId") {
             description = "커서 값 3 (피드의 사용자 키워드 ID)"
         }
+        queryParameter<Int>("size") {
+            description = "페이지네이션에 필요한 페이지 크기"
+        }
     }
     response {
         code(HttpStatusCode.OK) {
