@@ -32,18 +32,18 @@ class GetFeedsUseCase(private val feedRepository: FeedRepository) {
      */
     suspend operator fun invoke(
         userId: Long,
-        cursor: FeedCursor,
+        cursor: FeedCursor?,
         pageSize: Int,
     ): CursorPage<FeedDto, FeedCursor> {
         // 0) 데이터 전처리
         val userIdVO = UserId(userId)
-        val cursorUkIdVO: UserKeywordId? = cursor.userKeywordId?.let { UserKeywordId(it) }
+        val cursorUkIdVO: UserKeywordId? = cursor?.userKeywordId?.let { UserKeywordId(it) }
 
         // 1) 피드 목록 조회
         val feedsWithOneExtra = feedRepository.getFeeds(
             userId = userIdVO,
-            cursorScore = cursor.score,
-            cursorCreatedAt = cursor.createdAt,
+            cursorScore = cursor?.score,
+            cursorCreatedAt = cursor?.createdAt,
             cursorUkId = cursorUkIdVO,
             limit = pageSize,
         )
