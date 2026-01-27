@@ -3,7 +3,6 @@ package com.peekr.domain.feed.presentation.dto
 import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.feed.application.dto.FeedCursor
 import com.peekr.domain.feed.application.dto.FeedDto
-import kotlin.text.toLong
 import kotlinx.serialization.Serializable
 
 /**
