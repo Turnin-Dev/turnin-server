@@ -56,7 +56,7 @@ private fun RouteConfig.getDiscoverContextDocs() {
     response {
         code(HttpStatusCode.OK) {
             description = "탐색 컨텍스트(공유 키워드 정보) 응답 바디"
-            body<CursorPage<DiscoverContextResponse>> {
+            body<CursorPage<DiscoverContextResponse, Long>> {
                 example("CursorPage(DiscoverContextResponse)") {
                     value = DiscoverContextResponse.sample
                 }

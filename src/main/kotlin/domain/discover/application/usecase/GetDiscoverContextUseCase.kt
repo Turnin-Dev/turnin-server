@@ -33,7 +33,7 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
         userId: Long,
         cursor: Long?,
         pageSize: Int,
-    ): CursorPage<DiscoverContextDto> = suspendTransaction {
+    ): CursorPage<DiscoverContextDto, Long> = suspendTransaction {
         // 0) 데이터 전처리
         val userIdVO = UserId(userId)
 

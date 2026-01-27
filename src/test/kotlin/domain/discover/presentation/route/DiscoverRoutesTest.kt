@@ -27,7 +27,7 @@ class DiscoverRoutesTest {
     @Test
     fun `탐색 컨텍스트 목록 조회 - 페이지네이션 첫 페이지 조회`() = testApplication {
         val pageSize = 10
-        val testCursorPage = CursorPage(
+        val testCursorPage = CursorPage<DiscoverContextDto, Long>(
             items = List(pageSize) { pageIndex ->
                 val pageNumber = pageIndex + 1L
                 DiscoverContextDto(
@@ -77,7 +77,7 @@ class DiscoverRoutesTest {
     fun `탐색 컨텍스트 목록 조회 - 페이지네이션 중간 페이지 조회`() = testApplication {
         val pageSize = 10
         val cursor = 3L
-        val testCursorPage = CursorPage(
+        val testCursorPage = CursorPage<DiscoverContextDto, Long>(
             items = List(pageSize) { pageIndex ->
                 val pageNumber = pageIndex + 1L
                 DiscoverContextDto(
