@@ -9,11 +9,11 @@ import kotlinx.serialization.Serializable
  * @property nextCursor 다음 커서, 다음 데이터가 없으면 `null`
  */
 @Serializable
-data class CursorPage<T>(
+data class CursorPage<T, C>(
     val items: List<T>,
-    val nextCursor: Long?,
+    val nextCursor: C?,
 )
 
-fun <T, R> CursorPage<T>.toResponse(
+fun <T, R, C> CursorPage<T, C>.toResponse(
     mapper: (T) -> R,
-): CursorPage<R> = CursorPage(items.map(mapper), nextCursor)
+): CursorPage<R, C> = CursorPage(items.map(mapper), nextCursor)

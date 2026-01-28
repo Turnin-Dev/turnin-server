@@ -1,14 +1,19 @@
 package com.peekr.util.db
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.BlockReasons
+import com.peekr.common.db.schema.Blocks
+import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
+import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect
@@ -65,6 +70,7 @@ private object TestDBContainerFactory {
                 val enums = mapOf(
                     "user_role" to Role.entries.map { it.name },
                     "social_login_provider" to SocialLoginProvider.entries.map { it.name },
+                    "friend_status" to FriendRequestStatus.entries.map { it.name },
                 )
 
                 enums.forEach { (typeName, values) ->
@@ -83,20 +89,57 @@ private object TestDBContainerFactory {
             }
 
             // 테이블 생성
-            SchemaUtils.create(Users, Keywords, UserKeywords)
+            SchemaUtils.create(
+                Users,
+                Keywords,
+                UserKeywords,
+                Friends,
+                Blocks,
+                BlockReasons,
+            )
+
+            // 초기 데이터 준비
+            initData()
         }
     }
 
     fun cleanUp() {
         transaction(database) {
-            SchemaUtils.drop(Users, Keywords, UserKeywords)
-            SchemaUtils.create(Users, Keywords, UserKeywords)
+            SchemaUtils.drop(
+                Users,
+                Keywords,
+                UserKeywords,
+                Friends,
+                Blocks,
+                BlockReasons,
+            )
+            SchemaUtils.create(
+                Users,
+                Keywords,
+                UserKeywords,
+                Friends,
+                Blocks,
+                BlockReasons,
+            )
+
+            // 초기 데이터 준비
+            initData()
         }
     }
 
     fun shutdown() {
         container.stop()
         database = null
+    }
+
+    private fun initData() {
+        // 초기 데이터 삽입
+        repeat(2) {
+            BlockReasons.insert { stmt ->
+                stmt[code] = "TEST_BLOCK_REASON_$it"
+                stmt[description] = "TEST_BLOCK_REASON_DESC_$it"
+            }
+        }
     }
 
     suspend fun <T> dbQuery(block: () -> T): T =

@@ -14,7 +14,6 @@ import org.jetbrains.exposed.sql.Database
  * 코루틴 기반 트랜잭션 헬퍼(dbQuery) 제공을 담당합니다.
  *
  * 주의:
- * - Dev 환경에서는 migrate 시 clean()을 호출하여 기존 스키마가 초기화됩니다.
  * - 트랜잭션 헬퍼(dbQuery)는 IO 전용 컨텍스트(Dispatchers.IO)에서 newSuspendedTransaction을 실행합니다.
  */
 object DatabaseFactory {
@@ -63,8 +62,9 @@ object DatabaseFactory {
 
         val flyway = when (env) {
             RunEnvironment.Dev -> {
-                LOGGER.warn("Dev 환경에서 Flyway.clean()을 수행합니다. 모든 스키마가 초기화됩니다.")
-                flywayBuilder.cleanDisabled(false).load().also { it.clean() }
+//                flywayBuilder.cleanDisabled(false).load().also { it.clean() }
+                LOGGER.warn("Dev 환경에서도 Flyway.clean()을 수행하지 않으므로 모든 스키마가 유지됩니다.")
+                flywayBuilder.cleanDisabled(true).load()
             }
 
             RunEnvironment.Prod -> {
