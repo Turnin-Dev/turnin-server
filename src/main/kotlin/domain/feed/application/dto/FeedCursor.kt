@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class FeedCursor(
-    val score: Double?,
-    val createdAt: Long?,
-    val userKeywordId: Long?,
+    val score: Double,
+    val createdAt: Long,
+    val userKeywordId: Long,
 )

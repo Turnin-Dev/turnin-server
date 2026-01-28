@@ -43,7 +43,7 @@ fun RoutingContext.getFeedCursorPaginationParams(): CursorPaginationParams<FeedC
         size > 25 -> throw BadRequestException("Page size number too large.")
     }
 
-    val feedCursor = if (cursorScore == null && cursorCreatedAt == null && cursorUserKeywordId == null) {
+    val feedCursor = if (cursorScore == null || cursorCreatedAt == null || cursorUserKeywordId == null) {
         null
     } else {
         FeedCursor(
