@@ -98,13 +98,8 @@ private object TestDBContainerFactory {
                 BlockReasons,
             )
 
-            // 초기 데이터 삽입
-            repeat(2) {
-                BlockReasons.insert { stmt ->
-                    stmt[code] = "TEST_BLOCK_REASON_$it"
-                    stmt[description] = "TEST_BLOCK_REASON_DESC_$it"
-                }
-            }
+            // 초기 데이터 준비
+            initData()
         }
     }
 
@@ -126,12 +121,25 @@ private object TestDBContainerFactory {
                 Blocks,
                 BlockReasons,
             )
+
+            // 초기 데이터 준비
+            initData()
         }
     }
 
     fun shutdown() {
         container.stop()
         database = null
+    }
+
+    private fun initData() {
+        // 초기 데이터 삽입
+        repeat(2) {
+            BlockReasons.insert { stmt ->
+                stmt[code] = "TEST_BLOCK_REASON_$it"
+                stmt[description] = "TEST_BLOCK_REASON_DESC_$it"
+            }
+        }
     }
 
     suspend fun <T> dbQuery(block: () -> T): T =

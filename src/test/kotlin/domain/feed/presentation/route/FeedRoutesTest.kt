@@ -32,7 +32,7 @@ class FeedRoutesTest {
         coEvery {
             usecase.getFeeds(
                 TestUserId.value,
-                FeedCursor(null, null, null),
+                null,
                 pageSize,
             )
         } returns cursorPage
@@ -76,7 +76,7 @@ class FeedRoutesTest {
         coEvery {
             usecase.getFeeds(
                 TestUserId.value,
-                FeedCursor(null, null, null),
+                null,
                 pageSize,
             )
         } returns cursorPage
