@@ -39,7 +39,7 @@ class UserRepositoryImpl : UserRepository {
         Users.update({ (Users.id eq userId.value) }) { row ->
             row[name] = patch.userName.value
             row[profileImageUrl] = patch.profileImageUrl
-            patch.introduce?.let { row[introduce] = it.value }
+            patch.introduce.let { row[introduce] = it.value }
             patch.profileImageUrl?.let { row[profileImageUrl] = it }
         } > 0
     }

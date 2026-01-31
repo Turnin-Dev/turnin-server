@@ -81,6 +81,7 @@ class DiscoverRepositoryImplTest {
                 it[provider] = SocialLoginProvider.KAKAO
                 it[providerId] = "p1"
                 it[displayId] = "d1"
+                it[introduce] = ""
             }
             val u2 = Users.insertAndGetId {
                 it[name] = "테스트유저2"
@@ -88,6 +89,7 @@ class DiscoverRepositoryImplTest {
                 it[provider] = SocialLoginProvider.KAKAO
                 it[providerId] = "p2"
                 it[displayId] = "d2"
+                it[introduce] = ""
             }
 
             // 키워드 생성

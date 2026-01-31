@@ -15,7 +15,7 @@ object AuthMapper {
         userName = UserName(name),
         displayId = DisplayId(displayId),
         profileImageUrl = profileImageUrl,
-        introduce = introduce?.let { Introduce(it) },
+        introduce = Introduce(introduce),
     )
 
     fun FindUserResult.toDto(): FindUserResultDto = FindUserResultDto(exists)

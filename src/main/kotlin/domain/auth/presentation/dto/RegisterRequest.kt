@@ -26,7 +26,7 @@ data class RegisterRequest(
     val displayId: String,
     val name: String,
     val profileImageUrl: String? = null,
-    val introduce: String? = null,
+    val introduce: String,
 ) {
     companion object {
         val sample = RegisterRequest(
@@ -56,5 +56,5 @@ fun RegisterRequest.validate() {
     name.validateName()
     displayId.validateDisplayId()
     profileImageUrl?.validateProfileImageUrl()
-    introduce?.validateIntroduce()
+    introduce.validateIntroduce()
 }

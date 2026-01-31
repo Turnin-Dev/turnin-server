@@ -50,7 +50,7 @@ class AuthRepositoryImpl : AuthRepository {
             this.name = register.userName.value
             this.displayId = register.displayId.value
             this.profileImageUrl = register.profileImageUrl
-            this.introduce = register.introduce?.value
+            this.introduce = register.introduce.value
             this.isActive = isActive
             this.lastLoginAt = lastLoginAt
         }

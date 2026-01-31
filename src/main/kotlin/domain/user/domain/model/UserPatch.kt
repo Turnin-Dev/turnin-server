@@ -13,5 +13,5 @@ import com.peekr.common.model.UserName
 data class UserPatch(
     val userName: UserName,
     val profileImageUrl: String?,
-    val introduce: Introduce?,
+    val introduce: Introduce,
 )

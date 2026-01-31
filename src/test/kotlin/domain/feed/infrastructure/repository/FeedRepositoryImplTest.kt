@@ -185,6 +185,7 @@ class FeedRepositoryImplTest {
             this.providerId = "pid$uniqueValue"
             this.displayId = "did$uniqueValue"
             this.name = "name$uniqueValue"
+            this.introduce = "introduce$uniqueValue"
         }
     }
 

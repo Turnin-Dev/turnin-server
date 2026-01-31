@@ -26,7 +26,7 @@ data class UserResponse(
     val displayId: String,
     val name: String,
     val profileImageUrl: String?,
-    val introduce: String?,
+    val introduce: String,
     val lastLoginAt: Long?,
     val isActive: Boolean,
 ) {
@@ -54,7 +54,7 @@ fun UserDto.toResponse(): UserResponse = UserResponse(
     displayId = displayId.value,
     name = userName.value,
     profileImageUrl = profileImageUrl,
-    introduce = introduce?.value,
+    introduce = introduce.value,
     isActive = isActive,
     lastLoginAt = lastLoginAt,
 )

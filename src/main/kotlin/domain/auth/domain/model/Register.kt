@@ -24,7 +24,7 @@ data class Register(
     val displayId: DisplayId,
     val userName: UserName,
     val profileImageUrl: String?,
-    val introduce: Introduce?,
+    val introduce: Introduce,
 )
 
 fun Register.toAuthUser(

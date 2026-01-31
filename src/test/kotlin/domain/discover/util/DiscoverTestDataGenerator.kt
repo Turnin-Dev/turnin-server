@@ -38,6 +38,7 @@ object DiscoverTestDataGenerator {
                     this[Users.providerId] = "pid$i"
                     this[Users.displayId] = "display$i"
                     this[Users.name] = "사용자$i"
+                    this[Users.introduce] = "introduce$i"
                 }
             }
         }

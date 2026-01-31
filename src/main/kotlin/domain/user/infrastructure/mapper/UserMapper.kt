@@ -19,7 +19,7 @@ object UserMapper {
         displayId = DisplayId(this.displayId),
         userName = UserName(this.name),
         profileImageUrl = this.profileImageUrl,
-        introduce = this.introduce?.let { Introduce(it) },
+        introduce = Introduce(introduce),
         isActive = this.isActive,
         lastLoginAt = this.lastLoginAt,
     )
@@ -32,7 +32,7 @@ object UserMapper {
         displayId = DisplayId(row[Users.displayId]),
         userName = UserName(row[Users.name]),
         profileImageUrl = row[Users.profileImageUrl],
-        introduce = row[Users.introduce]?.let { Introduce(it) },
+        introduce = Introduce(row[Users.introduce]),
         isActive = row[Users.isActive],
         lastLoginAt = row[Users.lastLoginAt],
     )

@@ -18,7 +18,7 @@ object AuthMapper {
             displayId = DisplayId(row[Users.displayId]),
             userName = UserName(row[Users.name]),
             profileImageUrl = row[Users.profileImageUrl],
-            introduce = row[Users.introduce]?.let { Introduce(it) },
+            introduce = Introduce(row[Users.introduce]),
             isActive = row[Users.isActive],
             lastLoginAt = row[Users.lastLoginAt],
         )

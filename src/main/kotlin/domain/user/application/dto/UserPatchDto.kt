@@ -14,7 +14,7 @@ import com.peekr.domain.user.domain.model.UserPatch
 data class UserPatchDto(
     val userName: UserName,
     val profileImageUrl: String?,
-    val introduce: Introduce?,
+    val introduce: Introduce,
 )
 
 fun UserPatchDto.toDomain(): UserPatch = UserPatch(
