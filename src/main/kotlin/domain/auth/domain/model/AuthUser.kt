@@ -32,7 +32,7 @@ data class AuthUser(
     val profileImageUrl: String?,
     val introduce: Introduce,
     val isActive: Boolean,
-    val lastLoginAt: Instant?,
+    val lastLoginAt: Instant,
 ) {
     companion object {
         val sample: AuthUser = AuthUser(

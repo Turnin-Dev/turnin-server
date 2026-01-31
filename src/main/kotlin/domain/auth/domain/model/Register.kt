@@ -31,7 +31,7 @@ fun Register.toAuthUser(
     id: Long,
     role: Role,
     isActive: Boolean,
-    lastLoginAt: Instant?,
+    lastLoginAt: Instant,
 ): AuthUser = AuthUser(
     userId = UserId(id),
     role = role,

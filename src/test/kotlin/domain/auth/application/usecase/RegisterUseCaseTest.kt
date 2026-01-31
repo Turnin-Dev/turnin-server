@@ -17,6 +17,7 @@ import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
+import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -88,7 +89,7 @@ class RegisterUseCaseTest {
             profileImageUrl = "profileImageUrl",
             introduce = Introduce("introduce"),
             isActive = true,
-            lastLoginAt = null,
+            lastLoginAt = Instant.now(),
         )
         private val TestRegisterDto = RegisterDto(
             provider = TestProvider,

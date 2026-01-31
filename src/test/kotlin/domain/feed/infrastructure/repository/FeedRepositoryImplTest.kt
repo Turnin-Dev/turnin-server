@@ -14,6 +14,7 @@ import com.peekr.domain.discover.util.TestVectorFixture
 import com.peekr.domain.discover.util.TestVectorFixture.toPgVectorString
 import com.peekr.util.db.PostgresRule
 import com.peekr.util.db.TestDatabaseFactory
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -186,6 +187,7 @@ class FeedRepositoryImplTest {
             this.displayId = "did$uniqueValue"
             this.name = "name$uniqueValue"
             this.introduce = "introduce$uniqueValue"
+            this.lastLoginAt = Instant.now()
         }
     }
 

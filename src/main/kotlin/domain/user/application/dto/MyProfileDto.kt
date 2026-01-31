@@ -23,6 +23,6 @@ data class MyProfileDto(
     val profileImageUrl: String?,
     val introduce: Introduce,
     val isActive: Boolean,
-    val lastLoginAt: Long?,
+    val lastLoginAt: Long,
     val friendsCount: Long,
 )

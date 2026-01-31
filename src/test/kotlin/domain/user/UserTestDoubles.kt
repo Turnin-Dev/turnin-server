@@ -27,6 +27,7 @@ object UserTestDoubles {
         this.name = "honggd"
         this.profileImageUrl = "https://example.com/image.jpg"
         this.introduce = "hello world!"
+        this.lastLoginAt = Instant.now()
     }
 
     fun saveFriendEntity(
@@ -52,6 +53,6 @@ object UserTestDoubles {
         profileImageUrl = "https://example.com/image.jpg",
         introduce = Introduce("hello world!"),
         isActive = true,
-        lastLoginAt = null,
+        lastLoginAt = 1000L,
     )
 }

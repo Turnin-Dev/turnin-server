@@ -48,6 +48,7 @@ class RefreshTokenRepositoryImplTest {
                 this.name = TestAuthUser.userName.value
                 this.profileImageUrl = TestAuthUser.profileImageUrl
                 this.introduce = TestAuthUser.introduce.value
+                this.lastLoginAt = Instant.now()
             }
 
             RefreshTokens.upsert {
@@ -87,6 +88,7 @@ class RefreshTokenRepositoryImplTest {
                 this.name = TestAuthUser.userName.value
                 this.profileImageUrl = TestAuthUser.profileImageUrl
                 this.introduce = TestAuthUser.introduce.value
+                this.lastLoginAt = Instant.now()
             }
             savedUserEntity.id.value
         }

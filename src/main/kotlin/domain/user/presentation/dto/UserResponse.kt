@@ -27,7 +27,7 @@ data class UserResponse(
     val name: String,
     val profileImageUrl: String?,
     val introduce: String,
-    val lastLoginAt: Long?,
+    val lastLoginAt: Long,
     val isActive: Boolean,
 ) {
     companion object {

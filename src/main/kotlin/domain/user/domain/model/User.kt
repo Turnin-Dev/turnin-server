@@ -32,5 +32,5 @@ data class User(
     val profileImageUrl: String?,
     val introduce: Introduce,
     val isActive: Boolean,
-    val lastLoginAt: Instant?,
+    val lastLoginAt: Instant,
 )

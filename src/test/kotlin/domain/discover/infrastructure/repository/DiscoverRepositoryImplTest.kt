@@ -10,6 +10,7 @@ import com.peekr.domain.discover.util.DiscoverTestDataGenerator.setupKeywordRela
 import com.peekr.domain.discover.util.TestVectorFixture
 import com.peekr.domain.discover.util.TestVectorFixture.toPgVectorString
 import com.peekr.util.db.PostgresRule
+import java.time.Instant
 import junit.framework.TestCase.assertTrue
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -82,6 +83,7 @@ class DiscoverRepositoryImplTest {
                 it[providerId] = "p1"
                 it[displayId] = "d1"
                 it[introduce] = ""
+                it[lastLoginAt] = Instant.now()
             }
             val u2 = Users.insertAndGetId {
                 it[name] = "테스트유저2"
@@ -90,6 +92,7 @@ class DiscoverRepositoryImplTest {
                 it[providerId] = "p2"
                 it[displayId] = "d2"
                 it[introduce] = ""
+                it[lastLoginAt] = Instant.now()
             }
 
             // 키워드 생성

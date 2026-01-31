@@ -22,7 +22,7 @@ data class MyProfileResponse(
     val name: String,
     val profileImageUrl: String?,
     val introduce: String,
-    val lastLoginAt: Long?,
+    val lastLoginAt: Long,
     val friendsCount: Long,
     val isActive: Boolean,
 ) {
