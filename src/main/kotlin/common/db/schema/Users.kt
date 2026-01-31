@@ -17,9 +17,9 @@ object Users : BaseLongIdTable("user") {
     val displayId = varchar("display_id", 30).uniqueIndex("uq_users_display_id")
     val name = varchar("name", 30)
     val profileImageUrl = varchar("profile_image_url", 500).nullable()
-    val introduce = text("introduce").nullable()
+    val introduce = text("introduce")
     val isActive = bool("is_active").default(true)
-    val lastLoginAt = timestamp("last_login_at").nullable()
+    val lastLoginAt = timestamp("last_login_at")
 
     init {
         uniqueIndex("uq_provider_user", provider, providerId)

@@ -30,9 +30,9 @@ data class UserDto(
     val displayId: DisplayId,
     val userName: UserName,
     val profileImageUrl: String?,
-    val introduce: Introduce?,
+    val introduce: Introduce,
     val isActive: Boolean,
-    val lastLoginAt: Long?,
+    val lastLoginAt: Long,
 )
 
 fun User.toDto(): UserDto = UserDto(
@@ -45,5 +45,5 @@ fun User.toDto(): UserDto = UserDto(
     profileImageUrl = profileImageUrl,
     introduce = introduce,
     isActive = isActive,
-    lastLoginAt = lastLoginAt?.epochSecond,
+    lastLoginAt = lastLoginAt.epochSecond,
 )

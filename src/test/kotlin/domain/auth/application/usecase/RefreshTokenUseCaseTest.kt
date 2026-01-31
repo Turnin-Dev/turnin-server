@@ -14,6 +14,7 @@ import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import io.mockk.coEvery
 import io.mockk.mockk
+import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -117,7 +118,7 @@ class RefreshTokenUseCaseTest {
             profileImageUrl = "http://example.com/profile.jpg",
             introduce = Introduce("Hello!"),
             isActive = true,
-            lastLoginAt = null,
+            lastLoginAt = Instant.now(),
         )
     }
 }

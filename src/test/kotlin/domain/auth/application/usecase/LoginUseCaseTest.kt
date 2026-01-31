@@ -19,6 +19,7 @@ import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just
 import io.mockk.mockk
+import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -117,7 +118,7 @@ class LoginUseCaseTest {
             profileImageUrl = "profileImageUrl",
             introduce = Introduce("introduce"),
             isActive = true,
-            lastLoginAt = null,
+            lastLoginAt = Instant.now(),
         )
         private val TestLoginResult = LoginResult(
             jwtToken = TestJwtToken,

@@ -10,6 +10,7 @@ import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import io.mockk.coEvery
 import io.mockk.mockk
+import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -60,7 +61,7 @@ class FindUserUseCaseTest {
             profileImageUrl = "http://example.com/profile.jpg",
             introduce = Introduce("Hello!"),
             isActive = true,
-            lastLoginAt = null,
+            lastLoginAt = Instant.now(),
         )
     }
 }

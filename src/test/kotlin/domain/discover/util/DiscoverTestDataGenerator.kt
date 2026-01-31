@@ -7,6 +7,7 @@ import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.domain.discover.util.TestVectorFixture.toPgVectorString
 import com.peekr.util.db.TestDatabaseFactory
+import java.time.Instant
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -38,6 +39,8 @@ object DiscoverTestDataGenerator {
                     this[Users.providerId] = "pid$i"
                     this[Users.displayId] = "display$i"
                     this[Users.name] = "사용자$i"
+                    this[Users.introduce] = "introduce$i"
+                    this[Users.lastLoginAt] = Instant.now()
                 }
             }
         }

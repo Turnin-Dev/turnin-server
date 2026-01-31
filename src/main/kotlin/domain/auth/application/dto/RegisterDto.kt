@@ -18,5 +18,5 @@ data class RegisterDto(
     val displayId: String,
     val name: String,
     val profileImageUrl: String?,
-    val introduce: String?,
+    val introduce: String,
 )
