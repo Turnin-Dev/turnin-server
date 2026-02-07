@@ -12,6 +12,8 @@ import com.peekr.domain.friend.exception.FriendException
 
 /**
  * 받은 친구 요청 목록 페이지네이션 조회
+ *
+ * @see invoke
  */
 class GetIncomingRequestersUseCase(
     private val repository: FriendRepository,

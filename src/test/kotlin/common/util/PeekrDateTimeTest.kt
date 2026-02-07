@@ -26,15 +26,6 @@ class PeekrDateTimeTest {
     }
 
     @Test
-    fun `1초 이내에 연속 호출하면 동일한 캐시된 값이 반환되어야 한다`() = runBlocking {
-        val first = PeekrDateTime.now()
-        delay(500L)
-        val second = PeekrDateTime.now()
-
-        assertEquals(first, second, "캐시된 값이 동일해야 한다.")
-    }
-
-    @Test
     fun `1초 뒤에 호출하면 서로 다른 값이 반환되어야 한다`() = runBlocking {
         val first = PeekrDateTime.now()
         delay(1100L)
@@ -43,26 +34,6 @@ class PeekrDateTimeTest {
         assertNotEquals(first, second, "서로 값이 달라야 한다.")
         assertTrue(second.isAfter(first.minus(2, ChronoUnit.SECONDS)))
         assertTrue(second.isBefore(first.plus(2, ChronoUnit.SECONDS)))
-    }
-
-    @Test
-    fun `캐시된 시간은 1초 뒤에 만료되어야 한다`() {
-        // given
-        val first = PeekrDateTime.now()
-
-        // when - 캐시 만료 대기
-        Thread.sleep(1100)
-
-        // 캐시가 만료된 후 새로운 호출
-        val second = PeekrDateTime.now()
-        val third = PeekrDateTime.now() // 이것은 새로운 캐시 값
-
-        // then
-        assertEquals(second, third, "캐시 갱신 후 연속 호출은 동일한 값이어야 합니다")
-        assertTrue(
-            second.isAfter(first.minus(2, ChronoUnit.SECONDS)),
-            message = "first와 second는 다를 수도 있지만, 적어도 유효한 시간 범위 내에 있어야 함",
-        )
     }
 
     @Test

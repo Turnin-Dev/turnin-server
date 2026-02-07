@@ -11,8 +11,12 @@ import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.dto.FriendInfoDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
+import com.peekr.domain.friend.application.dto.IncomingRequesterInfoDto
+import com.peekr.domain.friend.application.dto.IncomingRequesterPagingDataDto
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
+import com.peekr.domain.friend.presentation.dto.FriendsResponse
+import com.peekr.domain.friend.presentation.dto.IncomingRequestersResponse
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
 import com.peekr.util.testDeleteEndpoint
 import com.peekr.util.testGetEndpoint
@@ -24,6 +28,9 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -95,7 +102,7 @@ class FriendRouteTest {
         // when, then: 페이지네이션 시나리오 테스트
         // 1. 일반 페이지 (1 ~ 9페이지) 검증
         (1 until totalPages).forEach { pageNumber ->
-            testPaginationRoute(
+            testPaginationRoute<FriendsResponse>(
                 endpoint = "${route.ROUTE}${route.FRIENDS}",
                 queryParameters = mapOf(
                     "userId" to "$testUserId",
@@ -103,13 +110,15 @@ class FriendRouteTest {
                     "size" to "$pageSize",
                 ),
                 token = token,
-                expectedSize = pageSize,
-                expectedHasNext = true,
+                assertion = { response ->
+                    assertEquals(pageSize, response.friends.size)
+                    assertTrue(response.hasNext)
+                },
             )
         }
 
         // 2. 마지막 페이지 (10페이지) 검증
-        testPaginationRoute(
+        testPaginationRoute<FriendsResponse>(
             endpoint = "${route.ROUTE}${route.FRIENDS}",
             queryParameters = mapOf(
                 "userId" to "$testUserId",
@@ -117,12 +126,14 @@ class FriendRouteTest {
                 "size" to "$pageSize",
             ),
             token = token,
-            expectedSize = pageSize,
-            expectedHasNext = false,
+            assertion = { response ->
+                assertEquals(pageSize, response.friends.size)
+                assertFalse(response.hasNext)
+            },
         )
 
         // 3. 존재하지 않는 페이지 (11페이지) 검증
-        testPaginationRoute(
+        testPaginationRoute<FriendsResponse>(
             endpoint = "${route.ROUTE}${route.FRIENDS}",
             queryParameters = mapOf(
                 "userId" to "$testUserId",
@@ -130,8 +141,10 @@ class FriendRouteTest {
                 "size" to "$pageSize",
             ),
             token = token,
-            expectedSize = 0,
-            expectedHasNext = false,
+            assertion = { response ->
+                assertEquals(0, response.friends.size)
+                assertFalse(response.hasNext)
+            },
         )
     }
 
@@ -203,6 +216,187 @@ class FriendRouteTest {
     fun `친구 목록 조회 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         testGetEndpoint(
             endpoint = "${route.ROUTE}${route.FRIENDS}",
+            queryParameters = mapOf(
+                "userId" to "${TestUserId.value}",
+                "page" to "1",
+                "size" to "10",
+            ),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { friendRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `받은 친구 요청 목록 조회 - 페이지네이션 테스트`() = testApplication {
+        testPlugin(
+            authRouting = { friendRoutes(route, usecase) },
+        )
+
+        // given: 설정
+        val pageSize = 10
+        val totalItems = 100L // 전체 아이템 수 (10페이지 분량)
+        val totalPages = (totalItems / pageSize).toInt() // 총 페이지 수: 10
+        val testUserId = TestUserId.value
+        val token = JWTTestDoubles.getMockJWTToken(testUserId.toString())
+
+        // given: 데이터 Mocking
+        // 1. 일반 페이지 (1페이지 ~ 10페이지) Mocking
+        repeat(totalPages) { pageIndex ->
+            val pageNumber = pageIndex + 1L
+            val pagingDataDto = IncomingRequesterPagingDataDto(
+                pagingData = PagingData(
+                    pageNumber = pageNumber,
+                    pageSize = pageSize,
+                    totalSize = totalItems,
+                ),
+                requesters = List(pageSize) { createIncomingRequesterInfoDto(it + 1L) },
+            )
+            val paginationParams = PaginationParams(pageNumber, pageSize)
+            coEvery {
+                usecase.getIncomingRequesters(testUserId, paginationParams)
+            } returns pagingDataDto
+        }
+
+        // 2. 마지막 페이지를 넘어서는 요청 (11페이지) Mocking
+        val lastPageNumber = (totalPages + 1).toLong()
+        coEvery {
+            usecase.getIncomingRequesters(testUserId, PaginationParams(lastPageNumber, pageSize))
+        } returns IncomingRequesterPagingDataDto(
+            pagingData = PagingData(
+                pageNumber = lastPageNumber,
+                pageSize = pageSize,
+                totalSize = totalItems,
+            ),
+            requesters = emptyList(),
+        )
+
+        // when, then: 페이지네이션 시나리오 테스트
+        // 1. 일반 페이지 (1 ~ 9페이지) 검증
+        (1 until totalPages).forEach { pageNumber ->
+            testPaginationRoute<IncomingRequestersResponse>(
+                endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
+                queryParameters = mapOf(
+                    "userId" to "$testUserId",
+                    "page" to "$pageNumber",
+                    "size" to "$pageSize",
+                ),
+                token = token,
+                assertion = { response ->
+                    assertEquals(pageSize, response.requesters.size)
+                    assertTrue(response.hasNext)
+                },
+            )
+        }
+
+        // 2. 마지막 페이지 (10페이지) 검증
+        testPaginationRoute<IncomingRequestersResponse>(
+            endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
+            queryParameters = mapOf(
+                "userId" to "$testUserId",
+                "page" to "$totalPages",
+                "size" to "$pageSize",
+            ),
+            token = token,
+            assertion = { response ->
+                assertEquals(pageSize, response.requesters.size)
+                assertFalse(response.hasNext)
+            },
+        )
+
+        // 3. 존재하지 않는 페이지 (11페이지) 검증
+        testPaginationRoute<IncomingRequestersResponse>(
+            endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
+            queryParameters = mapOf(
+                "userId" to "$testUserId",
+                "page" to "${totalPages + 1}",
+                "size" to "$pageSize",
+            ),
+            token = token,
+            assertion = { response ->
+                assertEquals(0, response.requesters.size)
+                assertFalse(response.hasNext)
+            },
+        )
+    }
+
+    @Test
+    fun `받은 친구 요청 목록 조회 - 성공 테스트`() = testApplication {
+        // given
+        coEvery {
+            usecase.getIncomingRequesters(TestUserId.value, any())
+        } returns TestIncomingRequesterInfoDto
+
+        // when, then
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
+            queryParameters = mapOf(
+                "userId" to "${TestUserId.value}",
+                "page" to "1",
+                "size" to "10",
+            ),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { friendRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                containsAll(
+                    TestIncomingRequesterInfoDto.requesters
+                        .first()
+                        .userId
+                        .toString(),
+                    TestIncomingRequesterInfoDto.requesters.first().name,
+                    TestIncomingRequesterInfoDto.requesters.first().displayId,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `받은 친구 요청 목록 조회 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        val expectedApiException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery {
+            usecase.getIncomingRequesters(TestUserId.value, any())
+        } throws expectedApiException
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
+            queryParameters = mapOf(
+                "userId" to "${TestUserId.value}",
+                "page" to "1",
+                "size" to "10",
+            ),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { friendRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `받은 친구 요청 목록 조회 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
             queryParameters = mapOf(
                 "userId" to "${TestUserId.value}",
                 "page" to "1",
@@ -556,5 +750,25 @@ class FriendRouteTest {
             ),
             friends = listOf(TestFriendInfoDto),
         )
+        private val TestIncomingRequesterInfoDto = IncomingRequesterPagingDataDto(
+            pagingData = PagingData(
+                pageNumber = 1,
+                pageSize = 10,
+                totalSize = 100,
+            ),
+            requesters = listOf(createIncomingRequesterInfoDto(1)),
+        )
+
+        private fun createIncomingRequesterInfoDto(uniqueValue: Long): IncomingRequesterInfoDto =
+            IncomingRequesterInfoDto(
+                id = uniqueValue,
+                userId = uniqueValue,
+                displayId = "did$uniqueValue",
+                name = "name$uniqueValue",
+                profileImageUrl = null,
+                respondedAt = 1000L,
+                createdAt = 1000L,
+                updatedAt = 1000L,
+            )
     }
 }
