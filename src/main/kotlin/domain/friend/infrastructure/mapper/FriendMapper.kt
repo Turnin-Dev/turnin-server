@@ -5,7 +5,7 @@ import com.peekr.common.db.schema.Friends
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
-import com.peekr.domain.friend.domain.model.IncomingRequester
+import com.peekr.domain.friend.domain.model.IncomingRequest
 import org.jetbrains.exposed.sql.ResultRow
 
 object FriendMapper {
@@ -20,8 +20,8 @@ object FriendMapper {
             updatedAt = this[Friends.updatedAt].toEpochSecond(),
         )
 
-    fun ResultRow.toDomainIncomingRequester(): IncomingRequester =
-        IncomingRequester(
+    fun ResultRow.toDomainIncomingRequester(): IncomingRequest =
+        IncomingRequest(
             id = FriendId(this[Friends.id].value),
             requesterId = UserId(this[Friends.requesterId].value),
             requestStatus = this[Friends.status],

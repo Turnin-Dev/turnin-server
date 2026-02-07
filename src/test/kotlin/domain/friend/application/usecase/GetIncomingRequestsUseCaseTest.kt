@@ -6,8 +6,8 @@ import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.pagination.offset.PaginationParams
-import com.peekr.domain.friend.domain.model.IncomingRequester
-import com.peekr.domain.friend.domain.model.IncomingRequesterPagingData
+import com.peekr.domain.friend.domain.model.IncomingRequest
+import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
 import com.peekr.domain.friend.domain.provider.ExternalUserInfo
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -26,10 +26,10 @@ import org.junit.After
 /**
  * AI 버전 테스트 코드
  */
-class GetIncomingRequestersUseCaseTest {
+class GetIncomingRequestsUseCaseTest {
     private val repository: FriendRepository = mockk()
     private val userProvider: UserProvider = mockk()
-    private val usecase = GetIncomingRequestersUseCase(repository, userProvider)
+    private val usecase = GetIncomingRequestsUseCase(repository, userProvider)
 
     @After
     fun tearDown() {
@@ -46,7 +46,7 @@ class GetIncomingRequestersUseCaseTest {
         val requesterId1 = UserId(2L)
         val requesterId2 = UserId(3L)
 
-        val mockRequester1 = IncomingRequester(
+        val mockRequester1 = IncomingRequest(
             id = FriendId(1L),
             requesterId = requesterId1,
             requestStatus = FriendRequestStatus.PENDING,
@@ -54,7 +54,7 @@ class GetIncomingRequestersUseCaseTest {
             createdAt = 1000L,
             updatedAt = 1000L,
         )
-        val mockRequester2 = IncomingRequester(
+        val mockRequester2 = IncomingRequest(
             id = FriendId(2L),
             requesterId = requesterId2,
             requestStatus = FriendRequestStatus.PENDING,
@@ -63,9 +63,9 @@ class GetIncomingRequestersUseCaseTest {
             updatedAt = 1000L,
         )
 
-        val incomingRequesterPagingData = IncomingRequesterPagingData(
+        val incomingRequestPagingData = IncomingRequestPagingData(
             totalSize = 2L,
-            requesters = listOf(mockRequester1, mockRequester2),
+            requests = listOf(mockRequester1, mockRequester2),
         )
 
         val userInfo1 = ExternalUserInfo(
@@ -82,8 +82,8 @@ class GetIncomingRequestersUseCaseTest {
         )
 
         coEvery {
-            repository.getIncomingRequesters(userIdVO, 0L, 10)
-        } returns incomingRequesterPagingData
+            repository.getIncomingRequests(userIdVO, 0L, 10)
+        } returns incomingRequestPagingData
 
         coEvery {
             userProvider.getUserInfos(listOf(requesterId1, requesterId2))
@@ -96,23 +96,23 @@ class GetIncomingRequestersUseCaseTest {
         assertEquals(1, result.pagingData.pageNumber)
         assertEquals(10, result.pagingData.pageSize)
         assertEquals(2L, result.pagingData.totalSize)
-        assertEquals(2, result.requesters.size)
+        assertEquals(2, result.requests.size)
 
-        val requester1 = result.requesters[0]
+        val requester1 = result.requests[0]
         assertEquals(1L, requester1.id)
         assertEquals(2L, requester1.userId)
         assertEquals("user2", requester1.displayId)
         assertEquals("사용자2", requester1.name)
         assertEquals("https://example.com/profile2.jpg", requester1.profileImageUrl)
 
-        val requester2 = result.requesters[1]
+        val requester2 = result.requests[1]
         assertEquals(2L, requester2.id)
         assertEquals(3L, requester2.userId)
         assertEquals("user3", requester2.displayId)
         assertEquals("사용자3", requester2.name)
 
         coVerify(exactly = 1) {
-            repository.getIncomingRequesters(userIdVO, 0L, 10)
+            repository.getIncomingRequests(userIdVO, 0L, 10)
         }
         coVerify(exactly = 1) {
             userProvider.getUserInfos(listOf(requesterId1, requesterId2))
@@ -126,13 +126,13 @@ class GetIncomingRequestersUseCaseTest {
         val userIdVO = UserId(userId)
         val paginationParams = PaginationParams(page = 1, size = 10)
 
-        val emptyPagingData = IncomingRequesterPagingData(
+        val emptyPagingData = IncomingRequestPagingData(
             totalSize = 0L,
-            requesters = emptyList(),
+            requests = emptyList(),
         )
 
         coEvery {
-            repository.getIncomingRequesters(userIdVO, 0L, 10)
+            repository.getIncomingRequests(userIdVO, 0L, 10)
         } returns emptyPagingData
 
         // when
@@ -142,10 +142,10 @@ class GetIncomingRequestersUseCaseTest {
         assertEquals(1, result.pagingData.pageNumber)
         assertEquals(10, result.pagingData.pageSize)
         assertEquals(0L, result.pagingData.totalSize)
-        assertTrue(result.requesters.isEmpty())
+        assertTrue(result.requests.isEmpty())
 
         coVerify(exactly = 1) {
-            repository.getIncomingRequesters(userIdVO, 0L, 10)
+            repository.getIncomingRequests(userIdVO, 0L, 10)
         }
         coVerify(exactly = 0) {
             userProvider.getUserInfos(any())
@@ -161,7 +161,7 @@ class GetIncomingRequestersUseCaseTest {
 
         val requesterId = UserId(2L)
 
-        val mockRequester = IncomingRequester(
+        val mockRequester = IncomingRequest(
             id = FriendId(1L),
             requesterId = requesterId,
             requestStatus = FriendRequestStatus.PENDING,
@@ -170,14 +170,14 @@ class GetIncomingRequestersUseCaseTest {
             updatedAt = 1000L,
         )
 
-        val incomingRequesterPagingData = IncomingRequesterPagingData(
+        val incomingRequestPagingData = IncomingRequestPagingData(
             totalSize = 1L,
-            requesters = listOf(mockRequester),
+            requests = listOf(mockRequester),
         )
 
         coEvery {
-            repository.getIncomingRequesters(userIdVO, 0L, 10)
-        } returns incomingRequesterPagingData
+            repository.getIncomingRequests(userIdVO, 0L, 10)
+        } returns incomingRequestPagingData
 
         // userProvider가 빈 목록을 반환 (사용자 정보를 찾을 수 없음)
         coEvery {
@@ -190,7 +190,7 @@ class GetIncomingRequestersUseCaseTest {
         }
 
         coVerify(exactly = 1) {
-            repository.getIncomingRequesters(userIdVO, 0L, 10)
+            repository.getIncomingRequests(userIdVO, 0L, 10)
         }
         coVerify(exactly = 1) {
             userProvider.getUserInfos(listOf(requesterId))
@@ -204,13 +204,13 @@ class GetIncomingRequestersUseCaseTest {
         val userIdVO = UserId(userId)
         val paginationParams = PaginationParams(page = 2, size = 10)
 
-        val emptyPagingData = IncomingRequesterPagingData(
+        val emptyPagingData = IncomingRequestPagingData(
             totalSize = 15L,
-            requesters = emptyList(),
+            requests = emptyList(),
         )
 
         coEvery {
-            repository.getIncomingRequesters(userIdVO, 10L, 10)
+            repository.getIncomingRequests(userIdVO, 10L, 10)
         } returns emptyPagingData
 
         // when
@@ -222,7 +222,7 @@ class GetIncomingRequestersUseCaseTest {
         assertEquals(15L, result.pagingData.totalSize)
 
         coVerify(exactly = 1) {
-            repository.getIncomingRequesters(userIdVO, 10L, 10)
+            repository.getIncomingRequests(userIdVO, 10L, 10)
         }
     }
 
@@ -238,7 +238,7 @@ class GetIncomingRequestersUseCaseTest {
         val requesterId3 = UserId(4L)
 
         val mockRequesters = listOf(
-            IncomingRequester(
+            IncomingRequest(
                 id = FriendId(1L),
                 requesterId = requesterId1,
                 requestStatus = FriendRequestStatus.PENDING,
@@ -246,7 +246,7 @@ class GetIncomingRequestersUseCaseTest {
                 createdAt = 1000L,
                 updatedAt = 1000L,
             ),
-            IncomingRequester(
+            IncomingRequest(
                 id = FriendId(2L),
                 requesterId = requesterId2,
                 requestStatus = FriendRequestStatus.PENDING,
@@ -254,7 +254,7 @@ class GetIncomingRequestersUseCaseTest {
                 createdAt = 1000L,
                 updatedAt = 1000L,
             ),
-            IncomingRequester(
+            IncomingRequest(
                 id = FriendId(3L),
                 requesterId = requesterId3,
                 requestStatus = FriendRequestStatus.PENDING,
@@ -264,9 +264,9 @@ class GetIncomingRequestersUseCaseTest {
             ),
         )
 
-        val incomingRequesterPagingData = IncomingRequesterPagingData(
+        val incomingRequestPagingData = IncomingRequestPagingData(
             totalSize = 3L,
-            requesters = mockRequesters,
+            requests = mockRequesters,
         )
 
         // UserProvider는 역순으로 반환
@@ -292,8 +292,8 @@ class GetIncomingRequestersUseCaseTest {
         )
 
         coEvery {
-            repository.getIncomingRequesters(userIdVO, 0L, 10)
-        } returns incomingRequesterPagingData
+            repository.getIncomingRequests(userIdVO, 0L, 10)
+        } returns incomingRequestPagingData
 
         coEvery {
             userProvider.getUserInfos(listOf(requesterId1, requesterId2, requesterId3))
@@ -303,10 +303,10 @@ class GetIncomingRequestersUseCaseTest {
         val result = usecase(userId, paginationParams)
 
         // then
-        assertEquals(3, result.requesters.size)
+        assertEquals(3, result.requests.size)
         // Repository에서 반환한 순서대로 매핑되어야 함
-        assertEquals(2L, result.requesters[0].userId)
-        assertEquals(3L, result.requesters[1].userId)
-        assertEquals(4L, result.requesters[2].userId)
+        assertEquals(2L, result.requests[0].userId)
+        assertEquals(3L, result.requests[1].userId)
+        assertEquals(4L, result.requests[2].userId)
     }
 }

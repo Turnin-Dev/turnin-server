@@ -1,6 +1,6 @@
 package com.peekr.domain.friend.presentation.dto
 
-import com.peekr.domain.friend.application.dto.IncomingRequesterPagingDataDto
+import com.peekr.domain.friend.application.dto.IncomingRequestPagingDataDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -13,29 +13,29 @@ import kotlinx.serialization.Serializable
  * @property requesters 요청자 목록
  */
 @Serializable
-data class IncomingRequestersResponse(
+data class IncomingRequestsResponse(
     val pageNumber: Long,
     val pageSize: Int,
     val totalSize: Long,
     val hasNext: Boolean,
-    val requesters: List<IncomingRequesterInfoResponse>,
+    val requesters: List<IncomingRequestInfoResponse>,
 ) {
     companion object {
-        val sample = IncomingRequestersResponse(
+        val sample = IncomingRequestsResponse(
             pageNumber = 1,
             pageSize = 10,
             totalSize = 100,
             hasNext = true,
-            requesters = listOf(IncomingRequesterInfoResponse.sample),
+            requesters = listOf(IncomingRequestInfoResponse.sample),
         )
     }
 }
 
-fun IncomingRequesterPagingDataDto.toResponse(): IncomingRequestersResponse =
-    IncomingRequestersResponse(
+fun IncomingRequestPagingDataDto.toResponse(): IncomingRequestsResponse =
+    IncomingRequestsResponse(
         pageNumber = pagingData.pageNumber,
         pageSize = pagingData.pageSize,
         totalSize = pagingData.totalSize,
         hasNext = pagingData.hasNext,
-        requesters = requesters.map { it.toResponse() },
+        requesters = requests.map { it.toResponse() },
     )

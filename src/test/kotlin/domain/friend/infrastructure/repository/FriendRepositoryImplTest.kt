@@ -107,8 +107,8 @@ class FriendRepositoryImplTest {
             totalSize = totalSize,
             pageSize = pageSize,
             fetcher = { offset, limit ->
-                val pagingData = repository.getIncomingRequesters(userId, offset, limit)
-                pagingData.requesters
+                val pagingData = repository.getIncomingRequests(userId, offset, limit)
+                pagingData.requests
             },
         )
     }
@@ -122,8 +122,8 @@ class FriendRepositoryImplTest {
 
         // when: 페이징 조회
         // then: 요청 목록에는 1명의 사용자가 조회된다.
-        val pagingData = repository.getIncomingRequesters(userId, 0, 10)
-        assertEquals(1, pagingData.requesters.size)
+        val pagingData = repository.getIncomingRequests(userId, 0, 10)
+        assertEquals(1, pagingData.requests.size)
 
         // when: 친구 요청을 수락한다.
         repository.updateFriendRequestStatus(
@@ -133,8 +133,8 @@ class FriendRepositoryImplTest {
         )
 
         // then: 친구가 된 사용자는 요청 목록에서 제외된다.
-        val pagingData2 = repository.getIncomingRequesters(userId, 0, 10)
-        assertTrue(pagingData2.requesters.isEmpty())
+        val pagingData2 = repository.getIncomingRequests(userId, 0, 10)
+        assertTrue(pagingData2.requests.isEmpty())
     }
 
     @Test
@@ -143,10 +143,10 @@ class FriendRepositoryImplTest {
         val userId = insertUserAndReturnId("user1")
 
         // when
-        val pagingData = repository.getIncomingRequesters(userId, 0, 10)
+        val pagingData = repository.getIncomingRequests(userId, 0, 10)
 
         // then
-        assertTrue(pagingData.requesters.isEmpty())
+        assertTrue(pagingData.requests.isEmpty())
     }
 
     @Test

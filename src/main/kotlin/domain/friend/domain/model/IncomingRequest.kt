@@ -5,7 +5,7 @@ import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 
 /**
- * 받은 친구 요청자
+ * 나에게 들어온 친구 요청
  *
  * @property id 친구 ID
  * @property requesterId 요청한 사용자 ID
@@ -14,7 +14,7 @@ import com.peekr.common.model.id.UserId
  * @property createdAt 요청 생성 일자
  * @property updatedAt 요청 수정 일자
  */
-data class IncomingRequester(
+data class IncomingRequest(
     val id: FriendId,
     val requesterId: UserId,
     val requestStatus: FriendRequestStatus,

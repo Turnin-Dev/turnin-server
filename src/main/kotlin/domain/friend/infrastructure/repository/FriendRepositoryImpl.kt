@@ -10,7 +10,7 @@ import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
-import com.peekr.domain.friend.domain.model.IncomingRequesterPagingData
+import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
@@ -58,11 +58,11 @@ class FriendRepositoryImpl : FriendRepository {
         FriendsPagingData(totalCount, friends)
     }
 
-    override suspend fun getIncomingRequesters(
+    override suspend fun getIncomingRequests(
         userId: UserId,
         offset: Long,
         size: Int,
-    ): IncomingRequesterPagingData = suspendTransaction {
+    ): IncomingRequestPagingData = suspendTransaction {
         // 1. 받은 친구 요청 조회 쿼리 선언
         val incomingRequestQuery = Op.build {
             (Friends.receiverId eq userId.value) and
@@ -91,7 +91,7 @@ class FriendRepositoryImpl : FriendRepository {
             .map { it.toDomainIncomingRequester() }
 
         // 4. 결과 반환
-        IncomingRequesterPagingData(totalCount, incomingRequests)
+        IncomingRequestPagingData(totalCount, incomingRequests)
     }
 
     override suspend fun findByIds(

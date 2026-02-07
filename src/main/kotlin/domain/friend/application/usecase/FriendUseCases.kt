@@ -3,8 +3,8 @@ package com.peekr.domain.friend.application.usecase
 data class FriendUseCases(
     /** @see GetFriendsUseCase */
     val getFriends: GetFriendsUseCase,
-    /** @see GetIncomingRequestersUseCase */
-    val getIncomingRequesters: GetIncomingRequestersUseCase,
+    /** @see GetIncomingRequestsUseCase */
+    val getIncomingRequesters: GetIncomingRequestsUseCase,
     /** @see AddFriendUseCase */
     val add: AddFriendUseCase,
     /** @see UpdateFriendRequestStatusUseCase */
