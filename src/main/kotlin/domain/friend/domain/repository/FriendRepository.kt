@@ -4,10 +4,11 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
+import com.peekr.domain.friend.domain.model.IncomingRequesterPagingData
 
 interface FriendRepository {
     /**
-     * 친구 목록 조회 (페이지네이션 적용)
+     * 친구 목록 조회 (페이지네이션)
      *
      * @param userId 사용자 ID
      * @param offset 페이지 오프셋
@@ -18,6 +19,21 @@ interface FriendRepository {
         offset: Long,
         size: Int,
     ): FriendsPagingData
+
+    /**
+     * 받은 친구 요청 목록 조회 (페이지네이션)
+     *
+     * 목록은 **최신순**으로 정렬된다.
+     *
+     * @param userId 사용자 ID
+     * @param offset 페이지 오프셋
+     * @param size 페이지 사이즈
+     */
+    suspend fun getIncomingRequesters(
+        userId: UserId,
+        offset: Long,
+        size: Int,
+    ): IncomingRequesterPagingData
 
     /**
      * 사용자(본인) ID와 다른 사용자 ID로 친구 데이터를 조회한다.

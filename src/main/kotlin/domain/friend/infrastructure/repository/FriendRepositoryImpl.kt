@@ -10,10 +10,13 @@ import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
+import com.peekr.domain.friend.domain.model.IncomingRequesterPagingData
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
+import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -21,7 +24,6 @@ import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 
-// TODO: 친구 기능은 이미 취소된 즉, 이미 데이터 지워진 상태에서 쿼리될 확률이 높다. -> 대처해야함
 class FriendRepositoryImpl : FriendRepository {
     override suspend fun getFriendsPagination(
         userId: UserId,
@@ -29,7 +31,7 @@ class FriendRepositoryImpl : FriendRepository {
         size: Int,
     ): FriendsPagingData = suspendTransaction {
         // 1) 친구 조회 쿼리 선언
-        val friendCondition = Op.Companion.build {
+        val friendCondition = Op.build {
             (Friends.status eq FriendRequestStatus.ACCEPTED) and
                 (
                     (Friends.requesterId eq userId.value) or
@@ -47,12 +49,49 @@ class FriendRepositoryImpl : FriendRepository {
         val friends = Friends
             .selectAll()
             .where(friendCondition)
+            .orderBy(Friends.id to SortOrder.DESC)
             .limit(count = size)
             .offset(start = offset)
             .map { it.toDomain() }
 
         // 4) 결과 반환
         FriendsPagingData(totalCount, friends)
+    }
+
+    override suspend fun getIncomingRequesters(
+        userId: UserId,
+        offset: Long,
+        size: Int,
+    ): IncomingRequesterPagingData = suspendTransaction {
+        // 1. 받은 친구 요청 조회 쿼리 선언
+        val incomingRequestQuery = Op.build {
+            (Friends.receiverId eq userId.value) and
+                (Friends.status eq FriendRequestStatus.PENDING)
+        }
+
+        // 2. 전체 항목 개수 조회
+        val totalCount = Friends
+            .select(Friends.id)
+            .where(incomingRequestQuery)
+            .count()
+
+        // 3. 현재 페이지 목록 조회
+        val incomingRequests = Friends
+            .select(
+                Friends.id,
+                Friends.requesterId,
+                Friends.status,
+                Friends.respondedAt,
+                Friends.createdAt,
+                Friends.updatedAt,
+            ).where(incomingRequestQuery)
+            .orderBy(Friends.createdAt to SortOrder.DESC)
+            .limit(count = size)
+            .offset(start = offset)
+            .map { it.toDomainIncomingRequester() }
+
+        // 4. 결과 반환
+        IncomingRequesterPagingData(totalCount, incomingRequests)
     }
 
     override suspend fun findByIds(

@@ -5,7 +5,8 @@ import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.application.usecase.GetFriendStatusUseCase
-import com.peekr.domain.friend.application.usecase.GetFriendsPaginationUseCase
+import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
+import com.peekr.domain.friend.application.usecase.GetIncomingRequestersUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -22,12 +23,19 @@ val friendModule = module {
     single<UserProvider> { UserProviderImpl(get()) }
 
     // Usecase
-    factory { GetFriendsPaginationUseCase(get(), get()) }
+    factory { GetFriendsUseCase(get(), get()) }
     factory { AddFriendUseCase(get(), get()) }
     factory { UpdateFriendRequestStatusUseCase(get(), get()) }
     factory { DeleteFriendUseCase(get()) }
     factory { GetFriendStatusUseCase(get()) }
+    factory { GetIncomingRequestersUseCase(get(), get()) }
     single<FriendUseCases> {
-        FriendUseCases(get(), get(), get(), get())
+        FriendUseCases(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+        )
     }
 }

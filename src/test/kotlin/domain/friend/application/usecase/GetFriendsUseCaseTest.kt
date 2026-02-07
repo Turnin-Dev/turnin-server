@@ -19,10 +19,10 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 
-class GetFriendsPaginationUseCaseTest {
+class GetFriendsUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
     private val userProvider: UserProvider = mockk()
-    private val usecase = GetFriendsPaginationUseCase(friendRepository, userProvider)
+    private val usecase = GetFriendsUseCase(friendRepository, userProvider)
 
     @Test
     fun `친구 목록 페이지네이션 조회 성공 테스트`() = runTest {

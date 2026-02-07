@@ -8,6 +8,7 @@ import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
 import com.peekr.domain.friend.presentation.dto.FriendResponse
 import com.peekr.domain.friend.presentation.dto.FriendsResponse
+import com.peekr.domain.friend.presentation.dto.IncomingRequestersResponse
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
 import com.peekr.domain.friend.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -30,8 +31,15 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
             val paginationParams = getPaginationParams()
-            val friendsPagingDataDto = usecase.getFriendsPagination(userId, paginationParams)
+            val friendsPagingDataDto = usecase.getFriends(userId, paginationParams)
             call.respond(friendsPagingDataDto.toResponse())
+        }
+
+        get(route.INCOMING_REQUEST, { getIncomingRequestersDocs() }) {
+            val userId = extractUserIdWithToken()
+            val paginationParams = getPaginationParams()
+            val incomingRequesterPagingDataDto = usecase.getIncomingRequesters(userId.value, paginationParams)
+            call.respond(incomingRequesterPagingDataDto.toResponse())
         }
 
         post({ addFriendDocs() }) {
@@ -54,6 +62,7 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
             )
         }
 
+        // TODO: 친구 기능은 이미 취소된 즉, 이미 데이터 지워진 상태에서 쿼리될 확률이 높다. -> 대처 필요
         patch(route.STATUS, { updateFriendStatusDocs() }) {
             val userId = extractUserIdWithToken()
             val updateFriendStatusRequest = call.receive<UpdateFriendStatusRequest>()
@@ -127,6 +136,29 @@ private fun RouteConfig.getFriendsDocs() {
             body<FriendsResponse> {
                 example("FriendsResponse") {
                     value = FriendsResponse.sample
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getIncomingRequestersDocs() {
+    summary = "받은 친구 요청 목록 조회 (페이지네이션)"
+    description = "사용자 ID로 받은 친구 요청 목록을 조회한다. (페이지네이션)"
+    request {
+        queryParameter<Long>("page") {
+            description = "페이지네이션에 필요한 페이지 번호"
+        }
+        queryParameter<Int>("size") {
+            description = "페이지네이션에 필요한 페이지 크기"
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            description = "받은 친구 요청 정보 목록"
+            body<IncomingRequestersResponse> {
+                example("IncomingRequestersResponse") {
+                    value = IncomingRequestersResponse.sample
                 }
             }
         }

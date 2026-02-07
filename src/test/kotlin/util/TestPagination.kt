@@ -1,7 +1,6 @@
 package com.peekr.util
 
 import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.domain.friend.presentation.dto.FriendsResponse
 import com.peekr.util.TestClientFactory.createTestClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -81,15 +80,13 @@ fun <T> testPagination(
  * @param endpoint 테스트할 엔드포인트
  * @param queryParameters 쿼리 파라미터 (page, size 등)
  * @param token 테스트 인증 토큰
- * @param expectedSize 검증할 페이지 사이즈
- * @param expectedHasNext 검증할 다음 페이지 여부
+ * @param assertion [T]를 파라미터로 받아 검증을 수행
  */
-suspend fun ApplicationTestBuilder.testPaginationRoute(
+suspend inline fun <reified T : Any> ApplicationTestBuilder.testPaginationRoute(
     endpoint: String,
     queryParameters: Map<String, String>,
     token: JWTToken?,
-    expectedSize: Int,
-    expectedHasNext: Boolean,
+    assertion: (T) -> Unit,
 ) {
     val client = createTestClient()
 
@@ -105,9 +102,8 @@ suspend fun ApplicationTestBuilder.testPaginationRoute(
     }
 
     val responseBody = response.bodyAsText()
-    val friendsResponse = Json.decodeFromString<FriendsResponse>(responseBody)
+    val decodedResponse = Json.decodeFromString<T>(responseBody)
 
     // 검증
-    assertEquals(expectedSize, friendsResponse.friends.size, "페이지 목록 크기 불일치")
-    assertEquals(expectedHasNext, friendsResponse.hasNext, "페이지 hasNext 불일치")
+    assertion(decodedResponse)
 }

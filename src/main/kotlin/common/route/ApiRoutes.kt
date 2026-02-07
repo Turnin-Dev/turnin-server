@@ -65,6 +65,7 @@ object Api {
             const val ROUTE = "/friend"
             const val TAG = "Friend"
             const val FRIENDS = "/list"
+            const val INCOMING_REQUEST = "/incoming-request"
             const val STATUS = "/status"
         }
 

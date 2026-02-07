@@ -92,6 +92,64 @@ class FriendRepositoryImplTest {
     }
 
     @Test
+    fun `받은 친구 요청 목록 페이지네이션 조회 성공 테스트`() = runTest {
+        // given
+        val totalSize = 33
+        val pageSize = 10
+        val userId = insertUserAndReturnId("user1")
+        repeat(totalSize) {
+            val testUserId = insertUserAndReturnId("test$it")
+            repository.createFriend(requesterId = testUserId, receiverId = userId)
+        }
+
+        // when
+        testPagination(
+            totalSize = totalSize,
+            pageSize = pageSize,
+            fetcher = { offset, limit ->
+                val pagingData = repository.getIncomingRequesters(userId, offset, limit)
+                pagingData.requesters
+            },
+        )
+    }
+
+    @Test
+    fun `받은 친구 요청 목록에서 요청을 수락하면 목록에서 제외된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("user1")
+        val testUserId = insertUserAndReturnId("test1")
+        repository.createFriend(requesterId = testUserId, receiverId = userId)
+
+        // when: 페이징 조회
+        // then: 요청 목록에는 1명의 사용자가 조회된다.
+        val pagingData = repository.getIncomingRequesters(userId, 0, 10)
+        assertEquals(1, pagingData.requesters.size)
+
+        // when: 친구 요청을 수락한다.
+        repository.updateFriendRequestStatus(
+            testUserId,
+            userId,
+            FriendRequestStatus.ACCEPTED,
+        )
+
+        // then: 친구가 된 사용자는 요청 목록에서 제외된다.
+        val pagingData2 = repository.getIncomingRequesters(userId, 0, 10)
+        assertTrue(pagingData2.requesters.isEmpty())
+    }
+
+    @Test
+    fun `받은 요청이 없다면 빈 리스트를 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("user1")
+
+        // when
+        val pagingData = repository.getIncomingRequesters(userId, 0, 10)
+
+        // then
+        assertTrue(pagingData.requesters.isEmpty())
+    }
+
+    @Test
     fun `requesterId와 receiverId로 친구 데이터 조회 성공 테스트`() = runTest {
         // given
         val userId1 = insertUserAndReturnId("a")
