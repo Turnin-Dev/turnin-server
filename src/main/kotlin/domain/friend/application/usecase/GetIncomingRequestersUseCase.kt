@@ -22,6 +22,8 @@ class GetIncomingRequestersUseCase(
      *
      * @param userId 사용자 ID
      * @param paginationParams 페이지네이션 파라미터
+     *
+     * @throws FriendException.UserNotFoundException 요청자 목록을 조회하는 찰나의 순간에 사용자 정보가 사라지는 경우 예외가 발생한다.
      */
     suspend operator fun invoke(
         userId: Long,

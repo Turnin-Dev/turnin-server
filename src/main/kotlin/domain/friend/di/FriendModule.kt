@@ -6,6 +6,7 @@ import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.application.usecase.GetFriendStatusUseCase
 import com.peekr.domain.friend.application.usecase.GetFriendsPaginationUseCase
+import com.peekr.domain.friend.application.usecase.GetIncomingRequestersUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
@@ -27,6 +28,7 @@ val friendModule = module {
     factory { UpdateFriendRequestStatusUseCase(get(), get()) }
     factory { DeleteFriendUseCase(get()) }
     factory { GetFriendStatusUseCase(get()) }
+    factory { GetIncomingRequestersUseCase(get(), get()) }
     single<FriendUseCases> {
         FriendUseCases(
             get(),
