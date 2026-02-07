@@ -11,12 +11,12 @@ import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.dto.FriendInfoDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
-import com.peekr.domain.friend.application.dto.IncomingRequesterInfoDto
-import com.peekr.domain.friend.application.dto.IncomingRequesterPagingDataDto
+import com.peekr.domain.friend.application.dto.IncomingRequestInfoDto
+import com.peekr.domain.friend.application.dto.IncomingRequestPagingDataDto
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
 import com.peekr.domain.friend.presentation.dto.FriendsResponse
-import com.peekr.domain.friend.presentation.dto.IncomingRequestersResponse
+import com.peekr.domain.friend.presentation.dto.IncomingRequestsResponse
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
 import com.peekr.util.testDeleteEndpoint
 import com.peekr.util.testGetEndpoint
@@ -248,13 +248,13 @@ class FriendRouteTest {
         // 1. 일반 페이지 (1페이지 ~ 10페이지) Mocking
         repeat(totalPages) { pageIndex ->
             val pageNumber = pageIndex + 1L
-            val pagingDataDto = IncomingRequesterPagingDataDto(
+            val pagingDataDto = IncomingRequestPagingDataDto(
                 pagingData = PagingData(
                     pageNumber = pageNumber,
                     pageSize = pageSize,
                     totalSize = totalItems,
                 ),
-                requesters = List(pageSize) { createIncomingRequesterInfoDto(it + 1L) },
+                requests = List(pageSize) { createIncomingRequestInfoDto(it + 1L) },
             )
             val paginationParams = PaginationParams(pageNumber, pageSize)
             coEvery {
@@ -266,19 +266,19 @@ class FriendRouteTest {
         val lastPageNumber = (totalPages + 1).toLong()
         coEvery {
             usecase.getIncomingRequesters(testUserId, PaginationParams(lastPageNumber, pageSize))
-        } returns IncomingRequesterPagingDataDto(
+        } returns IncomingRequestPagingDataDto(
             pagingData = PagingData(
                 pageNumber = lastPageNumber,
                 pageSize = pageSize,
                 totalSize = totalItems,
             ),
-            requesters = emptyList(),
+            requests = emptyList(),
         )
 
         // when, then: 페이지네이션 시나리오 테스트
         // 1. 일반 페이지 (1 ~ 9페이지) 검증
         (1 until totalPages).forEach { pageNumber ->
-            testPaginationRoute<IncomingRequestersResponse>(
+            testPaginationRoute<IncomingRequestsResponse>(
                 endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
                 queryParameters = mapOf(
                     "userId" to "$testUserId",
@@ -294,7 +294,7 @@ class FriendRouteTest {
         }
 
         // 2. 마지막 페이지 (10페이지) 검증
-        testPaginationRoute<IncomingRequestersResponse>(
+        testPaginationRoute<IncomingRequestsResponse>(
             endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
             queryParameters = mapOf(
                 "userId" to "$testUserId",
@@ -309,7 +309,7 @@ class FriendRouteTest {
         )
 
         // 3. 존재하지 않는 페이지 (11페이지) 검증
-        testPaginationRoute<IncomingRequestersResponse>(
+        testPaginationRoute<IncomingRequestsResponse>(
             endpoint = "${route.ROUTE}${route.INCOMING_REQUEST}",
             queryParameters = mapOf(
                 "userId" to "$testUserId",
@@ -329,7 +329,7 @@ class FriendRouteTest {
         // given
         coEvery {
             usecase.getIncomingRequesters(TestUserId.value, any())
-        } returns TestIncomingRequesterInfoDto
+        } returns TestIncomingRequestInfoDto
 
         // when, then
         testGetEndpoint(
@@ -348,12 +348,12 @@ class FriendRouteTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 containsAll(
-                    TestIncomingRequesterInfoDto.requesters
+                    TestIncomingRequestInfoDto.requests
                         .first()
                         .userId
                         .toString(),
-                    TestIncomingRequesterInfoDto.requesters.first().name,
-                    TestIncomingRequesterInfoDto.requesters.first().displayId,
+                    TestIncomingRequestInfoDto.requests.first().name,
+                    TestIncomingRequestInfoDto.requests.first().displayId,
                 )
             },
         )
@@ -750,17 +750,17 @@ class FriendRouteTest {
             ),
             friends = listOf(TestFriendInfoDto),
         )
-        private val TestIncomingRequesterInfoDto = IncomingRequesterPagingDataDto(
+        private val TestIncomingRequestInfoDto = IncomingRequestPagingDataDto(
             pagingData = PagingData(
                 pageNumber = 1,
                 pageSize = 10,
                 totalSize = 100,
             ),
-            requesters = listOf(createIncomingRequesterInfoDto(1)),
+            requests = listOf(createIncomingRequestInfoDto(1)),
         )
 
-        private fun createIncomingRequesterInfoDto(uniqueValue: Long): IncomingRequesterInfoDto =
-            IncomingRequesterInfoDto(
+        private fun createIncomingRequestInfoDto(uniqueValue: Long): IncomingRequestInfoDto =
+            IncomingRequestInfoDto(
                 id = uniqueValue,
                 userId = uniqueValue,
                 displayId = "did$uniqueValue",

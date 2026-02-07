@@ -1,7 +1,7 @@
 package com.peekr.domain.friend.application.dto
 
 /**
- * 받은 친구 요청자 정보 DTO
+ * 나에게 들어온 친구 요청 정보 DTO
  *
  * @property id 친구 ID
  * @property userId 사용자(친구) ID
@@ -12,7 +12,7 @@ package com.peekr.domain.friend.application.dto
  * @property createdAt 요청 생성 일자
  * @property updatedAt 요청 수정 일자
  */
-data class IncomingRequesterInfoDto(
+data class IncomingRequestInfoDto(
     val id: Long,
     val userId: Long,
     val displayId: String,

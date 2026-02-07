@@ -1,10 +1,10 @@
 package com.peekr.domain.friend.presentation.dto
 
-import com.peekr.domain.friend.application.dto.IncomingRequesterInfoDto
+import com.peekr.domain.friend.application.dto.IncomingRequestInfoDto
 import kotlinx.serialization.Serializable
 
 /**
- * 받은 친구 요청자 정보 응답 바디
+ * 나에게 들어온 친구 요청 정보 응답 바디
  *
  * @property id 친구 ID
  * @property userId 사용자(친구) ID
@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
  * @property updatedAt 요청 수정 일자
  */
 @Serializable
-data class IncomingRequesterInfoResponse(
+data class IncomingRequestInfoResponse(
     val id: Long,
     val userId: Long,
     val displayId: String,
@@ -27,7 +27,7 @@ data class IncomingRequesterInfoResponse(
     val updatedAt: Long,
 ) {
     companion object {
-        val sample = IncomingRequesterInfoResponse(
+        val sample = IncomingRequestInfoResponse(
             id = 1,
             userId = 2L,
             displayId = "did2",
@@ -40,8 +40,8 @@ data class IncomingRequesterInfoResponse(
     }
 }
 
-fun IncomingRequesterInfoDto.toResponse(): IncomingRequesterInfoResponse =
-    IncomingRequesterInfoResponse(
+fun IncomingRequestInfoDto.toResponse(): IncomingRequestInfoResponse =
+    IncomingRequestInfoResponse(
         id = id,
         userId = userId,
         displayId = displayId,

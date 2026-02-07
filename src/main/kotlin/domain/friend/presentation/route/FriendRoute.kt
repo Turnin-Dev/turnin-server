@@ -8,7 +8,7 @@ import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.dto.AddFriendRequest
 import com.peekr.domain.friend.presentation.dto.FriendResponse
 import com.peekr.domain.friend.presentation.dto.FriendsResponse
-import com.peekr.domain.friend.presentation.dto.IncomingRequestersResponse
+import com.peekr.domain.friend.presentation.dto.IncomingRequestsResponse
 import com.peekr.domain.friend.presentation.dto.UpdateFriendStatusRequest
 import com.peekr.domain.friend.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -35,7 +35,7 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
             call.respond(friendsPagingDataDto.toResponse())
         }
 
-        get(route.INCOMING_REQUEST, { getIncomingRequestersDocs() }) {
+        get(route.INCOMING_REQUEST, { getIncomingRequestsDocs() }) {
             val userId = extractUserIdWithToken()
             val paginationParams = getPaginationParams()
             val incomingRequesterPagingDataDto = usecase.getIncomingRequesters(userId.value, paginationParams)
@@ -142,9 +142,9 @@ private fun RouteConfig.getFriendsDocs() {
     }
 }
 
-private fun RouteConfig.getIncomingRequestersDocs() {
-    summary = "받은 친구 요청 목록 조회 (페이지네이션)"
-    description = "사용자 ID로 받은 친구 요청 목록을 조회한다. (페이지네이션)"
+private fun RouteConfig.getIncomingRequestsDocs() {
+    summary = "나에게 들어온 친구 요청 목록 조회 (페이지네이션)"
+    description = "나에게 들어온 친구 요청 목록을 조회한다. (페이지네이션)"
     request {
         queryParameter<Long>("page") {
             description = "페이지네이션에 필요한 페이지 번호"
@@ -155,10 +155,10 @@ private fun RouteConfig.getIncomingRequestersDocs() {
     }
     response {
         code(HttpStatusCode.OK) {
-            description = "받은 친구 요청 정보 목록"
-            body<IncomingRequestersResponse> {
-                example("IncomingRequestersResponse") {
-                    value = IncomingRequestersResponse.sample
+            description = "나에게 들어온 친구 요청 정보 목록"
+            body<IncomingRequestsResponse> {
+                example("IncomingRequestsResponse") {
+                    value = IncomingRequestsResponse.sample
                 }
             }
         }
