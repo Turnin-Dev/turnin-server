@@ -71,7 +71,7 @@ class GetIncomingRequestersUseCase(
             val requesterInfo = requesterInfoMap[requester.requesterId]
             if (requesterInfo == null) {
                 LOGGER.error(
-                    "requesterInfo corresponding to ($${requester.requesterId}) is missing, requester: $requester",
+                    "requesterInfo corresponding to (${requester.requesterId}) is missing, requester: $requester",
                 )
                 throw FriendException.UserNotFoundException()
             }

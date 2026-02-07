@@ -19,9 +19,9 @@ import io.mockk.mockk
 import junit.framework.TestCase.assertTrue
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.jupiter.api.assertThrows
 
 /**
  * AI 버전 테스트 코드
@@ -185,7 +185,7 @@ class GetIncomingRequestersUseCaseTest {
         } returns emptyList()
 
         // when & then
-        assertThrows<FriendException.UserNotFoundException> {
+        assertFailsWith<FriendException.UserNotFoundException> {
             usecase(userId, paginationParams)
         }
 
