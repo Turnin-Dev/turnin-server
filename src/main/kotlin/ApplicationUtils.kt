@@ -1,6 +1,7 @@
 package com.peekr
 
 import com.peekr.common.db.DatabaseFactory
+import com.peekr.common.util.TimeZoneInfo
 import com.peekr.common.util.config.AppConfig
 import com.peekr.common.util.config.RunEnvironment.Companion.toRunEnvironment
 import io.ktor.server.application.Application
@@ -34,5 +35,39 @@ object ApplicationUtils {
 
         println("Server is running in $environment mode")
         println("Listening on port $port")
+    }
+
+    fun Application.printTimeZone(timezone: TimeZoneInfo) {
+        println("Application TimeZone: ${timezone.appTimeZone}")
+        println("Application CurrentTime: ${timezone.appTime}")
+        println("DB TimeZone: ${timezone.dbTimeZone}")
+        println("DB CurrentTime: ${timezone.dbTime}")
+
+        // App, DB 타임 차이 체크 (1초 이내인지 체크)
+        val diffMs = kotlin.math.abs(
+            java.time.Duration
+                .between(timezone.dbTime, timezone.appTime)
+                .toMillis(),
+        )
+        println(
+            "App and DB Time Sync: ${
+                if (diffMs > 1000) {
+                    "⚠️ App and DB time differ by more than 1 second!"
+                } else {
+                    "✅"
+                }
+            }",
+        )
+
+        // DB가 UTC인지 체크
+        println(
+            "DB is Using UTC: ${
+                if (timezone.dbTimeZone.equals("UTC", ignoreCase = true)) {
+                    "✅"
+                } else {
+                    "⚠️ DB is using ${timezone.dbTimeZone}, not UTC"
+                }
+            }",
+        )
     }
 }
