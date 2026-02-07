@@ -25,6 +25,7 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
         tags = setOf(route.TAG)
         description = "Friend API"
     }) {
+        // TODO: 리포지토리에서 getFriendsPagination -> getFriends 로 수정
         get(route.FRIENDS, { getFriendsDocs() }) {
             val userId = call.queryParameters["userId"]
                 ?.toLongOrNull()
@@ -32,6 +33,9 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
             val paginationParams = getPaginationParams()
             val friendsPagingDataDto = usecase.getFriendsPagination(userId, paginationParams)
             call.respond(friendsPagingDataDto.toResponse())
+        }
+
+        get(route.REQUEST_INCOMING, {}) {
         }
 
         post({ addFriendDocs() }) {
@@ -54,6 +58,7 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
             )
         }
 
+        // TODO: 친구 기능은 이미 취소된 즉, 이미 데이터 지워진 상태에서 쿼리될 확률이 높다. -> 대처 필요
         patch(route.STATUS, { updateFriendStatusDocs() }) {
             val userId = extractUserIdWithToken()
             val updateFriendStatusRequest = call.receive<UpdateFriendStatusRequest>()

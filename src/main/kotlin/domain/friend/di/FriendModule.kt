@@ -28,6 +28,12 @@ val friendModule = module {
     factory { DeleteFriendUseCase(get()) }
     factory { GetFriendStatusUseCase(get()) }
     single<FriendUseCases> {
-        FriendUseCases(get(), get(), get(), get())
+        FriendUseCases(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+        )
     }
 }
