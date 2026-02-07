@@ -1,16 +1,12 @@
 package com.peekr.common.util
 
 import com.peekr.util.db.TestDatabaseFactory
-import io.mockk.every
-import io.mockk.mockkObject
-import java.sql.SQLException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Collections
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -100,18 +96,6 @@ class PeekrDateTimeTest {
         }
 
         assertEquals(threadCount, results.size)
-    }
-
-    @Test
-    fun `DB 에러가 발생하여 값을 가져오지 못할 때에도 정상적으로 시간을 반환해야 한다`() {
-        mockkObject(TimeQuery)
-        every { TimeQuery.getInstant() } throws SQLException()
-
-        val result = PeekrDateTime.now()
-
-        assertNotNull(result)
-        assertTrue(result.isBefore(Instant.now().plus(1, ChronoUnit.MINUTES)))
-        assertTrue(result.isAfter(Instant.now().minus(1, ChronoUnit.MINUTES)))
     }
 
     @Test

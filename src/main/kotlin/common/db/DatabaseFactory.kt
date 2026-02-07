@@ -49,6 +49,7 @@ object DatabaseFactory {
                 username = dbUser
                 password = dbPassword
                 maximumPoolSize = 5
+                connectionInitSql = "SET TIME ZONE 'UTC'"
 //            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
             },
         )
