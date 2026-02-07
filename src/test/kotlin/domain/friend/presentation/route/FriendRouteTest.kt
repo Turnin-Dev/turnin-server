@@ -75,14 +75,14 @@ class FriendRouteTest {
             )
             val paginationParams = PaginationParams(pageNumber, pageSize)
             coEvery {
-                usecase.getFriendsPagination(testUserId, paginationParams)
+                usecase.getFriends(testUserId, paginationParams)
             } returns testFriendsPagingDataDto
         }
 
         // 2. 마지막 페이지를 넘어서는 요청 (11페이지) Mocking
         val lastPageNumber = (totalPages + 1).toLong()
         coEvery {
-            usecase.getFriendsPagination(testUserId, PaginationParams(lastPageNumber, pageSize))
+            usecase.getFriends(testUserId, PaginationParams(lastPageNumber, pageSize))
         } returns FriendsPagingDataDto(
             pagingData = PagingData(
                 pageNumber = lastPageNumber,
@@ -139,7 +139,7 @@ class FriendRouteTest {
     fun `친구 목록 조회 - 성공 테스트`() = testApplication {
         // given
         coEvery {
-            usecase.getFriendsPagination(TestUserId.value, any())
+            usecase.getFriends(TestUserId.value, any())
         } returns TestFriendsPagingDataDto
 
         // when, then
@@ -174,7 +174,7 @@ class FriendRouteTest {
             status = HttpStatusCode.InternalServerError,
             message = "unexpected error",
         )
-        coEvery { usecase.getFriendsPagination(TestUserId.value, any()) } throws expectedApiException
+        coEvery { usecase.getFriends(TestUserId.value, any()) } throws expectedApiException
 
         testGetEndpoint(
             endpoint = "${route.ROUTE}${route.FRIENDS}",

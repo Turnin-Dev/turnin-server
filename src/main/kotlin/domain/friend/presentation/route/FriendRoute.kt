@@ -26,13 +26,12 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
         tags = setOf(route.TAG)
         description = "Friend API"
     }) {
-        // TODO: 리포지토리에서 getFriendsPagination -> getFriends 로 수정
         get(route.FRIENDS, { getFriendsDocs() }) {
             val userId = call.queryParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
             val paginationParams = getPaginationParams()
-            val friendsPagingDataDto = usecase.getFriendsPagination(userId, paginationParams)
+            val friendsPagingDataDto = usecase.getFriends(userId, paginationParams)
             call.respond(friendsPagingDataDto.toResponse())
         }
 

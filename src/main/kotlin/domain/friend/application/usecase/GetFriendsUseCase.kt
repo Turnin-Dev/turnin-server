@@ -15,7 +15,7 @@ import com.peekr.domain.friend.exception.FriendException
  *
  * @see invoke
  */
-class GetFriendsPaginationUseCase(
+class GetFriendsUseCase(
     private val friendRepository: FriendRepository,
     private val userProvider: UserProvider,
 ) {
