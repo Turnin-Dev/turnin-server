@@ -15,6 +15,7 @@ import io.ktor.server.response.respond
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
         exception<DatabaseException> { call, cause ->
+            warnLogging("DatabaseException", cause)
             call.respond(
                 status = HttpStatusCode.InternalServerError,
                 message = ErrorResponse(
@@ -38,6 +39,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<ValidatorException> { call, cause ->
+            warnLogging("ValidatorException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
@@ -49,6 +51,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<DomainException> { call, cause ->
+            warnLogging("DomainException", cause)
             call.respond(
                 status = HttpStatusCode.InternalServerError,
                 message = ErrorResponse(
@@ -60,6 +63,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<IllegalArgumentException> { call, cause ->
+            warnLogging("IllegalArgumentException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(

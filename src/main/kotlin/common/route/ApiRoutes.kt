@@ -78,6 +78,12 @@ object Api {
             const val ROUTE = "/feed"
             const val TAG = "Feed"
         }
+
+        object Block {
+            const val ROUTE = "/block"
+            const val TAG = "Block"
+            const val REASON = "/reason"
+        }
     }
 
     /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */

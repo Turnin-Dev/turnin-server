@@ -13,6 +13,6 @@ class GetBlockReasonsUseCase(private val blockRepository: BlockRepository) {
     /**
      * 차단 사유 목록을 조회한다.
      */
-    suspend fun invoke(): List<BlockReasonDto> =
+    suspend operator fun invoke(): List<BlockReasonDto> =
         blockRepository.getBlockReasons().map { it.toDto() }
 }
