@@ -22,7 +22,7 @@ class CreateBlockUseCase(
      */
     suspend operator fun invoke(
         blockDetailDto: BlockDetailDto,
-    ) = suspendTransaction {
+    ): Unit = suspendTransaction {
         // 1) 차단 생성
         val blockDetail = blockDetailDto.toDomain()
         blockRepository.createBlock(blockDetail)
