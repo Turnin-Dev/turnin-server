@@ -1,4 +1,4 @@
-package com.peekr.domain.block.domain
+package com.peekr.domain.block.domain.model
 
 import com.peekr.common.model.id.BlockId
 
