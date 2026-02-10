@@ -2,8 +2,6 @@ package com.peekr.util.db
 
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.BlockReasons
-import com.peekr.common.db.schema.BlockReasons.code
-import com.peekr.common.db.schema.BlockReasons.description
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Keywords
