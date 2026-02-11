@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * @property pageSize 현재 페이지 크기
  * @property totalSize 전체 크기
  * @property hasNext 다음 페이지 존재 여부
- * @property blocks 친구 목록
+ * @property blocks 차단 목록
  */
 @Serializable
 data class BlocksResponse(

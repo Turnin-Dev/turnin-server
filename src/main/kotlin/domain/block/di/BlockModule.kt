@@ -1,5 +1,6 @@
 package com.peekr.domain.block.di
 
+import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.application.usecase.CreateBlockUseCase
 import com.peekr.domain.block.application.usecase.GetBlockReasonsUseCase
 import com.peekr.domain.block.application.usecase.GetBlocksUseCase
@@ -20,5 +21,5 @@ val blockModule = module {
     factory { GetBlockReasonsUseCase(get()) }
     factory { CreateBlockUseCase(get(), get()) }
     factory { GetBlocksUseCase(get()) }
-    single<GetBlocksUseCase> { GetBlocksUseCase(get()) }
+    single<BlockUseCases> { BlockUseCases(get(), get(), get()) }
 }

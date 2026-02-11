@@ -118,7 +118,10 @@ class CreateBlockUseCaseIntegrationTest {
         // 친구 삭제 시 에외가 발생하도록 설정
         val mockFriendProvider = mockk<FriendProvider>()
         coEvery {
-            mockFriendProvider.deleteFriend(UserId(1L), UserId(2L))
+            mockFriendProvider.deleteFriend(
+                userId1 = UserId(user1.id.value),
+                userId2 = UserId(user2.id.value),
+            )
         } throws Exception("error")
         usecase = CreateBlockUseCase(blockRepository, mockFriendProvider)
 

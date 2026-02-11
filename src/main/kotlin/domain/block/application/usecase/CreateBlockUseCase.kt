@@ -1,8 +1,10 @@
 package com.peekr.domain.block.application.usecase
 
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.model.id.BlockReasonId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.application.dto.BlockDetailDto
-import com.peekr.domain.block.application.dto.toDomain
+import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.provider.FriendProvider
 import com.peekr.domain.block.domain.repository.BlockRepository
 
@@ -24,7 +26,12 @@ class CreateBlockUseCase(
         blockDetailDto: BlockDetailDto,
     ): Unit = suspendTransaction {
         // 1) 차단 생성
-        val blockDetail = blockDetailDto.toDomain()
+        val blockDetail = BlockDetail.create(
+            blockerId = UserId(blockDetailDto.blockerId),
+            blockedId = UserId(blockDetailDto.blockedId),
+            reasonId = BlockReasonId(blockDetailDto.reasonId),
+            customReason = blockDetailDto.customReason,
+        )
         blockRepository.createBlock(blockDetail)
 
         // 2) 친구 삭제

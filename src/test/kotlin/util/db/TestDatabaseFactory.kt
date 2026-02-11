@@ -13,7 +13,6 @@ import com.peekr.common.db.schema.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -50,15 +49,29 @@ object TestDatabaseFactory {
 
     fun cleanUp() {
         transaction {
-            Blocks.deleteAll()
-            Reports.deleteAll()
-            UserKeywords.deleteAll()
-            Friends.deleteAll()
-            RefreshTokens.deleteAll()
-            Keywords.deleteAll()
-            Users.deleteAll()
-            ReportReasons.deleteAll()
-            BlockReasons.deleteAll()
+            SchemaUtils.drop(
+                Users,
+                RefreshTokens,
+                Keywords,
+                UserKeywords,
+                Friends,
+                ReportReasons,
+                Reports,
+                BlockReasons,
+                Blocks,
+            )
+
+            SchemaUtils.create(
+                Users,
+                RefreshTokens,
+                Keywords,
+                UserKeywords,
+                Friends,
+                ReportReasons,
+                Reports,
+                BlockReasons,
+                Blocks,
+            )
 
             initData()
         }

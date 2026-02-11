@@ -1,7 +1,5 @@
 package com.peekr.domain.block.application.dto
 
-import com.peekr.common.model.id.BlockReasonId
-import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 
 /**
@@ -18,14 +16,6 @@ data class BlockDetailDto(
     val reasonId: Long,
     val customReason: String?,
 )
-
-fun BlockDetailDto.toDomain(): BlockDetail =
-    BlockDetail(
-        blockerId = UserId(blockerId),
-        blockedId = UserId(blockedId),
-        reasonId = BlockReasonId(reasonId),
-        customReason = customReason,
-    )
 
 fun BlockDetail.toDto(): BlockDetailDto =
     BlockDetailDto(
