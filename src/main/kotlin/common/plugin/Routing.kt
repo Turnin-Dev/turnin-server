@@ -3,6 +3,8 @@ package com.peekr.common.plugin
 import com.peekr.common.route.Api
 import com.peekr.domain.auth.application.usecase.AuthUseCases
 import com.peekr.domain.auth.presentation.route.authRoutes
+import com.peekr.domain.block.application.usecase.BlockUseCases
+import com.peekr.domain.block.presentation.route.blockRoutes
 import com.peekr.domain.discover.application.usecase.DiscoverUseCases
 import com.peekr.domain.discover.presentation.route.discoverRoutes
 import com.peekr.domain.feed.application.usecase.FeedUseCases
@@ -38,6 +40,7 @@ fun Application.configureRouting() {
     val friendUseCases by inject<FriendUseCases>()
     val discoverUseCases by inject<DiscoverUseCases>()
     val feedUseCases by inject<FeedUseCases>()
+    val blockUseCases by inject<BlockUseCases>()
 
     routing {
         customRoutingOption()
@@ -55,6 +58,7 @@ fun Application.configureRouting() {
                     friendRoutes(route = Api.V1.Friend, usecase = friendUseCases)
                     discoverRoutes(route = Api.V1.Discover, usecase = discoverUseCases)
                     feedRoutes(route = Api.V1.Feed, usecase = feedUseCases)
+                    blockRoutes(route = Api.V1.Block, usecase = blockUseCases)
 
                     // 도메인과 API 명세서에 표시되는 위치가 다른 라우트
                     externalUserKeywordRoutes(route = Api.V1.User, usecase = userKeywordUseCases)

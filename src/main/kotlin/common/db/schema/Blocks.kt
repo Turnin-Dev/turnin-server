@@ -12,7 +12,6 @@ object Blocks : BaseLongIdTable("block") {
     val blockedId = reference("blocked_id", Users, onDelete = ReferenceOption.RESTRICT)
     val reasonId = reference("reason_id", BlockReasons, onDelete = ReferenceOption.RESTRICT)
     val customReason = text("custom_reason").nullable()
-    val isBlocked = bool("is_blocked").default(true)
 
     init {
         uniqueIndex("uq_block_pair", blockerId, blockedId)
@@ -27,5 +26,4 @@ class BlockEntity(id: EntityID<Long>) : BaseEntity(id, Blocks) {
     var blockedId by Blocks.blockedId
     var reasonId by Blocks.reasonId
     var customReason by Blocks.customReason
-    var isBlocked by Blocks.isBlocked
 }

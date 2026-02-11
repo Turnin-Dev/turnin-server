@@ -1,6 +1,8 @@
 package com.peekr.util.db
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.BlockReasons
+import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.RefreshTokens
@@ -11,6 +13,7 @@ import com.peekr.common.db.schema.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -36,20 +39,26 @@ object TestDatabaseFactory {
                 Friends,
                 ReportReasons,
                 Reports,
+                BlockReasons,
+                Blocks,
             )
+
+            initData()
         }
     }
 
     fun cleanUp() {
         transaction {
             SchemaUtils.drop(
-                UserKeywords,
+                Users,
                 RefreshTokens,
                 Keywords,
+                UserKeywords,
                 Friends,
-                Users,
                 ReportReasons,
                 Reports,
+                BlockReasons,
+                Blocks,
             )
 
             SchemaUtils.create(
@@ -60,7 +69,11 @@ object TestDatabaseFactory {
                 Friends,
                 ReportReasons,
                 Reports,
+                BlockReasons,
+                Blocks,
             )
+
+            initData()
         }
     }
 
@@ -71,6 +84,16 @@ object TestDatabaseFactory {
             throw DatabaseException.DBQueryException(e)
         } catch (e: Exception) {
             throw e
+        }
+    }
+
+    private fun initData() {
+        // 초기 데이터 삽입
+        repeat(2) {
+            BlockReasons.insertIgnore { stmt ->
+                stmt[code] = "TEST_BLOCK_REASON_$it"
+                stmt[description] = "TEST_BLOCK_REASON_DESC_$it"
+            }
         }
     }
 }
