@@ -196,6 +196,51 @@ class DiscoverRepositoryImplTest {
         assertEquals(0, result.size)
     }
 
+    @Test
+    fun `findUserIdsWithSimilarKeywords - 차단 당한 사용자는 차단한 사용자가 조회되지 않는다`() = runTest {
+        // given: 데이터 세팅
+
+        // 1번 키워드 벡터 값: 기준 (1, 0, 0 ...)
+        val baseVector = TestVectorFixture.unitVector(1.0f)
+        // 2번 키워드 벡터 값: 동일 (1, 0, 0 ...) -> 유사도 1.0 (성공)
+        val sameVector = TestVectorFixture.unitVector(1.0f)
+
+        val targetUserId = UserId(1L)
+        val blockedUserId = UserId(2L)
+
+        setupKeywordRelations(
+            userCount = 3,
+            keywordsWithVectors = listOf(
+                // 1번 키워드
+                "BaseKey" to baseVector,
+                // 2번 키워드
+                "SameKey" to sameVector,
+            ),
+            userKeywordRelation = mapOf(
+                // 나 (기준)
+                targetUserId.value to listOf(1L),
+                // 차단된 사용자 (동일한 키워드 벡터 값의 키워드로 등록해서 조회 대상이 되도록 설정)
+                blockedUserId.value to listOf(2L),
+            ),
+        )
+
+        // 차단 수행
+        setUpBlock(
+            blockerId = targetUserId,
+            blockedId = blockedUserId,
+        )
+
+        // when
+        val result = repository.findUserIdsWithSimilarKeywords(
+            targetUserId = blockedUserId,
+            cursor = null,
+            pageSize = 10,
+        )
+
+        // then: 차단된 사용자를 제외했으니 리스트는 비어있어야 한다.
+        assertEquals(0, result.size)
+    }
+
     private suspend fun setUpBlock(
         blockerId: UserId,
         blockedId: UserId,

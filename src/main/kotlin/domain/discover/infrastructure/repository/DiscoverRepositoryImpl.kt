@@ -39,8 +39,8 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 AND NOT EXISTS (
                     SELECT 1
                     FROM block
-                    WHERE block.blocker_id = ?
-                        AND block.blocked_id = uk_other.user_id
+                    WHERE (block.blocker_id = ? AND block.blocked_id = uk_other.user_id)
+                        OR (block.blocked_id = ? AND block.blocker_id = uk_other.user_id)
                 )
                 $cursorCondition
             ORDER BY uk_other.user_id DESC
@@ -49,6 +49,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
 
         val params = buildList {
             add(DoubleColumnType() to SharedUserKeyword.HIGH_SIMILARITY_THRESHOLD)
+            add(LongColumnType() to targetUserId.value)
             add(LongColumnType() to targetUserId.value)
             add(LongColumnType() to targetUserId.value)
             add(LongColumnType() to targetUserId.value)
