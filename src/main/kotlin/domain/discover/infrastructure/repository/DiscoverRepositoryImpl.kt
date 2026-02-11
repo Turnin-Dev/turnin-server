@@ -35,14 +35,21 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             JOIN keyword k_other ON (1 - (k_other.embedding <=> k_mine.embedding)) >= ?
             JOIN user_keyword uk_other ON k_other.id = uk_other.keyword_id
             WHERE uk_mine.user_id = ?
-              AND uk_other.user_id != ?
-              $cursorCondition
+                AND uk_other.user_id != ?
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM block
+                    WHERE block.blocker_id = ?
+                        AND block.blocked_id = uk_other.user_id
+                )
+                $cursorCondition
             ORDER BY uk_other.user_id DESC
             LIMIT ?;
         """.trimIndent()
 
         val params = buildList {
             add(DoubleColumnType() to SharedUserKeyword.HIGH_SIMILARITY_THRESHOLD)
+            add(LongColumnType() to targetUserId.value)
             add(LongColumnType() to targetUserId.value)
             add(LongColumnType() to targetUserId.value)
             cursor?.let { add(LongColumnType() to it) }
