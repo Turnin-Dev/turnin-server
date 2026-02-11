@@ -7,4 +7,6 @@ data class BlockUseCases(
     val getBlocks: GetBlocksUseCase,
     /** @see CreateBlockUseCase */
     val createBlock: CreateBlockUseCase,
+    /** @see DeleteBlockUseCase */
+    val deleteBlock: DeleteBlockUseCase,
 )

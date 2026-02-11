@@ -4,6 +4,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.common.util.pagination.offset.getPaginationParams
+import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.presentation.dto.BlockDetailRequest
 import com.peekr.domain.block.presentation.dto.BlockReasonResponse
@@ -11,6 +12,7 @@ import com.peekr.domain.block.presentation.dto.BlocksResponse
 import com.peekr.domain.block.presentation.dto.toDto
 import com.peekr.domain.block.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
@@ -41,6 +43,14 @@ fun AuthenticatedRoute.blockRoutes(route: Api.V1.Block, usecase: BlockUseCases) 
             verifyAuthUserId(blockerId)
             usecase.createBlock(blockDetailRequest.toDto())
             call.respond(HttpStatusCode.Created)
+        }
+
+        delete({ deleteBlockDocs() }) {
+            val blockId = call.request.queryParameters["blockId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("차단 ID")
+            usecase.deleteBlock(blockId)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }
@@ -102,6 +112,22 @@ private fun RouteConfig.createBlockDocs() {
         }
         code(HttpStatusCode.Forbidden) {
             description = "차단 요청자와 blockerId가 일치하지 않는 경우"
+        }
+    }
+}
+
+private fun RouteConfig.deleteBlockDocs() {
+    summary = "차단 해제"
+    description = "차단을 해제한다. (삭제)"
+    request {
+        queryParameter<Long>("blockId") {
+            description = "차단 ID"
+        }
+    }
+
+    response {
+        code(HttpStatusCode.OK) {
+            description = "차단 성공 시"
         }
     }
 }

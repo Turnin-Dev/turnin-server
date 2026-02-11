@@ -1,5 +1,7 @@
 package com.peekr.domain.block.domain.repository
 
+import com.peekr.common.db.schema.BlockEntity
+import com.peekr.common.model.id.BlockId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.model.BlockReason
@@ -16,7 +18,7 @@ interface BlockRepository {
      *
      * @param blockDetail 차단 디테일
      */
-    suspend fun createBlock(blockDetail: BlockDetail)
+    suspend fun createBlock(blockDetail: BlockDetail): BlockEntity
 
     /**
      * 차단 목록 조회 (페이지네이션)
@@ -30,4 +32,11 @@ interface BlockRepository {
         offset: Long,
         size: Int,
     ): BlocksPagingData
+
+    /**
+     * 차단 삭제
+     *
+     * @param blockId 차단 ID
+     */
+    suspend fun deleteBlock(blockId: BlockId): Boolean
 }

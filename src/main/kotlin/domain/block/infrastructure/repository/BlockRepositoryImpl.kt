@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.model.id.BlockId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.model.BlockReason
@@ -15,6 +16,8 @@ import com.peekr.domain.block.infrastructure.mapper.BlockMapper.toDomainBlockRea
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.selectAll
 
 class BlockRepositoryImpl : BlockRepository {
@@ -24,7 +27,7 @@ class BlockRepositoryImpl : BlockRepository {
             .map { it.toDomainBlockReason() }
     }
 
-    override suspend fun createBlock(blockDetail: BlockDetail): Unit = suspendTransaction {
+    override suspend fun createBlock(blockDetail: BlockDetail): BlockEntity = suspendTransaction {
         BlockEntity.new {
             this.blockerId = EntityID(blockDetail.blockerId.value, Users)
             this.blockedId = EntityID(blockDetail.blockedId.value, Users)
@@ -60,5 +63,11 @@ class BlockRepositoryImpl : BlockRepository {
 
         // 4) 결과 반환
         BlocksPagingData(totalCount, blocks)
+    }
+
+    override suspend fun deleteBlock(blockId: BlockId): Boolean = suspendTransaction {
+        Blocks.deleteWhere {
+            Blocks.id eq blockId.value
+        } > 0
     }
 }

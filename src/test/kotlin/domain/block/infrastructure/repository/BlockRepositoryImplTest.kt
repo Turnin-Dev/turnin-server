@@ -1,16 +1,21 @@
 package com.peekr.domain.block.infrastructure.repository
 
+import com.peekr.common.db.schema.BlockEntity
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
+import com.peekr.common.model.id.BlockId
+import com.peekr.common.model.id.BlockReasonId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.infrastructure.mapper.BlockMapper.toDomain
 import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.batchInsert
@@ -128,6 +133,30 @@ class BlockRepositoryImplTest {
         // 중복 확인: 모든 차단 ID가 고유한지
         val uniqueBlockIds = allBlocks.map { it.id.value }.toSet()
         assertEquals(15, uniqueBlockIds.size)
+    }
+
+    @Test
+    fun `차단 삭제 성공 테스트`() = runTest {
+        // given: 사용자 2명 생성 후 차단 생성
+        val user1 = insertUserAndReturnId("1")
+        val user2 = insertUserAndReturnId("2")
+        val blockDetail = BlockDetail(
+            blockerId = user1,
+            blockedId = user2,
+            reasonId = BlockReasonId(1L),
+            customReason = "custom-reason",
+        )
+        val blockEntity = repository.createBlock(blockDetail)
+
+        // when: 차단 삭제
+        val result = repository.deleteBlock(BlockId(blockEntity.id.value))
+
+        // then: 차단 삭제 검증
+        assertTrue(result)
+        val savedBlock = TestDatabaseFactory.dbQuery {
+            BlockEntity.findById(blockEntity.id)
+        }
+        assertNull(savedBlock)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
