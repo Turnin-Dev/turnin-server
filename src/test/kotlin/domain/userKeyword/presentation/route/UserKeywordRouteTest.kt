@@ -477,7 +477,7 @@ class UserKeywordRouteTest {
         // given
         val route = Api.V1.UserKeyword
         coEvery {
-            userKeywordUseCases.getDetail(TestUserKeywordId.value)
+            userKeywordUseCases.getDetail(TestUserId.value, TestUserKeywordId.value)
         } returns TestUserKeywordDetailDto
 
         // when, then

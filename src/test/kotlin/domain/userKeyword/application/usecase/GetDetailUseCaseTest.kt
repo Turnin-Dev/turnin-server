@@ -26,11 +26,11 @@ class GetDetailUseCaseTest {
     fun `사용자 키워드 상세 정보 조회 시 정상적으로 값을 반환한다`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.getDetailById(TestUserKeywordId)
+            userKeywordRepository.getDetailById(TestCurrentUserId, TestUserKeywordId)
         } returns TestUserKeywordDetail
 
         // when
-        val result = usecase(TestUserKeywordId.value)
+        val result = usecase(TestCurrentUserId.value, TestUserKeywordId.value)
 
         // then
         assertNotNull(result)
@@ -41,17 +41,18 @@ class GetDetailUseCaseTest {
     fun `리포지토리에서 값을 찾지 못할 때 NULL을 반환한다`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.getDetailById(TestUserKeywordId)
+            userKeywordRepository.getDetailById(TestCurrentUserId, TestUserKeywordId)
         } returns null
 
         // when
-        val result = usecase(TestUserKeywordId.value)
+        val result = usecase(TestCurrentUserId.value, TestUserKeywordId.value)
 
         // then
         assertNull(result)
     }
 
     companion object {
+        private val TestCurrentUserId = UserId(1L)
         private val TestUserKeywordId = UserKeywordId(1L)
         private val TestUserKeywordDetail = UserKeywordDetail(
             userKeywordId = TestUserKeywordId,

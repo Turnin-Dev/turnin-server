@@ -40,7 +40,8 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             val userKeywordIdParam = call.parameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
-            val userKeywordDto = usecase.getDetail(userKeywordIdParam)
+            val currentUserId = extractUserIdWithToken()
+            val userKeywordDto = usecase.getDetail(currentUserId.value, userKeywordIdParam)
             if (userKeywordDto != null) {
                 call.respond(userKeywordDto.toResponse())
             } else {
