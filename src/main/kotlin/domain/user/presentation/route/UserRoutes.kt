@@ -174,7 +174,7 @@ private fun RouteConfig.getUserProfileDocs() {
         }
         code(HttpStatusCode.NotFound) {
             body<ErrorResponse> {
-                description = "사용자가 존재하지 않는 경우"
+                description = "사용자가 존재하지 않는 경우, 차단 관계에 있는 사용자인 경우"
                 example("UserNotFound") {
                     value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
                 }

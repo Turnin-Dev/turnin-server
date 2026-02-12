@@ -124,6 +124,9 @@ private fun RouteConfig.getDetailDocs() {
                 }
             }
         }
+        code(HttpStatusCode.NotFound) {
+            description = "사용자 키워드를 조회할 수 없는 경우, 차단된 사용자의 키워드 조회 시"
+        }
     }
 }
 
