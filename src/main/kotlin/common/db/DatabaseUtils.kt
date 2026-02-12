@@ -93,6 +93,8 @@ object DatabaseUtils {
      *
      * @param myUserId 나의 사용자 ID
      * @param otherUserIdColumn 다른 사용자 ID 컬럼
+     *
+     * @see isNotBlockedRelationship 단일 조회용
      */
     fun SqlExpressionBuilder.isNotBlockedRelationship(
         myUserId: Long,
@@ -107,6 +109,34 @@ object DatabaseUtils {
                 .where {
                     (Blocks.blockerId eq myUserId and (Blocks.blockedId eq otherUserIdColumn)) or
                         (Blocks.blockerId eq otherUserIdColumn and (Blocks.blockedId eq myUserId))
+                },
+        )
+    }
+
+    /**
+     * [myUserId]와 [otherUserId] 간에 차단 관계가 존재하는지 확인한다.
+     * 차단 관계가 없다면 `true`를 반환하여 해당 행이 결과에 포함되게 하고,
+     * 차단 관계(양방향 중 하나라도)가 있다면 `false`를 반환하여 결과에서 제외한다.
+     *
+     * 나 자신인 경우([myUserId]와 [otherUserId]가 같은 경우)에는 항상 `True`를 반환한다.
+     *
+     * @param myUserId 나의 사용자 ID
+     * @param otherUserId 다른 사용자 ID 컬럼
+     *
+     * @see isNotBlockedRelationship 다중 조회용
+     */
+    fun SqlExpressionBuilder.isNotBlockedRelationship(
+        myUserId: Long,
+        otherUserId: Long,
+    ): Op<Boolean> {
+        if (myUserId == otherUserId) return Op.TRUE
+
+        return notExists(
+            Blocks
+                .select(intLiteral(1))
+                .where {
+                    (Blocks.blockerId eq myUserId and (Blocks.blockedId eq otherUserId)) or
+                        (Blocks.blockerId eq otherUserId and (Blocks.blockedId eq myUserId))
                 },
         )
     }

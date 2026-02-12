@@ -8,13 +8,33 @@ import com.peekr.domain.user.domain.model.UserPatch
 
 interface UserRepository {
     /**
-     * ID를 통해 사용자를 조회한다.
+     * 사용자 존재 여부 확인
      *
      * @param id 사용자 ID
+     */
+    suspend fun existsUser(id: UserId): Boolean
+
+    /**
+     * ID를 통해 사용자를 조회한다.
+     *
+     * @param id 조회할 사용자 ID
      *
      * @return [User] - 사용자를 찾을 수 없으면 **`null`** 반환
      */
     suspend fun findById(id: UserId): User?
+
+    /**
+     * ID를 통해 사용자를 조회한다. (차단된 사용자는 제외한다.)
+     *
+     * @param currentId 현재 조회를 요청한 사용자 ID
+     * @param id 조회할 사용자 ID
+     *
+     * @return [User] - 사용자를 찾을 수 없으면 **`null`** 반환
+     */
+    suspend fun findVisibleById(
+        currentId: UserId,
+        id: UserId,
+    ): User?
 
     /**
      * ID 목록을 통해 사용자 목록을 조회한다.

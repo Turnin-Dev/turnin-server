@@ -30,7 +30,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
     }) {
         get({ getUserByIdDocs() }) {
             val userId = extractUserIdWithToken()
-            val user = usecase.get(userId)
+            val user = usecase.get(userId, userId)
             if (user != null) {
                 call.respond(user.toResponse())
             } else {
@@ -59,7 +59,12 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             val userId = call.pathParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
-            val userProfileDto = usecase.getUserProfile(myUserId = myUserId, userId = userId)
+            val includeBlocked = call.request.queryParameters["includeBlocked"]?.toBoolean() ?: false
+            val userProfileDto = usecase.getUserProfile(
+                myUserId = myUserId.value,
+                userId = userId,
+                includeBlocked = includeBlocked,
+            )
             if (userProfileDto != null) {
                 call.respond(userProfileDto.toResponse())
             } else {
@@ -104,6 +109,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
 
 // ------------------------------ Route Docs ------------------------------
 private fun RouteConfig.getUserByIdDocs() {
+    deprecated = true
     summary = "사용자 조회"
     description = "사용자 ID로 사용자를 조회한다."
     response {
@@ -155,6 +161,9 @@ private fun RouteConfig.getUserProfileDocs() {
             example("Example") {
                 value = 1L
             }
+        }
+        queryParameter<Boolean>("includeBlocked") {
+            description = "조회 시 차단 사용자 포함 여부 (`true`면 차단 사용자까지 함께 조회하고 `false`면 제외하고 조회한다.)"
         }
     }
     response {

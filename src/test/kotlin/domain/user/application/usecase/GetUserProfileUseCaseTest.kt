@@ -11,6 +11,7 @@ import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.provider.FriendProvider
 import com.peekr.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import java.time.Instant
 import kotlin.test.BeforeTest
@@ -27,6 +28,7 @@ class GetUserProfileUseCaseTest {
 
     @BeforeTest
     fun setUp() {
+        coEvery { userRepository.findVisibleById(TestMyUserId, TestUserId) } returns TestUser
         coEvery { userRepository.findById(TestUserId) } returns TestUser
         coEvery { friendProvider.countFriends(TestUserId) } returns 10L
         coEvery {
@@ -36,7 +38,7 @@ class GetUserProfileUseCaseTest {
 
     @Test
     fun `사용자 프로필 조회 성공 테스트`() = runTest {
-        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
+        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, false)
 
         assertNotNull(userProfileDto)
         assertEquals(TestUser.displayId, userProfileDto.displayId)
@@ -44,12 +46,37 @@ class GetUserProfileUseCaseTest {
     }
 
     @Test
+    fun `사용자 프로필 조회 시 차단 사용자를 제외하고 조회한다`() = runTest {
+        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, false)
+
+        assertNotNull(userProfileDto)
+        assertEquals(TestUser.displayId, userProfileDto.displayId)
+        assertEquals(TestUser.userName, userProfileDto.userName)
+
+        coVerify(exactly = 0) { userRepository.findById(TestUserId) }
+        coVerify(exactly = 1) { userRepository.findVisibleById(TestMyUserId, TestUserId) }
+    }
+
+    @Test
+    fun `사용자 프로필 조회 시 차단 사용자를 포함하여 조회한다`() = runTest {
+        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, true)
+
+        assertNotNull(userProfileDto)
+        assertEquals(TestUser.displayId, userProfileDto.displayId)
+        assertEquals(TestUser.userName, userProfileDto.userName)
+
+        coVerify(exactly = 0) { userRepository.findVisibleById(TestMyUserId, TestUserId) }
+        coVerify(exactly = 1) { userRepository.findById(TestUserId) }
+    }
+
+    @Test
     fun `사용자를 찾지 못하는 경우 null을 반환한다`() = runTest {
         // given
+        coEvery { userRepository.findVisibleById(TestMyUserId, TestUserId) } returns null
         coEvery { userRepository.findById(TestUserId) } returns null
 
         // when
-        val userProfileDto = usecase(TestMyUserId, TestUserId.value)
+        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, false)
 
         // then
         assertNull(userProfileDto)

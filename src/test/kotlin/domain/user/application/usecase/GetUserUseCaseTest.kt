@@ -38,10 +38,10 @@ class GetUserUseCaseTest {
     @Test
     fun `성공 테스트`() = runTest {
         // given
-        coEvery { userRepository.findById(TestUserId) } returns TestUser
+        coEvery { userRepository.findVisibleById(TestUserId, TestUserId) } returns TestUser
 
         // when
-        val userDto = usecase(TestUserId)
+        val userDto = usecase(TestUserId, TestUserId)
 
         // then
         assertNotNull(userDto)
@@ -51,10 +51,10 @@ class GetUserUseCaseTest {
     @Test
     fun `사용자가 존재하지 않을 때 실패 테스트`() = runTest {
         // given
-        coEvery { userRepository.findById(TestUserId) } returns null
+        coEvery { userRepository.findVisibleById(TestUserId, TestUserId) } returns null
 
         // when
-        val userDto = usecase(TestUserId)
+        val userDto = usecase(TestUserId, TestUserId)
 
         // then
         assertNull(userDto)

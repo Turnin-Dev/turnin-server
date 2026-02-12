@@ -14,7 +14,7 @@ class GetMyProfileUseCase(
     private val friendProvider: FriendProvider,
 ) {
     suspend operator fun invoke(id: UserId): MyProfileDto? {
-        val userDto = userRepository.findById(id)?.toDto() ?: return null
+        val userDto = userRepository.findVisibleById(id, id)?.toDto() ?: return null
         val friendsCount = friendProvider.countFriends(id)
         return MyProfileDto(
             userId = userDto.id.value,

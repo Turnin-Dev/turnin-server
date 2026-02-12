@@ -7,7 +7,7 @@ import com.peekr.domain.user.application.provider.UserProviderApi
 
 class UserProviderImpl(private val userProviderApi: UserProviderApi) : UserProvider {
     override suspend fun existsUser(userId: UserId): Boolean =
-        userProviderApi.findById(userId) != null
+        userProviderApi.existsUser(userId)
 
     override suspend fun getUserInfos(userIds: List<UserId>): List<ExternalUserInfo> {
         val users = userProviderApi.findByIds(userIds)
