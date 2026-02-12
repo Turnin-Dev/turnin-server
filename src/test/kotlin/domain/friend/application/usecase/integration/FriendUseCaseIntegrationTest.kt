@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.application.usecase.e2e
+package com.peekr.domain.friend.application.usecase.integration
 
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.FriendRequestStatus
@@ -10,12 +10,10 @@ import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
 import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
+import com.peekr.domain.friend.domain.provider.BlockProvider
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.infrastructure.provider.UserProviderImpl
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
-import com.peekr.domain.user.application.provider.UserProviderApi
-import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
 import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.AfterTest
@@ -30,10 +28,11 @@ import kotlinx.coroutines.test.runTest
  */
 class FriendUseCaseIntegrationTest {
     // UserBC의 API
-    private val userProvider: UserProvider = UserProviderImpl(UserProviderApi(UserRepositoryImpl()))
+    private val userProvider: UserProvider = FakeUserProvider()
+    private val blockProvider: BlockProvider = FakeBlockProvider()
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
     private val getFriendsUseCase = GetFriendsUseCase(friendRepository, userProvider)
-    private val addFriendUseCase = AddFriendUseCase(friendRepository, userProvider)
+    private val addFriendUseCase = AddFriendUseCase(friendRepository, userProvider, blockProvider)
     private val updateFriendRequestStatusUseCase = UpdateFriendRequestStatusUseCase(friendRepository, userProvider)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
 

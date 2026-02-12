@@ -5,20 +5,37 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
+import com.peekr.domain.friend.domain.provider.BlockProvider
 import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 
 class AddFriendUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
     private val userProvider: UserProvider = mockk()
-    private val usecase = AddFriendUseCase(friendRepository, userProvider)
+    private val blockProvider: BlockProvider = mockk()
+    private val usecase = AddFriendUseCase(friendRepository, userProvider, blockProvider)
+
+    @Before
+    fun setup() {
+        coEvery {
+            blockProvider.isBlockedRelationship(TestRequesterId, TestReceiverId)
+        } returns false
+    }
+
+    @After
+    fun teardown() {
+        clearAllMocks()
+    }
 
     @Test
     fun `친구 추가 성공 테스트`() = runTest {
@@ -61,8 +78,8 @@ class AddFriendUseCaseTest {
     fun `친구 요청한 사용자 ID와 요청 받은 사용자 ID가 같을 때 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            userProvider.existsUser(TestRequesterId)
-        } returns true
+            blockProvider.isBlockedRelationship(UserId(1L), UserId(1L))
+        } returns false
 
         // when, then
         assertThrows<FriendException.SelfRequestException> {
@@ -82,6 +99,22 @@ class AddFriendUseCaseTest {
 
         // when, then
         assertThrows<FriendException.AlreadyFriendRequestException> {
+            usecase(
+                requesterId = TestRequesterId.value,
+                receiverId = TestReceiverId.value,
+            )
+        }
+    }
+
+    @Test
+    fun `친구 요청 하려는 사용자와 차단 관계에 있는 경우 예외가 발생한다`() = runTest {
+        // given
+        coEvery {
+            blockProvider.isBlockedRelationship(TestRequesterId, TestReceiverId)
+        } returns true
+
+        // when, then
+        assertThrows<FriendException.UserNotFoundException> {
             usecase(
                 requesterId = TestRequesterId.value,
                 receiverId = TestReceiverId.value,

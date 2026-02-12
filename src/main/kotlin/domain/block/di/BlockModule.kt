@@ -1,5 +1,6 @@
 package com.peekr.domain.block.di
 
+import com.peekr.domain.block.application.provider.BlockProviderApi
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.application.usecase.CreateBlockUseCase
 import com.peekr.domain.block.application.usecase.DeleteBlockUseCase
@@ -16,6 +17,7 @@ val blockModule = module {
     single<BlockRepository> { BlockRepositoryImpl() }
 
     // Provider
+    single { BlockProviderApi(get()) }
     single<FriendProvider> { FriendProviderImpl(get()) }
 
     // Usecase
