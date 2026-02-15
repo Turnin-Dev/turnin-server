@@ -34,6 +34,7 @@ class FeedRepositoryImpl : FeedRepository {
             add(LongColumnType() to userId.value)
             add(LongColumnType() to userId.value)
             add(LongColumnType() to userId.value)
+            add(LongColumnType() to userId.value)
             add(DoubleColumnType() to cursorScore)
             add(DoubleColumnType() to cursorScore)
             add(JavaOffsetDateTimeColumnType() to cursorCreatedAt?.let { Instant.ofEpochSecond(it).toOffsetDateTime() })
@@ -118,7 +119,12 @@ class FeedRepositoryImpl : FeedRepository {
                 	END)
             	) as final_score
             FROM candidate_pool cp
-            WHERE cp.uk_user_id NOT IN (select blocked_id from block where blocker_id = ?)
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM block
+                WHERE (block.blocker_id = ? AND block.blocked_id = cp.uk_user_id)
+                    or (block.blocked_id = ? AND block.blocker_id = cp.uk_user_id)
+            )
             order by cp.uk_id, (cp.similarity * 50) desc
         ),
         result_list as (

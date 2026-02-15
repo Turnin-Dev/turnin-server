@@ -31,13 +31,14 @@ fun AuthenticatedRoute.externalUserKeywordRoutes(
             val userId = call.parameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
-            val userKeywordDetailsDto = usecase.getDetails(userId)
+            val currentUserId = extractUserIdWithToken()
+            val userKeywordDetailsDto = usecase.getDetails(currentUserId.value, userId)
             call.respond(userKeywordDetailsDto.map { it.toResponse() })
         }
 
         get("${route.ROUTE}/me/keywords", { getMyDetailsDocs() }) {
             val userId = extractUserIdWithToken()
-            val userKeywordDetailsDto = usecase.getDetails(userId.value)
+            val userKeywordDetailsDto = usecase.getDetails(userId.value, userId.value)
             call.respond(userKeywordDetailsDto.map { it.toResponse() })
         }
     }

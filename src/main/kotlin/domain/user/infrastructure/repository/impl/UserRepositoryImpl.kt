@@ -1,5 +1,6 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
+import com.peekr.common.db.DatabaseUtils.isNotBlockedRelationship
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
@@ -10,6 +11,9 @@ import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.intLiteral
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {
@@ -17,6 +21,27 @@ class UserRepositoryImpl : UserRepository {
         UserEntity
             .findById(id.value)
             ?.toDomain()
+    }
+
+    override suspend fun existsUser(id: UserId): Boolean = suspendTransaction {
+        Users
+            .select(intLiteral(1))
+            .where { Users.id eq id.value }
+            .limit(1)
+            .any()
+    }
+
+    override suspend fun findVisibleById(
+        currentId: UserId,
+        id: UserId,
+    ): User? = suspendTransaction {
+        Users
+            .selectAll()
+            .where {
+                (Users.id eq id.value) and
+                    isNotBlockedRelationship(myUserId = currentId.value, otherUserId = id.value)
+            }.map { it.toDomain() }
+            .singleOrNull()
     }
 
     override suspend fun findByIds(ids: List<UserId>): List<User> = suspendTransaction {

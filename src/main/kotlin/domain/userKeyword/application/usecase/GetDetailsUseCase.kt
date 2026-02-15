@@ -21,11 +21,13 @@ class GetDetailsUseCase(private val userKeywordRepository: UserKeywordRepository
      * @return [UserKeywordDetailDto] 사용자 키워드 상세 정보 DTO
      */
     suspend operator fun invoke(
+        currentUserId: Long,
         userId: Long,
     ): List<UserKeywordDetailDto> {
+        val currentUserIdVO = UserId(currentUserId)
         val userIdVO = UserId(userId)
         val userKeywordDetailDtoList = userKeywordRepository
-            .getDetailsByUserId(userIdVO)
+            .getDetailsByUserId(currentUserIdVO, userIdVO)
             .map { it.toDto() }
         return userKeywordDetailDtoList
     }

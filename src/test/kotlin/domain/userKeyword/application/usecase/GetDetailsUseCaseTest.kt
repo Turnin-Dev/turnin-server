@@ -27,11 +27,11 @@ class GetDetailsUseCaseTest {
         val expectedCount = 3
         val expectedList = List(expectedCount) { TestUserKeywordDetail }
         coEvery {
-            userKeywordRepository.getDetailsByUserId(TestUserId)
+            userKeywordRepository.getDetailsByUserId(TestCurrentUserId, TestUserId)
         } returns expectedList
 
         // when
-        val result = usecase(TestUserId.value)
+        val result = usecase(TestCurrentUserId.value, TestUserId.value)
 
         // then
         assertTrue(result.isNotEmpty())
@@ -43,17 +43,18 @@ class GetDetailsUseCaseTest {
     fun `데이터가 존재하지 않는 경우 빈 리스트를 반환한다`() = runTest {
         // given
         coEvery {
-            userKeywordRepository.getDetailsByUserId(TestUserId)
+            userKeywordRepository.getDetailsByUserId(TestCurrentUserId, TestUserId)
         } returns emptyList()
 
         // when
-        val result = usecase(TestUserId.value)
+        val result = usecase(TestCurrentUserId.value, TestUserId.value)
 
         // then
         assertTrue(result.isEmpty())
     }
 
     companion object {
+        private val TestCurrentUserId = UserId(100L)
         private val TestUserId = UserId(1L)
         private val TestUserKeywordDetail = UserKeywordDetail(
             userKeywordId = UserKeywordId(1L),

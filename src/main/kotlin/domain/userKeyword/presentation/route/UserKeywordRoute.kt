@@ -40,7 +40,8 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             val userKeywordIdParam = call.parameters["userKeywordId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 키워드 ID")
-            val userKeywordDto = usecase.getDetail(userKeywordIdParam)
+            val currentUserId = extractUserIdWithToken()
+            val userKeywordDto = usecase.getDetail(currentUserId.value, userKeywordIdParam)
             if (userKeywordDto != null) {
                 call.respond(userKeywordDto.toResponse())
             } else {
@@ -122,6 +123,9 @@ private fun RouteConfig.getDetailDocs() {
                     value = UserKeywordDetailResponse.sample
                 }
             }
+        }
+        code(HttpStatusCode.NotFound) {
+            description = "사용자 키워드를 조회할 수 없는 경우, 차단된 사용자의 키워드 조회 시"
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.peekr.domain.discover.infrastructure.repository
 
+import com.peekr.common.db.schema.BlockReasons
+import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
@@ -14,6 +16,7 @@ import java.time.Instant
 import junit.framework.TestCase.assertTrue
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.junit.Rule
@@ -145,5 +148,107 @@ class DiscoverRepositoryImplTest {
         // 유저 1이 가진 키워드들이 포함되어 있는지 확인
         val user1Keywords = result.filter { it.userId.value == user1.value }.map { it.keywordName.value }
         assertTrue(user1Keywords.containsAll(listOf("키워드1", "키워드2")))
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - 차단된 사용자는 조회되지 않는다`() = runTest {
+        // given: 데이터 세팅
+
+        // 1번 키워드 벡터 값: 기준 (1, 0, 0 ...)
+        val baseVector = TestVectorFixture.unitVector(1.0f)
+        // 2번 키워드 벡터 값: 동일 (1, 0, 0 ...) -> 유사도 1.0 (성공)
+        val sameVector = TestVectorFixture.unitVector(1.0f)
+
+        val targetUserId = UserId(1L)
+        val blockedUserId = UserId(2L)
+
+        setupKeywordRelations(
+            userCount = 3,
+            keywordsWithVectors = listOf(
+                // 1번 키워드
+                "BaseKey" to baseVector,
+                // 2번 키워드
+                "SameKey" to sameVector,
+            ),
+            userKeywordRelation = mapOf(
+                // 나 (기준)
+                targetUserId.value to listOf(1L),
+                // 차단된 사용자 (동일한 키워드 벡터 값의 키워드로 등록해서 조회 대상이 되도록 설정)
+                blockedUserId.value to listOf(2L),
+            ),
+        )
+
+        // 차단 수행
+        setUpBlock(
+            blockerId = targetUserId,
+            blockedId = blockedUserId,
+        )
+
+        // when
+        val result = repository.findUserIdsWithSimilarKeywords(
+            targetUserId = targetUserId,
+            cursor = null,
+            pageSize = 10,
+        )
+
+        // then: 차단된 사용자를 제외했으니 리스트는 비어있어야 한다.
+        assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - 차단 당한 사용자는 차단한 사용자가 조회되지 않는다`() = runTest {
+        // given: 데이터 세팅
+
+        // 1번 키워드 벡터 값: 기준 (1, 0, 0 ...)
+        val baseVector = TestVectorFixture.unitVector(1.0f)
+        // 2번 키워드 벡터 값: 동일 (1, 0, 0 ...) -> 유사도 1.0 (성공)
+        val sameVector = TestVectorFixture.unitVector(1.0f)
+
+        val targetUserId = UserId(1L)
+        val blockedUserId = UserId(2L)
+
+        setupKeywordRelations(
+            userCount = 3,
+            keywordsWithVectors = listOf(
+                // 1번 키워드
+                "BaseKey" to baseVector,
+                // 2번 키워드
+                "SameKey" to sameVector,
+            ),
+            userKeywordRelation = mapOf(
+                // 나 (기준)
+                targetUserId.value to listOf(1L),
+                // 차단된 사용자 (동일한 키워드 벡터 값의 키워드로 등록해서 조회 대상이 되도록 설정)
+                blockedUserId.value to listOf(2L),
+            ),
+        )
+
+        // 차단 수행
+        setUpBlock(
+            blockerId = targetUserId,
+            blockedId = blockedUserId,
+        )
+
+        // when
+        val result = repository.findUserIdsWithSimilarKeywords(
+            targetUserId = blockedUserId,
+            cursor = null,
+            pageSize = 10,
+        )
+
+        // then: 차단된 사용자를 제외했으니 리스트는 비어있어야 한다.
+        assertEquals(0, result.size)
+    }
+
+    private suspend fun setUpBlock(
+        blockerId: UserId,
+        blockedId: UserId,
+    ) = dbRule.dbQuery {
+        Blocks.insert {
+            it[this.blockerId] = EntityID(blockerId.value, Users)
+            it[this.blockedId] = EntityID(blockedId.value, Users)
+            it[this.reasonId] = EntityID(1L, BlockReasons)
+            it[this.customReason] = "custom reason"
+        }
     }
 }

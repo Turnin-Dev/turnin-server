@@ -2,6 +2,7 @@ package com.peekr.common.exception
 
 import com.peekr.common.db.DatabaseErrorMessage
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.toHttpStatusCode
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.validator.ValidatorException
@@ -17,11 +18,11 @@ fun Application.configureExceptionHandler() {
         exception<DatabaseException> { call, cause ->
             warnLogging("DatabaseException", cause)
             call.respond(
-                status = HttpStatusCode.InternalServerError,
+                status = cause.toHttpStatusCode(),
                 message = ErrorResponse(
                     code = DatabaseErrorMessage.CLIENT_COMMON_CODE,
-                    message = DatabaseErrorMessage.CLIENT_COMMON_MESSAGE,
-                    status = HttpStatusCode.InternalServerError.value,
+                    message = cause.message ?: DatabaseErrorMessage.CLIENT_COMMON_MESSAGE,
+                    status = cause.toHttpStatusCode().value,
                 ),
             )
         }

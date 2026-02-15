@@ -1,6 +1,8 @@
 package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.BlockEntity
+import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
@@ -41,7 +43,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `findById 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -69,7 +71,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `findListByUserId 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -89,7 +91,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `findListByUserId 성공 테스트 - 등록된 키워드가 없는 상태에서 조회 시 빈 리스트를 반환한다`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
 
         // when
         val userKeywords = repository.findListByUserId(userId)
@@ -108,7 +110,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `create 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
 
         // when
@@ -137,7 +139,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `findByKeywordIdAndUserId 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -163,7 +165,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `update 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -205,7 +207,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `delete 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -230,7 +232,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `findDescriptionById 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -249,7 +251,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `findDescriptionById 성공 테스트 - 등록되지 않은 사용자 키워드 조회 시 null을 반환한다`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
 
         // when
         val description = repository.findDescriptionById(userId, UserKeywordId(1L))
@@ -261,7 +263,7 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `findDescriptionById 성공 테스트 - 사용자 키워드 설명이 비어있는 경우 null을 반환한다`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val userId = insertUserAndReturnId("1")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -279,7 +281,8 @@ class UserKeywordRepositoryImplTest {
     @Test
     fun `getDetailById 성공 테스트 - 사용자 정보 포함`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val currentUserId = insertUserAndReturnId("1")
+        val userId = insertUserAndReturnId("2")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -288,7 +291,7 @@ class UserKeywordRepositoryImplTest {
         )
 
         // when
-        val userKeywordDetail = repository.getDetailById(userKeyword.id)
+        val userKeywordDetail = repository.getDetailById(currentUserId, userKeyword.id)
 
         // then
         assertEquals(TestDescription.value, userKeywordDetail?.description?.value)
@@ -297,9 +300,32 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
+    fun `getDetailById 성공 테스트 - 차단된 사용자끼리는 서로 조회되지 않는다(null 반환)`() = runTest {
+        // given: 사용자 2명을 생성하여 차단 관계를 만든다, 각 사용자의 키워드를 생성한다.
+        val user1 = insertUserAndReturnId("1")
+        val user2 = insertUserAndReturnId("2")
+        createBlock(user1.value, user2.value)
+        // user1 기준으로 사용자 키워드를 생성
+        val keywordId1 = insertKeywordAndReturnId(user1, "user1keyword")
+        val userKeyword1 = repository.create(keywordId1, user1, TestDescription)
+        // user2 기준으로 사용자 키워드를 생성
+        val keywordId2 = insertKeywordAndReturnId(user2, "user2keyword")
+        val userKeyword2 = repository.create(keywordId2, user2, TestDescription)
+
+        // when: user1과 user2 서로 키워드 상세 정보를 조회
+        val userKeywordDetail = repository.getDetailById(user1, userKeyword2.id)
+        val userKeywordDetail2 = repository.getDetailById(user2, userKeyword1.id)
+
+        // then: user1과 user2는 차단 관계이므로 조회되지 않는다.
+        assertNull(userKeywordDetail)
+        assertNull(userKeywordDetail2)
+    }
+
+    @Test
     fun `getDetailsByUserId 성공 테스트`() = runTest {
         // given
-        val userId = insertUserAndReturnId()
+        val currentUserId = insertUserAndReturnId("1")
+        val userId = insertUserAndReturnId("2")
         val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
         val userKeyword = repository.create(
             keywordId = keywordId,
@@ -308,7 +334,7 @@ class UserKeywordRepositoryImplTest {
         )
 
         // when
-        val userKeywordDetails = repository.getDetailsByUserId(userId)
+        val userKeywordDetails = repository.getDetailsByUserId(currentUserId, userId)
 
         // then
         assertEquals(1, userKeywordDetails.size)
@@ -317,21 +343,43 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
+    fun `getDetailsByUserId 성공 테스트 - 차단된 사용자끼리는 서로 조회되지 않는다(빈 리스트 반환)`() = runTest {
+        // given: 사용자 2명을 생성하여 차단 관계를 만든다, 각 사용자의 키워드를 생성한다.
+        val user1 = insertUserAndReturnId("1")
+        val user2 = insertUserAndReturnId("2")
+        createBlock(user1.value, user2.value)
+        // user1 기준으로 사용자 키워드를 생성
+        val keywordId1 = insertKeywordAndReturnId(user1, "user1keyword")
+        repository.create(keywordId1, user1, TestDescription)
+        // user2 기준으로 사용자 키워드를 생성
+        val keywordId2 = insertKeywordAndReturnId(user2, "user2keyword")
+        repository.create(keywordId2, user2, TestDescription)
+
+        // when: user1과 user2 서로 키워드 상세 정보를 조회
+        val userKeywordDetail = repository.getDetailsByUserId(user1, user2)
+        val userKeywordDetail2 = repository.getDetailsByUserId(user2, user1)
+
+        // then: user1과 user2는 차단 관계이므로 조회되지 않는다.
+        assertTrue(userKeywordDetail.isEmpty())
+        assertTrue(userKeywordDetail2.isEmpty())
+    }
+
+    @Test
     fun `getDetailsByUserId 성공 테스트 - 데이터가 없는 경우 빈 리스트를 반환한다`() = runTest {
         // when
-        val userKeywordDetails = repository.getDetailsByUserId(UserId(100L))
+        val userKeywordDetails = repository.getDetailsByUserId(UserId(1L), UserId(100L))
 
         // then
         assertTrue(userKeywordDetails.isEmpty())
     }
 
-    private suspend fun insertUserAndReturnId(): UserId = TestDatabaseFactory.dbQuery {
+    private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
             this.provider = SocialLoginProvider.GOOGLE
-            this.providerId = "asdasdads"
-            this.displayId = "hong"
-            this.name = "honggd"
+            this.providerId = "pid$uniqueValue"
+            this.displayId = "did$uniqueValue"
+            this.name = "name$uniqueValue"
             this.profileImageUrl = null
             this.introduce = "hello"
             this.isActive = true
@@ -350,6 +398,17 @@ class UserKeywordRepositoryImplTest {
             this.createdBy = EntityID(userId.value, Users)
         }
         KeywordId(savedKeyword.id.value)
+    }
+
+    private suspend fun createBlock(
+        blockerId: Long,
+        blockedId: Long,
+    ): BlockEntity = TestDatabaseFactory.dbQuery {
+        BlockEntity.new {
+            this.blockerId = EntityID(blockerId, Users)
+            this.blockedId = EntityID(blockedId, Users)
+            this.reasonId = EntityID(1, BlockReasons)
+        }
     }
 
     companion object {

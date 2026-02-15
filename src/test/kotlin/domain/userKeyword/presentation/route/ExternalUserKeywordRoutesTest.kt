@@ -28,18 +28,18 @@ class ExternalUserKeywordRoutesTest {
         val expectedCount = 2
         val expectedList = List(expectedCount) { TestUserKeywordDetailDto }
         coEvery {
-            usecase.getDetails(TestUserId.value)
+            usecase.getDetails(TestCurrentUserId.value, TestTargetUserId.value)
         } returns expectedList
 
         // when, then
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${TestUserId.value}/keywords",
+            endpoint = "${route.ROUTE}/${TestTargetUserId.value}/keywords",
             testPlugin = {
                 testPlugin(
                     authRouting = { externalUserKeywordRoutes(route, usecase) },
                 )
             },
-            tokenSubject = TestUserId.value.toString(),
+            tokenSubject = TestCurrentUserId.value.toString(),
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 val expectedResponse = Json.encodeToString(expectedList.map { it.toResponse() })
@@ -51,7 +51,7 @@ class ExternalUserKeywordRoutesTest {
     @Test
     fun `사용자 ID로 사용자 키워드 상세 정보 리스트 조회 - 토큰 에러 발생 시 HTTP 상태코드 401을 반환한다`() = testApplication {
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${TestUserId.value}/keywords",
+            endpoint = "${route.ROUTE}/${TestTargetUserId.value}/keywords",
             testPlugin = {
                 testPlugin(
                     authRouting = { externalUserKeywordRoutes(route, usecase) },
@@ -71,18 +71,18 @@ class ExternalUserKeywordRoutesTest {
             message = "hello, error!",
         ) {}
         coEvery {
-            usecase.getDetails(TestUserId.value)
+            usecase.getDetails(TestCurrentUserId.value, TestTargetUserId.value)
         } throws expectedException
 
         // when, then
         testGetEndpoint(
-            endpoint = "${route.ROUTE}/${TestUserId.value}/keywords",
+            endpoint = "${route.ROUTE}/${TestTargetUserId.value}/keywords",
             testPlugin = {
                 testPlugin(
                     authRouting = { externalUserKeywordRoutes(route, usecase) },
                 )
             },
-            tokenSubject = TestUserId.value.toString(),
+            tokenSubject = TestCurrentUserId.value.toString(),
             expectedStatus = expectedException.status,
             responseValidator = {
                 containsAll(
@@ -94,7 +94,8 @@ class ExternalUserKeywordRoutesTest {
     }
 
     companion object {
-        private val TestUserId = UserId(1L)
+        private val TestCurrentUserId = UserId(1L)
+        private val TestTargetUserId = UserId(2L)
         private val TestUserKeywordId = UserKeywordId(1L)
         private val TestUserKeywordDetailDto = UserKeywordDetailDto(
             userKeywordId = TestUserKeywordId.value,
@@ -102,7 +103,7 @@ class ExternalUserKeywordRoutesTest {
             keywordName = "keyword",
             description = "description",
             userInfo = UserInfoDto(
-                userId = TestUserId.value,
+                userId = TestCurrentUserId.value,
                 userName = "user",
                 profileImageUrl = null,
             ),

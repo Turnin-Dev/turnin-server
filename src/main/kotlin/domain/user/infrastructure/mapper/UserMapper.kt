@@ -24,16 +24,16 @@ object UserMapper {
         lastLoginAt = this.lastLoginAt,
     )
 
-    fun toDomain(row: ResultRow): User = User(
-        id = UserId(row[Users.id].value),
-        role = row[Users.role],
-        provider = row[Users.provider],
-        providerId = row[Users.providerId],
-        displayId = DisplayId(row[Users.displayId]),
-        userName = UserName(row[Users.name]),
-        profileImageUrl = row[Users.profileImageUrl],
-        introduce = Introduce(row[Users.introduce]),
-        isActive = row[Users.isActive],
-        lastLoginAt = row[Users.lastLoginAt],
+    fun ResultRow.toDomain(): User = User(
+        id = UserId(this[Users.id].value),
+        role = this[Users.role],
+        provider = this[Users.provider],
+        providerId = this[Users.providerId],
+        displayId = DisplayId(this[Users.displayId]),
+        userName = UserName(this[Users.name]),
+        profileImageUrl = this[Users.profileImageUrl],
+        introduce = Introduce(this[Users.introduce]),
+        isActive = this[Users.isActive],
+        lastLoginAt = this[Users.lastLoginAt],
     )
 }

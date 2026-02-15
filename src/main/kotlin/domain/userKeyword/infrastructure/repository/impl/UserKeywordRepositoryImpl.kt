@@ -1,5 +1,6 @@
 package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
+import com.peekr.common.db.DatabaseUtils.isNotBlockedRelationship
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
@@ -61,6 +62,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     }
 
     override suspend fun getDetailById(
+        currentUserId: UserId,
         userKeywordId: UserKeywordId,
     ): UserKeywordDetail? = suspendTransaction {
         val joinQuery = UserKeywords
@@ -85,12 +87,17 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 Users.id,
                 Users.name,
                 Users.profileImageUrl,
-            ).where { UserKeywords.id eq userKeywordId.value }
-            .map { it.toDetail() }
+            ).where {
+                (UserKeywords.id eq userKeywordId.value) and
+                    isNotBlockedRelationship(myUserId = currentUserId.value, Users.id)
+            }.map { it.toDetail() }
             .singleOrNull()
     }
 
-    override suspend fun getDetailsByUserId(userId: UserId): List<UserKeywordDetail> = suspendTransaction {
+    override suspend fun getDetailsByUserId(
+        currentUserId: UserId,
+        userId: UserId,
+    ): List<UserKeywordDetail> = suspendTransaction {
         val joinQuery = UserKeywords
             .innerJoin(
                 otherTable = Keywords,
@@ -113,8 +120,10 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 Users.id,
                 Users.name,
                 Users.profileImageUrl,
-            ).where { UserKeywords.userId eq userId.value }
-            .map { it.toDetail() }
+            ).where {
+                (UserKeywords.userId eq userId.value) and
+                    isNotBlockedRelationship(myUserId = currentUserId.value, Users.id)
+            }.map { it.toDetail() }
     }
 
     override suspend fun findDescriptionById(

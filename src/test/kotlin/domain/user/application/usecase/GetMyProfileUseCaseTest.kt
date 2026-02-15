@@ -26,7 +26,7 @@ class GetMyProfileUseCaseTest {
     @Test
     fun `나의 프로필 조회 성공 테스트`() = runTest {
         // given
-        coEvery { userRepository.findById(TestUserId) } returns TestUser
+        coEvery { userRepository.findVisibleById(TestUserId, TestUserId) } returns TestUser
         coEvery { friendProvider.countFriends(TestUserId) } returns TEST_FRIENDS_COUNT
 
         // when
@@ -41,7 +41,7 @@ class GetMyProfileUseCaseTest {
     @Test
     fun `나의 프로필 조회 실패 시 null을 반환한다`() = runTest {
         // given
-        coEvery { userRepository.findById(TestUserId) } returns null
+        coEvery { userRepository.findVisibleById(TestUserId, TestUserId) } returns null
 
         // when
         val userProfileDto = usecase(TestUserId)
