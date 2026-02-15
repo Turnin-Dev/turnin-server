@@ -1,6 +1,7 @@
 package com.peekr.domain.block.application.usecase
 
 import com.peekr.common.model.id.BlockId
+import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.repository.BlockRepository
 
 /**
@@ -16,8 +17,12 @@ class DeleteBlockUseCase(private val blockRepository: BlockRepository) {
      *
      * @param blockId 차단 ID
      */
-    suspend operator fun invoke(blockId: Long): Boolean {
+    suspend operator fun invoke(
+        ownerId: Long,
+        blockId: Long,
+    ): Boolean {
+        val ownerIdVO = UserId(ownerId)
         val blockIdVO = BlockId(blockId)
-        return blockRepository.deleteBlock(blockIdVO)
+        return blockRepository.deleteBlock(ownerIdVO, blockIdVO)
     }
 }

@@ -184,7 +184,7 @@ class BlockRepositoryImplTest {
         val blockEntity = repository.createBlock(blockDetail)
 
         // when: 차단 삭제
-        val result = repository.deleteBlock(BlockId(blockEntity.id.value))
+        val result = repository.deleteBlock(user1, BlockId(blockEntity.id.value))
 
         // then: 차단 삭제 검증
         assertTrue(result)

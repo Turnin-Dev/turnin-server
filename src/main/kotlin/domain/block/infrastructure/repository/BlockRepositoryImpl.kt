@@ -83,9 +83,13 @@ class BlockRepositoryImpl : BlockRepository {
         BlocksPagingData(totalCount, blocks)
     }
 
-    override suspend fun deleteBlock(blockId: BlockId): Boolean = suspendTransaction {
+    override suspend fun deleteBlock(
+        ownerId: UserId,
+        blockId: BlockId,
+    ): Boolean = suspendTransaction {
         Blocks.deleteWhere {
-            Blocks.id eq blockId.value
+            (Blocks.id eq blockId.value) and
+                (Blocks.blockerId eq ownerId.value)
         } > 0
     }
 }

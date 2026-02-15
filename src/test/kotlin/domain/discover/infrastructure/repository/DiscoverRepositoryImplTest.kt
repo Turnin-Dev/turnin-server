@@ -12,7 +12,6 @@ import com.peekr.domain.discover.util.DiscoverTestDataGenerator.setupKeywordRela
 import com.peekr.domain.discover.util.TestVectorFixture
 import com.peekr.domain.discover.util.TestVectorFixture.toPgVectorString
 import com.peekr.util.db.PostgresRule
-import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import junit.framework.TestCase.assertTrue
 import kotlin.test.assertEquals
@@ -244,7 +243,7 @@ class DiscoverRepositoryImplTest {
     private suspend fun setUpBlock(
         blockerId: UserId,
         blockedId: UserId,
-    ) = TestDatabaseFactory.dbQuery {
+    ) = dbRule.dbQuery {
         Blocks.insert {
             it[this.blockerId] = EntityID(blockerId.value, Users)
             it[this.blockedId] = EntityID(blockedId.value, Users)

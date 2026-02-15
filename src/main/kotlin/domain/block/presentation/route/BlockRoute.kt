@@ -49,7 +49,8 @@ fun AuthenticatedRoute.blockRoutes(route: Api.V1.Block, usecase: BlockUseCases) 
             val blockId = call.request.queryParameters["blockId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("차단 ID")
-            usecase.deleteBlock(blockId)
+            val ownerId = extractUserIdWithToken()
+            usecase.deleteBlock(ownerId.value, blockId)
             call.respond(HttpStatusCode.OK)
         }
     }
@@ -127,7 +128,7 @@ private fun RouteConfig.deleteBlockDocs() {
 
     response {
         code(HttpStatusCode.OK) {
-            description = "차단 성공 시"
+            description = "차단 해제 성공 시"
         }
     }
 }

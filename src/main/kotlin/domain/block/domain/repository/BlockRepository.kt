@@ -51,7 +51,11 @@ interface BlockRepository {
     /**
      * 차단 삭제
      *
+     * @param ownerId 차단 요청한 사용자 ID
      * @param blockId 차단 ID
      */
-    suspend fun deleteBlock(blockId: BlockId): Boolean
+    suspend fun deleteBlock(
+        ownerId: UserId,
+        blockId: BlockId,
+    ): Boolean
 }
