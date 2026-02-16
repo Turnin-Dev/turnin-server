@@ -10,6 +10,8 @@ import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 
+// TODO: 추후 '차단 목록 조회'처럼 조인 방식으로 리팩토링 필요
+
 /**
  * 친구 목록 페이지네이션 조회
  *

@@ -3,8 +3,8 @@ package com.peekr.domain.block.application.usecase
 data class BlockUseCases(
     /** @see GetBlockReasonsUseCase */
     val getBlockReasons: GetBlockReasonsUseCase,
-    /** @see GetBlocksUseCase */
-    val getBlocks: GetBlocksUseCase,
+    /** @see GetBlockUsersUseCase */
+    val getBlockUsers: GetBlockUsersUseCase,
     /** @see CreateBlockUseCase */
     val createBlock: CreateBlockUseCase,
     /** @see DeleteBlockUseCase */

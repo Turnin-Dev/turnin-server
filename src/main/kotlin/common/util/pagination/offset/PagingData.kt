@@ -18,3 +18,16 @@ open class PagingData(
     val hasNext: Boolean
         get() = (pageNumber * pageSize) < totalSize
 }
+
+/**
+ * 공통 페이징 데이터 (간단 버전)
+ *
+ * @property pageNumber 현재 페이지 번호
+ * @property pageSize 현재 페이지 크기
+ * @property hasNext 다음 페이지 존재 여부
+ */
+open class SimplePagingData(
+    val pageNumber: Long,
+    val pageSize: Int,
+    val hasNext: Boolean,
+)

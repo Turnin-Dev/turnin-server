@@ -5,7 +5,7 @@ import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.application.usecase.CreateBlockUseCase
 import com.peekr.domain.block.application.usecase.DeleteBlockUseCase
 import com.peekr.domain.block.application.usecase.GetBlockReasonsUseCase
-import com.peekr.domain.block.application.usecase.GetBlocksUseCase
+import com.peekr.domain.block.application.usecase.GetBlockUsersUseCase
 import com.peekr.domain.block.domain.provider.FriendProvider
 import com.peekr.domain.block.domain.repository.BlockRepository
 import com.peekr.domain.block.infrastructure.provider.FriendProviderImpl
@@ -23,7 +23,7 @@ val blockModule = module {
     // Usecase
     factory { GetBlockReasonsUseCase(get()) }
     factory { CreateBlockUseCase(get(), get()) }
-    factory { GetBlocksUseCase(get()) }
+    factory { GetBlockUsersUseCase(get()) }
     factory { DeleteBlockUseCase(get()) }
     single<BlockUseCases> { BlockUseCases(get(), get(), get(), get()) }
 }

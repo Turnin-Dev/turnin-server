@@ -5,7 +5,7 @@ import com.peekr.common.model.id.BlockId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.model.BlockReason
-import com.peekr.domain.block.domain.model.BlocksPagingData
+import com.peekr.domain.block.domain.model.BlockUsersPagingData
 
 interface BlockRepository {
     /**
@@ -42,11 +42,11 @@ interface BlockRepository {
      * @param offset 페이지 오프셋
      * @param size 페이지 사이즈
      */
-    suspend fun getBlocksById(
+    suspend fun getBlockUsersById(
         userId: UserId,
         offset: Long,
         size: Int,
-    ): BlocksPagingData
+    ): BlockUsersPagingData
 
     /**
      * 차단 삭제
