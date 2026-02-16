@@ -1,6 +1,6 @@
 package com.peekr.domain.block.presentation.dto
 
-import com.peekr.domain.block.application.dto.BlockUserDto
+import com.peekr.domain.block.application.dto.BlockedUserDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
  * @property profileImageUrl 차단한 사용자 프로필 사진 url
  */
 @Serializable
-data class BlockUserResponse(
+data class BlockedUserResponse(
     val id: Long,
     val userId: Long,
     val displayId: String,
@@ -21,7 +21,7 @@ data class BlockUserResponse(
     val profileImageUrl: String?,
 ) {
     companion object {
-        val sample = BlockUserResponse(
+        val sample = BlockedUserResponse(
             id = 1,
             userId = 1,
             displayId = "DisplayID",
@@ -31,8 +31,8 @@ data class BlockUserResponse(
     }
 }
 
-fun BlockUserDto.toResponse() =
-    BlockUserResponse(
+fun BlockedUserDto.toResponse() =
+    BlockedUserResponse(
         id = id,
         userId = userId,
         displayId = displayId,

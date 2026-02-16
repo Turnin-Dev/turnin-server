@@ -9,7 +9,7 @@ import com.peekr.common.model.id.BlockId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.model.BlockReason
-import com.peekr.domain.block.domain.model.BlockUsersPagingData
+import com.peekr.domain.block.domain.model.BlockedUsersPagingData
 import com.peekr.domain.block.domain.repository.BlockRepository
 import com.peekr.domain.block.infrastructure.mapper.BlockMapper.toBlockUser
 import com.peekr.domain.block.infrastructure.mapper.BlockMapper.toDomainBlockReason
@@ -54,11 +54,11 @@ class BlockRepositoryImpl : BlockRepository {
         }
     }
 
-    override suspend fun getBlockUsersById(
+    override suspend fun getBlockedUsersById(
         userId: UserId,
         offset: Long,
         size: Int,
-    ): BlockUsersPagingData = suspendTransaction {
+    ): BlockedUsersPagingData = suspendTransaction {
         // 1) 조건 정의 (내가(userId) 차단한 사람들)
         val condition = Blocks.blockerId eq userId.value
 
@@ -93,7 +93,7 @@ class BlockRepositoryImpl : BlockRepository {
         }
 
         // 5) 결과 반환
-        BlockUsersPagingData(hasNext, blocks)
+        BlockedUsersPagingData(hasNext, blocks)
     }
 
     override suspend fun deleteBlock(

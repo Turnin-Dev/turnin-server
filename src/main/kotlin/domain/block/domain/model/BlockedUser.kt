@@ -14,7 +14,7 @@ import com.peekr.common.model.id.UserId
  * @property name 차단한 사용자 명
  * @property profileImageUrl 차단한 사용자 프로필 사진 url
  */
-data class BlockUser(
+data class BlockedUser(
     val id: BlockId,
     val userId: UserId,
     val displayId: DisplayId,

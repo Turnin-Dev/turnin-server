@@ -122,38 +122,38 @@ class BlockRepositoryImplTest {
         }
 
         // when: 첫 번째 페이지 조회 (offset=0, size=10)
-        val firstPage = repository.getBlockUsersById(
+        val firstPage = repository.getBlockedUsersById(
             userId = blocker,
             offset = 0,
             size = 10,
         )
 
         // then: 첫 페이지 검증
-        assertEquals(10, firstPage.blockUsers.size) // 현재 페이지 항목 수
-        assertEquals(16L, firstPage.blockUsers[0].userId.value) // 차단자 확인 (내림차순 기준)
+        assertEquals(10, firstPage.blockedUsers.size) // 현재 페이지 항목 수
+        assertEquals(16L, firstPage.blockedUsers[0].userId.value) // 차단자 확인 (내림차순 기준)
 
         // when: 두 번째 페이지 조회 (offset=10, size=10)
-        val secondPage = repository.getBlockUsersById(
+        val secondPage = repository.getBlockedUsersById(
             userId = blocker,
             offset = 10,
             size = 10,
         )
 
         // then: 두 번째 페이지 검증
-        assertEquals(5, secondPage.blockUsers.size) // 나머지 5개만 조회
+        assertEquals(5, secondPage.blockedUsers.size) // 나머지 5개만 조회
 
         // when: 세 번째 페이지 조회 (offset=20, size=10) - 데이터 없음
-        val thirdPage = repository.getBlockUsersById(
+        val thirdPage = repository.getBlockedUsersById(
             userId = blocker,
             offset = 20,
             size = 10,
         )
 
         // then: 빈 페이지 검증
-        assertEquals(0, thirdPage.blockUsers.size) // 조회된 항목 없음
+        assertEquals(0, thirdPage.blockedUsers.size) // 조회된 항목 없음
 
         // 정렬 확인: ID 내림차순 (최신 차단이 먼저)
-        val allBlocks = firstPage.blockUsers + secondPage.blockUsers
+        val allBlocks = firstPage.blockedUsers + secondPage.blockedUsers
         val sortedIds = allBlocks.map { it.id.value }
         assertEquals(sortedIds, sortedIds.sortedDescending())
 

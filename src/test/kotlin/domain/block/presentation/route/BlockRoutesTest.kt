@@ -6,8 +6,8 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.common.util.pagination.offset.SimplePagingData
 import com.peekr.domain.block.application.dto.BlockReasonDto
-import com.peekr.domain.block.application.dto.BlockUserDto
-import com.peekr.domain.block.application.dto.BlockUsersPagingDataDto
+import com.peekr.domain.block.application.dto.BlockedUserDto
+import com.peekr.domain.block.application.dto.BlockedUsersPagingDataDto
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.presentation.dto.BlockDetailRequest
 import com.peekr.util.testGetEndpoint
@@ -29,8 +29,8 @@ class BlockRoutesTest {
     fun `차단 목록 조회 - 성공 테스트`() = testApplication {
         // given
         coEvery {
-            usecase.getBlockUsers(TestUserId.value, any())
-        } returns TestBlockUsersPagingDataDto
+            usecase.getBlockedUsers(TestUserId.value, any())
+        } returns TestBlockedUsersPagingDataDto
 
         // when, then
         testGetEndpoint(
@@ -48,14 +48,14 @@ class BlockRoutesTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 containsAll(
-                    TestBlockUsersPagingDataDto.blockUsers
+                    TestBlockedUsersPagingDataDto.blockUsers
                         .first()
                         .userId
                         .toString(),
-                    TestBlockUsersPagingDataDto.blockUsers
+                    TestBlockedUsersPagingDataDto.blockUsers
                         .first()
                         .displayId,
-                    TestBlockUsersPagingDataDto.blockUsers
+                    TestBlockedUsersPagingDataDto.blockUsers
                         .first()
                         .name,
                 )
@@ -72,7 +72,7 @@ class BlockRoutesTest {
             message = "unexpected error",
         )
         coEvery {
-            usecase.getBlockUsers(TestUserId.value, any())
+            usecase.getBlockedUsers(TestUserId.value, any())
         } throws expectedApiException
 
         // when, then
@@ -225,14 +225,14 @@ class BlockRoutesTest {
 
     companion object {
         private val TestUserId = UserId(1L)
-        private val TestBlockUsersPagingDataDto = BlockUsersPagingDataDto(
+        private val TestBlockedUsersPagingDataDto = BlockedUsersPagingDataDto(
             pagingData = SimplePagingData(
                 pageNumber = 1,
                 pageSize = 10,
                 hasNext = true,
             ),
             blockUsers = listOf(
-                BlockUserDto(
+                BlockedUserDto(
                     id = 1L,
                     userId = 2L,
                     displayId = "did",

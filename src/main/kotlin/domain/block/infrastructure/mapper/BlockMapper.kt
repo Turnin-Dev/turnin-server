@@ -11,7 +11,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.Block
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.model.BlockReason
-import com.peekr.domain.block.domain.model.BlockUser
+import com.peekr.domain.block.domain.model.BlockedUser
 import org.jetbrains.exposed.sql.ResultRow
 
 object BlockMapper {
@@ -33,8 +33,8 @@ object BlockMapper {
             ),
         )
 
-    fun ResultRow.toBlockUser(): BlockUser =
-        BlockUser(
+    fun ResultRow.toBlockUser(): BlockedUser =
+        BlockedUser(
             id = BlockId(this[Blocks.id].value),
             userId = UserId(this[Users.id].value),
             displayId = DisplayId(this[Users.displayId]),

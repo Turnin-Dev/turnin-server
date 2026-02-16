@@ -6,8 +6,8 @@ import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.domain.block.application.dto.toDto
-import com.peekr.domain.block.domain.model.BlockUser
-import com.peekr.domain.block.domain.model.BlockUsersPagingData
+import com.peekr.domain.block.domain.model.BlockedUser
+import com.peekr.domain.block.domain.model.BlockedUsersPagingData
 import com.peekr.domain.block.domain.repository.BlockRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -15,28 +15,28 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
-class GetBlockUsersUseCaseTest {
+class GetBlockedUsersUseCaseTest {
     private val blockRepository = mockk<BlockRepository>()
-    private val usecase = GetBlockUsersUseCase(blockRepository)
+    private val usecase = GetBlockedUsersUseCase(blockRepository)
 
     @Test
     fun `차단 목록 조회 성공 테스트`() = runTest {
         // given
         val userId = UserId(1L)
         coEvery {
-            blockRepository.getBlockUsersById(
+            blockRepository.getBlockedUsersById(
                 userId = userId,
                 offset = TestPaginationParams.offset,
                 size = TestPaginationParams.size,
             )
-        } returns TestBlockUsersPagingData
+        } returns TestBlockedUsersPagingData
 
         // when
         val pagingDataDto = usecase(userId.value, TestPaginationParams)
 
         // then
         assertEquals(
-            TestBlockUsersPagingData.blockUsers.map { it.toDto() },
+            TestBlockedUsersPagingData.blockedUsers.map { it.toDto() },
             pagingDataDto.blockUsers,
         )
     }
@@ -46,10 +46,10 @@ class GetBlockUsersUseCaseTest {
             page = 1,
             size = 10,
         )
-        private val TestBlockUsersPagingData = BlockUsersPagingData(
+        private val TestBlockedUsersPagingData = BlockedUsersPagingData(
             hasNext = true,
-            blockUsers = listOf(
-                BlockUser(
+            blockedUsers = listOf(
+                BlockedUser(
                     id = BlockId(1L),
                     userId = UserId(2L),
                     displayId = DisplayId("did"),

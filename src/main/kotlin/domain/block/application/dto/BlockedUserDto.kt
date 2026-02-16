@@ -1,6 +1,6 @@
 package com.peekr.domain.block.application.dto
 
-import com.peekr.domain.block.domain.model.BlockUser
+import com.peekr.domain.block.domain.model.BlockedUser
 
 /**
  * 차단 사용자 DTO
@@ -11,7 +11,7 @@ import com.peekr.domain.block.domain.model.BlockUser
  * @property name 차단한 사용자 명
  * @property profileImageUrl 차단한 사용자 프로필 사진 url
  */
-data class BlockUserDto(
+data class BlockedUserDto(
     val id: Long,
     val userId: Long,
     val displayId: String,
@@ -19,8 +19,8 @@ data class BlockUserDto(
     val profileImageUrl: String?,
 )
 
-fun BlockUser.toDto(): BlockUserDto =
-    BlockUserDto(
+fun BlockedUser.toDto(): BlockedUserDto =
+    BlockedUserDto(
         id = id.value,
         userId = userId.value,
         displayId = displayId.value,

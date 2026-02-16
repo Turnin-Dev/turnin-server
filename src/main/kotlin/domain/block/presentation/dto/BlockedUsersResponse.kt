@@ -1,6 +1,6 @@
 package com.peekr.domain.block.presentation.dto
 
-import com.peekr.domain.block.application.dto.BlockUsersPagingDataDto
+import com.peekr.domain.block.application.dto.BlockedUsersPagingDataDto
 import kotlinx.serialization.Serializable
 
 /**
@@ -12,20 +12,20 @@ import kotlinx.serialization.Serializable
  * @property blockUsers 차단 사용자 목록
  */
 @Serializable
-data class BlockUsersResponse(
+data class BlockedUsersResponse(
     val pageNumber: Long,
     val pageSize: Int,
     val hasNext: Boolean,
-    val blockUsers: List<BlockUserResponse>,
+    val blockUsers: List<BlockedUserResponse>,
 ) {
     companion object {
-        val sample = BlockUsersResponse(
+        val sample = BlockedUsersResponse(
             pageNumber = 1,
             pageSize = 20,
             hasNext = true,
             blockUsers = List(2) {
                 val id = it + 1L
-                BlockUserResponse(
+                BlockedUserResponse(
                     id = id,
                     userId = id,
                     displayId = "did$id",
@@ -37,8 +37,8 @@ data class BlockUsersResponse(
     }
 }
 
-fun BlockUsersPagingDataDto.toResponse(): BlockUsersResponse =
-    BlockUsersResponse(
+fun BlockedUsersPagingDataDto.toResponse(): BlockedUsersResponse =
+    BlockedUsersResponse(
         pageNumber = pagingData.pageNumber,
         pageSize = pagingData.pageSize,
         hasNext = pagingData.hasNext,
