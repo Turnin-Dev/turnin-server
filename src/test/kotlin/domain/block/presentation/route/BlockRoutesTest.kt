@@ -4,11 +4,10 @@ import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
-import com.peekr.common.util.pagination.offset.PagingData
-import com.peekr.domain.block.application.dto.BlockDetailDto
-import com.peekr.domain.block.application.dto.BlockDto
+import com.peekr.common.util.pagination.offset.SimplePagingData
 import com.peekr.domain.block.application.dto.BlockReasonDto
-import com.peekr.domain.block.application.dto.BlocksPagingDataDto
+import com.peekr.domain.block.application.dto.BlockedUserDto
+import com.peekr.domain.block.application.dto.BlockedUsersPagingDataDto
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.presentation.dto.BlockDetailRequest
 import com.peekr.util.testGetEndpoint
@@ -30,8 +29,8 @@ class BlockRoutesTest {
     fun `차단 목록 조회 - 성공 테스트`() = testApplication {
         // given
         coEvery {
-            usecase.getBlocks(TestUserId.value, any())
-        } returns TestBlocksPagingDataDto
+            usecase.getBlockedUsers(TestUserId.value, any())
+        } returns TestBlockedUsersPagingDataDto
 
         // when, then
         testGetEndpoint(
@@ -49,19 +48,16 @@ class BlockRoutesTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 containsAll(
-                    TestBlocksPagingDataDto.pagingData.totalSize.toString(),
-                    TestBlocksPagingDataDto.blocks
+                    TestBlockedUsersPagingDataDto.blockUsers
                         .first()
-                        .detail.blockerId
+                        .userId
                         .toString(),
-                    TestBlocksPagingDataDto.blocks
+                    TestBlockedUsersPagingDataDto.blockUsers
                         .first()
-                        .detail.blockedId
-                        .toString(),
-                    TestBlocksPagingDataDto.blocks
+                        .displayId,
+                    TestBlockedUsersPagingDataDto.blockUsers
                         .first()
-                        .detail.reasonId
-                        .toString(),
+                        .name,
                 )
             },
         )
@@ -76,7 +72,7 @@ class BlockRoutesTest {
             message = "unexpected error",
         )
         coEvery {
-            usecase.getBlocks(TestUserId.value, any())
+            usecase.getBlockedUsers(TestUserId.value, any())
         } throws expectedApiException
 
         // when, then
@@ -229,21 +225,19 @@ class BlockRoutesTest {
 
     companion object {
         private val TestUserId = UserId(1L)
-        private val TestBlocksPagingDataDto = BlocksPagingDataDto(
-            pagingData = PagingData(
+        private val TestBlockedUsersPagingDataDto = BlockedUsersPagingDataDto(
+            pagingData = SimplePagingData(
                 pageNumber = 1,
                 pageSize = 10,
-                totalSize = 100,
+                hasNext = true,
             ),
-            blocks = listOf(
-                BlockDto(
+            blockUsers = listOf(
+                BlockedUserDto(
                     id = 1L,
-                    detail = BlockDetailDto(
-                        blockerId = TestUserId.value,
-                        blockedId = 2L,
-                        reasonId = 1L,
-                        customReason = "customReason",
-                    ),
+                    userId = 2L,
+                    displayId = "did",
+                    name = "name",
+                    profileImageUrl = "profileImageUrl",
                 ),
             ),
         )

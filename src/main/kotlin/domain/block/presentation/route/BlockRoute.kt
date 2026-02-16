@@ -8,7 +8,7 @@ import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.presentation.dto.BlockDetailRequest
 import com.peekr.domain.block.presentation.dto.BlockReasonResponse
-import com.peekr.domain.block.presentation.dto.BlocksResponse
+import com.peekr.domain.block.presentation.dto.BlockedUsersResponse
 import com.peekr.domain.block.presentation.dto.toDto
 import com.peekr.domain.block.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -25,11 +25,11 @@ fun AuthenticatedRoute.blockRoutes(route: Api.V1.Block, usecase: BlockUseCases) 
         tags = setOf(route.TAG)
         description = "Block API"
     }) {
-        get({ getBlocksDocs() }) {
+        get({ getBlockedUsersDocs() }) {
             val userId = extractUserIdWithToken()
             val paginationParams = getPaginationParams()
-            val blocksPagingDataDto = usecase.getBlocks(userId.value, paginationParams)
-            call.respond(HttpStatusCode.OK, blocksPagingDataDto.toResponse())
+            val blockedUsersPagingDataDto = usecase.getBlockedUsers(userId.value, paginationParams)
+            call.respond(HttpStatusCode.OK, blockedUsersPagingDataDto.toResponse())
         }
 
         get(route.REASON, { getBlockReasonsDocs() }) {
@@ -56,9 +56,9 @@ fun AuthenticatedRoute.blockRoutes(route: Api.V1.Block, usecase: BlockUseCases) 
     }
 }
 
-private fun RouteConfig.getBlocksDocs() {
-    summary = "차단 목록 조회 (페이지네이션)"
-    description = "차단 목록을 조회한다. (페이지네이션)"
+private fun RouteConfig.getBlockedUsersDocs() {
+    summary = "차단 사용자 목록 조회 (페이지네이션)"
+    description = "차단 사용자 목록을 조회한다. (페이지네이션)"
     request {
         queryParameter<Long>("page") {
             description = "페이지네이션에 필요한 페이지 번호"
@@ -70,10 +70,10 @@ private fun RouteConfig.getBlocksDocs() {
 
     response {
         code(HttpStatusCode.OK) {
-            description = "차단 목록"
-            body<BlocksResponse> {
-                example("BlocksResponse") {
-                    value = BlocksResponse.sample
+            description = "차단 사용자 목록"
+            body<BlockedUsersResponse> {
+                example("BlockedUsersResponse") {
+                    value = BlockedUsersResponse.sample
                 }
             }
         }

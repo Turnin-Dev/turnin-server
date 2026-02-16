@@ -2,42 +2,42 @@ package com.peekr.domain.block.application.usecase
 
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.pagination.offset.PaginationParams
-import com.peekr.common.util.pagination.offset.PagingData
-import com.peekr.domain.block.application.dto.BlocksPagingDataDto
+import com.peekr.common.util.pagination.offset.SimplePagingData
+import com.peekr.domain.block.application.dto.BlockedUsersPagingDataDto
 import com.peekr.domain.block.application.dto.toDto
 import com.peekr.domain.block.domain.repository.BlockRepository
 
 /**
- * 차단 목록 조회
+ * 차단 사용자 목록 조회
  *
  * @see invoke
  */
-class GetBlocksUseCase(private val blockRepository: BlockRepository) {
+class GetBlockedUsersUseCase(private val blockRepository: BlockRepository) {
     /**
-     * 차단 목록을 조회한다. (페이지네이션)
+     * 차단 사용자 목록을 조회한다. (페이지네이션)
      *
      * @param userId 조회할 사용자 ID
      * @param paginationParams 페이지네이션 파라미터
      *
-     * @return [BlocksPagingDataDto] 차단 목록 페이징 데이터 DTO
+     * @return [BlockedUsersPagingDataDto] 차단 목록 페이징 데이터 DTO
      */
     suspend operator fun invoke(
         userId: Long,
         paginationParams: PaginationParams,
-    ): BlocksPagingDataDto {
+    ): BlockedUsersPagingDataDto {
         val userIdVO = UserId(userId)
-        val blocksPagingData = blockRepository.getBlocksById(
+        val blockedUsersPagingData = blockRepository.getBlockedUsersById(
             userId = userIdVO,
             offset = paginationParams.offset,
             size = paginationParams.size,
         )
-        return BlocksPagingDataDto(
-            pagingData = PagingData(
+        return BlockedUsersPagingDataDto(
+            pagingData = SimplePagingData(
                 pageNumber = paginationParams.page,
                 pageSize = paginationParams.size,
-                totalSize = blocksPagingData.totalSize,
+                hasNext = blockedUsersPagingData.hasNext,
             ),
-            blocks = blocksPagingData.blocks.map { it.toDto() },
+            blockUsers = blockedUsersPagingData.blockedUsers.map { it.toDto() },
         )
     }
 }
