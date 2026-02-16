@@ -70,19 +70,52 @@ class UserRepositoryImplTest {
     }
 
     @Test
-    fun `findVisibleById 성공 테스트 - 차단된 사용자는 서로 조회되지 않는다`() = runTest {
+    fun `findVisibleById 성공 테스트 - 내가 차단한 사용자를 조회 시 isBlocked가 true인 채로 조회된다`() = runTest {
         // given: 사용자 2명 생성 후 차단 관계 설정
-        val user1 = insertUser("1")
-        val user2 = insertUser("2")
-        createBlock(user1.id.value, user2.id.value)
+        val me = insertUser("1")
+        val user = insertUser("2")
+        // me -> user 차단
+        createBlock(me.id.value, user.id.value)
+
+        // when: 사용자 조회
+        val myResult = repository.findVisibleById(me.id, user.id)
+
+        // then: isBlocked가 true인 채로 조회된다.
+        assertNotNull(myResult)
+        assertTrue(myResult.isBlocked)
+    }
+
+    @Test
+    fun `findVisibleById 성공 테스트 - 내가 차단 당한 사용자를 조회 시 조회되지 않는다`() = runTest {
+        // given: 사용자 2명 생성 후 차단 관계 설정
+        val me = insertUser("1")
+        val user = insertUser("2")
+        // user -> me 차단
+        createBlock(user.id.value, me.id.value)
+
+        // when: 차단 당한 사용자 조회
+        val myResult = repository.findVisibleById(me.id, user.id)
+
+        // then: 사용자가 조회되지 않는다.
+        assertNull(myResult)
+    }
+
+    @Test
+    fun `findVisibleById 성공 테스트 - 상호 차단인 경우 서로 조회되지 않는다`() = runTest {
+        // given: 사용자 2명 생성 후 차단 관계 설정
+        val me = insertUser("1")
+        val user = insertUser("2")
+        // 상호 차단
+        createBlock(me.id.value, user.id.value)
+        createBlock(user.id.value, me.id.value)
 
         // when: 사용자 서로 조회
-        val userResult1 = repository.findVisibleById(user1.id, user2.id)
-        val userResult2 = repository.findVisibleById(user2.id, user1.id)
+        val myResult = repository.findVisibleById(me.id, user.id)
+        val userResult = repository.findVisibleById(user.id, me.id)
 
-        // then: 사용자 서로 조회되지 않는다.
-        assertNull(userResult1)
-        assertNull(userResult2)
+        // then: 사용자가 서로 조회되지 않는다.
+        assertNull(myResult)
+        assertNull(userResult)
     }
 
     @Test

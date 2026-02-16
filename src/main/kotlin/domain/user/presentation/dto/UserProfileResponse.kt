@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
  * @property friendsCount 친구 수
  * @property friendStatus 친구 관계 상태
  * @property isActive 사용자 활성 여부
+ * @property isBlocked 차단 여부
  */
 @Serializable
 data class UserProfileResponse(
@@ -28,6 +29,7 @@ data class UserProfileResponse(
     val friendsCount: Long,
     val friendStatus: FriendStatus,
     val isActive: Boolean,
+    val isBlocked: Boolean,
 ) {
     companion object {
         val sample = UserProfileResponse(
@@ -40,6 +42,7 @@ data class UserProfileResponse(
             friendsCount = 51L,
             friendStatus = FriendStatus.NOTHING,
             isActive = true,
+            isBlocked = false,
         )
     }
 }
@@ -54,4 +57,5 @@ fun UserProfileDto.toResponse(): UserProfileResponse = UserProfileResponse(
     lastLoginAt = lastLoginAt,
     friendsCount = friendsCount,
     friendStatus = friendStatus,
+    isBlocked = isBlocked,
 )

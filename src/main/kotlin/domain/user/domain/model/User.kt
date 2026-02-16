@@ -21,6 +21,7 @@ import java.time.Instant
  * @param introduce 사용자 소개 글
  * @param isActive 사용자 활성 여부
  * @param lastLoginAt 마지막 로그인 일시
+ * @param isBlocked 차단 여부
  */
 data class User(
     val id: UserId,
@@ -33,4 +34,5 @@ data class User(
     val introduce: Introduce,
     val isActive: Boolean,
     val lastLoginAt: Instant,
+    val isBlocked: Boolean = false,
 )
