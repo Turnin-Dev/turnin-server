@@ -26,6 +26,10 @@ interface UserRepository {
     /**
      * ID를 통해 사용자를 조회한다. (차단된 사용자는 제외한다.)
      *
+     * 1. 내가 차단한 사용자를 조회 시: isBlocked가 true인 채로 반환
+     * 2. 내가 차단 당한 사용자를 조회 시: `null` 반환
+     * 3. 상호 차단인 경우 사용자 조회 시: `null` 반환
+     *
      * @param currentId 현재 조회를 요청한 사용자 ID
      * @param id 조회할 사용자 ID
      *

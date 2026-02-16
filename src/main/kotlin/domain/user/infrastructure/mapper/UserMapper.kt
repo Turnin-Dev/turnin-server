@@ -24,7 +24,7 @@ object UserMapper {
         lastLoginAt = this.lastLoginAt,
     )
 
-    fun ResultRow.toDomain(): User = User(
+    fun ResultRow.toDomain(isBlocked: Boolean): User = User(
         id = UserId(this[Users.id].value),
         role = this[Users.role],
         provider = this[Users.provider],
@@ -35,5 +35,6 @@ object UserMapper {
         introduce = Introduce(this[Users.introduce]),
         isActive = this[Users.isActive],
         lastLoginAt = this[Users.lastLoginAt],
+        isBlocked = isBlocked,
     )
 }

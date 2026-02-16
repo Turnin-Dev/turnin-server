@@ -1,5 +1,6 @@
 package com.peekr.domain.user.application.usecase
 
+import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.application.dto.UserProfileDto
 import com.peekr.domain.user.application.dto.toDto
@@ -20,27 +21,30 @@ class GetUserProfileUseCase(
      *
      * @param myUserId 나의 사용자 ID
      * @param userId 조회할 사용자 ID
-     * @param includeBlocked 조회 시 차단 사용자 포함 여부 (`true`면 차단 사용자까지 함께 조회하고 `false`면 제외하고 조회한다.)
      *
      * @return [UserProfileDto] 사용자 프로필 DTO
      */
     suspend operator fun invoke(
         myUserId: Long,
         userId: Long,
-        includeBlocked: Boolean,
     ): UserProfileDto? {
         // 0) 데이터 전처리
         val myUserVO = UserId(myUserId)
         val userIdVO = UserId(userId)
 
-        // 1) 사용자, 친구 수, 친구 상태 조회
-        val userDto = if (includeBlocked) {
-            userRepository.findById(userIdVO)?.toDto() ?: return null
+        // 1) 사용자, 친구 수, 친구 상태 조회 (isBlocked 여부에 따른 마스킹 처리는 여기서 수행)
+        val user = userRepository.findVisibleById(myUserVO, userIdVO) ?: return null
+        val userDto = user.toDto()
+        val friendsCount = if (user.isBlocked) {
+            0
         } else {
-            userRepository.findVisibleById(myUserVO, userIdVO)?.toDto() ?: return null
+            friendProvider.countFriends(userDto.id)
         }
-        val friendsCount = friendProvider.countFriends(userDto.id)
-        val friendshipStatus = friendProvider.getFriendStatus(myUserVO, userDto.id)
+        val friendshipStatus = if (user.isBlocked) {
+            FriendStatus.NOTHING
+        } else {
+            friendProvider.getFriendStatus(myUserVO, userDto.id)
+        }
 
         // 2) 최종 반환
         return UserProfileDto(
@@ -53,6 +57,7 @@ class GetUserProfileUseCase(
             lastLoginAt = userDto.lastLoginAt,
             friendsCount = friendsCount,
             friendStatus = friendshipStatus,
+            isBlocked = user.isBlocked,
         )
     }
 }

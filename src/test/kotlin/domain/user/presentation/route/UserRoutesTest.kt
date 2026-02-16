@@ -195,7 +195,7 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 성공 테스트`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value, false)
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
         } returns TestUserProfileDto
 
         testGetEndpoint(
@@ -220,7 +220,7 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value, false)
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
         } returns TestUserProfileDto
 
         testGetEndpoint(
@@ -239,7 +239,7 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value, false)
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
         } returns null
 
         testGetEndpoint(
@@ -258,7 +258,7 @@ class UserRoutesTest {
     @Test
     fun `사용자 프로필 조회 GET 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value, false)
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
         } returns TestUserProfileDto
 
         testGetEndpoint(
@@ -282,7 +282,7 @@ class UserRoutesTest {
             message = "unexpected error",
         )
         coEvery {
-            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value, false)
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
         } throws expectedApiException
 
         testGetEndpoint(
@@ -551,6 +551,7 @@ class UserRoutesTest {
             lastLoginAt = 1697875200L,
             friendsCount = 51L,
             friendStatus = FriendStatus.NOTHING,
+            isBlocked = false,
         )
     }
 }

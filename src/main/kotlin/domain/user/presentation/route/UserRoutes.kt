@@ -59,12 +59,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             val userId = call.pathParameters["userId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("사용자 ID")
-            val includeBlocked = call.request.queryParameters["includeBlocked"]?.toBoolean() ?: false
-            val userProfileDto = usecase.getUserProfile(
-                myUserId = myUserId.value,
-                userId = userId,
-                includeBlocked = includeBlocked,
-            )
+            val userProfileDto = usecase.getUserProfile(myUserId = myUserId.value, userId = userId)
             if (userProfileDto != null) {
                 call.respond(userProfileDto.toResponse())
             } else {
@@ -161,9 +156,6 @@ private fun RouteConfig.getUserProfileDocs() {
             example("Example") {
                 value = 1L
             }
-        }
-        queryParameter<Boolean>("includeBlocked") {
-            description = "조회 시 차단 사용자 포함 여부 (`true`면 차단 사용자까지 함께 조회하고 `false`면 제외하고 조회한다.)"
         }
     }
     response {

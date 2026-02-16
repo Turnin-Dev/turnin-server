@@ -1,6 +1,6 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseUtils.isNotBlockedRelationship
+import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
@@ -12,8 +12,9 @@ import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.intLiteral
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.notExists
 import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {
@@ -35,13 +36,29 @@ class UserRepositoryImpl : UserRepository {
         currentId: UserId,
         id: UserId,
     ): User? = suspendTransaction {
+        // 내가 상대를 차단했는지에 대한 여부
+        val isBlockedByMe = exists(
+            Blocks.select(intLiteral(1)).where {
+                (Blocks.blockerId eq currentId.value and (Blocks.blockedId eq id.value))
+            },
+        )
+
+        // 상대가 나를 차단했는지에 대한 여부
+        val blockedByOtherQuery = Blocks.select(intLiteral(1)).where {
+            (Blocks.blockerId eq id.value and (Blocks.blockedId eq currentId.value))
+        }
+
         Users
-            .selectAll()
+            .select(Users.columns + isBlockedByMe)
             .where {
-                (Users.id eq id.value) and
-                    isNotBlockedRelationship(myUserId = currentId.value, otherUserId = id.value)
-            }.map { it.toDomain() }
-            .singleOrNull()
+                // 상대가 나를 차단하지 않았을 때만 행을 반환하여
+                // 만약 상대가 나를 차단했다면, 쿼리 결과는 0건 -> null을 반환한다.
+                (Users.id eq id.value) and notExists(blockedByOtherQuery)
+            }.map { row ->
+                // 이 매핑은 상대가 나를 차단하지 않은 상태일 때 수행
+                val blockedByMe = row[isBlockedByMe]
+                row.toDomain(blockedByMe)
+            }.singleOrNull()
     }
 
     override suspend fun findByIds(ids: List<UserId>): List<User> = suspendTransaction {

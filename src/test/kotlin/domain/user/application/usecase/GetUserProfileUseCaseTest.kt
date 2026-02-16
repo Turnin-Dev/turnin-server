@@ -19,6 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 
 class GetUserProfileUseCaseTest {
@@ -38,35 +39,11 @@ class GetUserProfileUseCaseTest {
 
     @Test
     fun `사용자 프로필 조회 성공 테스트`() = runTest {
-        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, false)
+        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value)
 
         assertNotNull(userProfileDto)
         assertEquals(TestUser.displayId, userProfileDto.displayId)
         assertEquals(TestUser.userName, userProfileDto.userName)
-    }
-
-    @Test
-    fun `사용자 프로필 조회 시 차단 사용자를 제외하고 조회한다`() = runTest {
-        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, false)
-
-        assertNotNull(userProfileDto)
-        assertEquals(TestUser.displayId, userProfileDto.displayId)
-        assertEquals(TestUser.userName, userProfileDto.userName)
-
-        coVerify(exactly = 0) { userRepository.findById(TestUserId) }
-        coVerify(exactly = 1) { userRepository.findVisibleById(TestMyUserId, TestUserId) }
-    }
-
-    @Test
-    fun `사용자 프로필 조회 시 차단 사용자를 포함하여 조회한다`() = runTest {
-        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, true)
-
-        assertNotNull(userProfileDto)
-        assertEquals(TestUser.displayId, userProfileDto.displayId)
-        assertEquals(TestUser.userName, userProfileDto.userName)
-
-        coVerify(exactly = 0) { userRepository.findVisibleById(TestMyUserId, TestUserId) }
-        coVerify(exactly = 1) { userRepository.findById(TestUserId) }
     }
 
     @Test
@@ -76,10 +53,29 @@ class GetUserProfileUseCaseTest {
         coEvery { userRepository.findById(TestUserId) } returns null
 
         // when
-        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value, false)
+        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value)
 
         // then
         assertNull(userProfileDto)
+    }
+
+    @Test
+    fun `차단 여부가 true인 사용자 조회 시 마스킹된 데이터를 반환한다`() = runTest {
+        // given
+        coEvery {
+            userRepository.findVisibleById(TestMyUserId, TestUserId)
+        } returns TestUser.copy(isBlocked = true)
+
+        // when
+        val userProfileDto = usecase(TestMyUserId.value, TestUserId.value)
+
+        // then
+        assertNotNull(userProfileDto)
+        assertTrue(userProfileDto.isBlocked)
+        assertEquals(0, userProfileDto.friendsCount)
+        assertEquals(FriendStatus.NOTHING, userProfileDto.friendStatus)
+        coVerify(exactly = 0) { friendProvider.countFriends(TestUserId) }
+        coVerify(exactly = 0) { friendProvider.getFriendStatus(TestMyUserId, TestUserId) }
     }
 
     companion object {
