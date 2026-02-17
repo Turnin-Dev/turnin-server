@@ -48,7 +48,7 @@ class BlockRoutesTest {
         testGetEndpoint(
             endpoint = route.ROUTE,
             queryParameters = mapOf(
-                "page" to "1",
+                "cursor" to "1",
                 "size" to "10",
             ),
             testPlugin = {
@@ -86,7 +86,7 @@ class BlockRoutesTest {
         testGetEndpoint(
             endpoint = route.ROUTE,
             queryParameters = mapOf(
-                "page" to "1",
+                "cursor" to "1",
                 "size" to "10",
             ),
             testPlugin = {
@@ -110,7 +110,7 @@ class BlockRoutesTest {
         testGetEndpoint(
             endpoint = route.ROUTE,
             queryParameters = mapOf(
-                "page" to "1",
+                "cursor" to "1",
                 "size" to "10",
             ),
             testPlugin = {
