@@ -37,7 +37,7 @@ class GetBlockedUsersUseCase(private val blockRepository: BlockRepository) {
         } else {
             blockedUsersWithOneExtra
         }
-        val nextCursor = blockedUsers.last().id.value
+        val nextCursor = if (hasNext) blockedUsers.last().id.value else null
 
         // 3) 결과 반환
         return CursorPage(items = blockedUsers.map { it.toDto() }, nextCursor = nextCursor)
