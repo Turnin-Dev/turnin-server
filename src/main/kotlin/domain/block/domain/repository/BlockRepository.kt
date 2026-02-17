@@ -5,7 +5,7 @@ import com.peekr.common.model.id.BlockId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.model.BlockReason
-import com.peekr.domain.block.domain.model.BlockedUsersPagingData
+import com.peekr.domain.block.domain.model.BlockedUser
 
 interface BlockRepository {
     /**
@@ -38,15 +38,19 @@ interface BlockRepository {
     /**
      * 차단 사용자 목록 조회 (페이지네이션)
      *
+     * 초기 호출 시 커서 값은 null이다.
+     *
+     * 페이지네이션을 위해 실제 조회 개수는 pageSize + 1이다.
+     *
      * @param userId 조회할 사용자 ID
-     * @param offset 페이지 오프셋
+     * @param cursor 커서 (차단 ID)
      * @param size 페이지 사이즈
      */
     suspend fun getBlockedUsersById(
         userId: UserId,
-        offset: Long,
+        cursor: Long?,
         size: Int,
-    ): BlockedUsersPagingData
+    ): List<BlockedUser>
 
     /**
      * 차단 삭제

@@ -1,5 +1,6 @@
 package com.peekr.domain.block.presentation.dto
 
+import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.block.application.dto.BlockedUserDto
 import kotlinx.serialization.Serializable
 
@@ -21,12 +22,17 @@ data class BlockedUserResponse(
     val profileImageUrl: String?,
 ) {
     companion object {
-        val sample = BlockedUserResponse(
-            id = 1,
-            userId = 1,
-            displayId = "DisplayID",
-            name = "Username",
-            profileImageUrl = "https://image-server.com/photo.jpg",
+        val sample = CursorPage(
+            items = List(2) {
+                BlockedUserResponse(
+                    id = it + 1L,
+                    userId = it + 1L,
+                    displayId = "did${it + 1L}",
+                    name = "name${it + 1L}",
+                    profileImageUrl = "https://image-server.com/photo${it + 1L}",
+                )
+            },
+            nextCursor = 2L,
         )
     }
 }

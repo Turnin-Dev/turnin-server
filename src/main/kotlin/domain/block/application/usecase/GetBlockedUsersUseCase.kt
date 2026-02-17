@@ -1,9 +1,8 @@
 package com.peekr.domain.block.application.usecase
 
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.offset.PaginationParams
-import com.peekr.common.util.pagination.offset.SimplePagingData
-import com.peekr.domain.block.application.dto.BlockedUsersPagingDataDto
+import com.peekr.common.util.pagination.cursor.CursorPage
+import com.peekr.domain.block.application.dto.BlockedUserDto
 import com.peekr.domain.block.application.dto.toDto
 import com.peekr.domain.block.domain.repository.BlockRepository
 
@@ -17,27 +16,30 @@ class GetBlockedUsersUseCase(private val blockRepository: BlockRepository) {
      * 차단 사용자 목록을 조회한다. (페이지네이션)
      *
      * @param userId 조회할 사용자 ID
-     * @param paginationParams 페이지네이션 파라미터
-     *
-     * @return [BlockedUsersPagingDataDto] 차단 목록 페이징 데이터 DTO
+     * @param cursor 커서 값 (차단 ID)
+     * @param pageSize 페이지 사이즈
      */
     suspend operator fun invoke(
         userId: Long,
-        paginationParams: PaginationParams,
-    ): BlockedUsersPagingDataDto {
+        cursor: Long?,
+        pageSize: Int,
+    ): CursorPage<BlockedUserDto, Long> {
+        // 0) 데이터 전처리
         val userIdVO = UserId(userId)
-        val blockedUsersPagingData = blockRepository.getBlockedUsersById(
-            userId = userIdVO,
-            offset = paginationParams.offset,
-            size = paginationParams.size,
-        )
-        return BlockedUsersPagingDataDto(
-            pagingData = SimplePagingData(
-                pageNumber = paginationParams.page,
-                pageSize = paginationParams.size,
-                hasNext = blockedUsersPagingData.hasNext,
-            ),
-            blockUsers = blockedUsersPagingData.blockedUsers.map { it.toDto() },
-        )
+
+        // 1) 데이터 조회
+        val blockedUsersWithOneExtra = blockRepository.getBlockedUsersById(userIdVO, cursor, pageSize)
+
+        // 2) 다음 페이지 존재 여부 확인 및 다음 커서 결정
+        val hasNext = blockedUsersWithOneExtra.size > pageSize
+        val blockedUsers = if (hasNext) {
+            blockedUsersWithOneExtra.take(pageSize)
+        } else {
+            blockedUsersWithOneExtra
+        }
+        val nextCursor = blockedUsers.last().id.value
+
+        // 3) 결과 반환
+        return CursorPage(items = blockedUsers.map { it.toDto() }, nextCursor = nextCursor)
     }
 }

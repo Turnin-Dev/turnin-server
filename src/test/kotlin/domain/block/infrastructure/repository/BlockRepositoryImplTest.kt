@@ -121,39 +121,43 @@ class BlockRepositoryImplTest {
             )
         }
 
-        // when: 첫 번째 페이지 조회 (offset=0, size=10)
-        val firstPage = repository.getBlockedUsersById(
+        // when: 첫 번째 페이지 조회 (cursor=null, size=10)
+        val firstPageWithOneExtra = repository.getBlockedUsersById(
             userId = blocker,
-            offset = 0,
+            cursor = null,
             size = 10,
         )
+        val firstPage = firstPageWithOneExtra.take(10)
 
         // then: 첫 페이지 검증
-        assertEquals(10, firstPage.blockedUsers.size) // 현재 페이지 항목 수
-        assertEquals(16L, firstPage.blockedUsers[0].userId.value) // 차단자 확인 (내림차순 기준)
+        assertEquals(10, firstPage.size) // 현재 페이지 항목 수
+        assertEquals(15L, firstPage[0].id.value) // 차단 ID 확인 (내림차순 기준)
 
-        // when: 두 번째 페이지 조회 (offset=10, size=10)
-        val secondPage = repository.getBlockedUsersById(
+        // when: 두 번째 페이지 조회
+        val secondPageCursor = firstPage.last().id.value
+        val secondPageWithOneExtra = repository.getBlockedUsersById(
             userId = blocker,
-            offset = 10,
+            cursor = secondPageCursor,
             size = 10,
         )
+        val secondPage = secondPageWithOneExtra.take(10)
 
         // then: 두 번째 페이지 검증
-        assertEquals(5, secondPage.blockedUsers.size) // 나머지 5개만 조회
+        assertEquals(5, secondPage.size) // 나머지 5개만 조회
 
-        // when: 세 번째 페이지 조회 (offset=20, size=10) - 데이터 없음
+        // when: 세 번째 페이지 조회 - 데이터 없음
+        val thirdPageCursor = secondPage.last().id.value
         val thirdPage = repository.getBlockedUsersById(
             userId = blocker,
-            offset = 20,
+            cursor = thirdPageCursor,
             size = 10,
         )
 
         // then: 빈 페이지 검증
-        assertEquals(0, thirdPage.blockedUsers.size) // 조회된 항목 없음
+        assertEquals(0, thirdPage.size) // 조회된 항목 없음
 
         // 정렬 확인: ID 내림차순 (최신 차단이 먼저)
-        val allBlocks = firstPage.blockedUsers + secondPage.blockedUsers
+        val allBlocks = firstPage + secondPage
         val sortedIds = allBlocks.map { it.id.value }
         assertEquals(sortedIds, sortedIds.sortedDescending())
 
