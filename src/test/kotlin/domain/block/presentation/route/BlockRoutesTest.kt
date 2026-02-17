@@ -2,9 +2,6 @@ package com.peekr.domain.block.presentation.route
 
 import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.model.UserName.Companion.invoke
-import com.peekr.common.model.id.BlockId.Companion.invoke
-import com.peekr.common.model.id.DisplayId.Companion.invoke
 import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
 import com.peekr.common.util.pagination.cursor.CursorPage
