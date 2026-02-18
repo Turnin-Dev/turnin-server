@@ -4,10 +4,9 @@ import com.peekr.common.exception.ApiException
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.model.id.UserId
 import com.peekr.common.route.Api
-import com.peekr.common.util.pagination.offset.SimplePagingData
+import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.block.application.dto.BlockReasonDto
 import com.peekr.domain.block.application.dto.BlockedUserDto
-import com.peekr.domain.block.application.dto.BlockedUsersPagingDataDto
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.presentation.dto.BlockDetailRequest
 import com.peekr.util.testGetEndpoint
@@ -19,6 +18,7 @@ import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just
 import io.mockk.mockk
+import kotlin.collections.List
 import org.junit.Test
 
 class BlockRoutesTest {
@@ -28,15 +28,27 @@ class BlockRoutesTest {
     @Test
     fun `차단 목록 조회 - 성공 테스트`() = testApplication {
         // given
+        val cursorPage = CursorPage(
+            items = List(3) {
+                BlockedUserDto(
+                    id = it + 1L,
+                    userId = it + 1L,
+                    displayId = "did${it + 1L}",
+                    name = "name${it + 1L}",
+                    profileImageUrl = "image${it + 1L}",
+                )
+            },
+            nextCursor = 2L,
+        )
         coEvery {
-            usecase.getBlockedUsers(TestUserId.value, any())
-        } returns TestBlockedUsersPagingDataDto
+            usecase.getBlockedUsers(TestUserId.value, any(), any())
+        } returns cursorPage
 
         // when, then
         testGetEndpoint(
             endpoint = route.ROUTE,
             queryParameters = mapOf(
-                "page" to "1",
+                "cursor" to "1",
                 "size" to "10",
             ),
             testPlugin = {
@@ -48,16 +60,11 @@ class BlockRoutesTest {
             expectedStatus = HttpStatusCode.OK,
             responseValidator = {
                 containsAll(
-                    TestBlockedUsersPagingDataDto.blockUsers
-                        .first()
-                        .userId
-                        .toString(),
-                    TestBlockedUsersPagingDataDto.blockUsers
-                        .first()
-                        .displayId,
-                    TestBlockedUsersPagingDataDto.blockUsers
-                        .first()
-                        .name,
+                    cursorPage.nextCursor.toString(),
+                    cursorPage.items.first().displayId,
+                    cursorPage.items.first().name,
+                    cursorPage.items.last().displayId,
+                    cursorPage.items.last().name,
                 )
             },
         )
@@ -72,14 +79,14 @@ class BlockRoutesTest {
             message = "unexpected error",
         )
         coEvery {
-            usecase.getBlockedUsers(TestUserId.value, any())
+            usecase.getBlockedUsers(TestUserId.value, any(), any())
         } throws expectedApiException
 
         // when, then
         testGetEndpoint(
             endpoint = route.ROUTE,
             queryParameters = mapOf(
-                "page" to "1",
+                "cursor" to "1",
                 "size" to "10",
             ),
             testPlugin = {
@@ -103,7 +110,7 @@ class BlockRoutesTest {
         testGetEndpoint(
             endpoint = route.ROUTE,
             queryParameters = mapOf(
-                "page" to "1",
+                "cursor" to "1",
                 "size" to "10",
             ),
             testPlugin = {
@@ -225,22 +232,6 @@ class BlockRoutesTest {
 
     companion object {
         private val TestUserId = UserId(1L)
-        private val TestBlockedUsersPagingDataDto = BlockedUsersPagingDataDto(
-            pagingData = SimplePagingData(
-                pageNumber = 1,
-                pageSize = 10,
-                hasNext = true,
-            ),
-            blockUsers = listOf(
-                BlockedUserDto(
-                    id = 1L,
-                    userId = 2L,
-                    displayId = "did",
-                    name = "name",
-                    profileImageUrl = "profileImageUrl",
-                ),
-            ),
-        )
         private val TestBlockReasonDto = BlockReasonDto(
             id = 1L,
             code = "code",

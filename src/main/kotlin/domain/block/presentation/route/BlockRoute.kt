@@ -3,12 +3,14 @@ package com.peekr.domain.block.presentation.route
 import com.peekr.common.model.id.UserId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
-import com.peekr.common.util.pagination.offset.getPaginationParams
+import com.peekr.common.util.pagination.cursor.CursorPage
+import com.peekr.common.util.pagination.cursor.getCursorPaginationParams
+import com.peekr.common.util.pagination.cursor.toResponse
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.presentation.dto.BlockDetailRequest
 import com.peekr.domain.block.presentation.dto.BlockReasonResponse
-import com.peekr.domain.block.presentation.dto.BlockedUsersResponse
+import com.peekr.domain.block.presentation.dto.BlockedUserResponse
 import com.peekr.domain.block.presentation.dto.toDto
 import com.peekr.domain.block.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -27,9 +29,16 @@ fun AuthenticatedRoute.blockRoutes(route: Api.V1.Block, usecase: BlockUseCases) 
     }) {
         get({ getBlockedUsersDocs() }) {
             val userId = extractUserIdWithToken()
-            val paginationParams = getPaginationParams()
-            val blockedUsersPagingDataDto = usecase.getBlockedUsers(userId.value, paginationParams)
-            call.respond(HttpStatusCode.OK, blockedUsersPagingDataDto.toResponse())
+            val cursorPaginationParams = getCursorPaginationParams()
+            val cursorPage = usecase.getBlockedUsers(
+                userId = userId.value,
+                cursor = cursorPaginationParams.cursor,
+                pageSize = cursorPaginationParams.size,
+            )
+            val response = cursorPage.toResponse { blockedUserDto ->
+                blockedUserDto.toResponse()
+            }
+            call.respond(HttpStatusCode.OK, response)
         }
 
         get(route.REASON, { getBlockReasonsDocs() }) {
@@ -60,8 +69,8 @@ private fun RouteConfig.getBlockedUsersDocs() {
     summary = "차단 사용자 목록 조회 (페이지네이션)"
     description = "차단 사용자 목록을 조회한다. (페이지네이션)"
     request {
-        queryParameter<Long>("page") {
-            description = "페이지네이션에 필요한 페이지 번호"
+        queryParameter<Long?>("cursor") {
+            description = "페이지네이션에 필요한 커서 값 (초기 호출 시 null 로 요청)"
         }
         queryParameter<Int>("size") {
             description = "페이지네이션에 필요한 페이지 크기"
@@ -71,9 +80,9 @@ private fun RouteConfig.getBlockedUsersDocs() {
     response {
         code(HttpStatusCode.OK) {
             description = "차단 사용자 목록"
-            body<BlockedUsersResponse> {
-                example("BlockedUsersResponse") {
-                    value = BlockedUsersResponse.sample
+            body<CursorPage<BlockedUserResponse, Long>> {
+                example("CursorPage(BlockedUserResponse)") {
+                    value = BlockedUserResponse.sample
                 }
             }
         }

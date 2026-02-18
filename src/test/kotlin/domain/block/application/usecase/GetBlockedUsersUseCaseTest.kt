@@ -4,10 +4,8 @@ import com.peekr.common.model.UserName
 import com.peekr.common.model.id.BlockId
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.domain.block.application.dto.toDto
 import com.peekr.domain.block.domain.model.BlockedUser
-import com.peekr.domain.block.domain.model.BlockedUsersPagingData
 import com.peekr.domain.block.domain.repository.BlockRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -23,40 +21,39 @@ class GetBlockedUsersUseCaseTest {
     fun `차단 목록 조회 성공 테스트`() = runTest {
         // given
         val userId = UserId(1L)
+        val pageSize = 10
+        val blockedUsersWithOneExtra = List(pageSize + 1) {
+            BlockedUser(
+                id = BlockId(it + 1L),
+                userId = UserId(it + 1L),
+                displayId = DisplayId("did${it + 1L}"),
+                name = UserName("name${it + 1L}"),
+                profileImageUrl = "image${it + 1L}",
+            )
+        }
         coEvery {
             blockRepository.getBlockedUsersById(
                 userId = userId,
-                offset = TestPaginationParams.offset,
-                size = TestPaginationParams.size,
+                cursor = null,
+                size = pageSize,
             )
-        } returns TestBlockedUsersPagingData
+        } returns blockedUsersWithOneExtra
 
         // when
-        val pagingDataDto = usecase(userId.value, TestPaginationParams)
+        val cursorPage = usecase(userId.value, null, pageSize)
 
         // then
+        assertEquals(pageSize, cursorPage.items.size)
         assertEquals(
-            TestBlockedUsersPagingData.blockedUsers.map { it.toDto() },
-            pagingDataDto.blockUsers,
+            blockedUsersWithOneExtra.take(pageSize).map { it.toDto() },
+            cursorPage.items,
         )
-    }
-
-    companion object {
-        private val TestPaginationParams = PaginationParams(
-            page = 1,
-            size = 10,
-        )
-        private val TestBlockedUsersPagingData = BlockedUsersPagingData(
-            hasNext = true,
-            blockedUsers = listOf(
-                BlockedUser(
-                    id = BlockId(1L),
-                    userId = UserId(2L),
-                    displayId = DisplayId("did"),
-                    name = UserName("name"),
-                    profileImageUrl = null,
-                ),
-            ),
+        assertEquals(
+            blockedUsersWithOneExtra
+                .take(pageSize)
+                .last()
+                .id.value,
+            cursorPage.nextCursor,
         )
     }
 }
