@@ -7,6 +7,8 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.upsert
 
 // TODO: 리프레시 토큰 평문 비교는 추후 해싱 고려 필요
@@ -35,5 +37,9 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
                 it[refreshToken] = token
             }.resultedValues
             ?.isNotEmpty() == true
+    }
+
+    override suspend fun delete(userId: UserId) = suspendTransaction {
+        RefreshTokens.deleteWhere { Users.id eq userId.value } > 0
     }
 }

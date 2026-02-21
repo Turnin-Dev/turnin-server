@@ -21,4 +21,11 @@ interface RefreshTokenRepository {
         userId: UserId,
         token: String,
     ): Boolean
+
+    /**
+     * 리프레쉬 토큰을 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun delete(userId: UserId): Boolean
 }

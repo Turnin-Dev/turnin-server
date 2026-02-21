@@ -29,6 +29,7 @@ object Api {
             const val ROUTE = "/user"
             const val TAG = "User"
             const val INTRODUCE = "/introduce"
+            const val LOGOUT = "/logout"
 
             fun myProfile(): String = "/me/profile"
 

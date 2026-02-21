@@ -99,6 +99,12 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
                 )
             }
         }
+
+        get(route.LOGOUT, { logoutDocs() }) {
+            val userId = extractUserIdWithToken()
+            usecase.logout(userId.value)
+            call.respond(HttpStatusCode.OK)
+        }
     }
 }
 
@@ -223,6 +229,16 @@ private fun RouteConfig.patchIntroduceDocs() {
                     value = UserErrorCode.IntroducePatchFailed.toErrorResponse(HttpStatusCode.NotFound)
                 }
             }
+        }
+    }
+}
+
+private fun RouteConfig.logoutDocs() {
+    summary = "로그아웃"
+    description = "로그아웃을 수행한다."
+    response {
+        code(HttpStatusCode.OK) {
+            description = "로그아웃 성공 시"
         }
     }
 }

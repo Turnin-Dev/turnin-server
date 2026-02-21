@@ -11,4 +11,6 @@ data class UserUseCases(
     val update: UpdateUserUseCase,
     /** @see [UpdateIntroduceUseCase] */
     val updateIntroduce: UpdateIntroduceUseCase,
+    /** @see [LogoutUseCase] */
+    val logout: LogoutUseCase,
 )
