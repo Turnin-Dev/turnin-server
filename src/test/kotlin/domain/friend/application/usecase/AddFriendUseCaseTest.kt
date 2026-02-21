@@ -5,7 +5,6 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
-import com.peekr.domain.friend.domain.provider.BlockProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 import io.mockk.clearAllMocks
@@ -20,13 +19,12 @@ import org.junit.jupiter.api.assertThrows
 
 class AddFriendUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
-    private val blockProvider: BlockProvider = mockk()
-    private val usecase = AddFriendUseCase(friendRepository, blockProvider)
+    private val usecase = AddFriendUseCase(friendRepository)
 
     @Before
     fun setup() {
         coEvery {
-            blockProvider.isBlockedRelationship(TestRequesterId, TestReceiverId)
+            friendRepository.isBlockedRelationship(TestRequesterId, TestReceiverId)
         } returns false
     }
 
@@ -76,7 +74,7 @@ class AddFriendUseCaseTest {
     fun `친구 요청한 사용자 ID와 요청 받은 사용자 ID가 같을 때 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            blockProvider.isBlockedRelationship(UserId(1L), UserId(1L))
+            friendRepository.isBlockedRelationship(UserId(1L), UserId(1L))
         } returns false
 
         // when, then
@@ -108,7 +106,7 @@ class AddFriendUseCaseTest {
     fun `친구 요청 하려는 사용자와 차단 관계에 있는 경우 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            blockProvider.isBlockedRelationship(TestRequesterId, TestReceiverId)
+            friendRepository.isBlockedRelationship(TestRequesterId, TestReceiverId)
         } returns true
 
         // when, then

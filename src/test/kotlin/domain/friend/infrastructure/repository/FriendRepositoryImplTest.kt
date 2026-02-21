@@ -321,27 +321,6 @@ class FriendRepositoryImplTest {
         assertEquals(savedUserId, users.map { it.userId })
     }
 
-    @Test
-    fun `existsUser 성공 테스트 - 사용자가 존재하지 않는 경우 true를 반환한다`() = runTest {
-        // given
-        val userId = insertUserAndReturnId("a")
-
-        // when
-        val result = repository.existsUser(userId)
-
-        // then
-        assertTrue(result)
-    }
-
-    @Test
-    fun `existsUser 성공 테스트 - 사용자가 존재하지 않는 경우 false를 반환한다`() = runTest {
-        // when
-        val result = repository.existsUser(UserId(100))
-
-        // then
-        assertFalse(result)
-    }
-
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER

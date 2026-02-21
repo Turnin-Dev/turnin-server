@@ -1,5 +1,8 @@
 package com.peekr.domain.friend.infrastructure.repository
 
+import com.peekr.common.db.extension.existsUser
+import com.peekr.common.db.extension.isBlockedRelationship
+import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Users
@@ -17,14 +20,12 @@ import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
-import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
@@ -161,11 +162,7 @@ class FriendRepositoryImpl : FriendRepository {
     }
 
     override suspend fun existsUser(userId: UserId): Boolean = suspendTransaction {
-        Users
-            .select(intLiteral(1))
-            .where { Users.id eq userId.value }
-            .limit(1)
-            .any()
+        Users.existsUser(userId)
     }
 
     override suspend fun getUserInfos(userIds: List<UserId>): List<UserInfo> = suspendTransaction {
@@ -184,5 +181,14 @@ class FriendRepositoryImpl : FriendRepository {
                     profileImageUrl = it[Users.profileImageUrl],
                 )
             }
+    }
+
+    override suspend fun isBlockedRelationship(
+        userId1: UserId,
+        userId2: UserId,
+    ): Boolean = suspendTransaction {
+        if (userId1 == userId2) return@suspendTransaction false
+
+        Blocks.isBlockedRelationship(userId1, userId2)
     }
 }

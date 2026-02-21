@@ -1,5 +1,6 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
+import com.peekr.common.db.extension.existsUser
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
@@ -25,11 +26,7 @@ class UserRepositoryImpl : UserRepository {
     }
 
     override suspend fun existsUser(id: UserId): Boolean = suspendTransaction {
-        Users
-            .select(intLiteral(1))
-            .where { Users.id eq id.value }
-            .limit(1)
-            .any()
+        Users.existsUser(id)
     }
 
     override suspend fun findVisibleById(

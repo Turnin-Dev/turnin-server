@@ -1,5 +1,6 @@
 package com.peekr.domain.block.infrastructure.repository
 
+import com.peekr.common.db.extension.isBlockedRelationship
 import com.peekr.common.db.schema.BlockEntity
 import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.Blocks
@@ -20,8 +21,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
-import org.jetbrains.exposed.sql.intLiteral
-import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 
 class BlockRepositoryImpl : BlockRepository {
@@ -31,13 +30,7 @@ class BlockRepositoryImpl : BlockRepository {
     ): Boolean = suspendTransaction {
         if (userId1 == userId2) return@suspendTransaction false
 
-        Blocks
-            .select(intLiteral(1))
-            .where {
-                (Blocks.blockerId eq userId1.value and (Blocks.blockedId eq userId2.value)) or
-                    (Blocks.blockerId eq userId2.value and (Blocks.blockedId eq userId1.value))
-            }.limit(1)
-            .any()
+        Blocks.isBlockedRelationship(userId1, userId2)
     }
 
     override suspend fun getBlockReasons(): List<BlockReason> = suspendTransaction {

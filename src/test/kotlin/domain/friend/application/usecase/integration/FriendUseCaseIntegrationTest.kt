@@ -10,7 +10,6 @@ import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
 import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
-import com.peekr.domain.friend.domain.provider.BlockProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import com.peekr.util.db.TestDatabaseFactory
@@ -27,10 +26,9 @@ import kotlinx.coroutines.test.runTest
  */
 class FriendUseCaseIntegrationTest {
     // UserBC의 API
-    private val blockProvider: BlockProvider = FakeBlockProvider()
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
     private val getFriendsUseCase = GetFriendsUseCase(friendRepository)
-    private val addFriendUseCase = AddFriendUseCase(friendRepository, blockProvider)
+    private val addFriendUseCase = AddFriendUseCase(friendRepository)
     private val updateFriendRequestStatusUseCase = UpdateFriendRequestStatusUseCase(friendRepository)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
 
