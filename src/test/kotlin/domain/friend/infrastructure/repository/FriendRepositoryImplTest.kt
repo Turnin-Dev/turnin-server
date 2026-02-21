@@ -10,9 +10,10 @@ import com.peekr.common.model.id.UserId
 import com.peekr.util.db.TestDatabaseFactory
 import com.peekr.util.testPagination
 import java.time.Instant
+import kotlin.collections.isNotEmpty
+import kotlin.collections.map
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
-import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -21,6 +22,7 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
+import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 
 class FriendRepositoryImplTest {
@@ -298,6 +300,46 @@ class FriendRepositoryImplTest {
 
         // then
         assertEquals(1, count)
+    }
+
+    @Test
+    fun `getUserInfos 성공 테스트`() = runTest {
+        // given: 10명의 테스트 사용자를 생성
+        val savedUserId = mutableListOf<UserId>()
+        val userTotalCount = 10
+        repeat(userTotalCount) {
+            val userId = insertUserAndReturnId("${it + 1L}")
+            savedUserId.add(userId)
+        }
+
+        // when
+        val users = repository.getUserInfos(savedUserId)
+
+        // then
+        assertTrue(users.isNotEmpty())
+        assertEquals(userTotalCount, users.size)
+        assertEquals(savedUserId, users.map { it.userId })
+    }
+
+    @Test
+    fun `existsUser 성공 테스트 - 사용자가 존재하지 않는 경우 true를 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("a")
+
+        // when
+        val result = repository.existsUser(userId)
+
+        // then
+        assertTrue(result)
+    }
+
+    @Test
+    fun `existsUser 성공 테스트 - 사용자가 존재하지 않는 경우 false를 반환한다`() = runTest {
+        // when
+        val result = repository.existsUser(UserId(100))
+
+        // then
+        assertFalse(result)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

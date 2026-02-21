@@ -6,7 +6,6 @@ import com.peekr.common.model.id.FriendId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.provider.BlockProvider
-import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 import io.mockk.clearAllMocks
@@ -21,9 +20,8 @@ import org.junit.jupiter.api.assertThrows
 
 class AddFriendUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
-    private val userProvider: UserProvider = mockk()
     private val blockProvider: BlockProvider = mockk()
-    private val usecase = AddFriendUseCase(friendRepository, userProvider, blockProvider)
+    private val usecase = AddFriendUseCase(friendRepository, blockProvider)
 
     @Before
     fun setup() {
@@ -44,7 +42,7 @@ class AddFriendUseCaseTest {
             friendRepository.createFriend(TestRequesterId, TestReceiverId)
         } returns TestFriend
         coEvery {
-            userProvider.existsUser(TestReceiverId)
+            friendRepository.existsUser(TestReceiverId)
         } returns true
 
         // when
@@ -62,7 +60,7 @@ class AddFriendUseCaseTest {
     fun `요청 받을 사용자가 존재하지 않을 때 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            userProvider.existsUser(TestReceiverId)
+            friendRepository.existsUser(TestReceiverId)
         } returns false
 
         // when, then
@@ -94,7 +92,7 @@ class AddFriendUseCaseTest {
             friendRepository.createFriend(TestRequesterId, TestReceiverId)
         } throws DatabaseException.DuplicatedDataException(Throwable())
         coEvery {
-            userProvider.existsUser(TestReceiverId)
+            friendRepository.existsUser(TestReceiverId)
         } returns true
 
         // when, then

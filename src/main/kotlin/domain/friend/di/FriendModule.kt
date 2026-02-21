@@ -9,10 +9,8 @@ import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
 import com.peekr.domain.friend.application.usecase.GetIncomingRequestsUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
 import com.peekr.domain.friend.domain.provider.BlockProvider
-import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.provider.BlockProviderImpl
-import com.peekr.domain.friend.infrastructure.provider.UserProviderImpl
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import org.koin.dsl.module
 
@@ -22,16 +20,15 @@ val friendModule = module {
 
     // Provider
     single { FriendProviderApi(get(), get()) }
-    single<UserProvider> { UserProviderImpl(get()) }
     single<BlockProvider> { BlockProviderImpl(get()) }
 
     // Usecase
-    factory { GetFriendsUseCase(get(), get()) }
-    factory { AddFriendUseCase(get(), get(), get()) }
-    factory { UpdateFriendRequestStatusUseCase(get(), get()) }
+    factory { GetFriendsUseCase(get()) }
+    factory { AddFriendUseCase(get(), get()) }
+    factory { UpdateFriendRequestStatusUseCase(get()) }
     factory { DeleteFriendUseCase(get()) }
     factory { GetFriendStatusUseCase(get()) }
-    factory { GetIncomingRequestsUseCase(get(), get()) }
+    factory { GetIncomingRequestsUseCase(get()) }
     single<FriendUseCases> {
         FriendUseCases(
             get(),

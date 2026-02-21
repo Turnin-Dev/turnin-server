@@ -6,7 +6,6 @@ import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.friend.application.dto.FriendDto
 import com.peekr.domain.friend.application.dto.toDto
 import com.peekr.domain.friend.domain.provider.BlockProvider
-import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 
@@ -15,7 +14,6 @@ import com.peekr.domain.friend.exception.FriendException
  */
 class AddFriendUseCase(
     private val friendRepository: FriendRepository,
-    private val userProvider: UserProvider,
     private val blockProvider: BlockProvider,
 ) {
     /**
@@ -49,7 +47,7 @@ class AddFriendUseCase(
         }
 
         // 3) 요청 받을 사용자가 존재하지 않으면 요청을 할 수 없다.
-        if (!userProvider.existsUser(receiverIdVO)) {
+        if (!friendRepository.existsUser(receiverIdVO)) {
             throw FriendException.UserNotFoundException()
         }
 

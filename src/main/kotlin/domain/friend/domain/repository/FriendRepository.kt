@@ -5,6 +5,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
+import com.peekr.domain.friend.domain.model.UserInfo
 
 interface FriendRepository {
     /**
@@ -95,4 +96,20 @@ interface FriendRepository {
         userId1: UserId,
         userId2: UserId,
     ): Boolean
+
+    /**
+     * 사용자 ID를 통해 사용자가 있는지 확인한다.
+     *
+     * **순환 참조를 방지하기 위해 임시방편으로 Users 테이블 조회만 수행한다.**
+     */
+    suspend fun existsUser(userId: UserId): Boolean
+
+    /**
+     * 사용자들의 ID를 통해 사용자 정보 일부 목록을 조회한다.
+     *
+     * (입력된 항목 순서를 그대로 유지해야 한다)
+     *
+     * **순환 참조를 방지하기 위해 임시방편으로 Users 테이블 조회만 수행한다.**
+     */
+    suspend fun getUserInfos(userIds: List<UserId>): List<UserInfo>
 }

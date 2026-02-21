@@ -6,7 +6,6 @@ import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.FriendInfoDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
-import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 
@@ -17,10 +16,7 @@ import com.peekr.domain.friend.exception.FriendException
  *
  * @see invoke
  */
-class GetFriendsUseCase(
-    private val friendRepository: FriendRepository,
-    private val userProvider: UserProvider,
-) {
+class GetFriendsUseCase(private val friendRepository: FriendRepository) {
     private val logger = AppLoggerFactory.createLogger(this::class.java.simpleName)
 
     /**
@@ -60,7 +56,7 @@ class GetFriendsUseCase(
                 friends = emptyList(),
             )
         }
-        val friendInfoMap = userProvider
+        val friendInfoMap = friendRepository
             .getUserInfos(friendIds)
             .associateBy { it.userId }
 

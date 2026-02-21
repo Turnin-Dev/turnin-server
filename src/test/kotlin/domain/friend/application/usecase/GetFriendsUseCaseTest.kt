@@ -8,8 +8,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
-import com.peekr.domain.friend.domain.provider.ExternalUserInfo
-import com.peekr.domain.friend.domain.provider.UserProvider
+import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -21,8 +20,7 @@ import kotlinx.coroutines.test.runTest
 
 class GetFriendsUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
-    private val userProvider: UserProvider = mockk()
-    private val usecase = GetFriendsUseCase(friendRepository, userProvider)
+    private val usecase = GetFriendsUseCase(friendRepository)
 
     @Test
     fun `친구 목록 페이지네이션 조회 성공 테스트`() = runTest {
@@ -32,10 +30,10 @@ class GetFriendsUseCaseTest {
         val expectedPageSize = (totalSize / pageSize).toLong()
 
         // 0. 사용자 정보 조회 데이터
-        coEvery { userProvider.getUserInfos(any()) } answers {
+        coEvery { friendRepository.getUserInfos(any()) } answers {
             val ids = firstArg<List<UserId>>()
             ids.map { id ->
-                TestExternalUserInfo.copy(userId = id)
+                TestUserInfo.copy(userId = id)
             }
         }
 
@@ -118,7 +116,7 @@ class GetFriendsUseCaseTest {
             createdAt = 1000,
             updatedAt = 1000,
         )
-        private val TestExternalUserInfo = ExternalUserInfo(
+        private val TestUserInfo = UserInfo(
             userId = UserId(1L),
             displayId = DisplayId("did"),
             userName = UserName("name"),

@@ -10,6 +10,9 @@ import com.peekr.common.db.schema.ReportReasons
 import com.peekr.common.db.schema.Reports
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
+import com.peekr.common.model.FriendRequestStatus
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -31,6 +34,19 @@ object TestDatabaseFactory {
 
         // 실제 테이블 모델 그대로 사용
         transaction {
+            // H2에서 커스텀 ENUM 타입 생성
+            val enums = mapOf(
+                "user_role" to Role.entries.map { it.name },
+                "social_login_provider" to SocialLoginProvider.entries.map { it.name },
+                "friend_status" to FriendRequestStatus.entries.map { it.name },
+            )
+
+            enums.forEach { (typeName, values) ->
+                val valuesString = values.joinToString { "'$it'" }
+                // H2 문법에 맞게 생성 (IF NOT EXISTS 포함)
+                exec("CREATE TYPE IF NOT EXISTS $typeName AS ENUM ($valuesString);")
+            }
+
             SchemaUtils.create(
                 Users,
                 RefreshTokens,

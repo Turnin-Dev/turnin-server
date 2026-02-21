@@ -5,21 +5,26 @@ import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.FriendRequestStatus
+import com.peekr.common.model.UserName
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
+import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
+import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
@@ -153,5 +158,31 @@ class FriendRepositoryImpl : FriendRepository {
             ((Friends.requesterId eq userId1.value) and (Friends.receiverId eq userId2.value)) or
                 ((Friends.requesterId eq userId2.value) and (Friends.receiverId eq userId1.value))
         } > 0
+    }
+
+    override suspend fun existsUser(userId: UserId): Boolean = suspendTransaction {
+        Users
+            .select(intLiteral(1))
+            .where { Users.id eq userId.value }
+            .limit(1)
+            .any()
+    }
+
+    override suspend fun getUserInfos(userIds: List<UserId>): List<UserInfo> = suspendTransaction {
+        Users
+            .select(
+                Users.id,
+                Users.displayId,
+                Users.name,
+                Users.profileImageUrl,
+            ).where { Users.id inList userIds.map { it.value } }
+            .map {
+                UserInfo(
+                    userId = UserId(it[Users.id].value),
+                    displayId = DisplayId(it[Users.displayId]),
+                    userName = UserName(it[Users.name]),
+                    profileImageUrl = it[Users.profileImageUrl],
+                )
+            }
     }
 }
