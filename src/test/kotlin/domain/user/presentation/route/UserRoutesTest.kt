@@ -20,7 +20,9 @@ import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.Test
 
@@ -509,6 +511,44 @@ class UserRoutesTest {
                     expectedApiException.errorCode.description,
                 )
             },
+        )
+    }
+
+    @Test
+    fun `로그아웃 요청 성공 테스트`() = testApplication {
+        // given
+        coEvery { userUseCases.logout(TestMyUserId.value) } just Runs
+
+        // when, then
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.LOGOUT}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+        )
+    }
+
+    @Test
+    fun `로그아웃 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        // given
+        coEvery { userUseCases.logout(TestMyUserId.value) } just Runs
+
+        // when, then
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.LOGOUT}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
         )
     }
 

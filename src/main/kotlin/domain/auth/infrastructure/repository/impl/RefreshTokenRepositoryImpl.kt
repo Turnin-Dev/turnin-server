@@ -40,6 +40,6 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
     }
 
     override suspend fun delete(userId: UserId) = suspendTransaction {
-        RefreshTokens.deleteWhere { Users.id eq userId.value } > 0
+        RefreshTokens.deleteWhere { RefreshTokens.user eq userId.value } > 0
     }
 }

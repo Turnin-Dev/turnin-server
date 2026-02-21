@@ -110,6 +110,40 @@ class RefreshTokenRepositoryImplTest {
         }
     }
 
+    @Test
+    fun `delete 성공 테스트`() = runTest {
+        // given
+        val userId = TestDatabaseFactory.dbQuery {
+            val savedUserEntity = UserEntity.new {
+                this.role = TestAuthUser.role
+                this.provider = TestAuthUser.provider
+                this.providerId = TestAuthUser.providerId
+                this.displayId = TestAuthUser.displayId.value
+                this.name = TestAuthUser.userName.value
+                this.profileImageUrl = TestAuthUser.profileImageUrl
+                this.introduce = TestAuthUser.introduce.value
+                this.lastLoginAt = Instant.now()
+            }
+
+            RefreshTokens.upsert {
+                it[user] = savedUserEntity.id
+                it[refreshToken] = TEST_REFRESH_TOKEN
+            }
+
+            savedUserEntity.id.value
+        }
+        val foundedUserId = refreshTokenRepository.findUserIdByRefreshToken(TEST_REFRESH_TOKEN)
+        assertNotNull(foundedUserId)
+        assertEquals(UserId(userId), foundedUserId)
+
+        // when: 토큰 삭제
+        val result = refreshTokenRepository.delete(foundedUserId)
+
+        // then: 토큰이 없는지 검증
+        assertTrue(result)
+        assertNull(refreshTokenRepository.findUserIdByRefreshToken(TEST_REFRESH_TOKEN))
+    }
+
     companion object {
         private const val TEST_REFRESH_TOKEN = "aaa.bbb.ccc"
         private val TestAuthUser = AuthUser(
