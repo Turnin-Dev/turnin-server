@@ -2,17 +2,13 @@ package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 
 /**
  * 친구 상태 수정
  */
-class UpdateFriendRequestStatusUseCase(
-    private val friendRepository: FriendRepository,
-    private val userProvider: UserProvider,
-) {
+class UpdateFriendRequestStatusUseCase(private val friendRepository: FriendRepository) {
     /**
      * 친구 상태를 수정한다.
      *
@@ -36,8 +32,8 @@ class UpdateFriendRequestStatusUseCase(
         }
 
         // 2) 상태를 수정하려는 친구(사용자)가 존재하지 않는 경우 수정이 불가능하다.
-        if (!userProvider.existsUser(userId1VO) ||
-            !userProvider.existsUser(userId2VO)
+        if (!friendRepository.existsUser(userId1VO) ||
+            !friendRepository.existsUser(userId2VO)
         ) {
             throw FriendException.UserNotFoundException()
         }

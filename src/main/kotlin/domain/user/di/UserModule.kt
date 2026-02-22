@@ -4,11 +4,16 @@ import com.peekr.domain.user.application.provider.UserProviderApi
 import com.peekr.domain.user.application.usecase.GetMyProfileUseCase
 import com.peekr.domain.user.application.usecase.GetUserProfileUseCase
 import com.peekr.domain.user.application.usecase.GetUserUseCase
+import com.peekr.domain.user.application.usecase.LogoutUseCase
 import com.peekr.domain.user.application.usecase.UpdateIntroduceUseCase
 import com.peekr.domain.user.application.usecase.UpdateUserUseCase
 import com.peekr.domain.user.application.usecase.UserUseCases
+import com.peekr.domain.user.domain.provider.AuthProvider
+import com.peekr.domain.user.domain.provider.FileProvider
 import com.peekr.domain.user.domain.provider.FriendProvider
 import com.peekr.domain.user.domain.repository.UserRepository
+import com.peekr.domain.user.infrastructure.provider.AuthProviderImpl
+import com.peekr.domain.user.infrastructure.provider.FileProviderImpl
 import com.peekr.domain.user.infrastructure.provider.FriendProviderImpl
 import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
 import org.koin.dsl.module
@@ -19,6 +24,8 @@ val userModule = module {
     // factory 스코프는 매번 주입될 때마다 불필요한 객체 할당을 발생시킨다.
     single { UserProviderApi(get()) }
     single<FriendProvider> { FriendProviderImpl(get()) }
+    single<AuthProvider> { AuthProviderImpl(get()) }
+    single<FileProvider> { FileProviderImpl(get()) }
 
     // Repository
     single<UserRepository> { UserRepositoryImpl() }
@@ -26,11 +33,13 @@ val userModule = module {
     // UseCase
     factory { GetUserUseCase(get()) }
     factory { GetMyProfileUseCase(get(), get()) }
-    factory { UpdateUserUseCase(get()) }
+    factory { UpdateUserUseCase(get(), get()) }
     factory { UpdateIntroduceUseCase(get()) }
     factory { GetUserProfileUseCase(get(), get()) }
+    factory { LogoutUseCase(get()) }
     single<UserUseCases> {
         UserUseCases(
+            get(),
             get(),
             get(),
             get(),

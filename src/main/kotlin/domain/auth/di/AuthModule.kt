@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.di
 
+import com.peekr.domain.auth.application.provider.AuthProviderApi
 import com.peekr.domain.auth.application.usecase.AuthUseCases
 import com.peekr.domain.auth.application.usecase.ExistsDisplayIdUseCase
 import com.peekr.domain.auth.application.usecase.FindUserUseCase
@@ -16,6 +17,9 @@ val authModule = module {
     // Repository
     single<AuthRepository> { AuthRepositoryImpl() }
     single<RefreshTokenRepository> { RefreshTokenRepositoryImpl() }
+
+    // Provider
+    single<AuthProviderApi> { AuthProviderApi(get()) }
 
     // UseCase
     factory { LoginUseCase(get(), get(), get()) }

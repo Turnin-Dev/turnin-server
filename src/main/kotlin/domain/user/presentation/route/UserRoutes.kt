@@ -17,6 +17,7 @@ import com.peekr.domain.user.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.patch
+import io.github.smiley4.ktoropenapi.put
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
@@ -70,7 +71,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        patch({ patchUserDocs() }) {
+        put({ updateUserDocs() }) {
             val userPatchRequest = call.receive<UserPatchRequest>()
             val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
@@ -98,6 +99,12 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
                     UserErrorCode.IntroducePatchFailed.toErrorResponse(HttpStatusCode.NotFound),
                 )
             }
+        }
+
+        get(route.LOGOUT, { logoutDocs() }) {
+            val userId = extractUserIdWithToken()
+            usecase.logout(userId.value)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }
@@ -175,7 +182,7 @@ private fun RouteConfig.getUserProfileDocs() {
     }
 }
 
-private fun RouteConfig.patchUserDocs() {
+private fun RouteConfig.updateUserDocs() {
     summary = "사용자 정보 수정"
     description = "사용자 정보를 수정한다."
     request {
@@ -223,6 +230,16 @@ private fun RouteConfig.patchIntroduceDocs() {
                     value = UserErrorCode.IntroducePatchFailed.toErrorResponse(HttpStatusCode.NotFound)
                 }
             }
+        }
+    }
+}
+
+private fun RouteConfig.logoutDocs() {
+    summary = "로그아웃"
+    description = "로그아웃을 수행한다."
+    response {
+        code(HttpStatusCode.OK) {
+            description = "로그아웃 성공 시"
         }
     }
 }

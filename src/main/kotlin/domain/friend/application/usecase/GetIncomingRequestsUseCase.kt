@@ -6,7 +6,6 @@ import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.IncomingRequestInfoDto
 import com.peekr.domain.friend.application.dto.IncomingRequestPagingDataDto
-import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 
@@ -15,10 +14,7 @@ import com.peekr.domain.friend.exception.FriendException
  *
  * @see invoke
  */
-class GetIncomingRequestsUseCase(
-    private val repository: FriendRepository,
-    private val userProvider: UserProvider,
-) {
+class GetIncomingRequestsUseCase(private val repository: FriendRepository) {
     /**
      * 나에게 들어온 친구 요청 목록을 페이지네이션을 사용하여 조회한다.
      *
@@ -62,7 +58,7 @@ class GetIncomingRequestsUseCase(
                 requests = emptyList(),
             )
         }
-        val requesterInfoMap = userProvider
+        val requesterInfoMap = repository
             .getUserInfos(requesterId)
             .associateBy { it.userId }
 

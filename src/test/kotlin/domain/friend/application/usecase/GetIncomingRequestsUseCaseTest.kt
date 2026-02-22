@@ -8,8 +8,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.domain.friend.domain.model.IncomingRequest
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
-import com.peekr.domain.friend.domain.provider.ExternalUserInfo
-import com.peekr.domain.friend.domain.provider.UserProvider
+import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 import io.mockk.clearAllMocks
@@ -28,8 +27,7 @@ import org.junit.After
  */
 class GetIncomingRequestsUseCaseTest {
     private val repository: FriendRepository = mockk()
-    private val userProvider: UserProvider = mockk()
-    private val usecase = GetIncomingRequestsUseCase(repository, userProvider)
+    private val usecase = GetIncomingRequestsUseCase(repository)
 
     @After
     fun tearDown() {
@@ -68,13 +66,13 @@ class GetIncomingRequestsUseCaseTest {
             requests = listOf(mockRequester1, mockRequester2),
         )
 
-        val userInfo1 = ExternalUserInfo(
+        val userInfo1 = UserInfo(
             userId = requesterId1,
             displayId = DisplayId("user2"),
             userName = UserName("사용자2"),
             profileImageUrl = "https://example.com/profile2.jpg",
         )
-        val userInfo2 = ExternalUserInfo(
+        val userInfo2 = UserInfo(
             userId = requesterId2,
             displayId = DisplayId("user3"),
             userName = UserName("사용자3"),
@@ -86,7 +84,7 @@ class GetIncomingRequestsUseCaseTest {
         } returns incomingRequestPagingData
 
         coEvery {
-            userProvider.getUserInfos(listOf(requesterId1, requesterId2))
+            repository.getUserInfos(listOf(requesterId1, requesterId2))
         } returns listOf(userInfo1, userInfo2)
 
         // when
@@ -115,7 +113,7 @@ class GetIncomingRequestsUseCaseTest {
             repository.getIncomingRequests(userIdVO, 0L, 10)
         }
         coVerify(exactly = 1) {
-            userProvider.getUserInfos(listOf(requesterId1, requesterId2))
+            repository.getUserInfos(listOf(requesterId1, requesterId2))
         }
     }
 
@@ -148,7 +146,7 @@ class GetIncomingRequestsUseCaseTest {
             repository.getIncomingRequests(userIdVO, 0L, 10)
         }
         coVerify(exactly = 0) {
-            userProvider.getUserInfos(any())
+            repository.getUserInfos(any())
         }
     }
 
@@ -181,7 +179,7 @@ class GetIncomingRequestsUseCaseTest {
 
         // userProvider가 빈 목록을 반환 (사용자 정보를 찾을 수 없음)
         coEvery {
-            userProvider.getUserInfos(listOf(requesterId))
+            repository.getUserInfos(listOf(requesterId))
         } returns emptyList()
 
         // when & then
@@ -193,7 +191,7 @@ class GetIncomingRequestsUseCaseTest {
             repository.getIncomingRequests(userIdVO, 0L, 10)
         }
         coVerify(exactly = 1) {
-            userProvider.getUserInfos(listOf(requesterId))
+            repository.getUserInfos(listOf(requesterId))
         }
     }
 
@@ -271,19 +269,19 @@ class GetIncomingRequestsUseCaseTest {
 
         // UserProvider는 역순으로 반환
         val userInfos = listOf(
-            ExternalUserInfo(
+            UserInfo(
                 userId = requesterId3,
                 displayId = DisplayId("user4"),
                 userName = UserName("사용자4"),
                 profileImageUrl = null,
             ),
-            ExternalUserInfo(
+            UserInfo(
                 userId = requesterId1,
                 displayId = DisplayId("user2"),
                 userName = UserName("사용자2"),
                 profileImageUrl = null,
             ),
-            ExternalUserInfo(
+            UserInfo(
                 userId = requesterId2,
                 displayId = DisplayId("user3"),
                 userName = UserName("사용자3"),
@@ -296,7 +294,7 @@ class GetIncomingRequestsUseCaseTest {
         } returns incomingRequestPagingData
 
         coEvery {
-            userProvider.getUserInfos(listOf(requesterId1, requesterId2, requesterId3))
+            repository.getUserInfos(listOf(requesterId1, requesterId2, requesterId3))
         } returns userInfos
 
         // when

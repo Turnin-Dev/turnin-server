@@ -29,6 +29,7 @@ object Api {
             const val ROUTE = "/user"
             const val TAG = "User"
             const val INTRODUCE = "/introduce"
+            const val LOGOUT = "/logout"
 
             fun myProfile(): String = "/me/profile"
 
@@ -39,6 +40,7 @@ object Api {
             const val ROUTE = "/file"
             const val TAG = "File"
             const val UPLOAD = "/upload"
+            const val UPDATE = "/update"
         }
 
         object Keyword {

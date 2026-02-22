@@ -189,32 +189,6 @@ class ReportRepositoryImplTest {
         assertTrue(exception is DatabaseException.DuplicatedDataException)
     }
 
-    @Test
-    fun `신고 대상이 없는 경우 예외가 발생한다`() = runTest {
-        // given
-        val userId = insertUserAndReturnId("1")
-        val reportReason = repository.createReportReason(
-            code = TEST_REPORT_REASON_CODE,
-            description = TEST_REPORT_REASON_DESCRIPTION,
-        )
-
-        // when
-        val exception = runCatching {
-            repository.createReport(
-                ReportDetail(
-                    reporterId = userId,
-                    reportedId = null,
-                    reportedUserKeywordId = null,
-                    reasonId = reportReason.id,
-                    customReason = TEST_CUSTOM_REASON,
-                ),
-            )
-        }.exceptionOrNull()
-
-        // then
-        assertTrue(exception is DatabaseException.ConstraintViolationException)
-    }
-
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER

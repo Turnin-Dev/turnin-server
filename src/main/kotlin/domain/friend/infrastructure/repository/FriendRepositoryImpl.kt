@@ -1,16 +1,22 @@
 package com.peekr.domain.friend.infrastructure.repository
 
+import com.peekr.common.db.extension.existsUser
+import com.peekr.common.db.extension.isBlockedRelationship
+import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.FriendRequestStatus
+import com.peekr.common.model.UserName
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
+import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
@@ -153,5 +159,36 @@ class FriendRepositoryImpl : FriendRepository {
             ((Friends.requesterId eq userId1.value) and (Friends.receiverId eq userId2.value)) or
                 ((Friends.requesterId eq userId2.value) and (Friends.receiverId eq userId1.value))
         } > 0
+    }
+
+    override suspend fun existsUser(userId: UserId): Boolean = suspendTransaction {
+        Users.existsUser(userId)
+    }
+
+    override suspend fun getUserInfos(userIds: List<UserId>): List<UserInfo> = suspendTransaction {
+        Users
+            .select(
+                Users.id,
+                Users.displayId,
+                Users.name,
+                Users.profileImageUrl,
+            ).where { Users.id inList userIds.map { it.value } }
+            .map {
+                UserInfo(
+                    userId = UserId(it[Users.id].value),
+                    displayId = DisplayId(it[Users.displayId]),
+                    userName = UserName(it[Users.name]),
+                    profileImageUrl = it[Users.profileImageUrl],
+                )
+            }
+    }
+
+    override suspend fun isBlockedRelationship(
+        userId1: UserId,
+        userId2: UserId,
+    ): Boolean = suspendTransaction {
+        if (userId1 == userId2) return@suspendTransaction false
+
+        Blocks.isBlockedRelationship(userId1, userId2)
     }
 }

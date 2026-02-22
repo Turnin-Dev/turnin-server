@@ -1,5 +1,6 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
+import com.peekr.common.db.extension.existsUser
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
@@ -25,11 +26,7 @@ class UserRepositoryImpl : UserRepository {
     }
 
     override suspend fun existsUser(id: UserId): Boolean = suspendTransaction {
-        Users
-            .select(intLiteral(1))
-            .where { Users.id eq id.value }
-            .limit(1)
-            .any()
+        Users.existsUser(id)
     }
 
     override suspend fun findVisibleById(
@@ -80,9 +77,9 @@ class UserRepositoryImpl : UserRepository {
     ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
             row[name] = patch.userName.value
-            row[profileImageUrl] = patch.profileImageUrl
-            patch.introduce.let { row[introduce] = it.value }
-            patch.profileImageUrl?.let { row[profileImageUrl] = it }
+            row[displayId] = patch.displayId.value
+            row[profileImageUrl] = patch.newProfileImageUrl
+            row[introduce] = patch.introduce.value
         } > 0
     }
 

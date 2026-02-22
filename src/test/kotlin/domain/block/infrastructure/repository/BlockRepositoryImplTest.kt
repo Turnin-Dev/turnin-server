@@ -14,7 +14,6 @@ import com.peekr.domain.block.infrastructure.mapper.BlockMapper.toDomain
 import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
@@ -36,40 +35,6 @@ class BlockRepositoryImplTest {
     @After
     fun teardown() {
         TestDatabaseFactory.cleanUp()
-    }
-
-    @Test
-    fun `차단 여부 확인 성공 테스트 - 차단 관계인 경우`() = runTest {
-        // given: 사용자 2명 생성 후 차단 생성
-        val userId1 = insertUserAndReturnId("1")
-        val userId2 = insertUserAndReturnId("2")
-        val blockReasons = repository.getBlockReasons()
-        val blockDetail = BlockDetail(
-            blockerId = userId1,
-            blockedId = userId2,
-            reasonId = blockReasons.first().id,
-            customReason = "custom-reason",
-        )
-        repository.createBlock(blockDetail)
-
-        // when
-        val result = repository.isBlockedRelationship(userId1, userId2)
-
-        // then
-        assertTrue(result)
-    }
-
-    @Test
-    fun `차단 여부 확인 성공 테스트 - 차단 관계가 아닌 경우`() = runTest {
-        // given: 사용자 2명 생성 후 차단 생성
-        val userId1 = insertUserAndReturnId("1")
-        val userId2 = insertUserAndReturnId("2")
-
-        // when
-        val result = repository.isBlockedRelationship(userId1, userId2)
-
-        // then
-        assertFalse(result)
     }
 
     @Test

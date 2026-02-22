@@ -19,6 +19,7 @@ import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
@@ -170,6 +171,32 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    fun `update 성공 테스트`() = runTest {
+        // given
+        val user = insertUser("1")
+        val userPatch = UserPatch(
+            userName = UserName("newName"),
+            displayId = DisplayId("newDid"),
+            oldProfileImageUrl = "oldImageUrl",
+            newProfileImageUrl = "newImageUrl",
+            introduce = Introduce("newIntroduce"),
+        )
+
+        // when
+        val result = repository.update(user.id, userPatch)
+
+        // then
+        assertTrue(result)
+        val updatedUser = repository.findById(user.id)
+        assertNotNull(updatedUser)
+        assertEquals(userPatch.userName, updatedUser.userName)
+        assertEquals(userPatch.displayId, updatedUser.displayId)
+        assertEquals(userPatch.introduce, updatedUser.introduce)
+        assertEquals(userPatch.newProfileImageUrl, updatedUser.profileImageUrl)
+        assertNotEquals(userPatch.oldProfileImageUrl, updatedUser.profileImageUrl)
+    }
+
+    @Test
     fun `update 실패 테스트 - 사용자를 찾지 못하는 경우 false를 반환한다`() = runTest {
         // when
         val userId = UserId(1L)
@@ -233,7 +260,9 @@ class UserRepositoryImplTest {
     companion object {
         private val TestUserPatch = UserPatch(
             userName = UserName("name"),
-            profileImageUrl = null,
+            displayId = DisplayId("did"),
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
             introduce = Introduce("introduce"),
         )
         private val TestIntroduce = Introduce("introduce")

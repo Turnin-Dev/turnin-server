@@ -2,7 +2,7 @@ package com.peekr.domain.file.presentation.route
 
 import com.peekr.common.route.Api
 import com.peekr.domain.file.application.dto.UploadFileInfoDto
-import com.peekr.domain.file.application.usecase.FileUseCase
+import com.peekr.domain.file.application.usecase.FileUseCases
 import com.peekr.domain.file.exception.FileException
 import com.peekr.util.TestClientFactory.createTestClient
 import com.peekr.util.testPlugin
@@ -18,16 +18,16 @@ import org.junit.Test
 
 class FileRouteTest {
     private val route = Api.V1.File
-    private val fileUseCase = mockk<FileUseCase>()
+    private val usecase = mockk<FileUseCases>()
 
     @Test
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 성공 테스트`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { fileUseCase(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { usecase.getFileUploadUrl(any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
-            routing = { fileRoutes(route, fileUseCase) },
+            routing = { fileRoutes(route, usecase) },
         )
 
         // when
@@ -52,11 +52,11 @@ class FileRouteTest {
         val expectedException = FileException.InvalidS3PresignerArgument()
         val client = createTestClient()
         coEvery {
-            fileUseCase(any(), any())
+            usecase.getFileUploadUrl(any(), any())
         } throws expectedException
 
         testPlugin(
-            routing = { fileRoutes(route, fileUseCase) },
+            routing = { fileRoutes(route, usecase) },
         )
 
         // when
@@ -77,10 +77,10 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 실패 테스트 - 파일이름 유효성 검사 실패 시 상태코드 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { fileUseCase(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { usecase.getFileUploadUrl(any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
-            routing = { fileRoutes(route, fileUseCase) },
+            routing = { fileRoutes(route, usecase) },
         )
 
         // when
@@ -99,10 +99,10 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 실패 테스트 - MIME 유효성 검사 실패 시 상태코드 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { fileUseCase(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { usecase.getFileUploadUrl(any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
-            routing = { fileRoutes(route, fileUseCase) },
+            routing = { fileRoutes(route, usecase) },
         )
 
         // when

@@ -5,6 +5,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
+import com.peekr.domain.friend.domain.model.UserInfo
 
 interface FriendRepository {
     /**
@@ -92,6 +93,35 @@ interface FriendRepository {
      * @return 성공 시 `true`, 실패 시 `false` 반환
      */
     suspend fun deleteFriend(
+        userId1: UserId,
+        userId2: UserId,
+    ): Boolean
+
+    /**
+     * 사용자 ID를 통해 사용자가 있는지 확인한다.
+     *
+     * **순환 참조를 방지하기 위해 임시방편으로 Users 테이블 조회만 수행한다.**
+     */
+    suspend fun existsUser(userId: UserId): Boolean
+
+    /**
+     * 사용자들의 ID를 통해 사용자 정보 일부 목록을 조회한다.
+     *
+     * **순환 참조를 방지하기 위해 임시방편으로 Users 테이블 조회만 수행한다.**
+     */
+    suspend fun getUserInfos(userIds: List<UserId>): List<UserInfo>
+
+    /**
+     * 차단 사용자 여부 확인
+     *
+     * [userId1]과 [userId2]의 차단 관계를 확인한다.
+     *
+     * 둘 중 한 명이라도 서로를 차단한 관계라면 `true`를 반환하고 아니라면 `false`를 반환한다.
+     *
+     * @param userId1 차단 관계 사용자 1 ID
+     * @param userId2 차단 관계 사용자 2 ID
+     */
+    suspend fun isBlockedRelationship(
         userId1: UserId,
         userId2: UserId,
     ): Boolean

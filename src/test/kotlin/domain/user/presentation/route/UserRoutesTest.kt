@@ -18,9 +18,12 @@ import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
+import com.peekr.util.testPutEndpoint
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.Test
 
@@ -305,10 +308,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 성공 테스트`() = testApplication {
+    fun `사용자 수정 PUT 요청 성공 테스트`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns true
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -323,10 +326,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns true
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -341,10 +344,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns false
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -359,10 +362,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns false
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -377,7 +380,7 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
         // given
         val expectedApiException = ApiException(
             errorCode = CommonErrorCode.Unexpected,
@@ -388,7 +391,7 @@ class UserRoutesTest {
             userUseCases.update(TestMyUserId, TestUserPatchDto)
         } throws expectedApiException
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -512,20 +515,62 @@ class UserRoutesTest {
         )
     }
 
+    @Test
+    fun `로그아웃 요청 성공 테스트`() = testApplication {
+        // given
+        coEvery { userUseCases.logout(TestMyUserId.value) } just Runs
+
+        // when, then
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.LOGOUT}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+        )
+    }
+
+    @Test
+    fun `로그아웃 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        // given
+        coEvery { userUseCases.logout(TestMyUserId.value) } just Runs
+
+        // when, then
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.LOGOUT}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
     companion object {
         private val TestMyUserId = UserId(1L)
         private val TestUserId = UserId(2L)
         private val TestDisplayId = DisplayId("did")
         private const val INVALID_USER_ID = "asd"
         private val TestUserPatchDto = UserPatchDto(
-            userName = UserName("name"),
-            profileImageUrl = null,
-            introduce = Introduce(TEST_INTRODUCE),
+            userName = "name",
+            displayId = "did",
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
+            introduce = "introduce",
         )
         private val TestUserPatchRequest = UserPatchRequest(
             name = "name",
-            profileImageUrl = null,
-            introduce = TEST_INTRODUCE,
+            displayId = "did",
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
+            introduce = "introduce",
         )
         private val TestMyProfileDto = MyProfileDto(
             userId = TestMyUserId.value,

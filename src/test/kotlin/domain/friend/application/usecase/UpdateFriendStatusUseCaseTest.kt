@@ -2,7 +2,6 @@ package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.provider.UserProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
 import io.mockk.coEvery
@@ -15,13 +14,12 @@ import org.junit.jupiter.api.assertThrows
 
 class UpdateFriendStatusUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
-    private val userProvider: UserProvider = mockk()
-    private val usecase = UpdateFriendRequestStatusUseCase(friendRepository, userProvider)
+    private val usecase = UpdateFriendRequestStatusUseCase(friendRepository)
 
     @BeforeTest
     fun setUp() {
-        coEvery { userProvider.existsUser(TestUserId1) } returns true
-        coEvery { userProvider.existsUser(TestUserId2) } returns true
+        coEvery { friendRepository.existsUser(TestUserId1) } returns true
+        coEvery { friendRepository.existsUser(TestUserId2) } returns true
         coEvery {
             friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any())
         } returns true
@@ -46,7 +44,7 @@ class UpdateFriendStatusUseCaseTest {
     @Test
     fun `상태를 수정하려는 친구(사용자)가 존재하지 않는 경우 예외가 발생한다`() = runTest {
         // given
-        coEvery { userProvider.existsUser(TestUserId2) } returns false
+        coEvery { friendRepository.existsUser(TestUserId2) } returns false
 
         // when, then
         assertThrows<FriendException.UserNotFoundException> {
