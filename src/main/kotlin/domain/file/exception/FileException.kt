@@ -25,4 +25,20 @@ sealed class FileException(
             status = HttpStatusCode.BadRequest,
             cause = cause,
         )
+
+    /** S3Presigner 서명 생성 과정에서 에러 발생 */
+    class S3CredentialException(cause: Throwable) :
+        FileException(
+            code = FileErrorCode.S3CredentialFailed,
+            status = HttpStatusCode.InternalServerError,
+            cause = cause,
+        )
+
+    /** R2 파일 삭제 과정에서 에러 발생 */
+    class R2DeleteFailed(cause: Throwable) :
+        FileException(
+            code = FileErrorCode.R2DeleteFailed,
+            status = HttpStatusCode.InternalServerError,
+            cause = cause,
+        )
 }

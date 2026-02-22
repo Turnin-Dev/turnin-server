@@ -40,6 +40,7 @@ object Api {
             const val ROUTE = "/file"
             const val TAG = "File"
             const val UPLOAD = "/upload"
+            const val UPDATE = "/update"
         }
 
         object Keyword {

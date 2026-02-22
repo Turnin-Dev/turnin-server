@@ -9,7 +9,7 @@ import com.peekr.domain.discover.application.usecase.DiscoverUseCases
 import com.peekr.domain.discover.presentation.route.discoverRoutes
 import com.peekr.domain.feed.application.usecase.FeedUseCases
 import com.peekr.domain.feed.presentation.route.feedRoutes
-import com.peekr.domain.file.application.usecase.FileUseCase
+import com.peekr.domain.file.application.usecase.FileUseCases
 import com.peekr.domain.file.presentation.route.fileRoutes
 import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.route.friendRoutes
@@ -33,7 +33,7 @@ import org.koin.ktor.ext.inject
 fun Application.configureRouting() {
     val authUseCases by inject<AuthUseCases>()
     val userUseCases by inject<UserUseCases>()
-    val fileUseCase by inject<FileUseCase>()
+    val fileUseCases by inject<FileUseCases>()
     val keywordUseCases by inject<KeywordUseCases>()
     val userKeywordUseCases by inject<UserKeywordUseCases>()
     val reportUseCases by inject<ReportUseCases>()
@@ -49,7 +49,7 @@ fun Application.configureRouting() {
         route(Api.ROUTE, { description = "Peekr API" }) {
             route(Api.V1.ROUTE, { description = "Peekr API V1" }) {
                 authRoutes(route = Api.V1.Auth, usecase = authUseCases)
-                fileRoutes(route = Api.V1.File, usecase = fileUseCase)
+                fileRoutes(route = Api.V1.File, usecase = fileUseCases)
                 authenticatedRoute {
                     userRoutes(route = Api.V1.User, usecase = userUseCases)
                     keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)

@@ -5,7 +5,11 @@ import com.peekr.common.util.config.AppConfig
 import com.peekr.common.util.masking
 import java.net.URI
 import java.time.Duration
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest
@@ -43,14 +47,23 @@ class CloudflareR2Service(
     // 5분
     val signatureDuration: Duration = Duration.ofMinutes(5)
 
+    /**
+     * PutObjectRequest 생성
+     *
+     * 캐시: 1년 설정
+     */
     private fun createPutObjectRequest(fileName: String, mimeType: String): PutObjectRequest =
         PutObjectRequest
             .builder()
             .bucket(bucketName)
             .key(fileName)
             .contentType(mimeType)
+            .cacheControl("public, max-age=31536000, immutable")
             .build()
 
+    /**
+     * S3Presigner 생성
+     */
     private fun getS3Presigner(): S3Presigner =
         s3PresignerFactory.createS3Presigner(
             accessKey,
@@ -60,9 +73,24 @@ class CloudflareR2Service(
         )
 
     /**
-     * Presigned URL 요청 객체를 생성한다.
+     * S3Client 생성 (삭제를 위해)
+     */
+    private fun getS3Client(): S3Client =
+        S3Client
+            .builder()
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(accessKey, secretKey),
+                ),
+            ).region(region)
+            .endpointOverride(endpoint)
+            .build()
+
+    /**
+     * Presigned PUT URL 요청 객체를 생성한다. (업로드 / 업데이트 공용)
      *
      * @param fileName 파일 이름
+     * @param mimeType MIME 타입
      */
     fun createPresignedRequest(fileName: String, mimeType: String): PresignedPutObjectRequest {
         try {
@@ -81,6 +109,32 @@ class CloudflareR2Service(
                 e,
                 "Failed to create presigned request" +
                     "(bucket=${bucketName.masking()}, key=${fileName.masking()}, contentType=$mimeType)",
+            )
+            throw e
+        }
+    }
+
+    /**
+     * 서버에서 파일을 직접 삭제한다.
+     *
+     * @param fileName 파일명
+     */
+    fun deleteFile(fileName: String) {
+        try {
+            getS3Client().use { s3 ->
+                s3.deleteObject(
+                    DeleteObjectRequest
+                        .builder()
+                        .bucket(bucketName)
+                        .key(fileName)
+                        .build(),
+                )
+            }
+        } catch (e: Exception) {
+            LOGGER.error(
+                e,
+                "Failed to delete file " +
+                    "(bucket=${bucketName.masking()}, key=${fileName.masking()})",
             )
             throw e
         }
