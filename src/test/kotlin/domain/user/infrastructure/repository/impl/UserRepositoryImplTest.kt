@@ -19,6 +19,7 @@ import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
@@ -167,6 +168,32 @@ class UserRepositoryImplTest {
 
         // then
         assertNull(userEntity)
+    }
+
+    @Test
+    fun `update 성공 테스트`() = runTest {
+        // given
+        val user = insertUser("1")
+        val userPatch = UserPatch(
+            userName = UserName("newName"),
+            displayId = DisplayId("newDid"),
+            oldProfileImageUrl = "oldImageUrl",
+            newProfileImageUrl = "newImageUrl",
+            introduce = Introduce("newIntroduce"),
+        )
+
+        // when
+        val result = repository.update(user.id, userPatch)
+
+        // then
+        assertTrue(result)
+        val updatedUser = repository.findById(user.id)
+        assertNotNull(updatedUser)
+        assertEquals(userPatch.userName, updatedUser.userName)
+        assertEquals(userPatch.displayId, updatedUser.displayId)
+        assertEquals(userPatch.introduce, updatedUser.introduce)
+        assertEquals(userPatch.newProfileImageUrl, updatedUser.profileImageUrl)
+        assertNotEquals(userPatch.oldProfileImageUrl, updatedUser.profileImageUrl)
     }
 
     @Test

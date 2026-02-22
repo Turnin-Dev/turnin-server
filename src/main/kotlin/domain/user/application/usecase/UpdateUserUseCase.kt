@@ -32,7 +32,8 @@ class UpdateUserUseCase(
         val result = userRepository.update(userId, patch.toDomain())
 
         // 2. 프로필 사진 업데이트 유무 판별 후 파일 삭제 진행
-        if (patch.oldProfileImageUrl != null &&
+        if (result &&
+            patch.oldProfileImageUrl != null &&
             patch.newProfileImageUrl != patch.oldProfileImageUrl
         ) {
             fileProvider.deleteFile(patch.oldProfileImageUrl)
