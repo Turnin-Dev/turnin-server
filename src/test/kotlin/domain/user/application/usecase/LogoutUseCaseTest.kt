@@ -8,7 +8,6 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertNull
 
 class LogoutUseCaseTest {
