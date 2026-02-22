@@ -5,6 +5,6 @@ import com.peekr.domain.auth.application.provider.AuthProviderApi
 import com.peekr.domain.user.domain.provider.AuthProvider
 
 class AuthProviderImpl(private val authProviderApi: AuthProviderApi) : AuthProvider {
-    override suspend fun deleteRefreshToken(userId: UserId): Boolean =
+    override suspend fun deleteRefreshToken(userId: UserId) =
         authProviderApi.deleteRefreshToken(userId)
 }

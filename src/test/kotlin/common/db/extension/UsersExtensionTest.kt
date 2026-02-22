@@ -26,7 +26,7 @@ class UsersExtensionTest {
     }
 
     @Test
-    fun `existsUser 성공 테스트 - 사용자가 존재하지 않는 경우 true를 반환한다`() = runTest {
+    fun `existsUser 성공 테스트 - 사용자가 존재하는 경우 true를 반환한다`() = runTest {
         // given
         val userId = insertUserAndReturnId("a")
 

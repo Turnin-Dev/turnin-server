@@ -18,6 +18,7 @@ import com.peekr.domain.user.presentation.dto.UserPatchRequest
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
+import com.peekr.util.testPutEndpoint
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.Runs
@@ -307,10 +308,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 성공 테스트`() = testApplication {
+    fun `사용자 수정 PUT 요청 성공 테스트`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns true
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -325,10 +326,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns true
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -343,10 +344,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns false
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -361,10 +362,10 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns false
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,
@@ -379,7 +380,7 @@ class UserRoutesTest {
     }
 
     @Test
-    fun `사용자 수정 PATCH 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+    fun `사용자 수정 PUT 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
         // given
         val expectedApiException = ApiException(
             errorCode = CommonErrorCode.Unexpected,
@@ -390,7 +391,7 @@ class UserRoutesTest {
             userUseCases.update(TestMyUserId, TestUserPatchDto)
         } throws expectedApiException
 
-        testPatchEndpoint(
+        testPutEndpoint(
             endpoint = route.ROUTE,
             queryParameters = null,
             requestBody = TestUserPatchRequest,

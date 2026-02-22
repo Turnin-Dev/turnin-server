@@ -12,6 +12,6 @@ class AuthProviderApi(private val refreshTokenRepository: RefreshTokenRepository
      *
      * @param userId 사용자 ID
      */
-    suspend fun deleteRefreshToken(userId: UserId): Boolean =
+    suspend fun deleteRefreshToken(userId: UserId): Unit =
         refreshTokenRepository.delete(userId)
 }

@@ -107,8 +107,6 @@ interface FriendRepository {
     /**
      * 사용자들의 ID를 통해 사용자 정보 일부 목록을 조회한다.
      *
-     * (입력된 항목 순서를 그대로 유지해야 한다)
-     *
      * **순환 참조를 방지하기 위해 임시방편으로 Users 테이블 조회만 수행한다.**
      */
     suspend fun getUserInfos(userIds: List<UserId>): List<UserInfo>

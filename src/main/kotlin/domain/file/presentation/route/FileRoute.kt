@@ -125,10 +125,23 @@ private fun RouteConfig.updateFileDocs() {
             }
         }
 
+        code(HttpStatusCode.BadRequest) {
+            body<ErrorResponse> {
+                example("ValidationError") {
+                    value = CommonErrorCode.ValidationDefault
+                        .toErrorResponse(HttpStatusCode.BadRequest)
+                }
+                example("InvalidS3PresignerArgument") {
+                    value = com.peekr.domain.file.exception.FileErrorCode.InvalidS3PresignerArgument
+                        .toErrorResponse(HttpStatusCode.BadRequest)
+                }
+            }
+        }
+
         code(HttpStatusCode.InternalServerError) {
             body<ErrorResponse> {
-                example("R2DeleteFailed") {
-                    value = com.peekr.domain.file.exception.FileErrorCode.R2DeleteFailed
+                example("S3CredentialFailed") {
+                    value = com.peekr.domain.file.exception.FileErrorCode.S3CredentialFailed
                         .toErrorResponse(HttpStatusCode.InternalServerError)
                 }
             }

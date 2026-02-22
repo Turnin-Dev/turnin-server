@@ -17,10 +17,12 @@ import com.peekr.domain.user.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.patch
+import io.github.smiley4.ktoropenapi.put
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.put
 
 // ------------------------------ Route ------------------------------
 fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
@@ -70,7 +72,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        patch({ patchUserDocs() }) {
+        put({ updateUserDocs() }) {
             val userPatchRequest = call.receive<UserPatchRequest>()
             val userId = extractUserIdWithToken()
             verifyAuthUserId(userId)
@@ -181,7 +183,7 @@ private fun RouteConfig.getUserProfileDocs() {
     }
 }
 
-private fun RouteConfig.patchUserDocs() {
+private fun RouteConfig.updateUserDocs() {
     summary = "사용자 정보 수정"
     description = "사용자 정보를 수정한다."
     request {

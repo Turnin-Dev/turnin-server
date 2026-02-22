@@ -137,10 +137,9 @@ class RefreshTokenRepositoryImplTest {
         assertEquals(UserId(userId), foundedUserId)
 
         // when: 토큰 삭제
-        val result = refreshTokenRepository.delete(foundedUserId)
+        refreshTokenRepository.delete(foundedUserId)
 
         // then: 토큰이 없는지 검증
-        assertTrue(result)
         assertNull(refreshTokenRepository.findUserIdByRefreshToken(TEST_REFRESH_TOKEN))
     }
 

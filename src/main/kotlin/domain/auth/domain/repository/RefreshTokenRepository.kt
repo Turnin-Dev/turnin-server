@@ -27,5 +27,5 @@ interface RefreshTokenRepository {
      *
      * @param userId 사용자 ID
      */
-    suspend fun delete(userId: UserId): Boolean
+    suspend fun delete(userId: UserId)
 }

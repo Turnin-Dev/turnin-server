@@ -3,7 +3,7 @@ package com.peekr.domain.user.domain.provider
 import com.peekr.common.model.id.UserId
 
 /**
- * 외부에서 제공되는 Friend BC API 인터페이스
+ * 외부에서 제공되는 Auth BC API 인터페이스
  */
 interface AuthProvider {
     /**
@@ -11,5 +11,5 @@ interface AuthProvider {
      *
      * @param userId 사용자 ID
      */
-    suspend fun deleteRefreshToken(userId: UserId): Boolean
+    suspend fun deleteRefreshToken(userId: UserId)
 }
