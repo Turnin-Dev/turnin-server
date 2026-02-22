@@ -2,9 +2,11 @@ package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.UserName
+import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.user.application.dto.UserPatchDto
 import com.peekr.domain.user.domain.model.UserPatch
+import com.peekr.domain.user.domain.provider.FileProvider
 import com.peekr.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -14,7 +16,8 @@ import kotlinx.coroutines.test.runTest
 
 class UpdateUserUseCaseTest {
     private val userRepository = mockk<UserRepository>()
-    private val usecase = UpdateUserUseCase(userRepository)
+    private val fileProvider = mockk<FileProvider>()
+    private val usecase = UpdateUserUseCase(userRepository, fileProvider)
 
     @Test
     fun `성공 테스트`() = runTest {
@@ -33,13 +36,17 @@ class UpdateUserUseCaseTest {
     companion object {
         private val TestUserId = UserId(1L)
         private val TestUserPatchDto = UserPatchDto(
-            userName = UserName("name"),
-            profileImageUrl = null,
-            introduce = Introduce("introduce"),
+            userName = "name",
+            displayId = "did",
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
+            introduce = "introduce",
         )
         private val TestUserPatch = UserPatch(
             userName = UserName("name"),
-            profileImageUrl = null,
+            displayId = DisplayId("did"),
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
             introduce = Introduce("introduce"),
         )
     }

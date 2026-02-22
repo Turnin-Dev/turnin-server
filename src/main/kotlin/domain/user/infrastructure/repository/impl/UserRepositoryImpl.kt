@@ -77,9 +77,9 @@ class UserRepositoryImpl : UserRepository {
     ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
             row[name] = patch.userName.value
-            row[profileImageUrl] = patch.profileImageUrl
-            patch.introduce.let { row[introduce] = it.value }
-            patch.profileImageUrl?.let { row[profileImageUrl] = it }
+            row[displayId] = patch.displayId.value
+            row[profileImageUrl] = patch.newProfileImageUrl
+            row[introduce] = patch.introduce.value
         } > 0
     }
 

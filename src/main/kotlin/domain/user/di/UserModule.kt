@@ -9,9 +9,11 @@ import com.peekr.domain.user.application.usecase.UpdateIntroduceUseCase
 import com.peekr.domain.user.application.usecase.UpdateUserUseCase
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.domain.provider.AuthProvider
+import com.peekr.domain.user.domain.provider.FileProvider
 import com.peekr.domain.user.domain.provider.FriendProvider
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.provider.AuthProviderImpl
+import com.peekr.domain.user.infrastructure.provider.FileProviderImpl
 import com.peekr.domain.user.infrastructure.provider.FriendProviderImpl
 import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
 import org.koin.dsl.module
@@ -23,6 +25,7 @@ val userModule = module {
     single { UserProviderApi(get()) }
     single<FriendProvider> { FriendProviderImpl(get()) }
     single<AuthProvider> { AuthProviderImpl(get()) }
+    single<FileProvider> { FileProviderImpl(get()) }
 
     // Repository
     single<UserRepository> { UserRepositoryImpl() }
@@ -30,7 +33,7 @@ val userModule = module {
     // UseCase
     factory { GetUserUseCase(get()) }
     factory { GetMyProfileUseCase(get(), get()) }
-    factory { UpdateUserUseCase(get()) }
+    factory { UpdateUserUseCase(get(), get()) }
     factory { UpdateIntroduceUseCase(get()) }
     factory { GetUserProfileUseCase(get(), get()) }
     factory { LogoutUseCase(get()) }

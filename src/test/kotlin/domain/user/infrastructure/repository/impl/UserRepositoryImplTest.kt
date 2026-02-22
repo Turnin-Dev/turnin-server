@@ -233,7 +233,9 @@ class UserRepositoryImplTest {
     companion object {
         private val TestUserPatch = UserPatch(
             userName = UserName("name"),
-            profileImageUrl = null,
+            displayId = DisplayId("did"),
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
             introduce = Introduce("introduce"),
         )
         private val TestIntroduce = Introduce("introduce")

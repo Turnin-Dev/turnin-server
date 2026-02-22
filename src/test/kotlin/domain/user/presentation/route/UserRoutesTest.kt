@@ -15,6 +15,7 @@ import com.peekr.domain.user.application.dto.UserProfileDto
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
+import com.peekr.domain.user.presentation.route.UserRoutesTest.Companion.TestUserPatchDto
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
@@ -558,14 +559,18 @@ class UserRoutesTest {
         private val TestDisplayId = DisplayId("did")
         private const val INVALID_USER_ID = "asd"
         private val TestUserPatchDto = UserPatchDto(
-            userName = UserName("name"),
-            profileImageUrl = null,
-            introduce = Introduce(TEST_INTRODUCE),
+            userName = "name",
+            displayId = "did",
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
+            introduce = "introduce",
         )
         private val TestUserPatchRequest = UserPatchRequest(
             name = "name",
-            profileImageUrl = null,
-            introduce = TEST_INTRODUCE,
+            displayId = "did",
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
+            introduce = "introduce",
         )
         private val TestMyProfileDto = MyProfileDto(
             userId = TestMyUserId.value,
