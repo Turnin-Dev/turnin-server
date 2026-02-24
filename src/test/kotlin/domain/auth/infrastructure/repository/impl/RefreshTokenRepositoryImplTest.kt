@@ -68,6 +68,37 @@ class RefreshTokenRepositoryImplTest {
     }
 
     @Test
+    fun `findUserIdByRefreshToken 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 사용자 생성 후 비활성화
+        val expectedUserId = TestDatabaseFactory.dbQuery {
+            val savedUserEntity = UserEntity.new {
+                this.role = TestAuthUser.role
+                this.provider = TestAuthUser.provider
+                this.providerId = TestAuthUser.providerId
+                this.displayId = TestAuthUser.displayId.value
+                this.name = TestAuthUser.userName.value
+                this.profileImageUrl = TestAuthUser.profileImageUrl
+                this.introduce = TestAuthUser.introduce.value
+                this.lastLoginAt = Instant.now()
+            }
+
+            RefreshTokens.upsert {
+                it[user] = savedUserEntity.id
+                it[refreshToken] = TEST_REFRESH_TOKEN
+            }
+
+            savedUserEntity.id.value
+        }
+        setUserInactive(UserId(expectedUserId))
+
+        // when: 비활성화 사용자 토큰 조회
+        val userId = refreshTokenRepository.findUserIdByRefreshToken(TEST_REFRESH_TOKEN)
+
+        // then: 조회되지 않는다.
+        assertNull(userId)
+    }
+
+    @Test
     fun `findUserIdByRefreshToken 실패 테스트 - 유효하지 않은 토큰으로 조회했을 경우`() = runTest {
         // when
         val userId = refreshTokenRepository.findUserIdByRefreshToken(TEST_REFRESH_TOKEN)
@@ -157,5 +188,11 @@ class RefreshTokenRepositoryImplTest {
             isActive = true,
             lastLoginAt = Instant.ofEpochMilli(1697875200000L),
         )
+
+        private suspend fun setUserInactive(userId: UserId) = TestDatabaseFactory.dbQuery {
+            UserEntity.findByIdAndUpdate(userId.value) {
+                it.isActive = false
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@ import com.peekr.common.model.id.UserId
 
 interface RefreshTokenRepository {
     /**
-     * 리프레쉬 토큰으로 사용자 ID를 찾는다.
+     * 리프레쉬 토큰으로 사용자 ID를 찾는다. (비활성화 사용자 제외)
      *
      * @param token 리프레쉬 토큰
      */

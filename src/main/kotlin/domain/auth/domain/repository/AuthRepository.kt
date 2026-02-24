@@ -8,7 +8,7 @@ import com.peekr.domain.auth.domain.model.Register
 
 interface AuthRepository {
     /**
-     * Provider(소셜로그인 플랫폼)와 Provider(소셜로그인 ID)로 [AuthUser]를 찾는다.
+     * Provider(소셜로그인 플랫폼)와 Provider(소셜로그인 ID)로 [AuthUser]를 찾는다. (비활성화 사용자 제외)
      *
      * @param provider 소셜로그인 플랫폼
      * @param providerId 소셜로그인 ID
@@ -21,7 +21,7 @@ interface AuthRepository {
     ): AuthUser?
 
     /**
-     * 사용자 ID를 통해 사용자를 조회한다.
+     * 사용자 ID를 통해 사용자를 조회한다. (비활성화 사용자 제외)
      *
      * @param userId 사용자 ID
      *

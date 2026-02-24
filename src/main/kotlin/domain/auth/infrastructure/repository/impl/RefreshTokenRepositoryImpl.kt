@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
+import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
@@ -23,6 +24,7 @@ class RefreshTokenRepositoryImpl : RefreshTokenRepository {
             .join(Users, JoinType.INNER, RefreshTokens.user, Users.id)
             .select(Users.id)
             .where { RefreshTokens.refreshToken eq token }
+            .filterActiveUser()
             .singleOrNull()
 
         result?.get(Users.id)?.let {
