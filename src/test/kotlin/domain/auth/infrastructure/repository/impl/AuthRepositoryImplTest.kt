@@ -1,7 +1,6 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseException
-import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserName
@@ -10,6 +9,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import junit.framework.TestCase.assertFalse
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -53,7 +53,7 @@ class AuthRepositoryImplTest {
         // given: 사용자 생성 후 비활성화
         val savedUser = repository.save(TestRegister)
         assertTrue(savedUser.userId.value > 0L)
-        setUserInactive(savedUser.userId)
+        setUserInactiveForTest(savedUser.userId)
 
         // when: 비활성화 사용자 조회
         val foundUser = repository.findAuthUserByProviderAndProviderId(
@@ -107,7 +107,7 @@ class AuthRepositoryImplTest {
         // given: 사용자 생성 후 비활성화
         val savedUser = repository.save(TestRegister)
         assertTrue(savedUser.userId.value > 0L)
-        setUserInactive(savedUser.userId)
+        setUserInactiveForTest(savedUser.userId)
 
         // when: 비활성화 사용자 조회
         val foundUser = repository.findUserByUserId(savedUser.userId)
@@ -177,7 +177,7 @@ class AuthRepositoryImplTest {
         // given: 사용자 생성 후 비활성화
         val savedUser = repository.save(TestRegister)
         val displayId = savedUser.displayId
-        setUserInactive(savedUser.userId)
+        setUserInactiveForTest(savedUser.userId)
 
         // when: 비활성화 사용자 조회
         val result = repository.existsByDisplayId(displayId)
@@ -204,11 +204,5 @@ class AuthRepositoryImplTest {
             profileImageUrl = "http://example.com/profile.jpg",
             introduce = Introduce("Hello!"),
         )
-
-        private suspend fun setUserInactive(userId: UserId) = TestDatabaseFactory.dbQuery {
-            UserEntity.findByIdAndUpdate(userId.value) {
-                it.isActive = false
-            }
-        }
     }
 }

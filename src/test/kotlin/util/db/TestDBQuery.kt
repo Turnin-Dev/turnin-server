@@ -8,7 +8,7 @@ import com.peekr.common.model.id.UserId
  *
  * @param userId 사용자 ID
  */
-suspend fun setUserInactive(userId: UserId) = TestDatabaseFactory.dbQuery {
+suspend fun setUserInactiveForTest(userId: UserId) = TestDatabaseFactory.dbQuery {
     UserEntity.findByIdAndUpdate(userId.value) {
         it.isActive = false
     }

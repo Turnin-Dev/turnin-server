@@ -12,7 +12,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.infrastructure.mapper.BlockMapper.toDomain
 import com.peekr.util.db.TestDatabaseFactory
-import com.peekr.util.db.setUserInactive
+import com.peekr.util.db.setUserInactiveForTest
 import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -154,7 +154,7 @@ class BlockRepositoryImplTest {
         }
 
         // 차단한 사용자 비활성화
-        setUserInactive(blockedUsers.first())
+        setUserInactiveForTest(blockedUsers.first())
 
         // when: 차단한 사용자 목록 조회
         val blockedList = repository.getBlockedUsersById(

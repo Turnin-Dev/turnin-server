@@ -11,6 +11,7 @@ import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -89,7 +90,7 @@ class RefreshTokenRepositoryImplTest {
 
             savedUserEntity.id.value
         }
-        setUserInactive(UserId(expectedUserId))
+        setUserInactiveForTest(UserId(expectedUserId))
 
         // when: 비활성화 사용자 토큰 조회
         val userId = refreshTokenRepository.findUserIdByRefreshToken(TEST_REFRESH_TOKEN)
@@ -188,11 +189,5 @@ class RefreshTokenRepositoryImplTest {
             isActive = true,
             lastLoginAt = Instant.ofEpochMilli(1697875200000L),
         )
-
-        private suspend fun setUserInactive(userId: UserId) = TestDatabaseFactory.dbQuery {
-            UserEntity.findByIdAndUpdate(userId.value) {
-                it.isActive = false
-            }
-        }
     }
 }
