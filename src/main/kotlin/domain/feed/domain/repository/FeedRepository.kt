@@ -9,7 +9,7 @@ import com.peekr.domain.feed.domain.model.Feed
  */
 interface FeedRepository {
     /**
-     * # 사용자 맞춤 추천 피드 조회
+     * # 사용자 맞춤 추천 피드 조회 (비활성화 사용자의 키워드 제외)
      *
      * ## 추천 알고리즘:
      * - 사용자의 최근 관심 키워드 5개를 추출

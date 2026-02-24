@@ -6,6 +6,8 @@ import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.UserKeywordEntity
+import com.peekr.common.db.schema.UserKeywords
+import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
@@ -19,6 +21,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.update
 import org.junit.Rule
 import org.junit.Test
 
@@ -177,6 +180,65 @@ class FeedRepositoryImplTest {
 
         // then
         assertTrue(emptyPage.isEmpty(), "데이터가 없어야 하는데 결과가 존재합니다.")
+    }
+
+    @Test
+    fun `비활성화된 사용자와 사용자 키워드는 조회되지 않는다`() = runTest {
+        // ------------------------------ given: 데이터 준비 ------------------------------
+        // 사용자 생성
+        val me = createUser("me")
+        val friend = createUser("friend")
+        val stranger = createUser("stranger")
+        val blocked = createUser("blocked")
+        val inactiveUser = createUser("inactiveUser") // 비활성화 사용자 추가
+        // 벡터 생성
+        val baseVector = TestVectorFixture.unitVector(1.0f)
+        val similarVector = TestVectorFixture.unitVector(0.9f)
+        // 키워드 생성
+        val myKeyword = createKeyword("myKeyword", baseVector.toPgVectorString(), me)
+        val similarKeyword = createKeyword("similarKeyword", similarVector.toPgVectorString(), me)
+        // 사용자 키워드 생성
+        createUserKeyword(me, myKeyword, "내 취향 글")
+        createUserKeyword(friend, similarKeyword, "친구의 유사한 글")
+        createUserKeyword(stranger, similarKeyword, "남의 유사한 글")
+        createUserKeyword(blocked, similarKeyword, "차단된 사용자의 글")
+        createUserKeyword(inactiveUser, similarKeyword, "비활성화 사용자의 글") // 비활성화 사용자 키워드 추가
+        // 친구 관계 생성
+        createFriends(
+            requesterId = me.id,
+            receiverId = friend.id,
+            status = FriendRequestStatus.ACCEPTED,
+        )
+        // 차단 관계 생성
+        createBlocks(
+            blockerId = me.id,
+            blockedId = blocked.id,
+            reasonId = EntityID(1L, BlockReasons),
+        )
+        // 비활성화 처리 (계정 삭제 시나리오: user -> user_keyword 순으로 비활성화)
+        TestDatabaseFactory.dbQuery {
+            Users.update({ Users.id eq inactiveUser.id }) { it[Users.isActive] = false }
+            UserKeywords.update({ UserKeywords.userId eq inactiveUser.id }) { it[UserKeywords.isActive] = false }
+        }
+
+        // ------------------------------ when: 피드 조회 ------------------------------
+        val myUserId = UserId(me.id.value)
+        val feeds = repository.getFeeds(
+            userId = myUserId,
+            cursorScore = null,
+            cursorCreatedAt = null,
+            cursorUkId = null,
+            limit = 10,
+        )
+
+        // ------------------------------ then ------------------------------
+        // 비활성화 사용자 글 제외 검증
+        assertTrue(UserId(inactiveUser.id.value) !in feeds.map { it.userId })
+        // 내 글, 차단된 사용자 글 제외 검증
+        assertTrue(myUserId !in feeds.map { it.userId })
+        assertTrue(UserId(blocked.id.value) !in feeds.map { it.userId })
+        // 피드 개수 검증 (friend 1건 + stranger 1건)
+        assertEquals(2, feeds.size)
     }
 
     // ------------------------------ Helper Functions ------------------------------

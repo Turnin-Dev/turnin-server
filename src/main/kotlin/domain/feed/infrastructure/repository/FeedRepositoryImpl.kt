@@ -76,7 +76,7 @@ class FeedRepositoryImpl : FeedRepository {
             select uk.keyword_id, k.embedding as seed_embedding
             from user_keyword uk
             join keyword k on uk.keyword_id = k.id
-            where uk.user_id = ?
+            where uk.user_id = ? and uk.is_active = true
             order by uk.created_at desc
             LIMIT 5
         ),
@@ -93,7 +93,7 @@ class FeedRepositoryImpl : FeedRepository {
                     (1 - (k.embedding <=> mtk.seed_embedding)) as similarity
                 FROM keyword k
                 JOIN user_keyword uk ON k.id = uk.keyword_id
-                WHERE uk.user_id != ?
+                WHERE uk.user_id != ? and uk.is_active = true
                 ORDER BY k.embedding <=> mtk.seed_embedding
                 LIMIT 20
             ) r

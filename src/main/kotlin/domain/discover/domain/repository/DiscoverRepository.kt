@@ -8,7 +8,7 @@ import com.peekr.domain.discover.domain.model.SharedUserKeyword
  */
 interface DiscoverRepository {
     /**
-     * 유사한 키워드를 공유하고 있는 사용자 ID 목록을 페이지네이션을 통해 조회한다. (비활성화 사용자 키워드 제외)
+     * 유사한 키워드를 공유하고 있는 사용자 ID 목록을 페이지네이션을 통해 조회한다. (비활성화 사용자의 키워드 제외)
      *
      * 초기 호출 시 커서 값은 `null`이다.
      *
@@ -26,7 +26,7 @@ interface DiscoverRepository {
 
     /**
      * 사용자 ID 리스트를 통해 (나와 유사한 키워드를 공유하고 있는) 사용자 키워드 상세정보를 조회한다.
-     * (비활성화 사용자, 비활성화 사용자 키워드 제외)
+     * (비활성화 사용자의 키워드 제외)
      *
      * @param matchedUserIds (나와 유사한 키워드를 공유하고 있는) 사용자 ID 리스트
      */
