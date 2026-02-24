@@ -1,6 +1,7 @@
 package com.peekr.domain.friend.infrastructure.repository
 
 import com.peekr.common.db.extension.existsUser
+import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.extension.isBlockedRelationship
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.FriendEntity
@@ -173,6 +174,7 @@ class FriendRepositoryImpl : FriendRepository {
                 Users.name,
                 Users.profileImageUrl,
             ).where { Users.id inList userIds.map { it.value } }
+            .filterActiveUser()
             .map {
                 UserInfo(
                     userId = UserId(it[Users.id].value),

@@ -15,6 +15,7 @@ fun Users.existsUser(userId: UserId): Boolean =
     this
         .select(intLiteral(1))
         .where { Users.id eq userId.value }
+        .filterActiveUser()
         .limit(1)
         .any()
 
