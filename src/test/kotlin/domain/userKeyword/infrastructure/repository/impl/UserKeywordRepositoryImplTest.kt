@@ -368,6 +368,12 @@ class UserKeywordRepositoryImplTest {
         // given: 비활성화 사용자 생성
         val currentUserId = insertUserAndReturnId("1")
         val userId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
         setUserInactiveForTest(userId)
 
         // when
