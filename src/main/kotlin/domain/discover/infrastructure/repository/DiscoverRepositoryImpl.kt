@@ -1,5 +1,7 @@
 package com.peekr.domain.discover.infrastructure.repository
 
+import com.peekr.common.db.extension.filterActiveUser
+import com.peekr.common.db.extension.filterActiveUserKeyword
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
@@ -35,7 +37,9 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             JOIN keyword k_other ON (1 - (k_other.embedding <=> k_mine.embedding)) >= ?
             JOIN user_keyword uk_other ON k_other.id = uk_other.keyword_id
             WHERE uk_mine.user_id = ?
+                AND uk_mine.is_active = true
                 AND uk_other.user_id != ?
+                AND uk_other.is_active = true
                 AND NOT EXISTS (
                     SELECT 1
                     FROM block
@@ -93,6 +97,8 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 Keywords.id,
                 Keywords.keyword,
             ).where { Users.id inList matchedUserIdsValue }
+            .filterActiveUser()
+            .filterActiveUserKeyword()
             .orderBy(Users.id to SortOrder.DESC)
             .map { row ->
                 SharedUserKeyword(
