@@ -8,14 +8,14 @@ import com.peekr.domain.user.domain.model.UserPatch
 
 interface UserRepository {
     /**
-     * 사용자 존재 여부 확인
+     * 사용자 존재 여부 확인 (비활성화 사용자 제외)
      *
      * @param id 사용자 ID
      */
     suspend fun existsUser(id: UserId): Boolean
 
     /**
-     * ID를 통해 사용자를 조회한다.
+     * ID를 통해 사용자를 조회한다. (비활성화 사용자 제외)
      *
      * @param id 조회할 사용자 ID
      *
@@ -24,7 +24,7 @@ interface UserRepository {
     suspend fun findById(id: UserId): User?
 
     /**
-     * ID를 통해 사용자를 조회한다. (차단된 사용자는 제외한다.)
+     * ID를 통해 사용자를 조회한다. (차단된 사용자, 비활성화 사용자 제외)
      *
      * 1. 내가 차단한 사용자를 조회 시: isBlocked가 true인 채로 반환
      * 2. 내가 차단 당한 사용자를 조회 시: `null` 반환
@@ -41,7 +41,7 @@ interface UserRepository {
     ): User?
 
     /**
-     * ID 목록을 통해 사용자 목록을 조회한다.
+     * ID 목록을 통해 사용자 목록을 조회한다. (비활성화 사용자 제외)
      *
      * @param ids 사용자 ID 목록
      *
@@ -50,7 +50,7 @@ interface UserRepository {
     suspend fun findByIds(ids: List<UserId>): List<User>
 
     /**
-     * 사용자 표시 ID를 통해 사용자를 조회한다.
+     * 사용자 표시 ID를 통해 사용자를 조회한다. (비활성화 사용자 제외)
      *
      * @param id 사용자 표시 ID
      *

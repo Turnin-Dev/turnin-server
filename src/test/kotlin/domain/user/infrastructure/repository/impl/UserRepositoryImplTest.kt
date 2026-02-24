@@ -15,6 +15,7 @@ import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.assertEquals
@@ -55,6 +56,19 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    fun `findById 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 생성
+        val user = insertUser("1")
+        setUserInactiveForTest(user.id)
+
+        // when
+        val userResult = repository.findById(user.id)
+
+        // then: 사용자가 조회되지 않는다.
+        assertNull(userResult)
+    }
+
+    @Test
     fun `findVisibleById 성공 테스트`() = runTest {
         // given
         val currentUser = insertUser("current")
@@ -68,6 +82,22 @@ class UserRepositoryImplTest {
         // then
         assertNotNull(userResult)
         assertEquals(userId, userResult.id)
+    }
+
+    @Test
+    fun `findVisibleById 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 생성
+        val currentUser = insertUser("current")
+        val user = insertUser("1")
+        val currentId = UserId(currentUser.id.value)
+        val userId = UserId(user.id.value)
+        setUserInactiveForTest(userId)
+
+        // when
+        val userResult = repository.findVisibleById(currentId, userId)
+
+        // then: 사용자가 조회되지 않는다.
+        assertNull(userResult)
     }
 
     @Test
@@ -148,6 +178,19 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    fun `findByIds 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 1명의 테스트 사용자를 생성, 사용자 비활성화
+        val user = insertUser("1")
+        setUserInactiveForTest(user.id)
+
+        // when
+        val users = repository.findByIds(listOf(user.id))
+
+        // then: 사용자가 조회되지 않는다.
+        assertEquals(0, users.size)
+    }
+
+    @Test
     fun `findByDisplayId 성공 테스트`() = runTest {
         // given
         val savedUser = insertUser("1")
@@ -159,6 +202,20 @@ class UserRepositoryImplTest {
         // then
         assertNotNull(user)
         assertEquals(displayId, user.displayId)
+    }
+
+    @Test
+    fun `findByDisplayId 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 생성
+        val savedUser = insertUser("1")
+        val displayId = savedUser.displayId
+        setUserInactiveForTest(savedUser.id)
+
+        // when
+        val user = repository.findByDisplayId(displayId)
+
+        // then: 사용자가 조회되지 않는다.
+        assertNull(user)
     }
 
     @Test

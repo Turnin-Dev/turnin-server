@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.intLiteral
 
 /**
- * 사용자 존재 여부 확인
+ * 사용자 존재 여부 확인 (비활성화 사용자 제외)
  *
  * @param userId 사용자 ID
  */
