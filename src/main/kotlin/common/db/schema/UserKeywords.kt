@@ -11,6 +11,7 @@ object UserKeywords : BaseLongIdTable("user_keyword") {
     val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
     val keywordId = reference("keyword_id", Keywords, onDelete = ReferenceOption.CASCADE)
     val description = text("description").nullable()
+    val isActive = bool("is_active").default(true)
 
     init {
         uniqueIndex("uq_userkeyword_user_keyword", userId, keywordId)
@@ -25,6 +26,7 @@ class UserKeywordEntity(id: EntityID<Long>) : BaseEntity(id, UserKeywords) {
     var userId by UserKeywords.userId
     var keywordId by UserKeywords.keywordId
     var description by UserKeywords.description
+    var isActive by UserKeywords.isActive
 
     val keywordEntity by KeywordEntity referencedOn UserKeywords.keywordId
 }
