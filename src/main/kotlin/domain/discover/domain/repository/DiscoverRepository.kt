@@ -26,6 +26,7 @@ interface DiscoverRepository {
 
     /**
      * 사용자 ID 리스트를 통해 (나와 유사한 키워드를 공유하고 있는) 사용자 키워드 상세정보를 조회한다.
+     * (비활성화 사용자, 비활성화 사용자 키워드 제외)
      *
      * @param matchedUserIds (나와 유사한 키워드를 공유하고 있는) 사용자 ID 리스트
      */
