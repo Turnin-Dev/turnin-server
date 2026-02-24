@@ -34,7 +34,7 @@ interface UserKeywordRepository {
     suspend fun findByKeywordIdAndUserId(keywordId: KeywordId, userId: UserId): UserKeyword?
 
     /**
-     * 사용자 키워드 ID로 사용자 키워드 상세 정보를 조회한다. (차단된 사용자는 제외된다.)
+     * 사용자 키워드 ID로 사용자 키워드 상세 정보를 조회한다. (차단된 사용자, 비활성화 사용자 제외)
      *
      * @param currentUserId 현재 조회 요청한 사용자 ID
      * @param userKeywordId 사용자 키워드 ID
@@ -47,7 +47,7 @@ interface UserKeywordRepository {
     ): UserKeywordDetail?
 
     /**
-     * 사용자 ID로 사용자의 키워드 상세 정보 리스트를 조회한다. (차단된 사용자는 제외된다.)
+     * 사용자 ID로 사용자의 키워드 상세 정보 리스트를 조회한다. (차단된 사용자, 비활성화 사용자 제외)
      *
      * @param currentUserId 현재 조회 요청한 사용자 ID
      * @param userId 사용자 ID
