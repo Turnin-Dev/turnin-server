@@ -12,6 +12,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.infrastructure.mapper.BlockMapper.toDomain
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactive
 import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -129,6 +130,41 @@ class BlockRepositoryImplTest {
         // 중복 확인: 모든 차단 ID가 고유한지
         val uniqueBlockIds = allBlocks.map { it.id.value }.toSet()
         assertEquals(15, uniqueBlockIds.size)
+    }
+
+    @Test
+    fun `차단 목록 조회 페이지네이션 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 차단하는 사용자 1명, 차단당하는 사용자 1명 생성, 차단 당한 사용자 비활성화
+        val blocker = insertUserAndReturnId("blocker")
+        val blockedUsers = batchInsertUserAndReturnIds(startId = 2, endId = 2)
+
+        val blockReasons = repository.getBlockReasons()
+        val firstReasonId = blockReasons.first().id
+
+        // 차단 데이터 생성
+        blockedUsers.forEach { blockedUser ->
+            repository.createBlock(
+                BlockDetail(
+                    blockerId = blocker,
+                    blockedId = blockedUser,
+                    reasonId = firstReasonId,
+                    customReason = "test reason",
+                ),
+            )
+        }
+
+        // 차단한 사용자 비활성화
+        setUserInactive(blockedUsers.first())
+
+        // when: 차단한 사용자 목록 조회
+        val blockedList = repository.getBlockedUsersById(
+            userId = blocker,
+            cursor = null,
+            size = 10,
+        )
+
+        // then: 차단한 사용자가 비활성화되었으니 아무도 조회되지 않는다.
+        assertEquals(0, blockedList.size)
     }
 
     @Test
