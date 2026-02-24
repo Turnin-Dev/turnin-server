@@ -16,7 +16,7 @@ import com.peekr.common.model.id.UserId
 data class ExternalKeyword(
     val id: KeywordId,
     val name: KeywordName,
-    val createdBy: UserId,
+    val createdBy: UserId?,
     val createdAt: Long,
     val updatedAt: Long,
 )

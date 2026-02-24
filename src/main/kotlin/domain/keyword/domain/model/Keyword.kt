@@ -17,7 +17,7 @@ data class Keyword(
     val id: KeywordId,
     val name: KeywordName,
     val embedding: String,
-    val createdBy: UserId,
+    val createdBy: UserId?,
     val createdAt: Long,
     val updatedAt: Long,
 )

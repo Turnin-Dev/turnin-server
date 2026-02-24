@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 data class KeywordResponse(
     val id: Long,
     val keyword: String,
-    val createdBy: Long,
+    val createdBy: Long?,
     val createdAt: Long,
     val updatedAt: Long,
 ) {
@@ -34,7 +34,7 @@ data class KeywordResponse(
 fun KeywordDto.toResponse(): KeywordResponse = KeywordResponse(
     id = id.value,
     keyword = name,
-    createdBy = createdBy.value,
+    createdBy = createdBy?.value,
     createdAt = createdAt,
     updatedAt = updatedAt,
 )
