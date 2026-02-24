@@ -8,7 +8,7 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertNull
 
 class LogoutUseCaseTest {
     private val authProvider: AuthProvider = mockk()
@@ -19,10 +19,13 @@ class LogoutUseCaseTest {
         // given
         coEvery { authProvider.deleteRefreshToken(TestUserId) } just Runs
 
-        // when, then
-        assertDoesNotThrow {
+        // when
+        val exception = runCatching {
             usecase(TestUserId.value)
-        }
+        }.exceptionOrNull()
+
+        // then
+        assertNull(exception)
     }
 
     companion object {

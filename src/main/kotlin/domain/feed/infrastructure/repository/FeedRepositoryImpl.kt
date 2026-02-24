@@ -125,7 +125,7 @@ class FeedRepositoryImpl : FeedRepository {
                 WHERE (block.blocker_id = ? AND block.blocked_id = cp.uk_user_id)
                     or (block.blocked_id = ? AND block.blocker_id = cp.uk_user_id)
             )
-            order by cp.uk_id, (cp.similarity * 50) desc
+            order by cp.uk_id, final_score desc
         ),
         result_list as (
         	SELECT *

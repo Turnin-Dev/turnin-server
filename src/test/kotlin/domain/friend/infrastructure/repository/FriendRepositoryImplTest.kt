@@ -8,6 +8,7 @@ import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import com.peekr.util.testPagination
 import java.time.Instant
 import kotlin.collections.isNotEmpty
@@ -319,6 +320,19 @@ class FriendRepositoryImplTest {
         assertTrue(users.isNotEmpty())
         assertEquals(userTotalCount, users.size)
         assertEquals(savedUserId, users.map { it.userId })
+    }
+
+    @Test
+    fun `getUserInfos 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 1명의 테스트 사용자를 생성, 해당 사용자 비활성화
+        val userId = insertUserAndReturnId("1")
+        setUserInactiveForTest(userId)
+
+        // when: 비활성화 사용자 조회
+        val users = repository.getUserInfos(listOf(userId))
+
+        // then: 사용자가 조회되지 않는다.
+        assertEquals(0, users.size)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

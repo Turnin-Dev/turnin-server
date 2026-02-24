@@ -14,6 +14,7 @@ import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -300,6 +301,26 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
+    fun `getDetailById 성공 테스트 - 비활성화 사용자의 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 생성
+        val currentUserId = insertUserAndReturnId("1")
+        val userId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserInactiveForTest(userId)
+
+        // when
+        val userKeywordDetail = repository.getDetailById(currentUserId, userKeyword.id)
+
+        // then: 키워드 상세정보가 조회되지 않는다.
+        assertNull(userKeywordDetail)
+    }
+
+    @Test
     fun `getDetailById 성공 테스트 - 차단된 사용자끼리는 서로 조회되지 않는다(null 반환)`() = runTest {
         // given: 사용자 2명을 생성하여 차단 관계를 만든다, 각 사용자의 키워드를 생성한다.
         val user1 = insertUserAndReturnId("1")
@@ -340,6 +361,26 @@ class UserKeywordRepositoryImplTest {
         assertEquals(1, userKeywordDetails.size)
         assertEquals(userKeyword.id, userKeywordDetails.first().userKeywordId)
         assertEquals(userKeyword.keywordId, userKeywordDetails.first().keywordId)
+    }
+
+    @Test
+    fun `getDetailsByUserId 성공 테스트 - 비활성화 사용자의 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 생성
+        val currentUserId = insertUserAndReturnId("1")
+        val userId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserInactiveForTest(userId)
+
+        // when
+        val userKeywordDetails = repository.getDetailsByUserId(currentUserId, userId)
+
+        // then: 키워드 상세정보가 조회되지 않는다.
+        assertEquals(0, userKeywordDetails.size)
     }
 
     @Test

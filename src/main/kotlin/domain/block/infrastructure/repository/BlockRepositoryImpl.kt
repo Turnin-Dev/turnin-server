@@ -1,5 +1,6 @@
 package com.peekr.domain.block.infrastructure.repository
 
+import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.extension.isBlockedRelationship
 import com.peekr.common.db.schema.BlockEntity
 import com.peekr.common.db.schema.BlockReasons
@@ -79,6 +80,7 @@ class BlockRepositoryImpl : BlockRepository {
                 Users.name,
                 Users.profileImageUrl,
             ).where(condition)
+            .filterActiveUser()
             .orderBy(Blocks.id to SortOrder.DESC)
             .limit(count = size + 1)
             .map { it.toBlockUser() }

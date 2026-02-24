@@ -1,6 +1,7 @@
 package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseUtils.isNotBlockedRelationship
+import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
@@ -90,7 +91,8 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             ).where {
                 (UserKeywords.id eq userKeywordId.value) and
                     isNotBlockedRelationship(myUserId = currentUserId.value, Users.id)
-            }.map { it.toDetail() }
+            }.filterActiveUser()
+            .map { it.toDetail() }
             .singleOrNull()
     }
 
@@ -123,7 +125,8 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             ).where {
                 (UserKeywords.userId eq userId.value) and
                     isNotBlockedRelationship(myUserId = currentUserId.value, Users.id)
-            }.map { it.toDetail() }
+            }.filterActiveUser()
+            .map { it.toDetail() }
     }
 
     override suspend fun findDescriptionById(

@@ -11,6 +11,7 @@ import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -65,6 +66,37 @@ class RefreshTokenRepositoryImplTest {
         // then
         assertNotNull(userId)
         assertEquals(UserId(expectedUserId), userId)
+    }
+
+    @Test
+    fun `findUserIdByRefreshToken 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 사용자 생성 후 비활성화
+        val expectedUserId = TestDatabaseFactory.dbQuery {
+            val savedUserEntity = UserEntity.new {
+                this.role = TestAuthUser.role
+                this.provider = TestAuthUser.provider
+                this.providerId = TestAuthUser.providerId
+                this.displayId = TestAuthUser.displayId.value
+                this.name = TestAuthUser.userName.value
+                this.profileImageUrl = TestAuthUser.profileImageUrl
+                this.introduce = TestAuthUser.introduce.value
+                this.lastLoginAt = Instant.now()
+            }
+
+            RefreshTokens.upsert {
+                it[user] = savedUserEntity.id
+                it[refreshToken] = TEST_REFRESH_TOKEN
+            }
+
+            savedUserEntity.id.value
+        }
+        setUserInactiveForTest(UserId(expectedUserId))
+
+        // when: 비활성화 사용자 토큰 조회
+        val userId = refreshTokenRepository.findUserIdByRefreshToken(TEST_REFRESH_TOKEN)
+
+        // then: 조회되지 않는다.
+        assertNull(userId)
     }
 
     @Test

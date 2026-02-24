@@ -1,6 +1,7 @@
 package com.peekr.domain.auth.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseUtils.eqEnum
+import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
@@ -18,24 +19,37 @@ import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.selectAll
 
 class AuthRepositoryImpl : AuthRepository {
     override suspend fun findAuthUserByProviderAndProviderId(
         provider: SocialLoginProvider,
         providerId: String,
     ): AuthUser? = suspendTransaction {
-        UserEntity
-            .find(
-                (Users.provider eqEnum provider) and (Users.providerId eq providerId),
-            ).map {
-                AuthMapper.toDomain(it.readValues)
-            }.singleOrNull()
+        Users
+            .selectAll()
+            .where {
+                (Users.provider eqEnum provider) and (Users.providerId eq providerId)
+            }.filterActiveUser()
+            .map { AuthMapper.toDomain(it) }
+            .singleOrNull()
     }
 
     override suspend fun findUserByUserId(userId: UserId): AuthUser? = suspendTransaction {
-        UserEntity.findById(userId.value)?.let {
-            AuthMapper.toDomain(it.readValues)
-        }
+        Users
+            .selectAll()
+            .where { Users.id eq userId.value }
+            .filterActiveUser()
+            .map { AuthMapper.toDomain(it) }
+            .singleOrNull()
+    }
+
+    override suspend fun existsByDisplayId(displayId: DisplayId): Boolean = suspendTransaction {
+        UserEntity
+            .find((Users.displayId eq displayId.value))
+            .limit(1)
+            .empty()
+            .not()
     }
 
     override suspend fun save(register: Register): AuthUser = suspendTransaction {
@@ -67,14 +81,6 @@ class AuthRepositoryImpl : AuthRepository {
         UserEntity.findByIdAndUpdate(userId.value) {
             it.lastLoginAt = PeekrDateTime.now()
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.value.masking()}")
-    }
-
-    override suspend fun existsByDisplayId(displayId: DisplayId): Boolean = suspendTransaction {
-        UserEntity
-            .find((Users.displayId eq displayId.value))
-            .limit(1)
-            .empty()
-            .not()
     }
 }
 

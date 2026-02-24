@@ -6,6 +6,7 @@ import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import java.time.Instant
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -37,6 +38,21 @@ class UsersExtensionTest {
 
         // then
         assertTrue(result)
+    }
+
+    @Test
+    fun `existsUser 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 생성
+        val userId = insertUserAndReturnId("a")
+        setUserInactiveForTest(userId)
+
+        // when
+        val result = TestDatabaseFactory.dbQuery {
+            Users.existsUser(userId)
+        }
+
+        // then: 사용자가 존재하지 않는다.
+        assertFalse(result)
     }
 
     @Test

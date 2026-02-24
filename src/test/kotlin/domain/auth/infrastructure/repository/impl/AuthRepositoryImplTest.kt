@@ -9,6 +9,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.auth.domain.model.Register
 import com.peekr.util.db.TestDatabaseFactory
+import com.peekr.util.db.setUserInactiveForTest
 import junit.framework.TestCase.assertFalse
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -48,6 +49,23 @@ class AuthRepositoryImplTest {
     }
 
     @Test
+    fun `findByProviderAndProviderId 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 사용자 생성 후 비활성화
+        val savedUser = repository.save(TestRegister)
+        assertTrue(savedUser.userId.value > 0L)
+        setUserInactiveForTest(savedUser.userId)
+
+        // when: 비활성화 사용자 조회
+        val foundUser = repository.findAuthUserByProviderAndProviderId(
+            provider = TestRegister.provider,
+            providerId = TestRegister.providerId,
+        )
+
+        // then: 사용자는 조회되지 않는다.
+        assertNull(foundUser)
+    }
+
+    @Test
     fun `findByProviderAndProviderId 실패 테스트 - 존재하지 않는 사용자`() = runTest {
         val notFoundUser = repository.findAuthUserByProviderAndProviderId(
             provider = SocialLoginProvider.KAKAO,
@@ -82,6 +100,20 @@ class AuthRepositoryImplTest {
         // then
         assertNotNull(foundUser)
         assertEquals(savedUser, foundUser)
+    }
+
+    @Test
+    fun `findUserByUserId 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 사용자 생성 후 비활성화
+        val savedUser = repository.save(TestRegister)
+        assertTrue(savedUser.userId.value > 0L)
+        setUserInactiveForTest(savedUser.userId)
+
+        // when: 비활성화 사용자 조회
+        val foundUser = repository.findUserByUserId(savedUser.userId)
+
+        // then: 사용자가 조회되지 않는다.
+        assertNull(foundUser)
     }
 
     @Test
@@ -137,6 +169,20 @@ class AuthRepositoryImplTest {
         val result = repository.existsByDisplayId(displayId)
 
         // then
+        assertTrue(result)
+    }
+
+    @Test
+    fun `existsByDisplayId 성공 테스트 - 비활성화 사용자도 조회 가능하다`() = runTest {
+        // given: 사용자 생성 후 비활성화
+        val savedUser = repository.save(TestRegister)
+        val displayId = savedUser.displayId
+        setUserInactiveForTest(savedUser.userId)
+
+        // when: 비활성화 사용자 조회
+        val result = repository.existsByDisplayId(displayId)
+
+        // then: 사용자가 조회된다.
         assertTrue(result)
     }
 

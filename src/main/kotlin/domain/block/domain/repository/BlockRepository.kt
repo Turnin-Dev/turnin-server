@@ -36,7 +36,7 @@ interface BlockRepository {
     suspend fun createBlock(blockDetail: BlockDetail): BlockEntity
 
     /**
-     * 차단 사용자 목록 조회 (페이지네이션)
+     * 차단 사용자 목록 페이지네이션 조회 (비활성화 사용자는 제외)
      *
      * 초기 호출 시 커서 값은 null이다.
      *

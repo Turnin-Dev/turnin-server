@@ -1,8 +1,8 @@
 package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.db.extension.existsUser
+import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.schema.Blocks
-import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.Introduce
@@ -16,13 +16,17 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.notExists
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {
     override suspend fun findById(id: UserId): User? = suspendTransaction {
-        UserEntity
-            .findById(id.value)
-            ?.toDomain()
+        Users
+            .selectAll()
+            .where { Users.id eq id.value }
+            .filterActiveUser()
+            .map { it.toDomain(false) }
+            .singleOrNull()
     }
 
     override suspend fun existsUser(id: UserId): Boolean = suspendTransaction {
@@ -51,7 +55,8 @@ class UserRepositoryImpl : UserRepository {
                 // 상대가 나를 차단하지 않았을 때만 행을 반환하여
                 // 만약 상대가 나를 차단했다면, 쿼리 결과는 0건 -> null을 반환한다.
                 (Users.id eq id.value) and notExists(blockedByOtherQuery)
-            }.map { row ->
+            }.filterActiveUser()
+            .map { row ->
                 // 이 매핑은 상대가 나를 차단하지 않은 상태일 때 수행
                 val blockedByMe = row[isBlockedByMe]
                 row.toDomain(blockedByMe)
@@ -59,16 +64,20 @@ class UserRepositoryImpl : UserRepository {
     }
 
     override suspend fun findByIds(ids: List<UserId>): List<User> = suspendTransaction {
-        UserEntity
-            .find { Users.id inList ids.map { it.value } }
-            .map { it.toDomain() }
+        Users
+            .selectAll()
+            .where { Users.id inList ids.map { it.value } }
+            .filterActiveUser()
+            .map { it.toDomain(false) }
     }
 
     override suspend fun findByDisplayId(id: DisplayId): User? = suspendTransaction {
-        UserEntity
-            .find { Users.displayId eq id.value }
+        Users
+            .selectAll()
+            .where { Users.displayId eq id.value }
+            .filterActiveUser()
+            .map { it.toDomain(false) }
             .singleOrNull()
-            ?.toDomain()
     }
 
     override suspend fun update(
