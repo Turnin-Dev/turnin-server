@@ -368,18 +368,12 @@ class UserKeywordRepositoryImplTest {
         // given: 비활성화 사용자 생성
         val currentUserId = insertUserAndReturnId("1")
         val userId = insertUserAndReturnId("2")
-        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
-        val userKeyword = repository.create(
-            keywordId = keywordId,
-            userId = userId,
-            description = TestDescription,
-        )
         setUserInactiveForTest(userId)
 
         // when
         val userKeywordDetails = repository.getDetailsByUserId(currentUserId, userId)
 
-        // then: 키워듣 상세정보가 조회되지 않는다.
+        // then: 키워드 상세정보가 조회되지 않는다.
         assertEquals(0, userKeywordDetails.size)
     }
 

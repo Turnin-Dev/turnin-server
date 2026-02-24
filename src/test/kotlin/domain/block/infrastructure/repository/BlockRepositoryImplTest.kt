@@ -153,7 +153,7 @@ class BlockRepositoryImplTest {
             )
         }
 
-        // 차단한 사용자 비활성화
+        // 차단당한 사용자 비활성화
         setUserInactiveForTest(blockedUsers.first())
 
         // when: 차단한 사용자 목록 조회
