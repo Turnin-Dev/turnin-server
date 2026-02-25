@@ -1,5 +1,6 @@
 package com.peekr.domain.friend.infrastructure.repository
 
+import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.extension.existsUser
 import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.extension.isBlockedRelationship
@@ -39,7 +40,7 @@ class FriendRepositoryImpl : FriendRepository {
     ): FriendsPagingData = suspendTransaction {
         // 1) 친구 조회 쿼리 선언
         val friendCondition = Op.build {
-            (Friends.status eq FriendRequestStatus.ACCEPTED) and
+            (Friends.status eqEnum FriendRequestStatus.ACCEPTED) and
                 (
                     (Friends.requesterId eq userId.value) or
                         (Friends.receiverId eq userId.value)
@@ -73,7 +74,7 @@ class FriendRepositoryImpl : FriendRepository {
         // 1. 받은 친구 요청 조회 쿼리 선언
         val incomingRequestQuery = Op.build {
             (Friends.receiverId eq userId.value) and
-                (Friends.status eq FriendRequestStatus.PENDING)
+                (Friends.status eqEnum FriendRequestStatus.PENDING)
         }
 
         // 2. 전체 항목 개수 조회
@@ -118,7 +119,7 @@ class FriendRepositoryImpl : FriendRepository {
         FriendEntity.count(
             (
                 ((Friends.requesterId eq userId.value) or (Friends.receiverId eq userId.value)) and
-                    (Friends.status eq FriendRequestStatus.ACCEPTED)
+                    (Friends.status eqEnum FriendRequestStatus.ACCEPTED)
             ),
         )
     }
