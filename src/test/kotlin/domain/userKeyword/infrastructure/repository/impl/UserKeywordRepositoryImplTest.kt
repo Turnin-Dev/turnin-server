@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.BlockEntity
 import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
@@ -566,6 +567,49 @@ class UserKeywordRepositoryImplTest {
 
         // then
         assertEquals(0, count)
+    }
+
+    @Test
+    fun `deactivate 성공 테스트`() = runTest {
+        // given: 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when: 비활성화
+        val result = repository.deactivate(userId, userKeyword.id)
+        val foundedUserKeyword = TestDatabaseFactory.dbQuery {
+            UserKeywordEntity.findById(userKeyword.id.value)
+        }
+
+        // then: 검증
+        assertTrue(result)
+        assertNotNull(foundedUserKeyword)
+        assertFalse(foundedUserKeyword.isActive)
+    }
+
+    @Test
+    fun `deactivate 성공 테스트 - 비활성화후 findById로 조회되지 않는다`() = runTest {
+        // given: 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when: 비활성화 후 findById 조회
+        val result = repository.deactivate(userId, userKeyword.id)
+        val foundedUserKeyword = repository.findById(userKeyword.id)
+
+        // then: 조회되지 않는다.
+        assertTrue(result)
+        assertNull(foundedUserKeyword)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

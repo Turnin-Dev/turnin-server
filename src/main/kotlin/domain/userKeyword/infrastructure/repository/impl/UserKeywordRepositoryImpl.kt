@@ -193,6 +193,19 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
     ): Boolean = suspendTransaction {
-        UserKeywords.deleteWhere { (id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) } > 0
+        UserKeywords.deleteWhere {
+            (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value)
+        } > 0
     }
+
+    override suspend fun deactivate(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+    ): Boolean = suspendTransaction {
+        UserKeywords.update({
+            (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value)
+        }) {
+            it[isActive] = false
+        }
+    } > 0
 }

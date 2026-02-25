@@ -108,7 +108,7 @@ interface UserKeywordRepository {
     ): Boolean
 
     /**
-     * 사용자별 키워드를 삭제한다.
+     * 사용자 키워드를 삭제한다.
      *
      * @param ownerId 사용자 ID
      * @param userKeywordId 사용자별 키워드 ID
@@ -116,4 +116,14 @@ interface UserKeywordRepository {
      * @return 삭제 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
     suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
+
+    /**
+     * 사용자 키워드를 비활성화한다.
+     *
+     * @param ownerId 사용자 ID
+     * @param userKeywordId 사용자별 키워드 ID
+     *
+     * @return 비활성화 성공 시 `true`, 실패 시 `false`를 반환한다.
+     */
+    suspend fun deactivate(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
 }

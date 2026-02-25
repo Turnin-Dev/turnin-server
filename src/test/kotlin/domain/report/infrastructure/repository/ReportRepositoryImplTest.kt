@@ -3,9 +3,11 @@ package com.peekr.domain.report.infrastructure.repository
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.Keywords
+import com.peekr.common.db.schema.ReportReasons
 import com.peekr.common.db.schema.Reports
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.UserKeywordEntity
+import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
@@ -15,11 +17,13 @@ import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.insert
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -187,6 +191,43 @@ class ReportRepositoryImplTest {
 
         // then
         assertTrue(exception is DatabaseException.DuplicatedDataException)
+    }
+
+    @Test
+    fun `사용자 키워드 ID로 신고 내역이 있는지 확인한다 - 존재하는 경우`() = runTest {
+        // given: 사용자 키워드 ID로 신고 내역 추가
+        val userId = insertUserAndReturnId("1")
+        val userKeywordId = insertUserKeywordAndReturnId(userId.value)
+        val reportReason = repository.createReportReason(
+            code = TEST_REPORT_REASON_CODE,
+            description = TEST_REPORT_REASON_DESCRIPTION,
+        )
+        TestDatabaseFactory.dbQuery {
+            Reports.insert {
+                it[reporterId] = EntityID(userId.value, Users)
+                it[reportedUserKeywordId] = EntityID(userKeywordId.value, UserKeywords)
+                it[reasonId] = EntityID(reportReason.id.value, ReportReasons)
+            }
+        }
+
+        // when: 존재 여부 확인
+        val isExists = repository.existsByUserKeywordId(userKeywordId)
+
+        // then: 존재 여부 검증
+        assertTrue(isExists)
+    }
+
+    @Test
+    fun `사용자 키워드 ID로 신고 내역이 있는지 확인한다 - 존재하지 않는 경우`() = runTest {
+        // given: 사용자 키워드 ID로 신고 내역 추가
+        val userId = insertUserAndReturnId("1")
+        val userKeywordId = insertUserKeywordAndReturnId(userId.value)
+
+        // when: 존재 여부 확인
+        val isExists = repository.existsByUserKeywordId(userKeywordId)
+
+        // then: 존재 여부 검증
+        assertFalse(isExists)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

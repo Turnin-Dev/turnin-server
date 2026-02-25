@@ -1,7 +1,5 @@
 package com.peekr.domain.discover.infrastructure.repository
 
-import com.peekr.common.db.extension.filterActiveUser
-import com.peekr.common.db.extension.filterActiveUserKeyword
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
@@ -97,8 +95,6 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 Keywords.id,
                 Keywords.keyword,
             ).where { Users.id inList matchedUserIdsValue }
-            .filterActiveUser()
-            .filterActiveUserKeyword()
             .orderBy(Users.id to SortOrder.DESC)
             .map { row ->
                 SharedUserKeyword(
