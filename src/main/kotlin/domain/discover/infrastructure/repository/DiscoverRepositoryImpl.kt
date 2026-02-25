@@ -35,7 +35,9 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             JOIN keyword k_other ON (1 - (k_other.embedding <=> k_mine.embedding)) >= ?
             JOIN user_keyword uk_other ON k_other.id = uk_other.keyword_id
             WHERE uk_mine.user_id = ?
+                AND uk_mine.is_active = true
                 AND uk_other.user_id != ?
+                AND uk_other.is_active = true
                 AND NOT EXISTS (
                     SELECT 1
                     FROM block

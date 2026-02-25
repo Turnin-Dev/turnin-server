@@ -10,21 +10,21 @@ import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 
 interface UserKeywordRepository {
     /**
-     * 사용자 키워드 ID로 사용자 키워드 조회
+     * 사용자 키워드 ID로 사용자 키워드 조회 (비활성화 사용자 키워드 제외)
      *
      * @param userKeywordId 사용자 키워드 ID
      */
     suspend fun findById(userKeywordId: UserKeywordId): UserKeyword?
 
     /**
-     * 사용자 ID를 통해 사용자별 키워드 리스트를 조회한다.
+     * 사용자 ID를 통해 사용자별 키워드 리스트를 조회한다. (비활성화 사용자 키워드 제외)
      *
      * @param userId 사용자 ID
      */
     suspend fun findListByUserId(userId: UserId): List<UserKeyword>
 
     /**
-     * 키워드 ID와 사용자 ID를 통해 사용자별 키워드를 찾는다.
+     * 키워드 ID와 사용자 ID를 통해 사용자별 키워드를 찾는다. (비활성화 사용자 키워드 제외)
      *
      * @param keywordId 키워드 ID
      * @param userId 사용자 ID
@@ -34,7 +34,8 @@ interface UserKeywordRepository {
     suspend fun findByKeywordIdAndUserId(keywordId: KeywordId, userId: UserId): UserKeyword?
 
     /**
-     * 사용자 키워드 ID로 사용자 키워드 상세 정보를 조회한다. (차단된 사용자, 비활성화 사용자 제외)
+     * 사용자 키워드 ID로 사용자 키워드 상세 정보를 조회한다.
+     * (차단된 사용자, 비활성화 사용자/사용자 키워드 제외)
      *
      * @param currentUserId 현재 조회 요청한 사용자 ID
      * @param userKeywordId 사용자 키워드 ID
@@ -47,7 +48,8 @@ interface UserKeywordRepository {
     ): UserKeywordDetail?
 
     /**
-     * 사용자 ID로 사용자의 키워드 상세 정보 리스트를 조회한다. (차단된 사용자, 비활성화 사용자 제외)
+     * 사용자 ID로 사용자의 키워드 상세 정보 리스트를 조회한다.
+     * (차단된 사용자, 비활성화 사용자/사용자 키워드 제외)
      *
      * @param currentUserId 현재 조회 요청한 사용자 ID
      * @param userId 사용자 ID
@@ -58,7 +60,7 @@ interface UserKeywordRepository {
     ): List<UserKeywordDetail>
 
     /**
-     * 사용자 키워드 ID를 통해 사용자 키워드 설명을 조회한다.
+     * 사용자 키워드 ID를 통해 사용자 키워드 설명을 조회한다. (비활성화 사용자 키워드 제외)
      *
      * @param ownerId 사용자 ID
      * @param userKeywordId 사용자 키워드 ID
@@ -71,7 +73,7 @@ interface UserKeywordRepository {
     ): Description?
 
     /**
-     * 사용자 키워드 개수 카운트
+     * 사용자 키워드 개수 카운트 (비활성화 사용자 키워드 제외)
      *
      * @param userId 사용자 ID
      */
@@ -106,7 +108,7 @@ interface UserKeywordRepository {
     ): Boolean
 
     /**
-     * 사용자별 키워드를 삭제한다.
+     * 사용자 키워드를 삭제한다.
      *
      * @param ownerId 사용자 ID
      * @param userKeywordId 사용자별 키워드 ID
@@ -114,4 +116,14 @@ interface UserKeywordRepository {
      * @return 삭제 성공 시 `true`, 실패 시 `false`를 반환한다.
      */
     suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
+
+    /**
+     * 사용자 키워드를 비활성화한다.
+     *
+     * @param ownerId 사용자 ID
+     * @param userKeywordId 사용자별 키워드 ID
+     *
+     * @return 비활성화 성공 시 `true`, 실패 시 `false`를 반환한다.
+     */
+    suspend fun deactivate(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
 }

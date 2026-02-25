@@ -1,9 +1,17 @@
 package com.peekr.domain.report.domain.repository
 
+import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.domain.report.domain.model.ReportReason
 
 interface ReportRepository {
+    /**
+     * 사용자 키워드 ID가 신고 내역에 존재하는지 확인한다.
+     *
+     * @param userKeywordId 사용자 키워드 ID
+     */
+    suspend fun existsByUserKeywordId(userKeywordId: UserKeywordId): Boolean
+
     /**
      * 신고 사유 목록 조회
      */

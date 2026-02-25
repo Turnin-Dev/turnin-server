@@ -28,13 +28,13 @@ class FeedRepositoryImpl : FeedRepository {
     ): List<Feed> = suspendTransaction {
         val sql = getFeedsNativeSQL()
         val params = buildList {
-            add(LongColumnType() to userId.value)
-            add(LongColumnType() to userId.value)
-            add(LongColumnType() to userId.value)
-            add(LongColumnType() to userId.value)
-            add(LongColumnType() to userId.value)
-            add(LongColumnType() to userId.value)
-            add(LongColumnType() to userId.value)
+            add(LongColumnType() to userId.value) // my_top_keywords: uk.user_id = ?
+            add(LongColumnType() to userId.value) // candidate_pool: uk.user_id = ?
+            add(LongColumnType() to userId.value) // candidate_pool: block.blocker_id = ?
+            add(LongColumnType() to userId.value) // candidate_pool: block.blocked_id = ?
+            add(LongColumnType() to userId.value) // friends: requester_id = ?
+            add(LongColumnType() to userId.value) // friends: requester_id = ?
+            add(LongColumnType() to userId.value) // friends: receiver_id = ?
             add(DoubleColumnType() to cursorScore)
             add(DoubleColumnType() to cursorScore)
             add(JavaOffsetDateTimeColumnType() to cursorCreatedAt?.let { Instant.ofEpochSecond(it).toOffsetDateTime() })
@@ -76,7 +76,7 @@ class FeedRepositoryImpl : FeedRepository {
             select uk.keyword_id, k.embedding as seed_embedding
             from user_keyword uk
             join keyword k on uk.keyword_id = k.id
-            where uk.user_id = ?
+            where uk.user_id = ? and uk.is_active = true
             order by uk.created_at desc
             LIMIT 5
         ),
@@ -94,6 +94,13 @@ class FeedRepositoryImpl : FeedRepository {
                 FROM keyword k
                 JOIN user_keyword uk ON k.id = uk.keyword_id
                 WHERE uk.user_id != ?
+                    AND uk.is_active = true
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM block
+                        WHERE (block.blocker_id = ? AND block.blocked_id = uk.user_id)
+                            or (block.blocked_id = ? AND block.blocker_id = uk.user_id)
+                    )
                 ORDER BY k.embedding <=> mtk.seed_embedding
                 LIMIT 20
             ) r
@@ -119,12 +126,6 @@ class FeedRepositoryImpl : FeedRepository {
                 	END)
             	) as final_score
             FROM candidate_pool cp
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM block
-                WHERE (block.blocker_id = ? AND block.blocked_id = cp.uk_user_id)
-                    or (block.blocked_id = ? AND block.blocker_id = cp.uk_user_id)
-            )
             order by cp.uk_id, final_score desc
         ),
         result_list as (

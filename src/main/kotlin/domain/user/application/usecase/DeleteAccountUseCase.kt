@@ -26,6 +26,18 @@ class DeleteAccountUseCase {
         // - Report 테이블과 연결된 데이터는 남겨둬야 함. (신고 내역 정책에 따라...)
         // - 이 외 데이터는 전부 삭제
 
+        // 또, 중요한 점은 피드/탐색 조회 쿼리 때문에 삭제 시 아래처럼 트랜잭션 내부에서 정확한 순서대로 삭제해야 한다.
+        // suspendTransaction {
+        //     // 1. 유저 비활성화
+        //     Users.update({ Users.id eq userId.value }) {
+        //         it[isActive] = false
+        //     }
+        //     // 2. 유저 키워드 전부 비활성화
+        //     UserKeywords.update({ UserKeywords.userId eq userId.value }) {
+        //         it[isActive] = false
+        //     }
+        // }
+
         // 2. 로그아웃 과정 수행 (리프레쉬, FCM 토큰 모두 삭제 포함)
 
         // 2. 파일 서버 정리 (스토리지 서버에 있는 사용자의 데이터를 모두 삭제)

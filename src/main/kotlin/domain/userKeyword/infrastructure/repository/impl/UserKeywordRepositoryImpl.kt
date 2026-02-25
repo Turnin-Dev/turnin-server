@@ -2,6 +2,7 @@ package com.peekr.domain.userKeyword.infrastructure.repository.impl
 
 import com.peekr.common.db.DatabaseUtils.isNotBlockedRelationship
 import com.peekr.common.db.extension.filterActiveUser
+import com.peekr.common.db.extension.filterActiveUserKeyword
 import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
@@ -27,7 +28,12 @@ import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun findById(userKeywordId: UserKeywordId): UserKeyword? = suspendTransaction {
-        UserKeywordEntity.findById(userKeywordId.value)?.toDomain()
+        UserKeywords
+            .selectAll()
+            .where { UserKeywords.id eq userKeywordId.value }
+            .filterActiveUserKeyword()
+            .map { it.toDomain() }
+            .singleOrNull()
     }
 
     override suspend fun findListByUserId(userId: UserId): List<UserKeyword> = suspendTransaction {
@@ -40,6 +46,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 UserKeywords.createdAt,
                 UserKeywords.updatedAt,
             ).where(UserKeywords.userId eq userId.value)
+            .filterActiveUserKeyword()
             .map { row -> row.toDomain() }
     }
 
@@ -58,7 +65,8 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             ).where(
                 (UserKeywords.keywordId eq keywordId.value) and
                     (UserKeywords.userId eq userId.value),
-            ).map { it.toDomain() }
+            ).filterActiveUserKeyword()
+            .map { it.toDomain() }
             .singleOrNull()
     }
 
@@ -92,6 +100,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 (UserKeywords.id eq userKeywordId.value) and
                     isNotBlockedRelationship(myUserId = currentUserId.value, Users.id)
             }.filterActiveUser()
+            .filterActiveUserKeyword()
             .map { it.toDetail() }
             .singleOrNull()
     }
@@ -126,6 +135,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
                 (UserKeywords.userId eq userId.value) and
                     isNotBlockedRelationship(myUserId = currentUserId.value, Users.id)
             }.filterActiveUser()
+            .filterActiveUserKeyword()
             .map { it.toDetail() }
     }
 
@@ -136,6 +146,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         UserKeywords
             .select(UserKeywords.description)
             .where((UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value))
+            .filterActiveUserKeyword()
             .map {
                 it[UserKeywords.description]?.let {
                     Description(it)
@@ -147,6 +158,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         UserKeywords
             .selectAll()
             .where { UserKeywords.userId eq userId.value }
+            .filterActiveUserKeyword()
             .count()
     }
 
@@ -181,6 +193,19 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
     ): Boolean = suspendTransaction {
-        UserKeywords.deleteWhere { (id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value) } > 0
+        UserKeywords.deleteWhere {
+            (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value)
+        } > 0
     }
+
+    override suspend fun deactivate(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+    ): Boolean = suspendTransaction {
+        UserKeywords.update({
+            (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value)
+        }) {
+            it[isActive] = false
+        }
+    } > 0
 }

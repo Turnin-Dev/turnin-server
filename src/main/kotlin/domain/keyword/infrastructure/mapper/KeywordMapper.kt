@@ -14,7 +14,7 @@ object KeywordMapper {
             id = KeywordId(this[Keywords.id].value),
             name = KeywordName(this[Keywords.keyword]),
             embedding = this[Keywords.embedding],
-            createdBy = UserId(this[Keywords.createdBy].value),
+            createdBy = this[Keywords.createdBy]?.let { UserId(it.value) },
             createdAt = this[Keywords.createdAt].toEpochSecond(),
             updatedAt = this[Keywords.updatedAt].toEpochSecond(),
         )
@@ -24,7 +24,7 @@ object KeywordMapper {
             id = KeywordId(this.id.value),
             name = KeywordName(this.keyword),
             embedding = this.embedding,
-            createdBy = UserId(this.createdBy.value),
+            createdBy = this.createdBy?.let { UserId(it.value) },
             createdAt = this.createdAt.toEpochSecond(),
             updatedAt = this.updatedAt.toEpochSecond(),
         )

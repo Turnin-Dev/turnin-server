@@ -17,13 +17,13 @@ class FakeKeywordProvider : KeywordProvider {
         Keywords
             .selectAll()
             .where { Keywords.id eq keywordId.value }
-            .map {
+            .map { eKeyword ->
                 ExternalKeyword(
-                    id = KeywordId(it[Keywords.id].value),
-                    name = KeywordName(it[Keywords.keyword]),
-                    createdBy = UserId(it[Keywords.createdBy].value),
-                    createdAt = it[Keywords.createdAt].toEpochSecond(),
-                    updatedAt = it[Keywords.updatedAt].toEpochSecond(),
+                    id = KeywordId(eKeyword[Keywords.id].value),
+                    name = KeywordName(eKeyword[Keywords.keyword]),
+                    createdBy = eKeyword[Keywords.createdBy]?.let { UserId(it.value) },
+                    createdAt = eKeyword[Keywords.createdAt].toEpochSecond(),
+                    updatedAt = eKeyword[Keywords.updatedAt].toEpochSecond(),
                 )
             }.singleOrNull()
     }
@@ -32,13 +32,13 @@ class FakeKeywordProvider : KeywordProvider {
         Keywords
             .selectAll()
             .where { Keywords.id inList keywordIds.map { it.value } }
-            .map {
+            .map { eKeyword ->
                 ExternalKeyword(
-                    id = KeywordId(it[Keywords.id].value),
-                    name = KeywordName(it[Keywords.keyword]),
-                    createdBy = UserId(it[Keywords.createdBy].value),
-                    createdAt = it[Keywords.createdAt].toEpochSecond(),
-                    updatedAt = it[Keywords.updatedAt].toEpochSecond(),
+                    id = KeywordId(eKeyword[Keywords.id].value),
+                    name = KeywordName(eKeyword[Keywords.keyword]),
+                    createdBy = eKeyword[Keywords.createdBy]?.let { UserId(it.value) },
+                    createdAt = eKeyword[Keywords.createdAt].toEpochSecond(),
+                    updatedAt = eKeyword[Keywords.updatedAt].toEpochSecond(),
                 )
             }
     }
@@ -47,13 +47,13 @@ class FakeKeywordProvider : KeywordProvider {
         Keywords
             .selectAll()
             .where { Keywords.keyword eq keywordName }
-            .map {
+            .map { eKeyword ->
                 ExternalKeyword(
-                    id = KeywordId(it[Keywords.id].value),
-                    name = KeywordName(it[Keywords.keyword]),
-                    createdBy = UserId(it[Keywords.createdBy].value),
-                    createdAt = it[Keywords.createdAt].toEpochSecond(),
-                    updatedAt = it[Keywords.updatedAt].toEpochSecond(),
+                    id = KeywordId(eKeyword[Keywords.id].value),
+                    name = KeywordName(eKeyword[Keywords.keyword]),
+                    createdBy = eKeyword[Keywords.createdBy]?.let { UserId(it.value) },
+                    createdAt = eKeyword[Keywords.createdAt].toEpochSecond(),
+                    updatedAt = eKeyword[Keywords.updatedAt].toEpochSecond(),
                 )
             }.singleOrNull()
     }

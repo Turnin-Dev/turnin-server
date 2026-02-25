@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.BlockEntity
 import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.KeywordEntity
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
@@ -15,6 +16,7 @@ import com.peekr.domain.userKeyword.domain.model.Description
 import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
 import com.peekr.util.db.TestDatabaseFactory
 import com.peekr.util.db.setUserInactiveForTest
+import com.peekr.util.db.setUserKeywordInactiveForTest
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -61,6 +63,25 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
+    fun `findById 성공 테스트 - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserKeywordInactiveForTest(userKeyword.id)
+
+        // when
+        val actualUserKeyword = repository.findById(userKeyword.id)
+
+        // then: 사용자 키워드가 조회되지 않는다.
+        assertNull(actualUserKeyword)
+    }
+
+    @Test
     fun `findById 실패 테스트 - 데이터가 없으면 null을 반환한다`() = runTest {
         // when
         val actualUserKeyword = repository.findById(UserKeywordId(1L))
@@ -87,6 +108,25 @@ class UserKeywordRepositoryImplTest {
         assertEquals(1, userKeywords.size)
         assertEquals(userKeywords.first().id, userKeyword.id)
         assertEquals(userKeywords.first().keywordId, keywordId)
+    }
+
+    @Test
+    fun `findListByUserId 성공 테스트 - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserKeywordInactiveForTest(userKeyword.id)
+
+        // when
+        val userKeywords = repository.findListByUserId(userId)
+
+        // then: 조회되지 않는다.
+        assertEquals(0, userKeywords.size)
     }
 
     @Test
@@ -154,6 +194,25 @@ class UserKeywordRepositoryImplTest {
         // then
         assertNotNull(actualUserKeyword)
         assertEquals(userKeyword, actualUserKeyword)
+    }
+
+    @Test
+    fun `findByKeywordIdAndUserId 성공 테스트 - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserKeywordInactiveForTest(userKeyword.id)
+
+        // when
+        val actualUserKeyword = repository.findByKeywordIdAndUserId(keywordId, userId)
+
+        // then: 조회되지 않는다.
+        assertNull(actualUserKeyword)
     }
 
     @Test
@@ -250,6 +309,25 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
+    fun `findDescriptionById 성공 테스트 - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserKeywordInactiveForTest(userKeyword.id)
+
+        // when
+        val description = repository.findDescriptionById(userId, userKeyword.id)
+
+        // then: 조회되지 않는다.
+        assertNull(description)
+    }
+
+    @Test
     fun `findDescriptionById 성공 테스트 - 등록되지 않은 사용자 키워드 조회 시 null을 반환한다`() = runTest {
         // given
         val userId = insertUserAndReturnId("1")
@@ -301,7 +379,7 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
-    fun `getDetailById 성공 테스트 - 비활성화 사용자의 키워드는 조회되지 않는다`() = runTest {
+    fun `getDetailById 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 비활성화 사용자 생성
         val currentUserId = insertUserAndReturnId("1")
         val userId = insertUserAndReturnId("2")
@@ -312,6 +390,26 @@ class UserKeywordRepositoryImplTest {
             description = TestDescription,
         )
         setUserInactiveForTest(userId)
+
+        // when
+        val userKeywordDetail = repository.getDetailById(currentUserId, userKeyword.id)
+
+        // then: 키워드 상세정보가 조회되지 않는다.
+        assertNull(userKeywordDetail)
+    }
+
+    @Test
+    fun `getDetailById 성공 테스트 - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 키워드 생성
+        val currentUserId = insertUserAndReturnId("1")
+        val userId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserKeywordInactiveForTest(userKeyword.id)
 
         // when
         val userKeywordDetail = repository.getDetailById(currentUserId, userKeyword.id)
@@ -364,7 +462,7 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
-    fun `getDetailsByUserId 성공 테스트 - 비활성화 사용자의 키워드는 조회되지 않는다`() = runTest {
+    fun `getDetailsByUserId 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 비활성화 사용자 생성
         val currentUserId = insertUserAndReturnId("1")
         val userId = insertUserAndReturnId("2")
@@ -375,6 +473,26 @@ class UserKeywordRepositoryImplTest {
             description = TestDescription,
         )
         setUserInactiveForTest(userId)
+
+        // when
+        val userKeywordDetails = repository.getDetailsByUserId(currentUserId, userId)
+
+        // then: 키워드 상세정보가 조회되지 않는다.
+        assertEquals(0, userKeywordDetails.size)
+    }
+
+    @Test
+    fun `getDetailsByUserId 성공 테스트 - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
+        // given: 비활성화 사용자 키워드 생성
+        val currentUserId = insertUserAndReturnId("1")
+        val userId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserKeywordInactiveForTest(userKeyword.id)
 
         // when
         val userKeywordDetails = repository.getDetailsByUserId(currentUserId, userId)
@@ -412,6 +530,86 @@ class UserKeywordRepositoryImplTest {
 
         // then
         assertTrue(userKeywordDetails.isEmpty())
+    }
+
+    @Test
+    fun `countByUserId 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when
+        val count = repository.countByUserId(userId)
+
+        // then
+        assertEquals(1, count)
+    }
+
+    @Test
+    fun `countByUserId 성공 테스트 - 비활성화 사용자 키워드는 제외된다`() = runTest {
+        // given: 비활성화 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        setUserKeywordInactiveForTest(userKeyword.id)
+
+        // when
+        val count = repository.countByUserId(userId)
+
+        // then
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun `deactivate 성공 테스트`() = runTest {
+        // given: 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when: 비활성화
+        val result = repository.deactivate(userId, userKeyword.id)
+        val foundedUserKeyword = TestDatabaseFactory.dbQuery {
+            UserKeywordEntity.findById(userKeyword.id.value)
+        }
+
+        // then: 검증
+        assertTrue(result)
+        assertNotNull(foundedUserKeyword)
+        assertFalse(foundedUserKeyword.isActive)
+    }
+
+    @Test
+    fun `deactivate 성공 테스트 - 비활성화후 findById로 조회되지 않는다`() = runTest {
+        // given: 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when: 비활성화 후 findById 조회
+        val result = repository.deactivate(userId, userKeyword.id)
+        val foundedUserKeyword = repository.findById(userKeyword.id)
+
+        // then: 조회되지 않는다.
+        assertTrue(result)
+        assertNull(foundedUserKeyword)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

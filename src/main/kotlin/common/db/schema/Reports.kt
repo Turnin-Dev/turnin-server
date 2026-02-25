@@ -13,7 +13,7 @@ object Reports : BaseLongIdTable("report") {
     val reportedUserKeywordId = reference(
         "reported_user_keyword_id",
         UserKeywords,
-        onDelete = ReferenceOption.SET_NULL,
+        onDelete = ReferenceOption.RESTRICT,
     ).nullable()
     val reasonId = reference("reason_id", ReportReasons, onDelete = ReferenceOption.RESTRICT)
     val customReason = text("custom_reason").nullable()

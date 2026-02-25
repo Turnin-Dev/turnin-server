@@ -16,7 +16,7 @@ import com.peekr.domain.keyword.domain.model.Keyword
 data class KeywordDto(
     val id: KeywordId,
     val name: String,
-    val createdBy: UserId,
+    val createdBy: UserId?,
     val createdAt: Long,
     val updatedAt: Long,
 )
