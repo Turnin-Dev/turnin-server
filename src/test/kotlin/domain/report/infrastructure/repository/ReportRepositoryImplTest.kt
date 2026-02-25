@@ -219,7 +219,7 @@ class ReportRepositoryImplTest {
 
     @Test
     fun `사용자 키워드 ID로 신고 내역이 있는지 확인한다 - 존재하지 않는 경우`() = runTest {
-        // given: 사용자 키워드 ID로 신고 내역 추가
+        // given: 사용자 키워드만 생성 (신고 내역 없음)
         val userId = insertUserAndReturnId("1")
         val userKeywordId = insertUserKeywordAndReturnId(userId.value)
 

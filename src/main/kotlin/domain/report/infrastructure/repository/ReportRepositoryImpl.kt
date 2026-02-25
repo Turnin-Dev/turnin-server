@@ -20,7 +20,9 @@ class ReportRepositoryImpl : ReportRepository {
         Reports
             .selectAll()
             .where { Reports.reportedUserKeywordId eq userKeywordId.value }
-            .count() > 0
+            .limit(1)
+            .empty()
+            .not()
     }
 
     override suspend fun getReportReasons(): List<ReportReason> = suspendTransaction {
