@@ -163,6 +163,13 @@ class FriendRepositoryImpl : FriendRepository {
         } > 0
     }
 
+    override suspend fun deleteAll(userId: UserId): Unit = suspendTransaction {
+        Friends.deleteWhere {
+            (Friends.requesterId eq userId.value) or
+                (Friends.receiverId eq userId.value)
+        }
+    }
+
     override suspend fun existsUser(userId: UserId): Boolean = suspendTransaction {
         Users.existsUser(userId)
     }
