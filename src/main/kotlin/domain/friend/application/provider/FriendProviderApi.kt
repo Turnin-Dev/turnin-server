@@ -47,12 +47,4 @@ class FriendProviderApi(
         userId2: UserId,
     ): Boolean =
         friendRepository.deleteFriend(userId1, userId2)
-
-    /**
-     * 사용자의 모든 친구 관계 삭제
-     *
-     * @param userId 삭제할 사용자 ID
-     */
-    suspend fun deleteAll(userId: UserId) =
-        friendRepository.deleteAll(userId)
 }

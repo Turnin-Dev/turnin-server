@@ -1,5 +1,6 @@
 package com.peekr.domain.friend.di
 
+import com.peekr.domain.friend.application.provider.FriendDeletionSupport
 import com.peekr.domain.friend.application.provider.FriendProviderApi
 import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
@@ -18,6 +19,7 @@ val friendModule = module {
 
     // Provider
     single { FriendProviderApi(get(), get()) }
+    single { FriendDeletionSupport(get()) }
 
     // Usecase
     factory { GetFriendsUseCase(get()) }
