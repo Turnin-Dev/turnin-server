@@ -13,10 +13,10 @@ val reportModule = module {
     single<ReportRepository> { ReportRepositoryImpl() }
 
     // Provider
-    single<ReportProviderApi> { ReportProviderApi(get()) }
+    single { ReportProviderApi(get()) }
 
     // Usecase
-    factory { GetReportReasonsUseCase(get()) }
-    factory { CreateReportUseCase(get()) }
-    single<ReportUseCases> { ReportUseCases(get(), get()) }
+    single { GetReportReasonsUseCase(get()) }
+    single { CreateReportUseCase(get()) }
+    single { ReportUseCases(get(), get()) }
 }

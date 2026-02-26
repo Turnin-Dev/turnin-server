@@ -22,6 +22,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 
 class BlockRepositoryImpl : BlockRepository {
@@ -94,5 +95,12 @@ class BlockRepositoryImpl : BlockRepository {
             (Blocks.id eq blockId.value) and
                 (Blocks.blockerId eq ownerId.value)
         } > 0
+    }
+
+    override suspend fun deleteAll(userId: UserId): Unit = suspendTransaction {
+        Blocks.deleteWhere {
+            (Blocks.blockerId eq userId.value) or
+                (Blocks.blockedId eq userId.value)
+        }
     }
 }

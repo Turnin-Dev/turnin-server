@@ -100,4 +100,10 @@ class UserRepositoryImpl : UserRepository {
             row[this.introduce] = introduce.value
         } > 0
     }
+
+    override suspend fun deactivate(userId: UserId): Unit = suspendTransaction {
+        Users.update({ Users.id eq userId.value }) {
+            it[isActive] = false
+        }
+    }
 }

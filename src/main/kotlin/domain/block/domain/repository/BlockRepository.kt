@@ -62,4 +62,13 @@ interface BlockRepository {
         ownerId: UserId,
         blockId: BlockId,
     ): Boolean
+
+    /**
+     * 사용자의 모든 차단 관계를 삭제한다.
+     *
+     * ###### 해당 메서드는 [userId]의 모든 차단 데이터를 지우므로 주의해서 사용해야 한다.
+     *
+     * @param userId 삭제할 사용자 ID
+     */
+    suspend fun deleteAll(userId: UserId)
 }

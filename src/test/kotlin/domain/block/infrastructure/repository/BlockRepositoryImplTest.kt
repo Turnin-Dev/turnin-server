@@ -1,9 +1,11 @@
 package com.peekr.domain.block.infrastructure.repository
 
 import com.peekr.common.db.schema.BlockEntity
+import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.BlockId
@@ -15,11 +17,14 @@ import com.peekr.util.db.TestDatabaseFactory
 import com.peekr.util.db.setUserInactiveForTest
 import java.time.Instant
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.After
 import org.junit.Before
@@ -191,6 +196,36 @@ class BlockRepositoryImplTest {
         assertNull(savedBlock)
     }
 
+    @Test
+    fun `모든 차단 관계 삭제 성공 테스트`() = runTest {
+        // given: 사용자 생성 후 차단 관계를 설정한다.
+        val userId = insertUserAndReturnId("me")
+        val blockerId = insertUserAndReturnId("blocker")
+        val blockedId = insertUserAndReturnId("blocked")
+
+        val blockEntity = createBlockForTest(blockerId, userId)
+        val blockEntity2 = createBlockForTest(userId, blockedId)
+
+        assertNotNull(findByIdForTest(blockEntity.id.value))
+        assertNotNull(findByIdForTest(blockEntity2.id.value))
+
+        // when: 모든 차단 관계 삭제
+        repository.deleteAll(userId)
+
+        // then: 모두 삭제됐는지 검증
+        assertNull(findByIdForTest(blockEntity.id.value))
+        assertNull(findByIdForTest(blockEntity2.id.value))
+        val blocks = TestDatabaseFactory.dbQuery {
+            Blocks
+                .selectAll()
+                .where {
+                    (Blocks.blockerId eq userId.value) or
+                        (Blocks.blockedId eq userId.value)
+                }.map { it[Blocks.id] }
+        }
+        assertEquals(0, blocks.size)
+    }
+
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
@@ -222,4 +257,17 @@ class BlockRepositoryImplTest {
                     this[Users.lastLoginAt] = Instant.now()
                 }.map { UserId(it[Users.id].value) }
         }
+
+    private suspend fun createBlockForTest(blockerId: UserId, blockedId: UserId): BlockEntity = suspendTransaction {
+        BlockEntity.new {
+            this.blockerId = EntityID(blockerId.value, Users)
+            this.blockedId = EntityID(blockedId.value, Users)
+            this.reasonId = EntityID(1L, BlockReasons)
+            this.customReason = "custom-reason"
+        }
+    }
+
+    private suspend fun findByIdForTest(blockId: Long): BlockEntity? = suspendTransaction {
+        BlockEntity.findById(blockId)
+    }
 }

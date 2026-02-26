@@ -1,5 +1,6 @@
 package com.peekr.domain.user.di
 
+import com.peekr.domain.user.application.provider.UserDeletionSupportApi
 import com.peekr.domain.user.application.provider.UserProviderApi
 import com.peekr.domain.user.application.usecase.GetMyProfileUseCase
 import com.peekr.domain.user.application.usecase.GetUserProfileUseCase
@@ -26,18 +27,19 @@ val userModule = module {
     single<FriendProvider> { FriendProviderImpl(get()) }
     single<AuthProvider> { AuthProviderImpl(get()) }
     single<FileProvider> { FileProviderImpl(get()) }
+    single { UserDeletionSupportApi(get()) }
 
     // Repository
     single<UserRepository> { UserRepositoryImpl() }
 
     // UseCase
-    factory { GetUserUseCase(get()) }
-    factory { GetMyProfileUseCase(get(), get()) }
-    factory { UpdateUserUseCase(get(), get()) }
-    factory { UpdateIntroduceUseCase(get()) }
-    factory { GetUserProfileUseCase(get(), get()) }
-    factory { LogoutUseCase(get()) }
-    single<UserUseCases> {
+    single { GetUserUseCase(get()) }
+    single { GetMyProfileUseCase(get(), get()) }
+    single { UpdateUserUseCase(get(), get()) }
+    single { UpdateIntroduceUseCase(get()) }
+    single { GetUserProfileUseCase(get(), get()) }
+    single { LogoutUseCase(get()) }
+    single {
         UserUseCases(
             get(),
             get(),

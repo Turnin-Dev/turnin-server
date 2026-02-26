@@ -89,4 +89,14 @@ interface UserRepository {
         userId: UserId,
         introduce: Introduce,
     ): Boolean
+
+    /**
+     * 사용자를 비활성화한다.
+     *
+     * ###### 해당 메서드는 [userId]를 비활성화 상태로 변경하므로 주의해서 사용해야 한다.
+     * ###### 비활성화된 사용자는 시스템에서 조회되지 않으며, 관련 데이터는 별도의 정리 작업을 통해 처리된다.
+     *
+     * @param userId 비활성화할 사용자 ID
+     */
+    suspend fun deactivate(userId: UserId)
 }

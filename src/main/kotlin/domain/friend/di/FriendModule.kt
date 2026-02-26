@@ -1,5 +1,6 @@
 package com.peekr.domain.friend.di
 
+import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
 import com.peekr.domain.friend.application.provider.FriendProviderApi
 import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
@@ -18,15 +19,16 @@ val friendModule = module {
 
     // Provider
     single { FriendProviderApi(get(), get()) }
+    single { FriendDeletionSupportApi(get()) }
 
     // Usecase
-    factory { GetFriendsUseCase(get()) }
-    factory { AddFriendUseCase(get()) }
-    factory { UpdateFriendRequestStatusUseCase(get()) }
-    factory { DeleteFriendUseCase(get()) }
-    factory { GetFriendStatusUseCase(get()) }
-    factory { GetIncomingRequestsUseCase(get()) }
-    single<FriendUseCases> {
+    single { GetFriendsUseCase(get()) }
+    single { AddFriendUseCase(get()) }
+    single { UpdateFriendRequestStatusUseCase(get()) }
+    single { DeleteFriendUseCase(get()) }
+    single { GetFriendStatusUseCase(get()) }
+    single { GetIncomingRequestsUseCase(get()) }
+    single {
         FriendUseCases(
             get(),
             get(),

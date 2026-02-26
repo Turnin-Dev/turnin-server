@@ -16,14 +16,14 @@ val keywordModule = module {
     single<KeywordRepository> { KeywordRepositoryImpl() }
 
     // UseCases
-    factory { GetKeywordUseCase(get()) }
-    factory { CreateKeywordUseCase(get(), get()) }
-    factory { GetKeywordByNameUseCase(get()) }
-    single<KeywordUseCases> { KeywordUseCases(get(), get(), get()) }
+    single { GetKeywordUseCase(get()) }
+    single { CreateKeywordUseCase(get(), get()) }
+    single { GetKeywordByNameUseCase(get()) }
+    single { KeywordUseCases(get(), get(), get()) }
 
     // Provider
     single<EmbeddingServiceProvider> { EmbeddingServiceProviderImpl(get()) }
 
     // Provider API
-    factory { KeywordProviderApi(get(), get()) }
+    single { KeywordProviderApi(get(), get()) }
 }

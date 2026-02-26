@@ -21,7 +21,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 class CloudflareR2Service(
     private val appConfig: AppConfig,
     private val s3PresignerFactory: S3PresignerFactory,
-) {
+) : AutoCloseable {
     private val accessKey by lazy {
         appConfig.getOrDefault("ktor.security.cloudflare.s3AccessKey", "")
     }
@@ -72,10 +72,7 @@ class CloudflareR2Service(
             endpoint,
         )
 
-    /**
-     * S3Client 생성 (삭제를 위해)
-     */
-    private fun getS3Client(): S3Client =
+    private val s3ClientDelegate = lazy {
         S3Client
             .builder()
             .credentialsProvider(
@@ -85,6 +82,10 @@ class CloudflareR2Service(
             ).region(region)
             .endpointOverride(endpoint)
             .build()
+    }
+
+    /** S3Client 생성 (삭제를 위해) */
+    private val s3Client: S3Client by s3ClientDelegate
 
     /**
      * Presigned PUT URL 요청 객체를 생성한다. (업로드 / 업데이트 공용)
@@ -121,15 +122,13 @@ class CloudflareR2Service(
      */
     fun deleteFile(fileName: String) {
         try {
-            getS3Client().use { s3 ->
-                s3.deleteObject(
-                    DeleteObjectRequest
-                        .builder()
-                        .bucket(bucketName)
-                        .key(fileName)
-                        .build(),
-                )
-            }
+            s3Client.deleteObject(
+                DeleteObjectRequest
+                    .builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build(),
+            )
         } catch (e: Exception) {
             LOGGER.error(
                 e,
@@ -137,6 +136,13 @@ class CloudflareR2Service(
                     "(bucket=${bucketName.masking()}, key=${fileName.masking()})",
             )
             throw e
+        }
+    }
+
+    override fun close() {
+        if (s3ClientDelegate.isInitialized()) {
+            runCatching { s3Client.close() }
+                .onFailure { LOGGER.error(it, "Failed to close S3Client") }
         }
     }
 }

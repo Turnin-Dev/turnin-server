@@ -7,9 +7,10 @@ import com.peekr.domain.discover.infrastructure.repository.DiscoverRepositoryImp
 import org.koin.dsl.module
 
 val discoverModule = module {
+    // Repository
     single<DiscoverRepository> { DiscoverRepositoryImpl() }
 
     // Usecase
-    factory { GetDiscoverContextUseCase(get()) }
-    single<DiscoverUseCases> { DiscoverUseCases(get()) }
+    single { GetDiscoverContextUseCase(get()) }
+    single { DiscoverUseCases(get()) }
 }

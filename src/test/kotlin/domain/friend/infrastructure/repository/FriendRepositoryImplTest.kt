@@ -1,8 +1,10 @@
 package com.peekr.domain.friend.infrastructure.repository
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
@@ -21,7 +23,9 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
@@ -335,6 +339,36 @@ class FriendRepositoryImplTest {
         assertEquals(0, users.size)
     }
 
+    @Test
+    fun `deleteAll 성공 테스트`() = runTest {
+        // given: 사용자 생성 후 친구 관계 설정
+        val userId = insertUserAndReturnId("me")
+        val friendUserId1 = insertUserAndReturnId("1")
+        val friendUserId2 = insertUserAndReturnId("2")
+
+        val friend1 = createFriendForTest(userId, friendUserId1, FriendRequestStatus.ACCEPTED)
+        val friend2 = createFriendForTest(userId, friendUserId2, FriendRequestStatus.PENDING)
+
+        assertNotNull(findByIdForTest(friend1.id.value))
+        assertNotNull(findByIdForTest(friend2.id.value))
+
+        // when: 모든 친구 관계 삭제
+        repository.deleteAll(userId)
+
+        // then: 친구가 삭제됐는지 검증
+        assertNull(findByIdForTest(friend1.id.value))
+        assertNull(findByIdForTest(friend2.id.value))
+        val friends = TestDatabaseFactory.dbQuery {
+            Friends
+                .selectAll()
+                .where {
+                    (Friends.requesterId eq userId.value) or
+                        (Friends.receiverId eq userId.value)
+                }.map { it[Friends.id].value }
+        }
+        assertEquals(0, friends.size)
+    }
+
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
@@ -349,5 +383,23 @@ class FriendRepositoryImplTest {
         }
 
         UserId(savedUser.id.value)
+    }
+
+    private suspend fun createFriendForTest(
+        userId1: UserId,
+        userId2: UserId,
+        status: FriendRequestStatus,
+    ): FriendEntity =
+        TestDatabaseFactory.dbQuery {
+            FriendEntity.new {
+                this.requesterId = EntityID(userId1.value, Users)
+                this.receiverId = EntityID(userId2.value, Users)
+                this.status = status
+                this.respondedAt = null
+            }
+        }
+
+    private suspend fun findByIdForTest(friendId: Long): FriendEntity? = TestDatabaseFactory.dbQuery {
+        FriendEntity.findById(friendId)
     }
 }

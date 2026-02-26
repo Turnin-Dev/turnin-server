@@ -15,7 +15,7 @@ fun Application.embeddingResourceAutoCleanup() {
 
 private fun closeEmbeddingService(service: EmbeddingService, reason: String) {
     try {
-        LOGGER.info("Closing embedding service: $reason")
+        LOGGER.info("Closing embedding service on '$reason'")
         service.close()
         LOGGER.info("Embedding service closed successfully")
     } catch (e: Exception) {
