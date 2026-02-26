@@ -208,4 +208,10 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
             it[isActive] = false
         }
     } > 0
+
+    override suspend fun deactivateAll(userId: UserId): Unit = suspendTransaction {
+        UserKeywords.update({ UserKeywords.userId eq userId.value }) {
+            it[isActive] = false
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.peekr.domain.userKeyword.di
 
+import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
 import com.peekr.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
 import com.peekr.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
 import com.peekr.domain.userKeyword.application.usecase.GetDetailUseCase
@@ -16,11 +17,13 @@ import com.peekr.domain.userKeyword.infrastructure.repository.impl.UserKeywordRe
 import org.koin.dsl.module
 
 val userKeywordModule = module {
+    // Repository
     single<UserKeywordRepository> { UserKeywordRepositoryImpl() }
 
-    // provider
+    // Provider
     single<KeywordProvider> { KeywordProviderImpl(get()) }
     single<ReportProvider> { ReportProviderImpl(get()) }
+    single { UserKeywordDeletionSupportApi(get()) }
 
     // UseCases
     factory { CreateUserKeywordUseCase(get(), get()) }

@@ -4,8 +4,10 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.schema.BlockEntity
 import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.KeywordEntity
+import com.peekr.common.db.schema.Keywords
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.UserKeywordEntity
+import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
@@ -26,6 +28,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.selectAll
 import org.junit.After
 import org.junit.Before
 import org.junit.jupiter.api.assertThrows
@@ -612,6 +615,32 @@ class UserKeywordRepositoryImplTest {
         assertNull(foundedUserKeyword)
     }
 
+    @Test
+    fun `deactivateAll 성공 테스트`() = runTest {
+        // given: 사용자 키워드 생성
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = createForTest(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+        assertNotNull(findByIdForTest(userKeyword.id.value))
+
+        // when: 모두 비활성화
+        repository.deactivateAll(userId)
+
+        // then: 모두 비활성화 됐는지 검증
+        val userKeywordActiveList = TestDatabaseFactory.dbQuery {
+            UserKeywords
+                .selectAll()
+                .where { UserKeywords.userId eq userId.value }
+                .map { it[UserKeywords.isActive] }
+        }
+        assertTrue(userKeywordActiveList.isNotEmpty())
+        assertTrue(userKeywordActiveList.all { !it })
+    }
+
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
@@ -648,6 +677,22 @@ class UserKeywordRepositoryImplTest {
             this.blockedId = EntityID(blockedId, Users)
             this.reasonId = EntityID(1, BlockReasons)
         }
+    }
+
+    private suspend fun createForTest(
+        userId: UserId,
+        keywordId: KeywordId,
+        description: Description,
+    ): UserKeywordEntity = TestDatabaseFactory.dbQuery {
+        UserKeywordEntity.new {
+            this.keywordId = EntityID(keywordId.value, Keywords)
+            this.userId = EntityID(userId.value, Users)
+            this.description = description.value
+        }
+    }
+
+    private suspend fun findByIdForTest(userKeywordId: Long): UserKeywordEntity? = TestDatabaseFactory.dbQuery {
+        UserKeywordEntity.findById(userKeywordId)
     }
 
     companion object {
