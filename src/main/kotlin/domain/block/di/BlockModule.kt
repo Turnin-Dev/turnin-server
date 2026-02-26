@@ -1,5 +1,6 @@
 package com.peekr.domain.block.di
 
+import com.peekr.domain.block.application.provider.BlockDeletionSupportApi
 import com.peekr.domain.block.application.usecase.BlockUseCases
 import com.peekr.domain.block.application.usecase.CreateBlockUseCase
 import com.peekr.domain.block.application.usecase.DeleteBlockUseCase
@@ -17,6 +18,7 @@ val blockModule = module {
 
     // Provider
     single<FriendProvider> { FriendProviderImpl(get()) }
+    single { BlockDeletionSupportApi(get()) }
 
     // Usecase
     factory { GetBlockReasonsUseCase(get()) }
