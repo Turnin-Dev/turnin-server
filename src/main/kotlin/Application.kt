@@ -15,6 +15,7 @@ import com.peekr.common.plugin.configureCors
 import com.peekr.common.plugin.configureResources
 import com.peekr.common.plugin.configureRouting
 import com.peekr.common.util.getTimeZoneInfo
+import com.peekr.domain.file.util.fileResourceAutoCleanup
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.netty.EngineMain
@@ -60,4 +61,5 @@ fun Application.module() {
 
     // ------------------------------ Embedding Service cleanup ------------------------------
     embeddingResourceAutoCleanup()
+    fileResourceAutoCleanup()
 }
