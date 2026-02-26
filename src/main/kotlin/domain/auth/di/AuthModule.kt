@@ -19,13 +19,21 @@ val authModule = module {
     single<RefreshTokenRepository> { RefreshTokenRepositoryImpl() }
 
     // Provider
-    single<AuthProviderApi> { AuthProviderApi(get()) }
+    single { AuthProviderApi(get()) }
 
     // UseCase
-    factory { LoginUseCase(get(), get(), get()) }
-    factory { RegisterUseCase(get(), get(), get()) }
-    factory { RefreshTokenUseCase(get(), get(), get()) }
-    factory { ExistsDisplayIdUseCase(get()) }
-    factory { FindUserUseCase(get()) }
-    single<AuthUseCases> { AuthUseCases(get(), get(), get(), get(), get()) }
+    single { LoginUseCase(get(), get(), get()) }
+    single { RegisterUseCase(get(), get(), get()) }
+    single { RefreshTokenUseCase(get(), get(), get()) }
+    single { ExistsDisplayIdUseCase(get()) }
+    single { FindUserUseCase(get()) }
+    single {
+        AuthUseCases(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+        )
+    }
 }

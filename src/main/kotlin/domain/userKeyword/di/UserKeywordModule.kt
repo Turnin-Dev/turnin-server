@@ -26,13 +26,13 @@ val userKeywordModule = module {
     single { UserKeywordDeletionSupportApi(get()) }
 
     // UseCases
-    factory { CreateUserKeywordUseCase(get(), get()) }
-    factory { GetUserKeywordsUseCase(get(), get()) }
-    factory { UpdateUserKeywordUseCase(get(), get()) }
-    factory { DeleteUserKeywordUseCase(get(), get()) }
-    factory { GetDetailUseCase(get()) }
-    factory { GetDetailsUseCase(get()) }
-    single<UserKeywordUseCases> {
+    single { CreateUserKeywordUseCase(get(), get()) }
+    single { GetUserKeywordsUseCase(get(), get()) }
+    single { UpdateUserKeywordUseCase(get(), get()) }
+    single { DeleteUserKeywordUseCase(get(), get()) }
+    single { GetDetailUseCase(get()) }
+    single { GetDetailsUseCase(get()) }
+    single {
         UserKeywordUseCases(
             get(),
             get(),

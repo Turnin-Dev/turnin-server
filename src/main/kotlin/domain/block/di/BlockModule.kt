@@ -21,9 +21,16 @@ val blockModule = module {
     single { BlockDeletionSupportApi(get()) }
 
     // Usecase
-    factory { GetBlockReasonsUseCase(get()) }
-    factory { CreateBlockUseCase(get(), get()) }
-    factory { GetBlockedUsersUseCase(get()) }
-    factory { DeleteBlockUseCase(get()) }
-    single<BlockUseCases> { BlockUseCases(get(), get(), get(), get()) }
+    single { GetBlockReasonsUseCase(get()) }
+    single { CreateBlockUseCase(get(), get()) }
+    single { GetBlockedUsersUseCase(get()) }
+    single { DeleteBlockUseCase(get()) }
+    single {
+        BlockUseCases(
+            get(),
+            get(),
+            get(),
+            get(),
+        )
+    }
 }

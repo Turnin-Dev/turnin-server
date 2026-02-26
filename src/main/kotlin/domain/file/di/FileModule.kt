@@ -16,13 +16,13 @@ val fileModule = module {
     single<FileService> { FileServiceImpl(get()) }
 
     // Provider
-    single<FileProviderApi> { FileProviderApi(get()) }
+    single { FileProviderApi(get()) }
 
     // UseCase
-    factory { GetFileUploadUrlUseCase(get()) }
-    factory { GetFileUpdateUrlUseCase(get()) }
-    factory { DeleteFileUseCase(get()) }
-    single<FileUseCases> { FileUseCases(get(), get()) }
+    single { GetFileUploadUrlUseCase(get()) }
+    single { GetFileUpdateUrlUseCase(get()) }
+    single { DeleteFileUseCase(get()) }
+    single { FileUseCases(get(), get()) }
 
     // Third-Party
     single { S3PresignerFactory() }

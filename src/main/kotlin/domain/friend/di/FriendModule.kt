@@ -22,13 +22,13 @@ val friendModule = module {
     single { FriendDeletionSupportApi(get()) }
 
     // Usecase
-    factory { GetFriendsUseCase(get()) }
-    factory { AddFriendUseCase(get()) }
-    factory { UpdateFriendRequestStatusUseCase(get()) }
-    factory { DeleteFriendUseCase(get()) }
-    factory { GetFriendStatusUseCase(get()) }
-    factory { GetIncomingRequestsUseCase(get()) }
-    single<FriendUseCases> {
+    single { GetFriendsUseCase(get()) }
+    single { AddFriendUseCase(get()) }
+    single { UpdateFriendRequestStatusUseCase(get()) }
+    single { DeleteFriendUseCase(get()) }
+    single { GetFriendStatusUseCase(get()) }
+    single { GetIncomingRequestsUseCase(get()) }
+    single {
         FriendUseCases(
             get(),
             get(),

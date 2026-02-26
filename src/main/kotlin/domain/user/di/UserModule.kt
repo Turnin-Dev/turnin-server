@@ -33,13 +33,13 @@ val userModule = module {
     single<UserRepository> { UserRepositoryImpl() }
 
     // UseCase
-    factory { GetUserUseCase(get()) }
-    factory { GetMyProfileUseCase(get(), get()) }
-    factory { UpdateUserUseCase(get(), get()) }
-    factory { UpdateIntroduceUseCase(get()) }
-    factory { GetUserProfileUseCase(get(), get()) }
-    factory { LogoutUseCase(get()) }
-    single<UserUseCases> {
+    single { GetUserUseCase(get()) }
+    single { GetMyProfileUseCase(get(), get()) }
+    single { UpdateUserUseCase(get(), get()) }
+    single { UpdateIntroduceUseCase(get()) }
+    single { GetUserProfileUseCase(get(), get()) }
+    single { LogoutUseCase(get()) }
+    single {
         UserUseCases(
             get(),
             get(),
