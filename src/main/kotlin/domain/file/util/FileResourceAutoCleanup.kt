@@ -23,7 +23,7 @@ private fun closeS3PresignerFactory(s3PresignerFactory: S3PresignerFactory, reas
         s3PresignerFactory.close()
         LOGGER.info("S3PresignerFactory closed successfully")
     } catch (e: Exception) {
-        LOGGER.error(e, "Falied to close s3PresignerFactory")
+        LOGGER.error(e, "Failed to close s3PresignerFactory")
     }
 }
 

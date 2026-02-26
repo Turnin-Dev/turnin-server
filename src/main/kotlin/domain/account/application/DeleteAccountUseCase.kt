@@ -17,7 +17,7 @@ class DeleteAccountUseCase {
      * @param userId 사용자 ID
      */
     suspend operator fun invoke(userId: Long) = suspendTransaction {
-        val userIDVO = UserId.Companion(userId)
+        val userIDVO = UserId(userId)
 
         // 1. 개인 정보 삭제/비식별화 (사용자의 모든 데이터 삭제/비식별화)
         // - 사용자, 사용자 키워드 비활성화
@@ -27,6 +27,6 @@ class DeleteAccountUseCase {
 
         // 2. 로그아웃 과정 수행 (리프레쉬, FCM 토큰 모두 삭제 포함)
 
-        // 2. 파일 서버 정리 (스토리지 서버에 있는 사용자의 데이터를 모두 삭제)
+        // 3. 파일 서버 정리 (스토리지 서버에 있는 사용자의 데이터를 모두 삭제)
     }
 }

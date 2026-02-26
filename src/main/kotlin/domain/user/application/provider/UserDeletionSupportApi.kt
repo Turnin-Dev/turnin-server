@@ -10,7 +10,7 @@ class UserDeletionSupportApi(private val userRepository: UserRepository) {
     /**
      * 사용자를 비활성화한다.
      *
-     * ###### 해당 메서드는 [userId]의 모든 데이터를 지우므로 주의해서 사용해야 한다.
+     * ###### 해당 메서드는 [userId] 계정을 비활성화(soft delete)하므로 주의해서 사용해야 한다.
      *
      * @param userId 비활성화할 사용자 ID
      */

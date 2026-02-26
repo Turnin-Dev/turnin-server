@@ -179,8 +179,8 @@ flowchart TD
 
 # 4. Rule (추가중)
 
-1. 모든 Entity / Value Object 으로의 매핑은 **`application`** 계층에서 진행한다.  
+1. 모든 Value Object / 도메인 모델로의 매핑은 **`application`** 계층에서 진행한다.  
    **매핑 예시**
     1. Primitive Type -> Value Object
-    2. UserDto -> User
+    2. UserDto(외부 입력) -> User(도메인 모델)
 2. 엔드포인트 테스트는 `TestEndpoint` 테스트 도구를 사용하여 테스트한다.
