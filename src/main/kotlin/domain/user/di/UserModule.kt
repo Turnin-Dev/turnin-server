@@ -1,5 +1,6 @@
 package com.peekr.domain.user.di
 
+import com.peekr.domain.user.application.provider.UserDeletionSupportApi
 import com.peekr.domain.user.application.provider.UserProviderApi
 import com.peekr.domain.user.application.usecase.GetMyProfileUseCase
 import com.peekr.domain.user.application.usecase.GetUserProfileUseCase
@@ -26,6 +27,7 @@ val userModule = module {
     single<FriendProvider> { FriendProviderImpl(get()) }
     single<AuthProvider> { AuthProviderImpl(get()) }
     single<FileProvider> { FileProviderImpl(get()) }
+    single { UserDeletionSupportApi(get()) }
 
     // Repository
     single<UserRepository> { UserRepositoryImpl() }

@@ -288,6 +288,37 @@ class UserRepositoryImplTest {
         assertFalse(result)
     }
 
+    @Test
+    fun `deactivate 성공 테스트`() = runTest {
+        // given: 사용자 생성
+        val user = insertUser("1")
+        assertNotNull(findByIdForTest(user.id.value))
+
+        // when: 사용자 비활성화
+        repository.deactivate(user.id)
+
+        // then: 비활성화 됐는지 검증
+        val foundedUser = findByIdForTest(user.id.value)
+        assertNotNull(foundedUser)
+        assertFalse(foundedUser.isActive)
+    }
+
+    @Test
+    fun `deactivate 성공 테스트 - 비활성화 시 findById, findVisibleById를 수행하는 경우 조회되지 않는다`() = runTest {
+        // given: 사용자 생성
+        val user = insertUser("1")
+        assertNotNull(findByIdForTest(user.id.value))
+
+        // when: 사용자 비활성화 후 findById, findVisibleById로 조회
+        repository.deactivate(user.id)
+        val foundedUser1 = repository.findById(user.id)
+        val foundedUser2 = repository.findVisibleById(user.id, user.id)
+
+        // then: 비활성화 됐는지 검증
+        assertNull(foundedUser1)
+        assertNull(foundedUser2)
+    }
+
     private suspend fun insertUser(uniqueValue: String): User = TestDatabaseFactory.dbQuery {
         UserEntity
             .new {
@@ -312,6 +343,10 @@ class UserRepositoryImplTest {
             this.blockedId = EntityID(blockedId, Users)
             this.reasonId = EntityID(1, BlockReasons)
         }
+    }
+
+    private suspend fun findByIdForTest(userId: Long): UserEntity? = TestDatabaseFactory.dbQuery {
+        UserEntity.findById(userId)
     }
 
     companion object {
