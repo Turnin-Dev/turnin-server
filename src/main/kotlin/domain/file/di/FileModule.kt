@@ -1,5 +1,6 @@
 package com.peekr.domain.file.di
 
+import com.peekr.domain.file.application.provider.FileDeletionSupportApi
 import com.peekr.domain.file.application.provider.FileProviderApi
 import com.peekr.domain.file.application.usecase.DeleteFileUseCase
 import com.peekr.domain.file.application.usecase.FileUseCases
@@ -17,6 +18,7 @@ val fileModule = module {
 
     // Provider
     single { FileProviderApi(get()) }
+    single { FileDeletionSupportApi(get()) }
 
     // UseCase
     single { GetFileUploadUrlUseCase(get()) }

@@ -22,5 +22,6 @@ class LogoutUseCase(private val authProvider: AuthProvider) {
         // 1. 토큰 삭제
         authProvider.deleteRefreshToken(userIDVO)
         // 2. 기기 정보 해제 (사용자와 매핑된 FCM 토큰 정보 제거)
+        // TODO: FCM 토큰 삭제 구현 예정
     }
 }

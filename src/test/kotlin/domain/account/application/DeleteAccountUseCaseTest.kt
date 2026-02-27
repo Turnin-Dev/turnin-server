@@ -1,0 +1,254 @@
+package com.peekr.domain.account.application
+
+import com.peekr.common.db.schema.BlockEntity
+import com.peekr.common.db.schema.BlockReasons
+import com.peekr.common.db.schema.Blocks
+import com.peekr.common.db.schema.FriendEntity
+import com.peekr.common.db.schema.Friends
+import com.peekr.common.db.schema.KeywordEntity
+import com.peekr.common.db.schema.RefreshTokens
+import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.UserKeywordEntity
+import com.peekr.common.db.schema.UserKeywords
+import com.peekr.common.db.schema.Users
+import com.peekr.common.model.FriendRequestStatus
+import com.peekr.common.model.Role
+import com.peekr.common.model.SocialLoginProvider
+import com.peekr.domain.account.exception.AccountException
+import com.peekr.domain.auth.application.provider.AuthDeletionSupportApi
+import com.peekr.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
+import com.peekr.domain.block.application.provider.BlockDeletionSupportApi
+import com.peekr.domain.block.infrastructure.repository.BlockRepositoryImpl
+import com.peekr.domain.file.application.provider.FileDeletionSupportApi
+import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
+import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
+import com.peekr.domain.user.application.provider.UserDeletionSupportApi
+import com.peekr.domain.user.domain.model.User
+import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
+import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
+import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
+import com.peekr.domain.userKeyword.infrastructure.repository.impl.UserKeywordRepositoryImpl
+import com.peekr.util.db.TestDatabaseFactory
+import io.mockk.coVerify
+import io.mockk.mockk
+import java.time.Instant
+import kotlinx.coroutines.test.runTest
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.upsert
+import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.jupiter.api.assertThrows
+
+class DeleteAccountUseCaseTest {
+    private val mockFileDeletionSupportApi = mockk<FileDeletionSupportApi>(relaxed = true)
+
+    private val usecase = DeleteAccountUseCase(
+        authDeletionSupportApi = AuthDeletionSupportApi(RefreshTokenRepositoryImpl()),
+        userDeletionSupportApi = UserDeletionSupportApi(UserRepositoryImpl()),
+        friendDeletionSupportApi = FriendDeletionSupportApi(FriendRepositoryImpl()),
+        blockDeletionSupportApi = BlockDeletionSupportApi(BlockRepositoryImpl()),
+        userKeywordDeletionSupportApi = UserKeywordDeletionSupportApi(UserKeywordRepositoryImpl()),
+        fileDeletionSupportApi = mockFileDeletionSupportApi,
+    )
+
+    @Before
+    fun setUp() {
+        TestDatabaseFactory.init()
+    }
+
+    @After
+    fun tearDown() {
+        TestDatabaseFactory.cleanUp()
+    }
+
+    @Test
+    fun `계정 삭제 성공 - 프로필 이미지가 있는 경우`() = runTest {
+        // given
+        val user = insertUser("1", profileImageUrl = "https://r2.example.com/profile.jpg")
+        val other = insertUser("2", profileImageUrl = "https://r2.example.com/profile2.jpg")
+        val originalProviderId = user.providerId
+        insertRefreshToken(user.id.value)
+        insertFriend(user.id.value, other.id.value)
+        insertBlock(user.id.value, other.id.value)
+        insertUserKeyword(user.id.value)
+
+        // when
+        usecase(user.id.value)
+
+        // then
+        // 사용자 비활성화 검증
+        val foundUser = findUserByIdForTest(user.id.value)
+        assertNotNull(foundUser)
+        assertFalse(foundUser!!.isActive)
+
+        // providerId 비식별화 검증
+        assertTrue(foundUser.providerId.startsWith("DELETED_"))
+        assertTrue(foundUser.providerId.endsWith(originalProviderId))
+        assertNotEquals(originalProviderId, foundUser.providerId)
+
+        // user_keyword 비활성화 검증
+        val userKeywords = findUserKeywordsByUserIdForTest(user.id.value)
+        assertTrue(userKeywords.all { !it.isActive })
+
+        // friend 하드 삭제 검증
+        val friends = findFriendsByUserIdForTest(user.id.value)
+        assertTrue(friends.isEmpty())
+
+        // block 하드 삭제 검증
+        val blocks = findBlocksByUserIdForTest(user.id.value)
+        assertTrue(blocks.isEmpty())
+
+        // refresh token 하드 삭제 검증
+        val refreshToken = findRefreshTokenByUserIdForTest(user.id.value)
+        assertNull(refreshToken)
+
+        // 파일 삭제 검증
+        coVerify(exactly = 1) { mockFileDeletionSupportApi.deleteFile("https://r2.example.com/profile.jpg") }
+
+        // other 사용자는 영향받지 않아야 함
+        val otherUser = findUserByIdForTest(other.id.value)
+        assertNotNull(otherUser)
+        assertTrue(otherUser!!.isActive)
+    }
+
+    @Test
+    fun `계정 삭제 성공 - 프로필 이미지가 없는 경우`() = runTest {
+        // given
+        val user = insertUser("1", profileImageUrl = null)
+        val originalProviderId = user.providerId
+
+        // when
+        usecase(user.id.value)
+
+        // then
+        val foundUser = findUserByIdForTest(user.id.value)
+        assertNotNull(foundUser)
+        assertFalse(foundUser!!.isActive)
+
+        // providerId 비식별화 검증
+        assertTrue(foundUser.providerId.startsWith("DELETED_"))
+        assertTrue(foundUser.providerId.endsWith(originalProviderId))
+        assertNotEquals(originalProviderId, foundUser.providerId)
+
+        // 파일 삭제 호출 안됨 검증
+        coVerify(exactly = 0) { mockFileDeletionSupportApi.deleteFile(any()) }
+    }
+
+    @Test
+    fun `계정 삭제 실패 - 존재하지 않는 사용자`() = runTest {
+        // given
+        val notExistUserId = 999L
+
+        // when & then
+        assertThrows<AccountException.UserNotFound> {
+            usecase(notExistUserId)
+        }
+    }
+
+    // ------------------------------ Test Utils ------------------------------
+
+    private suspend fun insertUser(
+        uniqueValue: String,
+        profileImageUrl: String?,
+    ): User = TestDatabaseFactory.dbQuery {
+        UserEntity
+            .new {
+                this.role = Role.USER
+                this.provider = SocialLoginProvider.GOOGLE
+                this.providerId = "pid$uniqueValue"
+                this.displayId = "did$uniqueValue"
+                this.name = "honggd$uniqueValue"
+                this.profileImageUrl = profileImageUrl
+                this.introduce = "hello$uniqueValue"
+                this.isActive = true
+                this.lastLoginAt = Instant.now()
+            }.toDomain()
+    }
+
+    private suspend fun insertRefreshToken(userId: Long) = TestDatabaseFactory.dbQuery {
+        RefreshTokens
+            .upsert {
+                it[user] = EntityID(userId, Users)
+                it[refreshToken] = "test.refresh.token"
+            }
+    }
+
+    private suspend fun insertFriend(userId1: Long, userId2: Long) = TestDatabaseFactory.dbQuery {
+        FriendEntity.new {
+            this.requesterId = EntityID(userId1, Users)
+            this.receiverId = EntityID(userId2, Users)
+            this.status = FriendRequestStatus.ACCEPTED
+            this.respondedAt = null
+        }
+    }
+
+    private suspend fun insertBlock(userId1: Long, userId2: Long) = TestDatabaseFactory.dbQuery {
+        BlockEntity.new {
+            this.blockerId = EntityID(userId1, Users)
+            this.blockedId = EntityID(userId2, Users)
+            this.reasonId = EntityID(1, BlockReasons)
+        }
+    }
+
+    private suspend fun insertUserKeyword(userId: Long) = TestDatabaseFactory.dbQuery {
+        val keyword = KeywordEntity.new {
+            this.keyword = "keyword"
+            this.embedding = "[1, 1, 1]"
+            this.createdBy = EntityID(userId, Users)
+        }
+
+        UserKeywordEntity.new {
+            this.userId = EntityID(userId, Users)
+            this.keywordId = keyword.id
+            this.description = "description"
+            this.isActive = true
+        }
+    }
+
+    private suspend fun findUserByIdForTest(userId: Long): UserEntity? = TestDatabaseFactory.dbQuery {
+        UserEntity.findById(userId)
+    }
+
+    private suspend fun findUserKeywordsByUserIdForTest(userId: Long): List<UserKeywordEntity> =
+        TestDatabaseFactory.dbQuery {
+            UserKeywordEntity
+                .find {
+                    UserKeywords.userId eq userId
+                }.toList()
+        }
+
+    private suspend fun findFriendsByUserIdForTest(userId: Long): List<FriendEntity> =
+        TestDatabaseFactory.dbQuery {
+            FriendEntity
+                .find {
+                    (Friends.requesterId eq userId) or
+                        (Friends.receiverId eq userId)
+                }.toList()
+        }
+
+    private suspend fun findBlocksByUserIdForTest(userId: Long): List<BlockEntity> =
+        TestDatabaseFactory.dbQuery {
+            BlockEntity
+                .find {
+                    (Blocks.blockerId eq userId) or
+                        (Blocks.blockedId eq userId)
+                }.toList()
+        }
+
+    private suspend fun findRefreshTokenByUserIdForTest(userId: Long): String? =
+        TestDatabaseFactory.dbQuery {
+            RefreshTokens
+                .selectAll()
+                .where { RefreshTokens.user eq userId }
+                .map { it[RefreshTokens.refreshToken] }
+                .singleOrNull()
+        }
+}
