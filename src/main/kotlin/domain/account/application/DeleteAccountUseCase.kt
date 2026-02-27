@@ -2,13 +2,22 @@ package com.peekr.domain.account.application
 
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.UserId
+import com.peekr.domain.block.application.provider.BlockDeletionSupportApi
+import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
+import com.peekr.domain.user.application.provider.UserDeletionSupportApi
+import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
 
 /**
  * 계정 삭제
  *
  * @see invoke
  */
-class DeleteAccountUseCase {
+class DeleteAccountUseCase(
+    private val userDeletionSupportApi: UserDeletionSupportApi,
+    private val friendDeletionSupportApi: FriendDeletionSupportApi,
+    private val blockDeletionSupportApi: BlockDeletionSupportApi,
+    private val userKeywordDeletionSupportApi: UserKeywordDeletionSupportApi,
+) {
     /**
      * 계정을 삭제한다.
      *
