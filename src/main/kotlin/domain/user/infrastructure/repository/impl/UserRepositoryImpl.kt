@@ -8,6 +8,7 @@ import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.PeekrDateTime
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
@@ -20,17 +21,25 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {
+    override suspend fun existsUser(id: UserId): Boolean = suspendTransaction {
+        Users.existsUser(id)
+    }
+
     override suspend fun findById(id: UserId): User? = suspendTransaction {
+        Users
+            .selectAll()
+            .where { Users.id eq id.value }
+            .map { it.toDomain(false) }
+            .singleOrNull()
+    }
+
+    override suspend fun findActiveById(id: UserId): User? = suspendTransaction {
         Users
             .selectAll()
             .where { Users.id eq id.value }
             .filterActiveUser()
             .map { it.toDomain(false) }
             .singleOrNull()
-    }
-
-    override suspend fun existsUser(id: UserId): Boolean = suspendTransaction {
-        Users.existsUser(id)
     }
 
     override suspend fun findVisibleById(
@@ -98,6 +107,16 @@ class UserRepositoryImpl : UserRepository {
     ): Boolean = suspendTransaction {
         Users.update({ (Users.id eq userId.value) }) { row ->
             row[this.introduce] = introduce.value
+        } > 0
+    }
+
+    override suspend fun anonymizeProviderId(
+        userId: UserId,
+        providerId: String,
+    ): Boolean = suspendTransaction {
+        val now = PeekrDateTime.now().epochSecond
+        Users.update({ Users.id eq userId.value }) {
+            it[Users.providerId] = "DELETED_${now}_$providerId"
         } > 0
     }
 
