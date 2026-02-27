@@ -56,13 +56,26 @@ class UserRepositoryImplTest {
     }
 
     @Test
-    fun `findById 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
+    fun `findActiveById 성공 테스트`() = runTest {
+        // given
+        val user = insertUser("1")
+
+        // when
+        val userResult = repository.findActiveById(user.id)
+
+        // then
+        assertNotNull(userResult)
+        assertEquals(user, userResult)
+    }
+
+    @Test
+    fun `findActiveById 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 비활성화 사용자 생성
         val user = insertUser("1")
         setUserInactiveForTest(user.id)
 
         // when
-        val userResult = repository.findById(user.id)
+        val userResult = repository.findActiveById(user.id)
 
         // then: 사용자가 조회되지 않는다.
         assertNull(userResult)
@@ -244,7 +257,7 @@ class UserRepositoryImplTest {
 
         // then
         assertTrue(result)
-        val updatedUser = repository.findById(user.id)
+        val updatedUser = repository.findActiveById(user.id)
         assertNotNull(updatedUser)
         assertEquals(userPatch.userName, updatedUser.userName)
         assertEquals(userPatch.displayId, updatedUser.displayId)
@@ -311,12 +324,30 @@ class UserRepositoryImplTest {
 
         // when: 사용자 비활성화 후 findById, findVisibleById로 조회
         repository.deactivate(user.id)
-        val foundedUser1 = repository.findById(user.id)
+        val foundedUser1 = repository.findActiveById(user.id)
         val foundedUser2 = repository.findVisibleById(user.id, user.id)
 
         // then: 비활성화 됐는지 검증
         assertNull(foundedUser1)
         assertNull(foundedUser2)
+    }
+
+    @Test
+    fun `anonymizeProviderId 성공 테스트`() = runTest {
+        // given: 사용자 생성
+        val user = insertUser("1")
+        val originalProviderId = user.providerId
+
+        // when: providerId 비식별화
+        val result = repository.anonymizeProviderId(user.id, user.providerId)
+
+        // then: 변조됐는지 검증
+        assertTrue(result)
+        val foundedUser = findByIdForTest(user.id.value)
+        assertNotNull(foundedUser)
+        assertTrue(foundedUser.providerId.startsWith("DELETED_"))
+        assertTrue(foundedUser.providerId.endsWith("_$originalProviderId"))
+        assertNotEquals(originalProviderId, foundedUser.providerId)
     }
 
     private suspend fun insertUser(uniqueValue: String): User = TestDatabaseFactory.dbQuery {

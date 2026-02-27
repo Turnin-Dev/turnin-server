@@ -30,7 +30,7 @@ class GetUserProfileUseCaseTest {
     @BeforeTest
     fun setUp() {
         coEvery { userRepository.findVisibleById(TestMyUserId, TestUserId) } returns TestUser
-        coEvery { userRepository.findById(TestUserId) } returns TestUser
+        coEvery { userRepository.findActiveById(TestUserId) } returns TestUser
         coEvery { friendProvider.countFriends(TestUserId) } returns 10L
         coEvery {
             friendProvider.getFriendStatus(TestMyUserId, TestUserId)
@@ -50,7 +50,7 @@ class GetUserProfileUseCaseTest {
     fun `사용자를 찾지 못하는 경우 null을 반환한다`() = runTest {
         // given
         coEvery { userRepository.findVisibleById(TestMyUserId, TestUserId) } returns null
-        coEvery { userRepository.findById(TestUserId) } returns null
+        coEvery { userRepository.findActiveById(TestUserId) } returns null
 
         // when
         val userProfileDto = usecase(TestMyUserId.value, TestUserId.value)

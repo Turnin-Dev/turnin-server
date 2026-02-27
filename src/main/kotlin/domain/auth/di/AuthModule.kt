@@ -1,5 +1,6 @@
 package com.peekr.domain.auth.di
 
+import com.peekr.domain.auth.application.provider.AuthDeletionSupportApi
 import com.peekr.domain.auth.application.provider.AuthProviderApi
 import com.peekr.domain.auth.application.usecase.AuthUseCases
 import com.peekr.domain.auth.application.usecase.ExistsDisplayIdUseCase
@@ -20,6 +21,7 @@ val authModule = module {
 
     // Provider
     single { AuthProviderApi(get()) }
+    single { AuthDeletionSupportApi(get()) }
 
     // UseCase
     single { LoginUseCase(get(), get(), get()) }
