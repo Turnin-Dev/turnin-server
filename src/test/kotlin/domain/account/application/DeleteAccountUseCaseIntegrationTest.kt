@@ -22,6 +22,7 @@ import com.peekr.domain.block.infrastructure.repository.BlockRepositoryImpl
 import com.peekr.domain.file.application.provider.FileDeletionSupportApi
 import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
+import com.peekr.domain.user.application.dto.toDto
 import com.peekr.domain.user.application.provider.UserDeletionSupportApi
 import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
@@ -29,6 +30,7 @@ import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
 import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
 import com.peekr.domain.userKeyword.infrastructure.repository.impl.UserKeywordRepositoryImpl
 import com.peekr.util.db.TestDatabaseFactory
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import java.time.Instant
@@ -38,6 +40,7 @@ import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.upsert
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
@@ -47,7 +50,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 
-class DeleteAccountUseCaseTest {
+class DeleteAccountUseCaseIntegrationTest {
     private val mockFileDeletionSupportApi = mockk<FileDeletionSupportApi>(relaxed = true)
 
     private val usecase = DeleteAccountUseCase(
@@ -151,6 +154,88 @@ class DeleteAccountUseCaseTest {
         assertThrows<AccountException.UserNotFound> {
             usecase(notExistUserId)
         }
+    }
+
+    @Test
+    fun `계정 삭제 성공 - 파일 삭제 실패 시 DB는 롤백되지 않는다`() = runTest {
+        // given
+        val user = insertUser("1", profileImageUrl = "https://r2.example.com/profile.jpg")
+        val originalProviderId = user.providerId
+        coEvery {
+            mockFileDeletionSupportApi.deleteFile(any())
+        } throws RuntimeException("R2 connection failed")
+
+        // when
+        usecase(user.id.value) // 파일 삭제 실패해도 예외가 전파되지 않아야 함
+
+        // then
+        // DB 작업은 정상적으로 완료됐는지 검증
+        val foundUser = findUserByIdForTest(user.id.value)
+        assertNotNull(foundUser)
+        assertFalse(foundUser!!.isActive)
+        assertTrue(foundUser.providerId.startsWith("DELETED_"))
+        assertTrue(foundUser.providerId.endsWith(originalProviderId))
+
+        // 파일 삭제 시도는 했는지 검증
+        coVerify(exactly = 1) { mockFileDeletionSupportApi.deleteFile("https://r2.example.com/profile.jpg") }
+    }
+
+    @Test
+    fun `계정 삭제 실패 - DB 작업 실패 시 롤백된다`() = runTest {
+        // given
+        val user = insertUser("1", profileImageUrl = "https://r2.example.com/profile.jpg")
+        val other = insertUser("2", profileImageUrl = null)
+        insertRefreshToken(user.id.value)
+        insertFriend(user.id.value, other.id.value)
+        insertBlock(user.id.value, other.id.value)
+        insertUserKeyword(user.id.value)
+
+        // userDeletionSupportApi.deactivate() 호출 시 예외 발생 (트랜잭션 중간 실패 시뮬레이션)
+        val mockUserDeletionSupportApi = mockk<UserDeletionSupportApi> {
+            coEvery { findById(user.id) } returns user.toDto()
+            coEvery { anonymizeProviderId(user.id, any()) } returns true
+            coEvery { deactivate(user.id) } throws RuntimeException("DB connection failed")
+        }
+
+        val failingUseCase = DeleteAccountUseCase(
+            authDeletionSupportApi = AuthDeletionSupportApi(RefreshTokenRepositoryImpl()),
+            userDeletionSupportApi = mockUserDeletionSupportApi,
+            friendDeletionSupportApi = FriendDeletionSupportApi(FriendRepositoryImpl()),
+            blockDeletionSupportApi = BlockDeletionSupportApi(BlockRepositoryImpl()),
+            userKeywordDeletionSupportApi = UserKeywordDeletionSupportApi(UserKeywordRepositoryImpl()),
+            fileDeletionSupportApi = mockFileDeletionSupportApi,
+        )
+
+        // when & then
+        assertThrows<RuntimeException> {
+            failingUseCase(user.id.value)
+        }
+
+        // then: 롤백 검증 - 모든 데이터가 원래 상태로 유지되어야 함
+        // 사용자 활성화 상태 유지 검증
+        val foundUser = findUserByIdForTest(user.id.value)
+        assertNotNull(foundUser)
+        assertTrue(foundUser!!.isActive)
+        assertEquals(user.providerId, foundUser.providerId) // providerId 변조 안됨
+
+        // friend 롤백 검증
+        val friends = findFriendsByUserIdForTest(user.id.value)
+        assertFalse(friends.isEmpty())
+
+        // block 롤백 검증
+        val blocks = findBlocksByUserIdForTest(user.id.value)
+        assertFalse(blocks.isEmpty())
+
+        // refresh token 롤백 검증
+        val refreshToken = findRefreshTokenByUserIdForTest(user.id.value)
+        assertNotNull(refreshToken)
+
+        // user_keyword 롤백 검증
+        val userKeywords = findUserKeywordsByUserIdForTest(user.id.value)
+        assertTrue(userKeywords.all { it.isActive })
+
+        // 파일 삭제 호출 안됨 검증 (트랜잭션 실패로 파일 삭제 단계까지 도달하지 않아야 함)
+        coVerify(exactly = 0) { mockFileDeletionSupportApi.deleteFile(any()) }
     }
 
     // ------------------------------ Test Utils ------------------------------
