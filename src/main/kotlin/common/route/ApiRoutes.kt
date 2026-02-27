@@ -15,6 +15,11 @@ object Api {
     object V1 {
         const val ROUTE = "/v1"
 
+        object Account {
+            const val ROUTE = "/account"
+            const val TAG = "Account"
+        }
+
         object Auth {
             const val ROUTE = "/auth"
             const val TAG = "Auth"

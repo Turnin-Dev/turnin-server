@@ -29,6 +29,8 @@ class DeleteAccountUseCase(
      * 자세한 내용은 기능 명세서 **`RQ-3`** 참고
      *
      * @param userId 사용자 ID
+     *
+     * @throws AccountException.UserNotFound 사용자가 존재하지 않는 경우 예외가 발생한다.
      */
     suspend operator fun invoke(userId: Long) = suspendTransaction {
         val userIDVO = UserId(userId)
