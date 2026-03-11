@@ -3,6 +3,7 @@ package com.peekr.domain.file.infrastructure.service.impl
 import com.peekr.domain.file.domain.model.UploadFileInfo
 import com.peekr.domain.file.domain.service.FileService
 import com.peekr.domain.file.exception.FileException
+import java.net.URI
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception
 
@@ -48,11 +49,15 @@ class FileServiceImpl(private val r2Service: CloudflareR2Service) : FileService 
 
     override fun deleteFile(fileName: String) {
         try {
-            r2Service.deleteFile(fileName)
+            val parsedFileName = parseFileName(fileName)
+            r2Service.deleteFile(parsedFileName)
         } catch (e: S3Exception) {
             throw FileException.R2DeleteFailed(e)
         } catch (e: SdkClientException) {
             throw FileException.R2DeleteFailed(e)
         }
     }
+
+    private fun parseFileName(imageUrl: String): String =
+        URI(imageUrl).path.drop(1)
 }
