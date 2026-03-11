@@ -235,6 +235,9 @@ class UserKeywordRepositoryImplTest {
             userId = userId,
             description = TestDescription,
         )
+        val originalUserKeyword = TestDatabaseFactory.dbQuery {
+            UserKeywordEntity.findById(userKeyword.id.value)?.updatedAt
+        }
 
         val newKeywordId = insertKeywordAndReturnId(userId, "newKeyword")
         val newDescription = Description("newDescription")
@@ -247,12 +250,16 @@ class UserKeywordRepositoryImplTest {
         // when
         val result = repository.update(userId, patch)
         val patchedUserKeyword = repository.findById(userKeyword.id)
+        val updatedAt = TestDatabaseFactory.dbQuery {
+            UserKeywordEntity.findById(patchedUserKeyword!!.id.value)?.updatedAt
+        }
 
         // then
         assertTrue(result)
         assertNotNull(patchedUserKeyword)
         assertEquals(newKeywordId, patchedUserKeyword.keywordId)
         assertEquals(newDescription, patchedUserKeyword.description)
+        assertTrue(updatedAt!!.isAfter(originalUserKeyword))
     }
 
     @Test
@@ -582,17 +589,24 @@ class UserKeywordRepositoryImplTest {
             userId = userId,
             description = TestDescription,
         )
+        val originalUpdatedAt = TestDatabaseFactory.dbQuery {
+            UserKeywordEntity.findById(userKeyword.id.value)?.updatedAt
+        }
 
         // when: 비활성화
         val result = repository.deactivate(userId, userKeyword.id)
         val foundedUserKeyword = TestDatabaseFactory.dbQuery {
             UserKeywordEntity.findById(userKeyword.id.value)
         }
+        val updatedAt = TestDatabaseFactory.dbQuery {
+            UserKeywordEntity.findById(foundedUserKeyword!!.id.value)?.updatedAt
+        }
 
         // then: 검증
         assertTrue(result)
         assertNotNull(foundedUserKeyword)
         assertFalse(foundedUserKeyword.isActive)
+        assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
     }
 
     @Test
@@ -619,13 +633,28 @@ class UserKeywordRepositoryImplTest {
     fun `deactivateAll 성공 테스트`() = runTest {
         // given: 사용자 키워드 생성
         val userId = insertUserAndReturnId("1")
-        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
-        val userKeyword = createForTest(
-            keywordId = keywordId,
+        val keywordId1 = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val keywordId2 = insertKeywordAndReturnId(userId, "keyword2")
+        val userKeyword1 = createForTest(
+            keywordId = keywordId1,
             userId = userId,
             description = TestDescription,
         )
-        assertNotNull(findByIdForTest(userKeyword.id.value))
+        val userKeyword2 = createForTest(
+            keywordId = keywordId2,
+            userId = userId,
+            description = Description("desc 2"),
+        )
+        val originalUpdatedAtList = listOf(
+            TestDatabaseFactory.dbQuery {
+                UserKeywordEntity.findById(userKeyword1.id.value)?.updatedAt
+            },
+            TestDatabaseFactory.dbQuery {
+                UserKeywordEntity.findById(userKeyword2.id.value)?.updatedAt
+            },
+        )
+        assertNotNull(findByIdForTest(userKeyword1.id.value))
+        assertNotNull(findByIdForTest(userKeyword2.id.value))
 
         // when: 모두 비활성화
         repository.deactivateAll(userId)
@@ -637,8 +666,16 @@ class UserKeywordRepositoryImplTest {
                 .where { UserKeywords.userId eq userId.value }
                 .map { it[UserKeywords.isActive] }
         }
+
+        val updatedAtList = TestDatabaseFactory.dbQuery {
+            UserKeywordEntity.find { UserKeywords.userId eq userId.value }.map { it.updatedAt }
+        }
+
         assertTrue(userKeywordActiveList.isNotEmpty())
         assertTrue(userKeywordActiveList.all { !it })
+        updatedAtList.zip(originalUpdatedAtList) { updatedAt, originalUpdatedAt ->
+            assertTrue(updatedAt.isAfter(originalUpdatedAt))
+        }
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

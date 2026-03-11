@@ -7,7 +7,6 @@ import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.FriendInfoDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
 import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.exception.FriendException
 
 // TODO: 추후 '차단 목록 조회'처럼 조인 방식으로 리팩토링 필요
 
@@ -26,8 +25,6 @@ class GetFriendsUseCase(private val friendRepository: FriendRepository) {
      * @param paginationParams 페이지네이션 파라미터
      *
      * @return [FriendsPagingDataDto] 친구 목록 페이지네이션 데이터 DTO
-     *
-     * @throws FriendException.UserNotFoundException 사용자를 찾지 못하는 경우
      */
     suspend operator fun invoke(
         userId: Long,
@@ -61,13 +58,14 @@ class GetFriendsUseCase(private val friendRepository: FriendRepository) {
             .associateBy { it.userId }
 
         // 3) FriendInfoDto 목록 생성
-        val friends = friendsPagingData.friends.map { friend ->
+        val friends = friendsPagingData.friends.mapNotNull { friend ->
             val targetId = if (friend.requesterId == userIdVO) friend.receiverId else friend.requesterId
             val friendInfo = friendInfoMap[targetId]
-            // 만약 친구 목록에는 있지만, UserProvider 에서 정보를 못 찾아온 경우 (데이터 불일치, 사용자 탈퇴 등)
+            // 친구 목록에는 있지만, UserProvider 에서 정보를 못 찾아온 경우 (데이터 불일치, 사용자 탈퇴 등)
+            // 만약 아래 if 식을 타게 되면, 전체 크기 데이터 정합성에 문제가 생기지만 크게 중요하지 않다고 판단.
             if (friendInfo == null) {
                 logger.error("friendInfo corresponding to ($targetId) is missing, friend: $friend")
-                throw FriendException.UserNotFoundException()
+                return@mapNotNull null
             }
 
             FriendInfoDto(

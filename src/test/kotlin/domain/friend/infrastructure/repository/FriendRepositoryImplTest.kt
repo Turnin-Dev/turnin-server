@@ -9,6 +9,7 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
+import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.util.db.TestDatabaseFactory
 import com.peekr.util.db.setUserInactiveForTest
 import com.peekr.util.testPagination
@@ -226,6 +227,12 @@ class FriendRepositoryImplTest {
         val userId1 = insertUserAndReturnId("a")
         val userId2 = insertUserAndReturnId("b")
         val expectedFriend = repository.createFriend(userId1, userId2)
+        val originalUpdatedAt = TestDatabaseFactory.dbQuery {
+            FriendEntity
+                .findById(
+                    expectedFriend.id.value,
+                )?.updatedAt
+        }
 
         // when, then: PENDING(초기 값), ACCEPTED 순서대로 검증
         // 1. PENDING
@@ -246,8 +253,14 @@ class FriendRepositoryImplTest {
                 .where((Friends.id eq expectedFriend.id.value))
                 .singleOrNull()
         }
+
         assertNotNull(friend2)
         assertEquals(FriendRequestStatus.ACCEPTED, friend2[Friends.status])
+        assertNotNull(friend2.toDomain().respondedAt)
+
+        // updatedAt은 UPDATE 후 갱신됐어야 함
+        val updatedAt = TestDatabaseFactory.dbQuery { FriendEntity.findById(friend2[Friends.id])?.updatedAt }
+        assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
     }
 
     @Test

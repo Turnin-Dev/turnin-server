@@ -9,6 +9,7 @@ import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.db.updateWithTimestamp
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
@@ -30,7 +31,6 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.update
 
 class FriendRepositoryImpl : FriendRepository {
     override suspend fun getFriendsPagination(
@@ -147,7 +147,7 @@ class FriendRepositoryImpl : FriendRepository {
             ((Friends.requesterId eq userId1.value) and (Friends.receiverId eq userId2.value)) or
                 ((Friends.requesterId eq userId2.value) and (Friends.receiverId eq userId1.value))
         }
-        Friends.update({ updateCondition }) {
+        Friends.updateWithTimestamp({ updateCondition }) {
             it[this.status] = requestStatus
             it[this.respondedAt] = PeekrDateTime.now().toOffsetDateTime()
         } > 0

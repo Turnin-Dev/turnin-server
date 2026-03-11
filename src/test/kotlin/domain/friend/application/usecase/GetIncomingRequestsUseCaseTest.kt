@@ -10,7 +10,6 @@ import com.peekr.domain.friend.domain.model.IncomingRequest
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
 import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.exception.FriendException
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -18,7 +17,6 @@ import io.mockk.mockk
 import junit.framework.TestCase.assertTrue
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 
@@ -151,7 +149,7 @@ class GetIncomingRequestsUseCaseTest {
     }
 
     @Test
-    fun `요청자 정보를 찾을 수 없으면 예외를 발생시킨다`() = runTest {
+    fun `요청자 정보를 찾을 수 없으면 해당 요청은 건너뛰고 나머지를 반환한다`() = runTest {
         // given
         val userId = 1L
         val userIdVO = UserId(userId)
@@ -182,10 +180,12 @@ class GetIncomingRequestsUseCaseTest {
             repository.getUserInfos(listOf(requesterId))
         } returns emptyList()
 
-        // when & then
-        assertFailsWith<FriendException.UserNotFoundException> {
-            usecase(userId, paginationParams)
-        }
+        // when
+        val result = usecase(userId, paginationParams)
+
+        // then
+        assertEquals(0, result.requests.size)
+        assertEquals(1L, result.pagingData.totalSize)
 
         coVerify(exactly = 1) {
             repository.getIncomingRequests(userIdVO, 0L, 10)

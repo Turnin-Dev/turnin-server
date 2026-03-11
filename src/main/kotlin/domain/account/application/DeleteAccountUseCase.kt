@@ -39,16 +39,13 @@ class DeleteAccountUseCase(
             val user = userDeletionSupportApi.findById(userIDVO)
                 ?: throw AccountException.UserNotFound()
 
-            // 1. 개인 정보 삭제/비식별화 (사용자의 모든 데이터 삭제/비식별화)
-            // - 사용자, 사용자 키워드 비활성화
-            // - 사용자 ProviderID 변조 ('DELETED_(타임스탬프)_' 접두어 추가)
-            // - 이 외 데이터 전부 Hard Delete
+            // 1. 사용자 데이터 삭제/비식별화
             // - 피드/탐색 조회 쿼리 때문에 삭제 시 트랜잭션 내부에서 정확한 순서대로 삭제해야 한다.
-
             authDeletionSupportApi.deleteRefreshToken(userIDVO)
             // TODO: 이 부분에 추가로 Notification 삭제 구현 예정
             friendDeletionSupportApi.deleteAll(userIDVO)
             blockDeletionSupportApi.deleteAll(userIDVO)
+            // TODO: 사용자, 키워드 비활성화 시 필요없는 부분은 전부 null혹은 빈 문자열로 바꾸는 것을 고려해야 함.
             userKeywordDeletionSupportApi.deactivateAll(userIDVO)
             userDeletionSupportApi.anonymizeProviderId(userIDVO, user.providerId)
             userDeletionSupportApi.deactivate(userIDVO)

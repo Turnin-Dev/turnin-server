@@ -15,6 +15,7 @@ import com.peekr.domain.user.presentation.dto.UserResponse
 import com.peekr.domain.user.presentation.dto.toDto
 import com.peekr.domain.user.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.patch
 import io.github.smiley4.ktoropenapi.put
@@ -101,7 +102,7 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        get(route.LOGOUT, { logoutDocs() }) {
+        delete(route.LOGOUT, { logoutDocs() }) {
             val userId = extractUserIdWithToken()
             usecase.logout(userId.value)
             call.respond(HttpStatusCode.OK)

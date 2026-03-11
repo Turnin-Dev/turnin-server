@@ -11,6 +11,15 @@ import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.dao.toEntity
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
+import org.jetbrains.exposed.sql.statements.UpdateStatement
+import org.jetbrains.exposed.sql.statements.UpsertStatement
+import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.upsert
+
+// ------------------------------ BaseLongIdTable ------------------------------
 
 /**
  * 모든 `LongIdTable`의 기초가 되는 추상 클래스
@@ -43,6 +52,60 @@ abstract class BaseLongIdTableWithoutTimestamp(
     name: String,
     idName: String = "id",
 ) : LongIdTable(name, idName)
+
+/**
+ * [BaseLongIdTable]의 UPDATE 구문에서 updated_at을 자동으로 갱신하는 확장 함수
+ *
+ * ##### 사용 예시
+ * ```
+ * Users.updateWithTimestamp({ Users.id eq userId }) {
+ *     it[name] = "변경된이름"
+ * }
+ * ```
+ */
+fun <T : BaseLongIdTable> T.updateWithTimestamp(
+    where: SqlExpressionBuilder.() -> Op<Boolean>,
+    body: T.(UpdateStatement) -> Unit,
+): Int = update(where) {
+    body(it)
+    // 이미 명시적으로 updated_at이 세팅된 경우 덮어쓰지 않음
+    if (updatedAt !in it.firstDataSet.map { col -> col.first }) {
+        it[updatedAt] = PeekrDateTime.now().toOffsetDateTime()
+    }
+}
+
+/**
+ * [BaseLongIdTable]의 UPSERT 구문에서 updated_at을 자동으로 갱신하는 확장 함수
+ *
+ * INSERT/UPDATE 모두 updated_at이 현재 시각으로 자동 갱신된다.
+ * INSERT 시 created_at은 직접 세팅해야 한다.
+ *
+ * ##### 사용 예시
+ * ```
+ * Users.upsertWithTimestamp(Users.provider, Users.providerId) {
+ *     it[provider] = SocialLoginProvider.KAKAO
+ *     it[providerId] = "provider_id"
+ *     it[name] = "변경된이름"
+ *     it[createdAt] = PeekrDateTime.now().toOffsetDateTime() // INSERT 시 직접 세팅
+ * }
+ * ```
+ */
+fun <T : BaseLongIdTable> T.upsertWithTimestamp(
+    vararg keys: Column<*>,
+    onUpdateExclude: List<Column<*>>? = null,
+    where: (SqlExpressionBuilder.() -> Op<Boolean>)? = null,
+    body: T.(UpsertStatement<Long>) -> Unit,
+) = upsert(
+    *keys,
+    onUpdateExclude = onUpdateExclude,
+    where = where,
+) {
+    body(it)
+    // INSERT/UPDATE 모두 현재 시각으로 갱신
+    it[updatedAt] = PeekrDateTime.now().toOffsetDateTime()
+}
+
+// ------------------------------ BaseEntity ------------------------------
 
 /**
  * 모든 Entity의 기초가 되는 추상 클래스

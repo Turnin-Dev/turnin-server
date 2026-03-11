@@ -8,6 +8,7 @@ import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.db.updateWithTimestamp
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
@@ -24,7 +25,6 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.update
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
     override suspend fun findById(userKeywordId: UserKeywordId): UserKeyword? = suspendTransaction {
@@ -180,7 +180,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         patch: UserKeywordPatch,
     ): Boolean = suspendTransaction {
-        UserKeywords.update({
+        UserKeywords.updateWithTimestamp({
             (UserKeywords.id eq patch.userKeywordId.value) and
                 (UserKeywords.userId eq ownerId.value)
         }) {
@@ -202,7 +202,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         ownerId: UserId,
         userKeywordId: UserKeywordId,
     ): Boolean = suspendTransaction {
-        UserKeywords.update({
+        UserKeywords.updateWithTimestamp({
             (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value)
         }) {
             it[isActive] = false
@@ -210,7 +210,7 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
     } > 0
 
     override suspend fun deactivateAll(userId: UserId): Unit = suspendTransaction {
-        UserKeywords.update({ UserKeywords.userId eq userId.value }) {
+        UserKeywords.updateWithTimestamp({ UserKeywords.userId eq userId.value }) {
             it[isActive] = false
         }
     }
