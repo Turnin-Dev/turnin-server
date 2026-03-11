@@ -2,6 +2,7 @@ package com.peekr.domain.user.infrastructure.repository.impl
 
 import com.peekr.common.db.schema.BlockEntity
 import com.peekr.common.db.schema.BlockReasons
+import com.peekr.common.db.schema.RefreshTokens.user
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.Introduce
@@ -10,7 +11,6 @@ import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.domain.model.User
 import com.peekr.domain.user.domain.model.UserPatch
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
@@ -45,7 +45,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findById 성공 테스트`() = runTest {
         // given
-        val user = insertUser("1")
+        val userEntity = insertUser("1")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
 
         // when
         val userResult = repository.findById(user.id)
@@ -58,7 +59,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findActiveById 성공 테스트`() = runTest {
         // given
-        val user = insertUser("1")
+        val userEntity = insertUser("1")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
 
         // when
         val userResult = repository.findActiveById(user.id)
@@ -71,7 +73,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findActiveById 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 비활성화 사용자 생성
-        val user = insertUser("1")
+        val userEntity = insertUser("1")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         setUserInactiveForTest(user.id)
 
         // when
@@ -116,8 +119,10 @@ class UserRepositoryImplTest {
     @Test
     fun `findVisibleById 성공 테스트 - 내가 차단한 사용자를 조회 시 isBlocked가 true인 채로 조회된다`() = runTest {
         // given: 사용자 2명 생성 후 차단 관계 설정
-        val me = insertUser("1")
-        val user = insertUser("2")
+        val meEntity = insertUser("1")
+        val me = TestDatabaseFactory.dbQuery { meEntity.toDomain() }
+        val userEntity = insertUser("2")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         // me -> user 차단
         createBlock(me.id.value, user.id.value)
 
@@ -132,8 +137,10 @@ class UserRepositoryImplTest {
     @Test
     fun `findVisibleById 성공 테스트 - 내가 차단 당한 사용자를 조회 시 조회되지 않는다`() = runTest {
         // given: 사용자 2명 생성 후 차단 관계 설정
-        val me = insertUser("1")
-        val user = insertUser("2")
+        val meEntity = insertUser("1")
+        val me = TestDatabaseFactory.dbQuery { meEntity.toDomain() }
+        val userEntity = insertUser("2")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         // user -> me 차단
         createBlock(user.id.value, me.id.value)
 
@@ -147,8 +154,10 @@ class UserRepositoryImplTest {
     @Test
     fun `findVisibleById 성공 테스트 - 상호 차단인 경우 서로 조회되지 않는다`() = runTest {
         // given: 사용자 2명 생성 후 차단 관계 설정
-        val me = insertUser("1")
-        val user = insertUser("2")
+        val meEntity = insertUser("1")
+        val me = TestDatabaseFactory.dbQuery { meEntity.toDomain() }
+        val userEntity = insertUser("2")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         // 상호 차단
         createBlock(me.id.value, user.id.value)
         createBlock(user.id.value, me.id.value)
@@ -193,7 +202,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findByIds 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 1명의 테스트 사용자를 생성, 사용자 비활성화
-        val user = insertUser("1")
+        val userEntity = insertUser("1")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         setUserInactiveForTest(user.id)
 
         // when
@@ -206,7 +216,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findByDisplayId 성공 테스트`() = runTest {
         // given
-        val savedUser = insertUser("1")
+        val userEntity = insertUser("1")
+        val savedUser = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         val displayId = savedUser.displayId
 
         // when
@@ -220,7 +231,8 @@ class UserRepositoryImplTest {
     @Test
     fun `findByDisplayId 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 비활성화 사용자 생성
-        val savedUser = insertUser("1")
+        val userEntity = insertUser("1")
+        val savedUser = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         val displayId = savedUser.displayId
         setUserInactiveForTest(savedUser.id)
 
@@ -244,6 +256,7 @@ class UserRepositoryImplTest {
     fun `update 성공 테스트`() = runTest {
         // given
         val user = insertUser("1")
+        val originalUpdatedAt = TestDatabaseFactory.dbQuery { user.updatedAt }
         val userPatch = UserPatch(
             userName = UserName("newName"),
             displayId = DisplayId("newDid"),
@@ -253,17 +266,19 @@ class UserRepositoryImplTest {
         )
 
         // when
-        val result = repository.update(user.id, userPatch)
+        val result = repository.update(UserId(user.id.value), userPatch)
+        val updatedUser = TestDatabaseFactory.dbQuery { UserEntity.findById(user.id.value) }
+        val updatedAt = TestDatabaseFactory.dbQuery { updatedUser?.updatedAt }
 
         // then
         assertTrue(result)
-        val updatedUser = repository.findActiveById(user.id)
         assertNotNull(updatedUser)
-        assertEquals(userPatch.userName, updatedUser.userName)
-        assertEquals(userPatch.displayId, updatedUser.displayId)
-        assertEquals(userPatch.introduce, updatedUser.introduce)
+        assertEquals(userPatch.userName.value, updatedUser.name)
+        assertEquals(userPatch.displayId.value, updatedUser.displayId)
+        assertEquals(userPatch.introduce.value, updatedUser.introduce)
         assertEquals(userPatch.newProfileImageUrl, updatedUser.profileImageUrl)
         assertNotEquals(userPatch.oldProfileImageUrl, updatedUser.profileImageUrl)
+        assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
     }
 
     @Test
@@ -280,15 +295,18 @@ class UserRepositoryImplTest {
     fun `updateIntroduce 성공 테스트`() = runTest {
         // given
         val savedUserEntity = insertUser("1")
+        val originalUpdatedAt = TestDatabaseFactory.dbQuery { savedUserEntity.updatedAt }
         val userId = UserId(savedUserEntity.id.value)
 
         // when
         val result = repository.updateIntroduce(userId, TestIntroduce)
-        val updatedUserEntity = repository.findVisibleById(userId, userId)
+        val updatedUserEntity = TestDatabaseFactory.dbQuery { UserEntity.findById(savedUserEntity.id.value) }
+        val updatedAt = TestDatabaseFactory.dbQuery { updatedUserEntity?.updatedAt }
 
         // then
         assertTrue(result)
-        assertEquals(TestIntroduce, updatedUserEntity?.introduce)
+        assertEquals(TestIntroduce.value, updatedUserEntity?.introduce)
+        assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
     }
 
     @Test
@@ -304,7 +322,8 @@ class UserRepositoryImplTest {
     @Test
     fun `deactivate 성공 테스트`() = runTest {
         // given: 사용자 생성
-        val user = insertUser("1")
+        val userEntity = insertUser("1")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
         assertNotNull(findByIdForTest(user.id.value))
 
         // when: 사용자 비활성화
@@ -322,27 +341,39 @@ class UserRepositoryImplTest {
     @Test
     fun `deactivate 성공 테스트 - 비활성화 시 findById, findVisibleById를 수행하는 경우 조회되지 않는다`() = runTest {
         // given: 사용자 생성
-        val user = insertUser("1")
+        val userEntity = insertUser("1")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
+        val originalUpdatedAt = TestDatabaseFactory.dbQuery { userEntity.updatedAt }
         assertNotNull(findByIdForTest(user.id.value))
 
         // when: 사용자 비활성화 후 findById, findVisibleById로 조회
         repository.deactivate(user.id)
         val foundedUser1 = repository.findActiveById(user.id)
         val foundedUser2 = repository.findVisibleById(user.id, user.id)
+        val updatedAt = TestDatabaseFactory.dbQuery {
+            UserEntity.findById(user.id.value)?.updatedAt
+        }
 
         // then: 비활성화 됐는지 검증
         assertNull(foundedUser1)
         assertNull(foundedUser2)
+        // 업데이트 시간 검증
+        assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
     }
 
     @Test
     fun `anonymizeProviderId 성공 테스트`() = runTest {
         // given: 사용자 생성
-        val user = insertUser("1")
+        val userEntity = insertUser("1")
+        val user = TestDatabaseFactory.dbQuery { userEntity.toDomain() }
+        val originalUpdatedAt = TestDatabaseFactory.dbQuery { userEntity.updatedAt }
         val originalProviderId = user.providerId
 
         // when: providerId 비식별화
         val result = repository.anonymizeProviderId(user.id, user.providerId)
+        val updatedAt = TestDatabaseFactory.dbQuery {
+            UserEntity.findById(user.id.value)?.updatedAt
+        }
 
         // then: 변조됐는지 검증
         assertTrue(result)
@@ -351,9 +382,10 @@ class UserRepositoryImplTest {
         assertTrue(foundedUser.providerId.startsWith("DELETED_"))
         assertTrue(foundedUser.providerId.endsWith("_$originalProviderId"))
         assertNotEquals(originalProviderId, foundedUser.providerId)
+        assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
     }
 
-    private suspend fun insertUser(uniqueValue: String): User = TestDatabaseFactory.dbQuery {
+    private suspend fun insertUser(uniqueValue: String): UserEntity = TestDatabaseFactory.dbQuery {
         UserEntity
             .new {
                 this.role = Role.USER
@@ -365,7 +397,7 @@ class UserRepositoryImplTest {
                 this.introduce = "hello"
                 this.isActive = true
                 this.lastLoginAt = Instant.now()
-            }.toDomain()
+            }
     }
 
     private suspend fun createBlock(

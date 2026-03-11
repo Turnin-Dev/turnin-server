@@ -5,6 +5,7 @@ import com.peekr.common.db.extension.filterActiveUser
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.db.updateWithTimestamp
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
@@ -18,7 +19,6 @@ import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.notExists
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.update
 
 class UserRepositoryImpl : UserRepository {
     override suspend fun existsUser(id: UserId): Boolean = suspendTransaction {
@@ -93,7 +93,7 @@ class UserRepositoryImpl : UserRepository {
         userId: UserId,
         patch: UserPatch,
     ): Boolean = suspendTransaction {
-        Users.update({ (Users.id eq userId.value) }) { row ->
+        Users.updateWithTimestamp({ (Users.id eq userId.value) }) { row ->
             row[name] = patch.userName.value
             row[displayId] = patch.displayId.value
             row[profileImageUrl] = patch.newProfileImageUrl
@@ -105,7 +105,7 @@ class UserRepositoryImpl : UserRepository {
         userId: UserId,
         introduce: Introduce,
     ): Boolean = suspendTransaction {
-        Users.update({ (Users.id eq userId.value) }) { row ->
+        Users.updateWithTimestamp({ (Users.id eq userId.value) }) { row ->
             row[this.introduce] = introduce.value
         } > 0
     }
@@ -115,13 +115,13 @@ class UserRepositoryImpl : UserRepository {
         providerId: String,
     ): Boolean = suspendTransaction {
         val now = PeekrDateTime.now().epochSecond
-        Users.update({ Users.id eq userId.value }) {
+        Users.updateWithTimestamp({ Users.id eq userId.value }) {
             it[Users.providerId] = "DELETED_${now}_$providerId"
         } > 0
     }
 
     override suspend fun deactivate(userId: UserId): Unit = suspendTransaction {
-        Users.update({ Users.id eq userId.value }) {
+        Users.updateWithTimestamp({ Users.id eq userId.value }) {
             // 1. 사용자 비활성화
             it[isActive] = false
 
