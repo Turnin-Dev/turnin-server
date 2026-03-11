@@ -61,13 +61,14 @@ class GetFriendsUseCase(private val friendRepository: FriendRepository) {
             .associateBy { it.userId }
 
         // 3) FriendInfoDto 목록 생성
-        val friends = friendsPagingData.friends.map { friend ->
+        val friends = friendsPagingData.friends.mapNotNull { friend ->
             val targetId = if (friend.requesterId == userIdVO) friend.receiverId else friend.requesterId
             val friendInfo = friendInfoMap[targetId]
-            // 만약 친구 목록에는 있지만, UserProvider 에서 정보를 못 찾아온 경우 (데이터 불일치, 사용자 탈퇴 등)
+            // 친구 목록에는 있지만, UserProvider 에서 정보를 못 찾아온 경우 (데이터 불일치, 사용자 탈퇴 등)
+            // 만약 아래 if 식을 타게 되면, 전체 크기 데이터 정합성에 문제가 생기지만 크게 중요하지 않다고 판단.
             if (friendInfo == null) {
                 logger.error("friendInfo corresponding to ($targetId) is missing, friend: $friend")
-                throw FriendException.UserNotFoundException()
+                return@mapNotNull null
             }
 
             FriendInfoDto(

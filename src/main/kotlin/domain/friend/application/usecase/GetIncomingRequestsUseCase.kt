@@ -63,13 +63,16 @@ class GetIncomingRequestsUseCase(private val repository: FriendRepository) {
             .associateBy { it.userId }
 
         // 3) IncomingRequestInfoDto 목록 생성
-        val requests = incomingRequestPagingData.requests.map { request ->
+        val requests = incomingRequestPagingData.requests.mapNotNull { request ->
             val requesterInfo = requesterInfoMap[request.requesterId]
+
+            // 목록에는 있지만 정보를 못 찾아온 경우 (데이터 불일치, 사용자 탈퇴 등)
+            // 만약 아래 if 식을 타게 되면, 전체 크기 데이터 정합성에 문제가 생기지만 크게 중요하지 않다고 판단.
             if (requesterInfo == null) {
                 LOGGER.error(
                     "requesterInfo corresponding to (${request.requesterId}) is missing, requester: $request",
                 )
-                throw FriendException.UserNotFoundException()
+                return@mapNotNull null
             }
 
             IncomingRequestInfoDto(
