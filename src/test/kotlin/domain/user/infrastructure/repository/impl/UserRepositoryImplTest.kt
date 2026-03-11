@@ -314,6 +314,9 @@ class UserRepositoryImplTest {
         val foundedUser = findByIdForTest(user.id.value)
         assertNotNull(foundedUser)
         assertFalse(foundedUser.isActive)
+        assertEquals("", foundedUser.introduce)
+        assertEquals("탈퇴한 사용자", foundedUser.name)
+        assertNull(foundedUser.profileImageUrl)
     }
 
     @Test

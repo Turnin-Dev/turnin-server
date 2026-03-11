@@ -122,7 +122,13 @@ class UserRepositoryImpl : UserRepository {
 
     override suspend fun deactivate(userId: UserId): Unit = suspendTransaction {
         Users.update({ Users.id eq userId.value }) {
+            // 1. 사용자 비활성화
             it[isActive] = false
+
+            // 2. 개인 식별 정보 삭제
+            it[name] = "탈퇴한 사용자"
+            it[introduce] = ""
+            it[profileImageUrl] = null
         }
     }
 }
