@@ -48,16 +48,6 @@ class GetIncomingRequestsUseCase(private val repository: FriendRepository) {
 
         // 2) 요청한 친구 정보 조회
         val requesterId = incomingRequestPagingData.requests.map { it.requesterId }
-        if (requesterId.isEmpty()) {
-            return IncomingRequestPagingDataDto(
-                pagingData = PagingData(
-                    pageNumber = paginationParams.page,
-                    pageSize = paginationParams.size,
-                    totalSize = incomingRequestPagingData.totalSize,
-                ),
-                requests = emptyList(),
-            )
-        }
         val requesterInfoMap = repository
             .getUserInfos(requesterId)
             .associateBy { it.userId }

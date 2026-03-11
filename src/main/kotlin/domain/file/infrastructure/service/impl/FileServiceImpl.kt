@@ -58,6 +58,12 @@ class FileServiceImpl(private val r2Service: CloudflareR2Service) : FileService 
         }
     }
 
-    private fun parseFileName(imageUrl: String): String =
-        URI(imageUrl).path.drop(1)
+    private fun parseFileName(fileNameOrUrl: String): String {
+        val rawKey = fileNameOrUrl.removePrefix("/")
+        val parsedPath = runCatching { URI(fileNameOrUrl).path }
+            .getOrNull()
+            ?.removePrefix("/")
+
+        return parsedPath?.takeIf { it.isNotBlank() } ?: rawKey
+    }
 }
