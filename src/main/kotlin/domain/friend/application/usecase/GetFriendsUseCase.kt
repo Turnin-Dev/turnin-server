@@ -7,7 +7,6 @@ import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.FriendInfoDto
 import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
 import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.exception.FriendException
 
 // TODO: 추후 '차단 목록 조회'처럼 조인 방식으로 리팩토링 필요
 
@@ -26,8 +25,6 @@ class GetFriendsUseCase(private val friendRepository: FriendRepository) {
      * @param paginationParams 페이지네이션 파라미터
      *
      * @return [FriendsPagingDataDto] 친구 목록 페이지네이션 데이터 DTO
-     *
-     * @throws FriendException.UserNotFoundException 사용자를 찾지 못하는 경우
      */
     suspend operator fun invoke(
         userId: Long,
