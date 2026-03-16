@@ -14,8 +14,8 @@ object UserKeywords : BaseLongIdTable("user_keyword") {
     val isActive = bool("is_active").default(true)
 
     init {
-        uniqueIndex("uq_userkeyword_user_keyword", userId, keywordId)
-        index("idx_user_keyword_user_id", false, userId)
+        uniqueIndex("uq_user_id_keyword_id", userId, keywordId)
+        index("idx_user_keyword_combo_keyword", false, keywordId, userId)
     }
 }
 
