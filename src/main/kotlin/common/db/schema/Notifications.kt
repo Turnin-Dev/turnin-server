@@ -6,7 +6,7 @@ import com.peekr.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
-/** 알림 엔티티 클래스 (복수형) */
+/** 알림 엔티티 클래스 (Exposed DSL 방식) */
 object Notifications : BaseLongIdTable("notification") {
     val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
     val notiType = varchar("noti_type", 50)
@@ -24,7 +24,7 @@ object Notifications : BaseLongIdTable("notification") {
     }
 }
 
-/** 알림 엔티티 클래스 (단수형) */
+/** 알림 엔티티 클래스 (Exposed DAO/ORM 방식) */
 class NotificationEntity(id: EntityID<Long>) : BaseEntity(id, Notifications) {
     companion object : BaseEntityClass<NotificationEntity>(Notifications)
 
