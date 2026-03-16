@@ -32,11 +32,11 @@ suspend fun <T> suspendTransaction(block: suspend () -> T): T =
                 block()
             }
         }
-    } catch (e: SQLException) {
-        LOGGER.error("Database query failed: ${e.message}")
-        throw handleSqlException(e)
     } catch (e: ExposedSQLException) {
-        LOGGER.error("Database query failed: ${e.message}")
+        LOGGER.error("Database query failed: ${e.cause?.message}")
+        throw handleSqlException(e)
+    } catch (e: SQLException) {
+        LOGGER.error("Database query failed: ${e.cause?.message}")
         throw handleSqlException(e)
     }
 
@@ -56,16 +56,11 @@ private fun handleSqlException(e: Throwable): DatabaseException {
         else -> null
     }
 
-    val message = e.message?.lowercase() ?: ""
-    val causeMsg = when (e) {
-        is ExposedSQLException -> e.cause?.message?.lowercase()
-        is SQLException -> e.cause?.message?.lowercase()
-        else -> null
-    } ?: ""
+    val message = e.cause?.message?.lowercase() ?: e.message?.lowercase() ?: ""
 
     // 중복 데이터 검사 (PostgreSQL 기준)
     val isDuplicate = sqlState == "23505" ||
-        sequenceOf(message, causeMsg).any { msg ->
+        sequenceOf(message).any { msg ->
             "already exists" in msg ||
                 "duplicate key" in msg ||
                 "unique constraint" in msg ||
@@ -74,7 +69,7 @@ private fun handleSqlException(e: Throwable): DatabaseException {
 
     // 외래키 제약조건 위반 검사 (PostgreSQL 기준)
     val isForeignKeyViolation = sqlState == "23503" ||
-        sequenceOf(message, causeMsg).any { msg ->
+        sequenceOf(message).any { msg ->
             "foreign key constraint" in msg ||
                 "referential integrity" in msg ||
                 "cannot add or update a child row" in msg ||
@@ -83,7 +78,7 @@ private fun handleSqlException(e: Throwable): DatabaseException {
 
     // 제약조건 위반 검사 (PostgreSQL 기준)
     val isConstraintViolation = sqlState == "23514" ||
-        sequenceOf(message, causeMsg).any { msg ->
+        sequenceOf(message).any { msg ->
             "check constraint violation" in msg
         }
 
