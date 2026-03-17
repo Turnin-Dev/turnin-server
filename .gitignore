@@ -54,3 +54,6 @@ out/
 
 # ML Models
 **/src/main/resources/ml/**
+
+### JSON (include firebase key) ###
+**/src/main/resources/**/*.json

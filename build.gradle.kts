@@ -155,4 +155,7 @@ dependencies {
     // ONNX, Tokenizers
     implementation(libs.onnx.runtime)
     implementation(libs.huggingface.tokenizers)
+
+    // Firebase Admin
+    implementation(libs.firebase.admin)
 }
