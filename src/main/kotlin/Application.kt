@@ -6,6 +6,7 @@ import com.peekr.ApplicationUtils.printServerSettings
 import com.peekr.ApplicationUtils.printTimeZone
 import com.peekr.common.di.configureKoin
 import com.peekr.common.exception.configureExceptionHandler
+import com.peekr.common.firebase.FirebaseAdmin
 import com.peekr.common.jwt.configureJwtSecurity
 import com.peekr.common.ml.embeddingResourceAutoCleanup
 import com.peekr.common.plugin.configureAPIDocuments
@@ -27,6 +28,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    // TODO: 개발 단계에서만 활성화
     intercept(ApplicationCallPipeline.Call) {
         delay(2000L)
         proceed()
@@ -34,10 +36,13 @@ fun Application.module() {
 
     // ------------------------------ Setting ------------------------------
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+
+    // ------------------------------ DI ------------------------------
     configureKoin()
 
     // ------------------------------ Initialize ------------------------------
     initDatabase()
+    FirebaseAdmin.initialize()
 
     // ------------------------------ Plugins ------------------------------
     configureResources()
