@@ -18,6 +18,8 @@ interface NotificationRepository {
     /**
      * 해당 사용자의 알림 목록을 최신순으로 조회한다. (커서 기반 페이지네이션)
      *
+     * 페이지네이션을 위해 ([size] + 1)개를 조회한다.
+     *
      * @param userId 조회할 사용자 ID
      * @param cursor 커서 값 (알림 ID), null 이면 첫 페이지
      * @param size 페이지 크기

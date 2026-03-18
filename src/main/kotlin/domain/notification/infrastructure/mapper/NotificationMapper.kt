@@ -13,7 +13,7 @@ object NotificationMapper {
         id = NotificationId(this.id.value),
         userId = this.userId?.let { UserId(it.value) },
         notiType = this.notiType,
-        title = this.title ?: "",
+        title = this.title,
         message = this.message,
         imageUrl = this.imageUrl,
         isRead = this.isRead,

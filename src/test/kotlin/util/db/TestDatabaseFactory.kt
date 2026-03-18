@@ -5,9 +5,11 @@ import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Keywords
+import com.peekr.common.db.schema.Notifications
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.ReportReasons
 import com.peekr.common.db.schema.Reports
+import com.peekr.common.db.schema.UserFcmTokens
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
@@ -57,6 +59,8 @@ object TestDatabaseFactory {
                 Reports,
                 BlockReasons,
                 Blocks,
+                UserFcmTokens,
+                Notifications,
             )
 
             initData()
@@ -75,6 +79,8 @@ object TestDatabaseFactory {
                 Reports,
                 BlockReasons,
                 Blocks,
+                UserFcmTokens,
+                Notifications,
             )
 
             SchemaUtils.create(
@@ -87,6 +93,8 @@ object TestDatabaseFactory {
                 Reports,
                 BlockReasons,
                 Blocks,
+                UserFcmTokens,
+                Notifications,
             )
 
             initData()

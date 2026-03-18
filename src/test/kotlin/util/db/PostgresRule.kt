@@ -5,6 +5,8 @@ import com.peekr.common.db.schema.BlockReasons
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.Keywords
+import com.peekr.common.db.schema.Notifications
+import com.peekr.common.db.schema.UserFcmTokens
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
@@ -96,6 +98,8 @@ private object TestDBContainerFactory {
                 Friends,
                 Blocks,
                 BlockReasons,
+                UserFcmTokens,
+                Notifications,
             )
 
             // 초기 데이터 준비
@@ -112,6 +116,8 @@ private object TestDBContainerFactory {
                 Friends,
                 Blocks,
                 BlockReasons,
+                UserFcmTokens,
+                Notifications,
             )
             SchemaUtils.create(
                 Users,
@@ -120,6 +126,8 @@ private object TestDBContainerFactory {
                 Friends,
                 Blocks,
                 BlockReasons,
+                UserFcmTokens,
+                Notifications,
             )
 
             // 초기 데이터 준비

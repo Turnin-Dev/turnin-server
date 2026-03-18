@@ -16,4 +16,9 @@ enum class NotificationType {
 
     /** 이벤트 */
     EVENT,
+
+    ;
+
+    val isBroadcast: Boolean
+        get() = this == NOTICE || this == EVENT
 }
