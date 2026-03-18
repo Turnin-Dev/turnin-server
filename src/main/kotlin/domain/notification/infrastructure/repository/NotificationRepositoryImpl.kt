@@ -69,14 +69,4 @@ class NotificationRepositoryImpl : NotificationRepository {
             }
             updated > 0
         }
-
-    override suspend fun markAllAsRead(userId: UserId): Unit =
-        suspendTransaction {
-            Notifications.updateWithTimestamp({
-                (Notifications.userId eq userId.value) and
-                    (Notifications.isRead eq false)
-            }) {
-                it[isRead] = true
-            }
-        }
 }

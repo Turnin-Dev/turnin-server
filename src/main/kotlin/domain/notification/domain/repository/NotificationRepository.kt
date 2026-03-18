@@ -38,11 +38,4 @@ interface NotificationRepository {
      * @return 읽음 처리 성공 시 true, 알림을 찾지 못한 경우 false
      */
     suspend fun markAsRead(notificationId: NotificationId, userId: UserId): Boolean
-
-    /**
-     * 해당 사용자의 모든 읽지 않은 알림을 읽음 처리한다.
-     *
-     * @param userId 읽음 처리할 사용자 ID
-     */
-    suspend fun markAllAsRead(userId: UserId)
 }
