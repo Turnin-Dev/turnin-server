@@ -91,6 +91,13 @@ object Api {
             const val TAG = "Block"
             const val REASON = "/reason"
         }
+
+        object Notification {
+            const val ROUTE = "/notification"
+            const val TAG = "Notification"
+            const val TOKEN = "/token"
+            const val READ = "/read"
+        }
     }
 
     /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */

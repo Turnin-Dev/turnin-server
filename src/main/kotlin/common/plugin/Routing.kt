@@ -17,6 +17,8 @@ import com.peekr.domain.friend.application.usecase.FriendUseCases
 import com.peekr.domain.friend.presentation.route.friendRoutes
 import com.peekr.domain.keyword.application.usecase.KeywordUseCases
 import com.peekr.domain.keyword.presentation.route.keywordRoutes
+import com.peekr.domain.notification.application.usecase.NotificationUseCases
+import com.peekr.domain.notification.presentation.route.notificationRoutes
 import com.peekr.domain.report.application.usecase.ReportUseCases
 import com.peekr.domain.report.presentation.route.reportRoutes
 import com.peekr.domain.user.application.usecase.UserUseCases
@@ -44,6 +46,7 @@ fun Application.configureRouting() {
     val discoverUseCases by inject<DiscoverUseCases>()
     val feedUseCases by inject<FeedUseCases>()
     val blockUseCases by inject<BlockUseCases>()
+    val notificationUseCases by inject<NotificationUseCases>()
 
     routing {
         customRoutingOption()
@@ -63,6 +66,7 @@ fun Application.configureRouting() {
                     discoverRoutes(route = Api.V1.Discover, usecase = discoverUseCases)
                     feedRoutes(route = Api.V1.Feed, usecase = feedUseCases)
                     blockRoutes(route = Api.V1.Block, usecase = blockUseCases)
+                    notificationRoutes(route = Api.V1.Notification, usecase = notificationUseCases)
 
                     // 도메인과 API 명세서에 표시되는 위치가 다른 라우트
                     externalUserKeywordRoutes(route = Api.V1.User, usecase = userKeywordUseCases)

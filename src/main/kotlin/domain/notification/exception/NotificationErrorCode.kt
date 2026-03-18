@@ -14,8 +14,16 @@ sealed class NotificationErrorCode(
 
     data object MissingUserIdInPersonalNotification :
         NotificationErrorCode(NOTI003, "특정 사용자 알림 전송 시 userId는 필수입니다.")
+
+    data object TokenNotFound :
+        NotificationErrorCode(NOTI004, "FCM 토큰을 찾을 수 없습니다.")
+
+    data object NotificationNotFound :
+        NotificationErrorCode(NOTI005, "알림을 찾을 수 없습니다.")
 }
 
 private const val NOTI001 = "NOTI001"
 private const val NOTI002 = "NOTI002"
 private const val NOTI003 = "NOTI003"
+private const val NOTI004 = "NOTI004"
+private const val NOTI005 = "NOTI005"
