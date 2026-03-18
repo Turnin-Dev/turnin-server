@@ -23,10 +23,4 @@ data class FcmMessage(
     val imageUrl: String? = null,
     val notiType: NotificationType,
     val data: Map<String, String> = emptyMap(),
-) {
-    init {
-        require(token != null || topic != null) {
-            FcmErrorCode.TopicOrTokenMustBeSet.description
-        }
-    }
-}
+)

@@ -9,6 +9,7 @@ import com.peekr.domain.notification.domain.model.Notification
 import com.peekr.domain.notification.domain.model.NotificationCommand
 import com.peekr.domain.notification.domain.repository.FcmTokenRepository
 import com.peekr.domain.notification.domain.repository.NotificationRepository
+import com.peekr.domain.notification.exception.NotificationException
 
 /**
  * 특정 사용자에게 알림 전송 및 저장
@@ -27,9 +28,8 @@ class SendNotificationUseCase(
      * @return 저장된 [Notification]
      */
     suspend operator fun invoke(command: NotificationCommand): NotificationDto {
-        val userId = requireNotNull(command.userId) {
-            "특정 사용자 알림 전송 시 userId는 필수입니다."
-        }
+        val userId = command.userId
+            ?: throw NotificationException.MissingUserIdInPersonalNotification()
 
         // 1. 활성 토큰 조회
         val tokens = fcmTokenRepository.findActiveTokens(userId)

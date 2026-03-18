@@ -7,13 +7,13 @@ import com.peekr.domain.notification.exception.NotificationErrorCode
 /**
  * 알림 저장 요청용 모델
  *
- * @property userId 사용자 ID
+ * @property userId 사용자 ID (수신자)
  * @property notiType 알림 유형
  * @property title 알림 제목
  * @property message 알림 본문
  * @property imageUrl 알림 첨부 이미지 URL
  * @property isBroadcast 브로드캐스트 여부
- * @property refId 참조 ID
+ * @property refId 참조 ID (발신자, 딥링크 용)
  * @property refType 참조 타입
  */
 @ConsistentCopyVisibility
