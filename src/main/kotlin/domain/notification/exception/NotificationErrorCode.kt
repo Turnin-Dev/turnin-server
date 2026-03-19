@@ -15,7 +15,7 @@ sealed class NotificationErrorCode(
     data object MissingUserIdInPersonalNotification :
         NotificationErrorCode(NOTI003, "특정 사용자 알림 전송 시 userId는 필수입니다.")
 
-    data object TokenNotFound :
+    data object FcmTokenNotFound :
         NotificationErrorCode(NOTI004, "FCM 토큰을 찾을 수 없습니다.")
 
     data object NotificationNotFound :

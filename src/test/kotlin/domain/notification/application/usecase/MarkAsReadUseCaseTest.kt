@@ -23,7 +23,7 @@ class MarkAsReadUseCaseTest {
         coEvery { notificationRepository.markAsRead(notificationId, userId) } returns true
 
         // when
-        val result = useCase(notificationId, userId)
+        val result = useCase(notificationId.value, userId)
 
         // then
         assertTrue(result)
@@ -38,7 +38,7 @@ class MarkAsReadUseCaseTest {
         coEvery { notificationRepository.markAsRead(notificationId, userId) } returns false
 
         // when
-        val result = useCase(notificationId, userId)
+        val result = useCase(notificationId.value, userId)
 
         // then
         assertFalse(result)

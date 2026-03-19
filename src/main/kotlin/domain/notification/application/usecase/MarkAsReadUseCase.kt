@@ -17,6 +17,8 @@ class MarkAsReadUseCase(private val notificationRepository: NotificationReposito
      * @param userId 요청한 사용자 ID
      * @return 읽음 처리 성공 시 true, 알림을 찾지 못한 경우 false
      */
-    suspend operator fun invoke(notificationId: NotificationId, userId: UserId): Boolean =
-        notificationRepository.markAsRead(notificationId, userId)
+    suspend operator fun invoke(notificationId: Long, userId: UserId): Boolean {
+        val notificationIdVO = NotificationId(notificationId)
+        return notificationRepository.markAsRead(notificationIdVO, userId)
+    }
 }

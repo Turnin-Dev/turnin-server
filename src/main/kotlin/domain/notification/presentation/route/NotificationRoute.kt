@@ -1,12 +1,12 @@
 package com.peekr.domain.notification.presentation.route
 
 import com.peekr.common.exception.toErrorResponse
-import com.peekr.common.model.id.NotificationId
 import com.peekr.common.plugin.AuthenticatedRoute
 import com.peekr.common.route.Api
 import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.common.util.pagination.cursor.getCursorPaginationParams
 import com.peekr.common.util.pagination.cursor.toResponse
+import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.notification.application.usecase.NotificationUseCases
 import com.peekr.domain.notification.exception.NotificationErrorCode
 import com.peekr.domain.notification.presentation.dto.FcmTokenResponse
@@ -49,7 +49,7 @@ fun AuthenticatedRoute.notificationRoutes(
             } else {
                 call.respond(
                     HttpStatusCode.NotFound,
-                    NotificationErrorCode.TokenNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                    NotificationErrorCode.FcmTokenNotFound.toErrorResponse(HttpStatusCode.NotFound),
                 )
             }
         }
@@ -70,12 +70,13 @@ fun AuthenticatedRoute.notificationRoutes(
         }
 
         // 알림 읽음 처리
-        patch(route.READ, { markAsReadDocs() }) {
+        patch(route.read("notificationId"), { markAsReadDocs() }) {
             val userId = extractUserIdWithToken()
-            val notificationId = call.parameters["notificationId"]
+            val notificationId = call.request.pathVariables["notificationId"]
                 ?.toLongOrNull()
-                ?: return@patch call.respond(HttpStatusCode.BadRequest)
-            val success = usecase.markAsRead(NotificationId(notificationId), userId)
+                .inputValidationAndReturn("알림 ID")
+
+            val success = usecase.markAsRead(notificationId, userId)
             if (success) {
                 call.respond(HttpStatusCode.NoContent)
             } else {
