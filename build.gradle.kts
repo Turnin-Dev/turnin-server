@@ -64,6 +64,7 @@ tasks.register<JavaExec>("runDev") {
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("io.ktor.server.netty.EngineMain")
     systemProperty("config.resource", "application-dev.conf")
+    systemProperty("io.ktor.development", "true")
     envDev.forEach { (key, value) ->
         environment(key, value)
     }
@@ -75,6 +76,7 @@ tasks.register<JavaExec>("runProd") {
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("io.ktor.server.netty.EngineMain")
     systemProperty("config.resource", "application-prod.conf")
+    systemProperty("io.ktor.development", "false")
     envProd.forEach { (key, value) -> environment(key, value) }
 }
 
@@ -157,5 +159,7 @@ dependencies {
     implementation(libs.huggingface.tokenizers)
 
     // Firebase Admin
-    implementation(libs.firebase.admin)
+    implementation(libs.firebase.admin) {
+        exclude(group = "io.netty")
+    }
 }
