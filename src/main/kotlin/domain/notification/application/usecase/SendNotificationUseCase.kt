@@ -31,6 +31,8 @@ class SendNotificationUseCase(
             ?: throw NotificationException.MissingUserIdInPersonalNotification()
 
         // 1. 알림 내역 먼저 저장
+        // 주의: FCM 전송 실패 후 재시도 시 중복 저장 가능성 있음.
+        // 추후 트래픽 증가 시 Outbox 패턴 또는 멱등 키 기반 중복 방지 도입 고려.
         val notification = notificationRepository.save(command)
 
         // 2. 활성 토큰 조회

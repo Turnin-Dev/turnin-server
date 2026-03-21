@@ -26,6 +26,10 @@ class SendBroadcastUseCase(
      */
     suspend operator fun invoke(command: NotificationCommand): NotificationDto {
         // 1. 브로드캐스트 알림 먼저 저장
+        // 주의: FCM 전송 실패 후 재시도 시 중복 저장 가능성 있음.
+        // 브로드캐스트 알림은 관리자가 수동으로 발송하는 구조라
+        // 자동 재시도가 없으므로 현재 단계에서는 허용 가능한 수준.
+        // 추후 트래픽 증가 시 Outbox 패턴 도입 고려.
         val notification = notificationRepository.save(command)
 
         // 2. FCM Topic 전송
