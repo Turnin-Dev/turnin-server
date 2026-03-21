@@ -1,6 +1,5 @@
 package com.peekr.domain.notification.application.usecase
 
-import com.peekr.common.firebase.FcmDataKey
 import com.peekr.common.firebase.FcmMessage
 import com.peekr.common.firebase.FcmService
 import com.peekr.common.firebase.FcmTopic
@@ -36,9 +35,6 @@ class SendBroadcastUseCase(
                 title = command.title ?: "",
                 body = command.message,
                 notiType = command.notiType,
-                data = mapOf(
-                    FcmDataKey.NOTI_TYPE to command.notiType.name,
-                ),
             ),
         )
 
