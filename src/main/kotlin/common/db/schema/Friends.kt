@@ -9,7 +9,7 @@ import com.peekr.common.model.FriendRequestStatus
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
-/** 친구 엔티티 클래스 (복수형) */
+/** 친구 엔티티 클래스 (Exposed DSL 방식) */
 object Friends : BaseLongIdTable("friend") {
     val requesterId = reference("requester_id", Users, onDelete = ReferenceOption.RESTRICT)
     val receiverId = reference("receiver_id", Users, onDelete = ReferenceOption.RESTRICT)
@@ -26,7 +26,7 @@ object Friends : BaseLongIdTable("friend") {
     }
 }
 
-/** 친구 엔티티 클래스 (단수형) */
+/** 친구 엔티티 클래스 (Exposed DAO/ORM 방식) */
 class FriendEntity(id: EntityID<Long>) : BaseEntity(id, Friends) {
     companion object : BaseEntityClass<FriendEntity>(Friends)
 

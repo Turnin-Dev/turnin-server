@@ -6,7 +6,7 @@ import com.peekr.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
-/** 사용자별 키워드 엔티티 클래스 (복수형) */
+/** 사용자별 키워드 엔티티 클래스 (Exposed DSL 방식) */
 object UserKeywords : BaseLongIdTable("user_keyword") {
     val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
     val keywordId = reference("keyword_id", Keywords, onDelete = ReferenceOption.CASCADE)
@@ -14,12 +14,12 @@ object UserKeywords : BaseLongIdTable("user_keyword") {
     val isActive = bool("is_active").default(true)
 
     init {
-        uniqueIndex("uq_userkeyword_user_keyword", userId, keywordId)
-        index("idx_user_keyword_user_id", false, userId)
+        uniqueIndex("uq_user_id_keyword_id", userId, keywordId)
+        index("idx_user_keyword_combo_keyword", false, keywordId, userId)
     }
 }
 
-/** 사용자별 키워드 엔티티 클래스 (단수형) */
+/** 사용자별 키워드 엔티티 클래스 (Exposed DAO/ORM 방식) */
 class UserKeywordEntity(id: EntityID<Long>) : BaseEntity(id, UserKeywords) {
     companion object : BaseEntityClass<UserKeywordEntity>(UserKeywords)
 

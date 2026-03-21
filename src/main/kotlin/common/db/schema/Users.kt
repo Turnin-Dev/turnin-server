@@ -9,7 +9,7 @@ import com.peekr.common.model.SocialLoginProvider
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.javatime.timestamp
 
-/** 사용자 엔티티 클래스 (복수형) */
+/** 사용자 엔티티 클래스 (Exposed DSL 방식) */
 object Users : BaseLongIdTable("user") {
     val role = customPostgresEnum<Role>("role", "user_role").default(Role.USER)
     val provider = customPostgresEnum<SocialLoginProvider>("provider", "social_login_provider")
@@ -26,7 +26,7 @@ object Users : BaseLongIdTable("user") {
     }
 }
 
-/** 사용자 엔티티 클래스 (단수형) */
+/** 사용자 엔티티 클래스 (Exposed DAO/ORM 방식) */
 class UserEntity(id: EntityID<Long>) : BaseEntity(id, Users) {
     companion object : BaseEntityClass<UserEntity>(Users)
 

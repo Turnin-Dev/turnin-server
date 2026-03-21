@@ -6,7 +6,7 @@ import com.peekr.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
-/** 키워드 댓글 엔티티 클래스 (복수형) */
+/** 키워드 댓글 엔티티 클래스 (Exposed DSL 방식) */
 object KeywordComments : BaseLongIdTable("keyword_comment") {
     val userId = reference("user_id", Users, onDelete = ReferenceOption.RESTRICT)
     val userKeywordId = reference("user_keyword_id", UserKeywords, onDelete = ReferenceOption.CASCADE)
@@ -18,7 +18,7 @@ object KeywordComments : BaseLongIdTable("keyword_comment") {
     }
 }
 
-/** 키워드 댓글 엔티티 클래스 (단수형) */
+/** 키워드 댓글 엔티티 클래스 (Exposed DAO/ORM 방식) */
 class KeywordCommentEntity(id: EntityID<Long>) : BaseEntity(id, KeywordComments) {
     companion object : BaseEntityClass<KeywordCommentEntity>(KeywordComments)
 

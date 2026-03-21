@@ -1,5 +1,6 @@
 package com.peekr.common.di
 
+import com.peekr.common.firebase.firebaseModule
 import com.peekr.common.jwt.di.jwtModule
 import com.peekr.common.ml.embeddingModule
 import com.peekr.domain.account.di.accountModule
@@ -10,6 +11,7 @@ import com.peekr.domain.feed.di.feedModule
 import com.peekr.domain.file.di.fileModule
 import com.peekr.domain.friend.di.friendModule
 import com.peekr.domain.keyword.di.keywordModule
+import com.peekr.domain.notification.di.notificationModule
 import com.peekr.domain.report.di.reportModule
 import com.peekr.domain.user.di.userModule
 import com.peekr.domain.userKeyword.di.userKeywordModule
@@ -37,8 +39,10 @@ fun Application.configureKoin() {
             feedModule,
             blockModule,
             accountModule,
+            notificationModule,
             // 3rd service
             embeddingModule,
+            firebaseModule,
         )
     }
 }

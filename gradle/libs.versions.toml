@@ -3,7 +3,7 @@ exposed-version = "0.61.0"
 h2-version = "2.3.232"
 kotlin-version = "2.1.10"
 ktor-version = "3.1.2"
-logback-version = "1.5.13"
+logback-version = "1.5.25"
 postgresql-version = "42.7.2"
 hikariCP-version = "5.0.1"
 dotenv-version = "6.4.0"
@@ -20,6 +20,7 @@ aws-s3 = "2.32.26"
 onnx-runtime = "1.23.2"
 huggingface-tokenizers = "0.36.0"
 test-container-pg = "1.21.4"
+firebase-admin = "9.8.0"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -81,6 +82,8 @@ onnx-runtime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref =
 huggingface-tokenizers = { module = "ai.djl.huggingface:tokenizers", version.ref = "huggingface-tokenizers" }
 # PostgreSQL Test Container
 test-container-postgresql = { module = "org.testcontainers:postgresql", version.ref = "test-container-pg" }
+# Firebase
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
