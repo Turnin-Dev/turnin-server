@@ -114,7 +114,7 @@ class NotificationRoutesTest {
         // when, then
         testDeleteEndpoint(
             endpoint = "${route.ROUTE}/${route.TOKEN}",
-            requestBody = TestRegisterFcmTokenRequest,
+            queryParameters = mapOf("token" to TestRegisterFcmTokenRequest.token),
             testPlugin = {
                 testPlugin(
                     authRouting = { notificationRoutes(route, usecase) },
@@ -135,7 +135,7 @@ class NotificationRoutesTest {
         // when, then
         testDeleteEndpoint(
             endpoint = "${route.ROUTE}/${route.TOKEN}",
-            requestBody = TestRegisterFcmTokenRequest,
+            queryParameters = mapOf("token" to TestRegisterFcmTokenRequest.token),
             testPlugin = {
                 testPlugin(
                     authRouting = { notificationRoutes(route, usecase) },
@@ -156,7 +156,7 @@ class NotificationRoutesTest {
     fun `FCM 토큰 비활성화 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         testDeleteEndpoint(
             endpoint = "${route.ROUTE}/${route.TOKEN}",
-            requestBody = TestRegisterFcmTokenRequest,
+            queryParameters = mapOf("token" to TestRegisterFcmTokenRequest.token),
             testPlugin = {
                 testPlugin(
                     authRouting = { notificationRoutes(route, usecase) },
