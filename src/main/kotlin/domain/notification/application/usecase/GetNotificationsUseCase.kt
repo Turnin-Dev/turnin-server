@@ -30,7 +30,7 @@ class GetNotificationsUseCase(private val notificationRepository: NotificationRe
         val notificationsWithOneExtra = notificationRepository.findByUserId(
             userId = userId,
             cursor = cursor,
-            size = pageSize,
+            size = pageSize + 1,
         )
 
         // 2. 다음 페이지 존재 여부 확인 및 다음 커서 결정

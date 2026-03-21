@@ -23,7 +23,7 @@ import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.netty.EngineMain
 import java.util.TimeZone
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -44,7 +44,7 @@ fun Application.module() {
 
     // ------------------------------ Initialize ------------------------------
     initDatabase()
-    launch(AppDispatchers.ioDispatcher) {
+    runBlocking(AppDispatchers.ioDispatcher) {
         FirebaseAdmin.initialize()
     }
 

@@ -55,7 +55,7 @@ class NotificationRepositoryImpl : NotificationRepository {
             NotificationEntity
                 .find { condition }
                 .orderBy(Notifications.id to SortOrder.DESC)
-                .limit(size + 1) // 다음 페이지 존재 여부 확인을 위해 size + 1 조회
+                .limit(size)
                 .map { it.toDomain() }
         }
 

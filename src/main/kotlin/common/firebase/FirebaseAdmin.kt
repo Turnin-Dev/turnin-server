@@ -17,11 +17,14 @@ object FirebaseAdmin {
 
         val serviceAccount =
             this::class.java.classLoader.getResourceAsStream("firebase-service-account.json")
+                ?: throw IllegalStateException("firebase-service-account.json not found in classpath")
 
-        val options = FirebaseOptions
-            .builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build()
+        val options = serviceAccount.use { stream ->
+            FirebaseOptions
+                .builder()
+                .setCredentials(GoogleCredentials.fromStream(stream))
+                .build()
+        }
 
         FirebaseApp.initializeApp(options)
     }

@@ -6,6 +6,7 @@ import com.peekr.common.model.NotificationType
  * FCM 메시지 규격
  *
  * [token] 혹은 [topic] 중 하나는 필수 이다.
+ * 단, 여러 사용자에게 보내는 경우에는 둘 다 비어있을 수 있다.
  *
  * @property token 특정 사용자 대상
  * @property topic 브로드캐스트 대상

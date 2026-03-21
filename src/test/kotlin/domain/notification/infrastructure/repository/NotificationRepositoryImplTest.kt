@@ -153,6 +153,7 @@ class NotificationRepositoryImplTest {
     fun `커서 기반 페이지네이션이 정상 동작한다`() = runTest {
         // given
         val userId = insertUserAndReturnId("1")
+        val pageSize = 4
         repeat(5) {
             repository.save(
                 NotificationCommand.personal(
@@ -164,27 +165,24 @@ class NotificationRepositoryImplTest {
             )
         }
 
-        // when: 첫 페이지 (size = 3 → 실제 조회는 size + 1 = 4개)
-        val firstPage = repository.findByUserId(userId, cursor = null, size = 3)
+        // when: 첫 페이지
+        val firstPage = repository.findByUserId(userId, cursor = null, size = pageSize)
 
-        // 실제 페이지 데이터는 3개, 4번째는 다음 페이지 존재 확인용 extra
-        // 커서는 실제 페이지 마지막 데이터(3번째)의 id
-        val nextCursor = firstPage[2].id.value
+        // 커서는 첫 페이지 마지막 데이터의 id
+        val nextCursor = firstPage.last().id.value
 
-        // when: 두 번째 페이지 (cursor = 실제 페이지 마지막 id)
+        // when: 두 번째 페이지
         val secondPage = repository.findByUserId(
             userId,
             cursor = nextCursor,
-            size = 3,
+            size = pageSize,
         )
 
         // then
-        // 첫 페이지: size + 1 = 4개 (extra 1개 포함)
-        assertEquals(4, firstPage.size)
-        // 두 번째 페이지: 남은 데이터 2개 (extra 없음 → 다음 페이지 없음)
-        assertEquals(2, secondPage.size)
+        assertEquals(pageSize, firstPage.size)
+        assertEquals(1, secondPage.size) // 남은 데이터 1개
         // 중복 없음 검증
-        val firstPageIds = firstPage.take(3).map { it.id.value }.toSet() // extra 제외
+        val firstPageIds = firstPage.map { it.id.value }.toSet()
         val secondPageIds = secondPage.map { it.id.value }.toSet()
         assertTrue(firstPageIds.intersect(secondPageIds).isEmpty())
     }

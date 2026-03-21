@@ -13,6 +13,7 @@ import com.peekr.common.db.schema.UserFcmTokens
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
+import com.peekr.common.model.NotificationType
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -41,6 +42,7 @@ object TestDatabaseFactory {
                 "user_role" to Role.entries.map { it.name },
                 "social_login_provider" to SocialLoginProvider.entries.map { it.name },
                 "friend_status" to FriendRequestStatus.entries.map { it.name },
+                "noti_type" to NotificationType.entries.map { it.name },
             )
 
             enums.forEach { (typeName, values) ->

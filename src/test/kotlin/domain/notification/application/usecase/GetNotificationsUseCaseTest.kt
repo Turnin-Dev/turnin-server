@@ -22,12 +22,12 @@ class GetNotificationsUseCaseTest {
         val pageSize = 3
         val notifications = (1..4)
             .map {
-                // size + 1 = 4개
                 notificationFixture(id = it.toLong(), userId = userId)
             }.sortedByDescending { it.id.value }
 
         coEvery {
-            notificationRepository.findByUserId(userId, cursor = null, size = pageSize)
+            // 유스케이스가 pageSize + 1 로 요청
+            notificationRepository.findByUserId(userId, cursor = null, size = pageSize + 1)
         } returns notifications
 
         // when
@@ -35,7 +35,6 @@ class GetNotificationsUseCaseTest {
 
         // then
         assertEquals(pageSize, result.items.size)
-        // 3번째 id가 다음 커서
         assertEquals(notifications[pageSize - 1].id.value, result.nextCursor)
     }
 
@@ -46,12 +45,12 @@ class GetNotificationsUseCaseTest {
         val pageSize = 3
         val notifications = (1..2)
             .map {
-                // size + 1 보다 적음
                 notificationFixture(id = it.toLong(), userId = userId)
             }.sortedByDescending { it.id.value }
 
         coEvery {
-            notificationRepository.findByUserId(userId, cursor = null, size = pageSize)
+            // 유스케이스가 pageSize + 1 로 요청했지만 2개만 반환 → 다음 페이지 없음
+            notificationRepository.findByUserId(userId, cursor = null, size = pageSize + 1)
         } returns notifications
 
         // when
@@ -66,13 +65,14 @@ class GetNotificationsUseCaseTest {
     fun `알림이 없으면 빈 리스트와 null 커서를 반환한다`() = runTest {
         // given
         val userId = UserId(1L)
+        val pageSize = 3
 
         coEvery {
-            notificationRepository.findByUserId(userId, cursor = null, size = 3)
+            notificationRepository.findByUserId(userId, cursor = null, size = pageSize + 1)
         } returns emptyList()
 
         // when
-        val result = usecase(userId, cursor = null, pageSize = 3)
+        val result = usecase(userId, cursor = null, pageSize = pageSize)
 
         // then
         assertTrue(result.items.isEmpty())

@@ -31,10 +31,13 @@ class SendNotificationUseCase(
         val userId = command.userId
             ?: throw NotificationException.MissingUserIdInPersonalNotification()
 
-        // 1. 활성 토큰 조회
+        // 1. 알림 내역 먼저 저장
+        val notification = notificationRepository.save(command)
+
+        // 2. 활성 토큰 조회
         val tokens = fcmTokenRepository.findActiveTokens(userId)
 
-        // 2. FCM 전송
+        // 3. FCM 전송
         if (tokens.isNotEmpty()) {
             fcmService.sendToUsers(
                 tokens = tokens,
@@ -52,7 +55,6 @@ class SendNotificationUseCase(
             )
         }
 
-        // 3. 알림 내역 저장 후 반환
-        return notificationRepository.save(command).toDto()
+        return notification.toDto()
     }
 }

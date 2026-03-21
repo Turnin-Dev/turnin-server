@@ -141,7 +141,12 @@ private fun RouteConfig.deactivateFcmTokenDocs() {
 
 private fun RouteConfig.getNotificationsDocs() {
     summary = "알림 목록 조회"
-    description = "개인 알림 및 브로드캐스트 알림을 최신순으로 조회한다. (커서 기반 페이지네이션)"
+    description = """
+        개인 알림 및 브로드캐스트 알림을 최신순으로 조회한다. (커서 기반 페이지네이션)
+
+        브로드캐스트 알림(isBroadcast = true)은 읽음 처리를 지원하지 않으므로
+        클라이언트에서 isBroadcast 여부를 확인하여 읽음 처리 UI를 숨겨야 한다.
+    """.trimIndent()
     request {
         queryParameter<Long?>("cursor") {
             description = "페이지네이션에 필요한 커서 값 (초기 호출 시 null 로 요청)"
@@ -167,10 +172,15 @@ private fun RouteConfig.getNotificationsDocs() {
 
 private fun RouteConfig.markAsReadDocs() {
     summary = "알림 읽음 처리"
-    description = "특정 알림을 읽음 처리한다."
+    description = """
+        특정 알림을 읽음 처리한다.
+
+        브로드캐스트 알림(isBroadcast = true)은 userId가 null이므로 읽음 처리가 불가능하다.
+        클라이언트에서 브로드캐스트 알림에 대한 읽음 처리 요청을 하지 않아야 한다.
+    """.trimIndent()
     request {
         pathParameter<Long>("notificationId") {
-            description = "읽음 처리할 알림 ID"
+            description = "읽음 처리할 알림 ID (브로드캐스트 알림 ID 전달 시 404 반환)"
         }
     }
     response {
@@ -178,7 +188,7 @@ private fun RouteConfig.markAsReadDocs() {
             description = "읽음 처리 성공 시"
         }
         code(HttpStatusCode.NotFound) {
-            description = "알림을 찾을 수 없는 경우"
+            description = "알림을 찾을 수 없는 경우 (브로드캐스트 알림 포함)"
         }
         code(HttpStatusCode.Unauthorized) {
             description = "인증 오류 시"

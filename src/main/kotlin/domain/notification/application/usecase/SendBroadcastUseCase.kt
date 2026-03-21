@@ -26,7 +26,10 @@ class SendBroadcastUseCase(
      * @return 저장된 [Notification]
      */
     suspend operator fun invoke(command: NotificationCommand): NotificationDto {
-        // 1. FCM Topic 전송
+        // 1. 브로드캐스트 알림 먼저 저장
+        val notification = notificationRepository.save(command)
+
+        // 2. FCM Topic 전송
         fcmService.sendToTopic(
             FcmMessage(
                 topic = FcmTopic.ALL,
@@ -39,7 +42,6 @@ class SendBroadcastUseCase(
             ),
         )
 
-        // 2. 브로드캐스트 알림 저장 후 반환
-        return notificationRepository.save(command).toDto()
+        return notification.toDto()
     }
 }

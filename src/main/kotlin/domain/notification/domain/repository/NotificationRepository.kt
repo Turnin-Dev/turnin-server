@@ -18,7 +18,11 @@ interface NotificationRepository {
     /**
      * 해당 사용자의 알림 목록을 최신순으로 조회한다. (커서 기반 페이지네이션)
      *
-     * 페이지네이션을 위해 ([size] + 1)개를 조회한다.
+     * 개인 알림과 브로드캐스트 알림을 함께 반환한다.
+     *
+     * ##### 브로드캐스트 알림 읽음 처리
+     * 브로드캐스트 알림([Notification.isBroadcast] = true)은 읽음 처리를 지원하지 않는다.
+     * 클라이언트에서 [Notification.isBroadcast] 여부를 확인하여 읽음 처리 UI를 숨겨야 한다.
      *
      * @param userId 조회할 사용자 ID
      * @param cursor 커서 값 (알림 ID), null 이면 첫 페이지
@@ -34,6 +38,10 @@ interface NotificationRepository {
     /**
      * 특정 알림을 읽음 처리한다.
      * 본인의 알림만 읽음 처리할 수 있도록 [userId] 로 소유권을 검증한다.
+     *
+     * ##### 브로드캐스트 알림
+     * 브로드캐스트 알림은 [userId]가 null이므로 읽음 처리가 불가능하다. (의도된 설계)
+     * 클라이언트에서 브로드캐스트 알림에 대한 읽음 처리 UI를 제공하지 않아야 한다.
      *
      * @param notificationId 읽음 처리할 알림 ID
      * @param userId 요청한 사용자 ID
