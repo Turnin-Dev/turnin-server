@@ -1,5 +1,6 @@
 package com.peekr.domain.notification.application.usecase
 
+import com.peekr.common.firebase.FcmDataKey
 import com.peekr.common.firebase.FcmMessage
 import com.peekr.common.firebase.FcmService
 import com.peekr.domain.notification.application.dto.NotificationDto
@@ -47,8 +48,10 @@ class SendNotificationUseCase(
                     body = command.message,
                     imageUrl = command.imageUrl,
                     notiType = command.notiType,
-                    refId = command.refId,
-                    refType = command.refType,
+                    data = buildMap {
+                        command.refType?.let { put(FcmDataKey.REF_TYPE, it) }
+                        command.refId?.let { put(FcmDataKey.REF_ID, it.toString()) }
+                    },
                 ),
             )
         }
