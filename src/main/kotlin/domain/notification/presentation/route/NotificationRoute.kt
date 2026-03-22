@@ -42,8 +42,8 @@ fun AuthenticatedRoute.notificationRoutes(
         // FCM 토큰 비활성화 (로그아웃)
         delete(route.TOKEN, { deactivateFcmTokenDocs() }) {
             val userId = extractUserIdWithToken()
-            val request = call.receive<RegisterFcmTokenRequest>()
-            val success = usecase.deactivateToken(userId, request.token)
+            val token = call.request.queryParameters["token"].inputValidationAndReturn("FCM 토큰")
+            val success = usecase.deactivateToken(userId, token)
             if (success) {
                 call.respond(HttpStatusCode.NoContent)
             } else {
@@ -119,11 +119,9 @@ private fun RouteConfig.deactivateFcmTokenDocs() {
     summary = "FCM 토큰 비활성화"
     description = "로그아웃 시 FCM 토큰을 비활성화한다."
     request {
-        body<RegisterFcmTokenRequest> {
-            description = "FCM 토큰 비활성화 요청 바디"
-            example("RegisterFcmTokenRequest") {
-                value = RegisterFcmTokenRequest.sample
-            }
+        queryParameter<String>("token") {
+            description = "비활성화할 FCM 토큰"
+            required = true
         }
     }
     response {
@@ -132,6 +130,9 @@ private fun RouteConfig.deactivateFcmTokenDocs() {
         }
         code(HttpStatusCode.NotFound) {
             description = "FCM 토큰을 찾을 수 없는 경우"
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = "token 파라미터가 누락된 경우"
         }
         code(HttpStatusCode.Unauthorized) {
             description = "인증 오류 시"

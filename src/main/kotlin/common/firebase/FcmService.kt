@@ -4,7 +4,6 @@ import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.MulticastMessage
-import com.google.firebase.messaging.Notification
 import com.peekr.common.model.NotificationType
 import com.peekr.common.util.AppLoggerFactory.createLogger
 import com.peekr.common.util.masking
@@ -39,8 +38,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
                 val fcmMessage = Message
                     .builder()
                     .setToken(message.token)
-                    .setNotification(buildNotification(message.title, message.body, message.imageUrl))
-                    .putAllData(message.data)
+                    .putAllData(message.toDataMap())
                     .setAndroidConfig(buildAndroidConfig(message.notiType))
                     .build()
 
@@ -73,8 +71,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
                 val fcmMessage = MulticastMessage
                     .builder()
                     .addAllTokens(chunk)
-                    .setNotification(buildNotification(message.title, message.body, message.imageUrl))
-                    .putAllData(message.data)
+                    .putAllData(message.toDataMap())
                     .setAndroidConfig(buildAndroidConfig(message.notiType))
                     .build()
 
@@ -111,8 +108,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
             val fcmMessage = Message
                 .builder()
                 .setTopic(message.topic)
-                .setNotification(buildNotification(message.title, message.body, message.imageUrl))
-                .putAllData(message.data)
+                .putAllData(message.toDataMap())
                 .setAndroidConfig(buildAndroidConfig(message.notiType))
                 .build()
 
@@ -125,32 +121,15 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
     }
 
     /**
-     * FCM 알림 객체를 생성한다.
-     *
-     * @param title 알림 제목
-     * @param body 알림 본문
-     * @param imageUrl 알림에 첨부할 이미지 URL (null이면 이미지 없이 전송)
-     */
-    private fun buildNotification(
-        title: String,
-        body: String,
-        imageUrl: String?,
-    ): Notification =
-        Notification
-            .builder()
-            .setTitle(title)
-            .setBody(body)
-            .apply { imageUrl?.let { setImage(imageUrl) } }
-            .build()
-
-    /**
      * 알림 유형에 따라 Android 전송 우선순위를 설정한다.
      *
      * FCM HIGH priority는 즉각적인 반응이 필요한 알림에만 사용해야 한다.
-     * (남용 시 Google의 배터리 최적화 정책에 의해 제재를 받을 수 있다)
+     * (남용 시 Google의 배터리 최적화 정책에 의해 제재를 받을 수 있다.)
+     * data-only 방식 사용 시 setDirectBootOk(true) 설정으로
+     * 기기 잠금 상태에서도 알림 수신 가능하다.
      *
-     * - HIGH : 즉각적인 확인이 필요한 사용자 액션
-     * - NORMAL : 즉각적이지 않아도 되는 알림
+     * - HIGH : 즉각적인 확인이 필요한 사용자 액션 (예: 친구 요청, 친구 수락)
+     * - NORMAL : 즉각적이지 않아도 되는 알림 (예: 새 키워드, 공지, 이벤트)
      *
      * @param type 알림 유형 ([NotificationType])
      */
@@ -171,6 +150,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
         return AndroidConfig
             .builder()
             .setPriority(priority)
+            .setDirectBootOk(true)
             .build()
     }
 }
