@@ -9,11 +9,16 @@ import com.peekr.domain.friend.application.usecase.GetFriendStatusUseCase
 import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
 import com.peekr.domain.friend.application.usecase.GetIncomingRequestsUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
+import com.peekr.domain.friend.domain.provider.NotificationProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
+import com.peekr.domain.friend.infrastructure.provider.NotificationProviderImpl
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import org.koin.dsl.module
 
 val friendModule = module {
+    // Provider
+    single<NotificationProvider> { NotificationProviderImpl(get()) }
+
     // Repository
     single<FriendRepository> { FriendRepositoryImpl() }
 
@@ -23,7 +28,7 @@ val friendModule = module {
 
     // Usecase
     single { GetFriendsUseCase(get()) }
-    single { AddFriendUseCase(get()) }
+    single { AddFriendUseCase(get(), get()) }
     single { UpdateFriendRequestStatusUseCase(get()) }
     single { DeleteFriendUseCase(get()) }
     single { GetFriendStatusUseCase(get()) }
