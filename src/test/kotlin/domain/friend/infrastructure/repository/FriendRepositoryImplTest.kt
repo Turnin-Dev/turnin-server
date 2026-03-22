@@ -1,6 +1,8 @@
 package com.peekr.domain.friend.infrastructure.repository
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.db.schema.BlockReasons
+import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.UserEntity
@@ -26,6 +28,7 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.Test
@@ -43,6 +46,8 @@ class FriendRepositoryImplTest {
     fun teardown() {
         TestDatabaseFactory.cleanUp()
     }
+
+    // ------------------------------ getFriendsPagination ------------------------------
 
     @Test
     fun `친구 목록 페이지네이션 조회 성공 테스트`() = runTest {
@@ -98,6 +103,8 @@ class FriendRepositoryImplTest {
         // then
         assertTrue(friends.friends.isEmpty())
     }
+
+    // ------------------------------ getIncomingRequests ------------------------------
 
     @Test
     fun `받은 친구 요청 목록 페이지네이션 조회 성공 테스트`() = runTest {
@@ -157,6 +164,8 @@ class FriendRepositoryImplTest {
         assertTrue(pagingData.requests.isEmpty())
     }
 
+    // ------------------------------ findByIds ------------------------------
+
     @Test
     fun `requesterId와 receiverId로 친구 데이터 조회 성공 테스트`() = runTest {
         // given
@@ -183,6 +192,8 @@ class FriendRepositoryImplTest {
         // then
         assertNull(friend)
     }
+
+    // ------------------------------ createFriend ------------------------------
 
     @Test
     fun `친구 요청 성공 테스트`() = runTest {
@@ -220,6 +231,8 @@ class FriendRepositoryImplTest {
             repository.createFriend(userId1, userId2)
         }
     }
+
+    // ------------------------------ updateFriendRequestStatus ------------------------------
 
     @Test
     fun `친구 상태 수정 성공 테스트`() = runTest {
@@ -275,6 +288,8 @@ class FriendRepositoryImplTest {
         assertFalse(result)
     }
 
+    // ------------------------------ deleteFriend ------------------------------
+
     @Test
     fun `친구 삭제 성공 테스트`() = runTest {
         // given
@@ -305,6 +320,8 @@ class FriendRepositoryImplTest {
         assertFalse(result)
     }
 
+    // ------------------------------ countFriends ------------------------------
+
     @Test
     fun `친구 수 조회 성공 테스트`() = runTest {
         // given: 사용자 1이 사용자2에게 친구 요청 후 수락
@@ -319,6 +336,8 @@ class FriendRepositoryImplTest {
         // then
         assertEquals(1, count)
     }
+
+    // ------------------------------ getUserInfos ------------------------------
 
     @Test
     fun `getUserInfos 성공 테스트`() = runTest {
@@ -352,6 +371,8 @@ class FriendRepositoryImplTest {
         assertEquals(0, users.size)
     }
 
+    // ------------------------------ deleteAll ------------------------------
+
     @Test
     fun `deleteAll 성공 테스트`() = runTest {
         // given: 사용자 생성 후 친구 관계 설정
@@ -380,6 +401,91 @@ class FriendRepositoryImplTest {
                 }.map { it[Friends.id].value }
         }
         assertEquals(0, friends.size)
+    }
+
+    // ------------------------------ getFriendRequestContext ------------------------------
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 요청자와 수신자 정보를 반환한다`() = runTest {
+        // given
+        val requesterId = insertUserAndReturnId("requester")
+        val receiverId = insertUserAndReturnId("receiver")
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, receiverId)
+
+        // then
+        assertNotNull(context)
+        assertEquals(requesterId, context.requesterInfo.userId)
+        assertEquals(receiverId, context.receiverInfo.userId)
+        assertFalse(context.isBlocked)
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 요청자가 존재하지 않으면 null을 반환한다`() = runTest {
+        // given
+        val receiverId = insertUserAndReturnId("receiver")
+
+        // when
+        val context = repository.getFriendRequestContext(UserId(999L), receiverId)
+
+        // then
+        assertNull(context)
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 수신자가 존재하지 않으면 null을 반환한다`() = runTest {
+        // given
+        val requesterId = insertUserAndReturnId("requester")
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, UserId(999L))
+
+        // then
+        assertNull(context)
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 비활성화된 수신자는 null을 반환한다`() = runTest {
+        // given
+        val requesterId = insertUserAndReturnId("requester")
+        val receiverId = insertUserAndReturnId("receiver")
+        setUserInactiveForTest(receiverId)
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, receiverId)
+
+        // then
+        assertNull(context)
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 요청자가 수신자를 차단한 경우 isBlocked가 true이다`() = runTest {
+        // given
+        val requesterId = insertUserAndReturnId("requester")
+        val receiverId = insertUserAndReturnId("receiver")
+        createBlockForTest(blockerId = requesterId, blockedId = receiverId)
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, receiverId)
+
+        // then
+        assertNotNull(context)
+        assertTrue(context.isBlocked)
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 수신자가 요청자를 차단한 경우 isBlocked가 true이다`() = runTest {
+        // given
+        val requesterId = insertUserAndReturnId("requester")
+        val receiverId = insertUserAndReturnId("receiver")
+        createBlockForTest(blockerId = receiverId, blockedId = requesterId)
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, receiverId)
+
+        // then
+        assertNotNull(context)
+        assertTrue(context.isBlocked)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
@@ -414,5 +520,17 @@ class FriendRepositoryImplTest {
 
     private suspend fun findByIdForTest(friendId: Long): FriendEntity? = TestDatabaseFactory.dbQuery {
         FriendEntity.findById(friendId)
+    }
+
+    private suspend fun createBlockForTest(
+        blockerId: UserId,
+        blockedId: UserId,
+    ): Unit = TestDatabaseFactory.dbQuery {
+        Blocks.insert {
+            it[Blocks.blockerId] = EntityID(blockerId.value, Users)
+            it[Blocks.blockedId] = EntityID(blockedId.value, Users)
+            it[Blocks.reasonId] = EntityID(1L, BlockReasons) // 기존 initData에서 생성된 차단 사유
+            it[Blocks.customReason] = null
+        }
     }
 }
