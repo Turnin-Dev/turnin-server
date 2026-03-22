@@ -12,7 +12,6 @@ import com.peekr.domain.notification.application.dto.NotificationDto
 import com.peekr.domain.notification.application.usecase.NotificationUseCases
 import com.peekr.domain.notification.exception.NotificationErrorCode
 import com.peekr.domain.notification.presentation.dto.RegisterFcmTokenRequest
-import com.peekr.util.testDeleteEndpoint
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
@@ -102,7 +101,7 @@ class NotificationRoutesTest {
         )
     }
 
-    // ======================== DELETE /token (FCM 토큰 비활성화) ========================
+    // ======================== PATCH /token (FCM 토큰 비활성화) ========================
 
     @Test
     fun `FCM 토큰 비활성화 - 성공 테스트`() = testApplication {
@@ -112,9 +111,9 @@ class NotificationRoutesTest {
         } returns true
 
         // when, then
-        testDeleteEndpoint(
-            endpoint = "${route.ROUTE}/${route.TOKEN}",
-            queryParameters = mapOf("token" to TestRegisterFcmTokenRequest.token),
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}/${route.DEACTIVATE_TOKEN}",
+            requestBody = TestRegisterFcmTokenRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { notificationRoutes(route, usecase) },
@@ -133,9 +132,9 @@ class NotificationRoutesTest {
         } returns false
 
         // when, then
-        testDeleteEndpoint(
-            endpoint = "${route.ROUTE}/${route.TOKEN}",
-            queryParameters = mapOf("token" to TestRegisterFcmTokenRequest.token),
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}/${route.DEACTIVATE_TOKEN}",
+            requestBody = TestRegisterFcmTokenRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { notificationRoutes(route, usecase) },
@@ -154,9 +153,9 @@ class NotificationRoutesTest {
 
     @Test
     fun `FCM 토큰 비활성화 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
-        testDeleteEndpoint(
-            endpoint = "${route.ROUTE}/${route.TOKEN}",
-            queryParameters = mapOf("token" to TestRegisterFcmTokenRequest.token),
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}/${route.DEACTIVATE_TOKEN}",
+            requestBody = TestRegisterFcmTokenRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { notificationRoutes(route, usecase) },
