@@ -35,7 +35,8 @@ class FriendUseCaseIntegrationTest {
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
     private val getFriendsUseCase = GetFriendsUseCase(friendRepository)
     private val addFriendUseCase = AddFriendUseCase(friendRepository, notificationProvider)
-    private val updateFriendRequestStatusUseCase = UpdateFriendRequestStatusUseCase(friendRepository)
+    private val updateFriendRequestStatusUseCase =
+        UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
 
     @BeforeTest

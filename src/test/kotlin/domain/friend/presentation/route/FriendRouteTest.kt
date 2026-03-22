@@ -45,8 +45,8 @@ class FriendRouteTest {
         } returns TestFriendDto
         coEvery {
             usecase.updateStatus(
-                userId1 = TestRequesterId.value,
-                userId2 = TestReceiverId.value,
+                requesterId = TestRequesterId.value,
+                receiverId = TestReceiverId.value,
                 requestStatus = FriendRequestStatus.ACCEPTED,
             )
         } returns true

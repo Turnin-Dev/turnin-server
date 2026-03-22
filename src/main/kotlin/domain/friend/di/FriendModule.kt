@@ -29,7 +29,7 @@ val friendModule = module {
     // Usecase
     single { GetFriendsUseCase(get()) }
     single { AddFriendUseCase(get(), get()) }
-    single { UpdateFriendRequestStatusUseCase(get()) }
+    single { UpdateFriendRequestStatusUseCase(get(), get()) }
     single { DeleteFriendUseCase(get()) }
     single { GetFriendStatusUseCase(get()) }
     single { GetIncomingRequestsUseCase(get()) }
