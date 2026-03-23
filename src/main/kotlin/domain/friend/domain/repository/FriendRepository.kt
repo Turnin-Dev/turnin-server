@@ -74,12 +74,16 @@ interface FriendRepository {
     /**
      * 친구들의 FCM 알림 전송에 필요한 컨텍스트를 조회한다.
      * 발신자 이름 + 친구들의 최신 활성 FCM 토큰을 한 번에 조회한다.
-     * 친구당 가장 최근 updated_at 기준 토큰 1개만 선택하며 최대 500명까지 조회한다.
+     * 친구당 가장 최근 updated_at 기준 토큰 1개만 선택하며 최대 [limit]명까지 조회한다.
      *
      * @param userId 발신자 ID
+     * @param limit 조회할 친구 수
      * @return [FriendFcmContext]
      */
-    suspend fun getFriendFcmContext(userId: UserId): FriendFcmContext
+    suspend fun getFriendFcmContext(
+        userId: UserId,
+        limit: Int = FriendFcmContext.MAX_NOTIFICATION_RECIPIENTS,
+    ): FriendFcmContext
 
     /**
      * 친구 요청 생성

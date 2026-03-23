@@ -25,6 +25,7 @@ import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.IntegerColumnType
 import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
@@ -186,27 +187,34 @@ class FriendRepositoryImpl : FriendRepository {
         )
     }
 
-    override suspend fun getFriendFcmContext(userId: UserId): FriendFcmContext = suspendTransaction {
+    override suspend fun getFriendFcmContext(
+        userId: UserId,
+        limit: Int,
+    ): FriendFcmContext = suspendTransaction {
         val sql = """
-        SELECT DISTINCT ON (uft.user_id) uft.token, sender.name as sender_name
-        FROM user_fcm_token uft
-        INNER JOIN (
-            SELECT receiver_id as friend_id FROM friend
-            WHERE requester_id = ? AND status = 'ACCEPTED'
-            UNION
-            SELECT requester_id as friend_id FROM friend
-            WHERE receiver_id = ? AND status = 'ACCEPTED'
-        ) friends ON uft.user_id = friends.friend_id
-        CROSS JOIN (SELECT name FROM "user" WHERE id = ?) sender
-        WHERE uft.is_active = true
-        ORDER BY uft.user_id, uft.updated_at DESC
-        LIMIT 500
+            SELECT DISTINCT ON (uft.user_id)
+                uft.token,
+                sender."name" as sender_name,
+                uft.updated_at
+            FROM user_fcm_token uft
+            INNER JOIN (
+                SELECT receiver_id as friend_id FROM friend
+                WHERE requester_id = ? AND status = 'ACCEPTED'
+                UNION
+                SELECT requester_id as friend_id FROM friend
+                WHERE receiver_id = ? AND status = 'ACCEPTED'
+            ) friends ON uft.user_id = friends.friend_id
+            CROSS JOIN (SELECT "name" FROM "user" WHERE id = ?) sender
+            WHERE uft.is_active = true
+            ORDER BY uft.user_id, uft.updated_at DESC
+            LIMIT ?
         """.trimIndent()
 
         val params = listOf(
             LongColumnType() to userId.value,
             LongColumnType() to userId.value,
             LongColumnType() to userId.value,
+            IntegerColumnType() to limit,
         )
 
         var senderName = ""

@@ -1,6 +1,6 @@
 package com.peekr.domain.userKeyword.di
 
-import com.peekr.common.di.BackgroundScopeQualifier
+import com.peekr.common.di.ApplicationScopeQualifier
 import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
 import com.peekr.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
 import com.peekr.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
@@ -39,7 +39,7 @@ val userKeywordModule = module {
             get(),
             get(),
             get(),
-            get(BackgroundScopeQualifier),
+            get(ApplicationScopeQualifier),
         )
     }
     single { GetUserKeywordsUseCase(get(), get()) }

@@ -9,4 +9,8 @@ package com.peekr.domain.friend.domain.model
 data class FriendFcmContext(
     val friendTokens: List<String>,
     val senderName: String,
-)
+) {
+    companion object {
+        const val MAX_NOTIFICATION_RECIPIENTS: Int = 500
+    }
+}

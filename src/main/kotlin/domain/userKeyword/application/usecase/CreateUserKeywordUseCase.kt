@@ -3,6 +3,7 @@ package com.peekr.domain.userKeyword.application.usecase
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.firebase.RefType
 import com.peekr.common.model.NotificationType
+import com.peekr.common.util.AppDispatchers
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
@@ -33,15 +34,15 @@ class CreateUserKeywordUseCase(
     private val keywordProvider: KeywordProvider,
     private val notificationProvider: NotificationProvider,
     private val friendProvider: FriendProvider,
-    private val backgroundScope: CoroutineScope,
+    private val applicationScope: CoroutineScope,
 ) {
     /**
      * @param createUserKeywordDto [CreateUserKeywordDto] 사용자별 키워드 DTO
      *
      * @return [UserKeywordDto] 사용자별 키워드 DTO
      */
-    suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto =
-        suspendTransaction {
+    suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto {
+        val userKeyword = suspendTransaction {
             // 1) 사용자 키워드 개수 제한 확인
             val userKeywordCount = userKeywordRepository.countByUserId(createUserKeywordDto.userId)
             if (userKeywordCount >= UserKeyword.COUNT_LIMIT) {
@@ -57,36 +58,37 @@ class CreateUserKeywordUseCase(
                 )
 
             // 3) 사용자 키워드 생성
-            val userKeyword = userKeywordRepository
+            userKeywordRepository
                 .create(
                     keyword.id,
                     createUserKeywordDto.userId,
                     createUserKeywordDto.description.toDomain(),
                 ).toDto(keyword.name.value)
-
-            // 4) 친구들에게 새 키워드 알림 전송 (비동기 - 사용자 응답과 무관)
-            //    알림 전송 실패 시에도 키워드 생성은 성공으로 처리
-            backgroundScope.launch {
-                runCatching {
-                    val fcmContext = friendProvider.getFriendFcmContext(createUserKeywordDto.userId)
-                    if (fcmContext.friendTokens.isNotEmpty()) {
-                        notificationProvider.sendNotificationToTokens(
-                            tokens = fcmContext.friendTokens,
-                            notiType = NotificationType.NEW_KEYWORD,
-                            title = UserKeywordNotificationMessage.TITLE,
-                            message = UserKeywordNotificationMessage.message(fcmContext.senderName),
-                            refId = userKeyword.id,
-                            refType = RefType.KEYWORD,
-                            senderUserId = createUserKeywordDto.userId.value,
-                        )
-                    }
-                }.onFailure { e ->
-                    LOGGER.warn("새 키워드 알림 전송 실패 | userId=${createUserKeywordDto.userId}", e)
-                }
-            }
-
-            userKeyword
         }
+
+        // 4) 친구들에게 새 키워드 알림 전송 (비동기 - 사용자 응답과 무관)
+        //    알림 전송 실패 시에도 키워드 생성은 성공으로 처리
+        applicationScope.launch(AppDispatchers.ioDispatcher) {
+            runCatching {
+                val fcmContext = friendProvider.getFriendFcmContext(createUserKeywordDto.userId)
+                if (fcmContext.friendTokens.isNotEmpty()) {
+                    notificationProvider.sendNotificationToTokens(
+                        tokens = fcmContext.friendTokens,
+                        notiType = NotificationType.NEW_KEYWORD,
+                        title = UserKeywordNotificationMessage.TITLE,
+                        message = UserKeywordNotificationMessage.message(fcmContext.senderName),
+                        refId = userKeyword.id,
+                        refType = RefType.KEYWORD,
+                        senderUserId = createUserKeywordDto.userId.value,
+                    )
+                }
+            }.onFailure { e ->
+                LOGGER.warn("새 키워드 알림 전송 실패 | userId=${createUserKeywordDto.userId}", e)
+            }
+        }
+
+        return userKeyword
+    }
 }
 
 private val LOGGER = AppLoggerFactory.createLogger<CreateUserKeywordUseCase>()
