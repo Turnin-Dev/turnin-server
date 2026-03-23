@@ -1,15 +1,19 @@
 package com.peekr.domain.friend.application.usecase
 
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.firebase.RefType
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.NotificationType
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.AppDispatchers
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.friend.domain.message.FriendNotificationMessage
 import com.peekr.domain.friend.domain.model.FriendNotificationCommand
 import com.peekr.domain.friend.domain.provider.NotificationProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * 친구 상태 수정
@@ -17,6 +21,7 @@ import com.peekr.domain.friend.exception.FriendException
 class UpdateFriendRequestStatusUseCase(
     private val friendRepository: FriendRepository,
     private val notificationProvider: NotificationProvider,
+    private val applicationScope: CoroutineScope,
 ) {
     /**
      * 친구 상태를 수정한다.
@@ -41,30 +46,34 @@ class UpdateFriendRequestStatusUseCase(
         // 1) 스스로 친구 관계가 될 수 없다.
         if (requesterId == receiverId) throw FriendException.SelfRequestException()
 
-        // 2) 요청자/수신자 정보 조회 + 존재 여부 확인
-        val context = friendRepository.getFriendRequestContext(requesterIdVO, receiverIdVO)
-            ?: throw FriendException.UserNotFoundException()
+        val (result, requesterName) = suspendTransaction {
+            // 2) 요청자/수신자 정보 조회 + 존재 여부 확인
+            val context = friendRepository.getFriendRequestContext(requesterIdVO, receiverIdVO)
+                ?: throw FriendException.UserNotFoundException()
 
-        // 3) 친구 상태 수정
-        val result = friendRepository.updateFriendRequestStatus(requesterIdVO, receiverIdVO, requestStatus)
+            // 3) 친구 상태 수정
+            val result = friendRepository.updateFriendRequestStatus(requesterIdVO, receiverIdVO, requestStatus)
 
-        // 4) 친구 수락 시 수신자(원래 친구 요청을 보낸 사람)에게 알림 전송 (실패해도 상태 수정은 성공으로 처리)
+            result to context.requesterInfo.userName.value
+        }
+
+        // 4) 친구 수락 시 수신자(원래 친구 요청을 보낸 사람)에게 알림 전송 비동기 실행 (실패해도 상태 수정은 성공으로 처리)
         if (result && requestStatus == FriendRequestStatus.ACCEPTED) {
-            runCatching {
-                notificationProvider.sendNotification(
-                    FriendNotificationCommand(
-                        userId = receiverIdVO,
-                        notiType = NotificationType.FRIEND_ACCEPT,
-                        title = FriendNotificationMessage.FriendAccept.TITLE,
-                        message = FriendNotificationMessage.FriendAccept.message(
-                            context.requesterInfo.userName.value,
+            applicationScope.launch(AppDispatchers.ioDispatcher) {
+                runCatching {
+                    notificationProvider.sendNotification(
+                        FriendNotificationCommand(
+                            userId = receiverIdVO,
+                            notiType = NotificationType.FRIEND_ACCEPT,
+                            title = FriendNotificationMessage.FriendAccept.TITLE,
+                            message = FriendNotificationMessage.FriendAccept.message(requesterName),
+                            refId = requesterId,
+                            refType = RefType.USER,
                         ),
-                        refId = requesterId,
-                        refType = RefType.USER,
-                    ),
-                )
-            }.onFailure { e ->
-                LOGGER.warn("친구 수락 알림 전송 실패 | receiverId=${receiverIdVO.value}", e)
+                    )
+                }.onFailure { e ->
+                    LOGGER.warn("친구 수락 알림 전송 실패 | receiverId=${receiverIdVO.value}", e)
+                }
             }
         }
 

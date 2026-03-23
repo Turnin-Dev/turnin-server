@@ -1,5 +1,6 @@
 package com.peekr.domain.friend.di
 
+import com.peekr.common.di.ApplicationScopeQualifier
 import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
 import com.peekr.domain.friend.application.provider.FriendProviderApi
 import com.peekr.domain.friend.application.usecase.AddFriendUseCase
@@ -28,8 +29,8 @@ val friendModule = module {
 
     // Usecase
     single { GetFriendsUseCase(get()) }
-    single { AddFriendUseCase(get(), get()) }
-    single { UpdateFriendRequestStatusUseCase(get(), get()) }
+    single { AddFriendUseCase(get(), get(), get(ApplicationScopeQualifier)) }
+    single { UpdateFriendRequestStatusUseCase(get(), get(), get(ApplicationScopeQualifier)) }
     single { DeleteFriendUseCase(get()) }
     single { GetFriendStatusUseCase(get()) }
     single { GetIncomingRequestsUseCase(get()) }

@@ -13,7 +13,7 @@ import org.junit.Test
 
 class RegisterFcmTokenUseCaseTest {
     private val fcmTokenRepository: FcmTokenRepository = mockk()
-    private val useCase = RegisterFcmTokenUseCase(fcmTokenRepository)
+    private val usecase = RegisterFcmTokenUseCase(fcmTokenRepository)
 
     @Test
     fun `FCM 토큰 등록 성공`() = runTest {
@@ -25,7 +25,7 @@ class RegisterFcmTokenUseCaseTest {
         coEvery { fcmTokenRepository.upsert(userId, token) } returns expectedFcmToken
 
         // when
-        val result = useCase(userId, token)
+        val result = usecase(userId, token)
 
         // then
         assertEquals(expectedFcmToken.toDto(), result)

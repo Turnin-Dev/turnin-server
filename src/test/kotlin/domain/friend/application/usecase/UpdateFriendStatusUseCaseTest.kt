@@ -9,24 +9,35 @@ import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.provider.NotificationProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.Runs
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UpdateFriendRequestStatusUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
     private val notificationProvider: NotificationProvider = mockk()
-    private val usecase = UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider)
+    private val applicationScope = TestScope()
+    private val usecase = UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider, applicationScope)
 
-    @BeforeTest
+    @Before
     fun setUp() {
+        TestDatabaseFactory.init()
+
         coEvery {
             friendRepository.getFriendRequestContext(TestUserId1, TestUserId2)
         } returns TestFriendRequestContext
@@ -38,6 +49,12 @@ class UpdateFriendRequestStatusUseCaseTest {
         coEvery {
             notificationProvider.sendNotification(any())
         } just Runs
+    }
+
+    @After
+    fun tearDown() {
+        TestDatabaseFactory.cleanUp()
+        clearAllMocks()
     }
 
     @Test
@@ -55,6 +72,7 @@ class UpdateFriendRequestStatusUseCaseTest {
         usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
 
         // then
+        applicationScope.advanceUntilIdle()
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
     }
 
@@ -64,6 +82,7 @@ class UpdateFriendRequestStatusUseCaseTest {
         usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.REJECTED)
 
         // then
+        applicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
@@ -79,6 +98,8 @@ class UpdateFriendRequestStatusUseCaseTest {
 
         // then
         assertTrue(result)
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
     }
 
     @Test
@@ -86,6 +107,9 @@ class UpdateFriendRequestStatusUseCaseTest {
         assertThrows<FriendException.SelfRequestException> {
             usecase(1L, 1L, FriendRequestStatus.ACCEPTED)
         }
+
+        // then 로직 최상단에서 걸리므로 DB 조회가 발생하지 않아야 함
+        coVerify(exactly = 0) { friendRepository.getFriendRequestContext(UserId(1L), UserId(1L)) }
     }
 
     @Test
@@ -99,6 +123,11 @@ class UpdateFriendRequestStatusUseCaseTest {
         assertThrows<FriendException.UserNotFoundException> {
             usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
         }
+
+        // then: 사용자 확인 단계에서 실패하므로 수정 로직이나 알림이 실행되지 않아야 함
+        coVerify(exactly = 0) { friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any()) }
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
     @Test
@@ -109,9 +138,28 @@ class UpdateFriendRequestStatusUseCaseTest {
         } returns false
 
         // when
-        usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
+        val result = usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
 
         // then
+        assertFalse(result)
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
+    }
+
+    @Test
+    fun `DB 수정 로직 중 예외 발생 시 알림을 전송하지 않는다`() = runTest {
+        // given
+        coEvery {
+            friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any())
+        } throws RuntimeException("DB 수정을 실패했습니다.")
+
+        // when, then
+        assertThrows<RuntimeException> {
+            usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
+        }
+
+        // then: 트랜잭션이 실패한 상태이므로 알림 로직에 진입하면 안 됨
+        applicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 

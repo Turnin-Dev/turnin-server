@@ -24,19 +24,20 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 
 /**
  * 여러 유스케이스들을 활용한 시나리오 테스트 (통합 테스트)
  */
 class FriendUseCaseIntegrationTest {
-    // UserBC의 API
+    private val applicationScope = TestScope()
     private val notificationProvider: NotificationProvider = mockk()
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
     private val getFriendsUseCase = GetFriendsUseCase(friendRepository)
-    private val addFriendUseCase = AddFriendUseCase(friendRepository, notificationProvider)
+    private val addFriendUseCase = AddFriendUseCase(friendRepository, notificationProvider, applicationScope)
     private val updateFriendRequestStatusUseCase =
-        UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider)
+        UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider, applicationScope)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
 
     @BeforeTest

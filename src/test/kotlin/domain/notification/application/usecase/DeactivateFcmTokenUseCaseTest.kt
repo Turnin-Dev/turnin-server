@@ -11,7 +11,7 @@ import org.junit.Test
 
 class DeactivateFcmTokenUseCaseTest {
     private val fcmTokenRepository: FcmTokenRepository = mockk()
-    private val useCase = DeactivateFcmTokenUseCase(fcmTokenRepository)
+    private val usecase = DeactivateFcmTokenUseCase(fcmTokenRepository)
 
     @Test
     fun `FCM 토큰 비활성화 성공`() = runTest {
@@ -22,7 +22,7 @@ class DeactivateFcmTokenUseCaseTest {
         coEvery { fcmTokenRepository.deactivate(userId, token) } returns true
 
         // when
-        val result = useCase(userId, token)
+        val result = usecase(userId, token)
 
         // then
         assertTrue(result)
@@ -37,7 +37,7 @@ class DeactivateFcmTokenUseCaseTest {
         coEvery { fcmTokenRepository.deactivate(userId, token) } returns false
 
         // when
-        val result = useCase(userId, token)
+        val result = usecase(userId, token)
 
         // then
         assertFalse(result)

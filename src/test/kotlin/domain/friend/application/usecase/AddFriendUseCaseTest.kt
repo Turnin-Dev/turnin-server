@@ -12,12 +12,16 @@ import com.peekr.domain.friend.domain.model.UserInfo
 import com.peekr.domain.friend.domain.provider.NotificationProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -25,13 +29,17 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AddFriendUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
     private val notificationProvider: NotificationProvider = mockk()
-    private val usecase = AddFriendUseCase(friendRepository, notificationProvider)
+    private val applicationScope = TestScope()
+    private val usecase = AddFriendUseCase(friendRepository, notificationProvider, applicationScope)
 
     @Before
     fun setup() {
+        TestDatabaseFactory.init()
+
         coEvery {
             friendRepository.getFriendRequestContext(TestRequesterId, TestReceiverId)
         } returns TestFriendRequestContext
@@ -43,6 +51,8 @@ class AddFriendUseCaseTest {
 
     @After
     fun teardown() {
+        TestDatabaseFactory.cleanUp()
+
         clearAllMocks()
     }
 
@@ -62,6 +72,7 @@ class AddFriendUseCaseTest {
         // then
         assertEquals(TestRequesterId.value, friendDto.requesterId)
         assertEquals(TestReceiverId.value, friendDto.receiverId)
+        applicationScope.advanceUntilIdle()
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
     }
 
@@ -79,6 +90,10 @@ class AddFriendUseCaseTest {
                 receiverId = TestReceiverId.value,
             )
         }
+
+        // then: 예외 발생 시 알림은 전송되지 않아야 함
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
     @Test
@@ -87,6 +102,9 @@ class AddFriendUseCaseTest {
         assertThrows<FriendException.SelfRequestException> {
             usecase(1L, 1L)
         }
+
+        // then: 비즈니스 룰 위반 시 DB 조회 조차 하지 않아야 함
+        coVerify(exactly = 0) { friendRepository.getFriendRequestContext(UserId(1L), UserId(1L)) }
     }
 
     @Test
@@ -140,6 +158,29 @@ class AddFriendUseCaseTest {
         // then
         assertEquals(TestRequesterId.value, friendDto.requesterId)
         assertEquals(TestReceiverId.value, friendDto.receiverId)
+        // 알림 전송 시도는 이루어졌음을 확인
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
+    }
+
+    @Test
+    fun `DB 생성 로직 실패 시 알림 전송은 호출되지 않아야 한다`() = runTest {
+        // given: 조회는 성공하지만 생성(트랜잭션 핵심부)에서 실패하는 상황
+        coEvery {
+            friendRepository.createFriend(TestRequesterId, TestReceiverId)
+        } throws RuntimeException("DB 저장 실패")
+
+        // when
+        assertThrows<RuntimeException> {
+            usecase(
+                requesterId = TestRequesterId.value,
+                receiverId = TestReceiverId.value,
+            )
+        }
+
+        // then: 트랜잭션이 실패했으므로 알림은 전송되지 않아야 함
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
     companion object {
