@@ -6,16 +6,20 @@ import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.UserEntity
+import com.peekr.common.db.schema.UserFcmTokens
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.toOffsetDateTime
+import com.peekr.domain.friend.domain.model.FriendFcmContext
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.util.db.TestDatabaseFactory
 import com.peekr.util.db.setUserInactiveForTest
 import com.peekr.util.testPagination
 import java.time.Instant
+import java.time.OffsetDateTime
 import kotlin.collections.isNotEmpty
 import kotlin.collections.map
 import kotlin.test.AfterTest
@@ -488,15 +492,105 @@ class FriendRepositoryImplTest {
         assertTrue(context.isBlocked)
     }
 
+    // ------------------------------ getFriendFcmContext ------------------------------
+
+    @Test
+    fun `getFriendFcmContext 성공 테스트 - 수락된 친구들의 활성화된 토큰과 내 이름을 반환한다`() = runTest {
+        // given
+        val myName = "나의이름"
+        val myId = insertUserAndReturnId(myName)
+        val friendId1 = insertUserAndReturnId("friend1")
+        val friendId2 = insertUserAndReturnId("friend2")
+
+        // 친구 관계 설정 (수락 상태)
+        repository.createFriend(myId, friendId1)
+        repository.updateFriendRequestStatus(friendId1, myId, FriendRequestStatus.ACCEPTED)
+        repository.createFriend(friendId2, myId) // 상대방이 신청한 경우
+        repository.updateFriendRequestStatus(myId, friendId2, FriendRequestStatus.ACCEPTED)
+
+        // 토큰 설정
+        val now = Instant.now().toOffsetDateTime()
+        insertFcmTokenForTest(friendId1, "token1", isActive = true, updatedAt = now)
+        insertFcmTokenForTest(friendId2, "token3_old", isActive = true, updatedAt = now.minusSeconds(600))
+        insertFcmTokenForTest(friendId2, "token2", isActive = true, updatedAt = now)
+
+        // when
+        val context = repository.getFriendFcmContext(myId)
+
+        // then
+        assertEquals(myName, context.senderName)
+        assertEquals(2, context.friendTokens.size)
+        assertTrue(context.friendTokens.containsAll(listOf("token1", "token2")))
+    }
+
+    @Test
+    fun `getFriendFcmContext 성공 테스트 - 친구가 없거나 토큰이 없으면 빈 목록을 반환한다`() = runTest {
+        // given
+        val myId = insertUserAndReturnId("me")
+
+        // when
+        val context = repository.getFriendFcmContext(myId)
+
+        // then
+        assertTrue(context.friendTokens.isEmpty())
+        assertEquals("", context.senderName) // JOIN 결과가 없어 이름도 빈값
+    }
+
+    @Test
+    fun `getFriendFcmContext 성공 테스트 - 비활성화된 토큰이나 수락되지 않은 친구는 제외한다`() = runTest {
+        // given
+        val myId = insertUserAndReturnId("me")
+        val friendId1 = insertUserAndReturnId("friend1")
+        val friendId2 = insertUserAndReturnId("friend2")
+
+        // friend1: 수락됨, 하지만 토큰 비활성
+        repository.createFriend(myId, friendId1)
+        repository.updateFriendRequestStatus(friendId1, myId, FriendRequestStatus.ACCEPTED)
+        insertFcmTokenForTest(friendId1, "inactive_token", isActive = false)
+
+        // friend2: 대기중(PENDING), 토큰 활성
+        repository.createFriend(myId, friendId2)
+        insertFcmTokenForTest(friendId2, "pending_friend_token", isActive = true)
+
+        // when
+        val context = repository.getFriendFcmContext(myId)
+
+        // then
+        assertTrue(context.friendTokens.isEmpty())
+    }
+
+    @Test
+    fun `getFriendFcmContext 성공 테스트 - 최대 제한 수만큼만 토큰을 가져온다`() = runTest {
+        // given
+        val myId = insertUserAndReturnId("me")
+        val limit = FriendFcmContext.MAX_NOTIFICATION_RECIPIENTS
+
+        // 제한 수보다 많은 친구 생성 (예: limit + 10)
+        repeat(limit + 10) {
+            val friendId = insertUserAndReturnId("friend$it")
+            repository.createFriend(myId, friendId)
+            repository.updateFriendRequestStatus(friendId, myId, FriendRequestStatus.ACCEPTED)
+            insertFcmTokenForTest(friendId, "token$it", isActive = true)
+        }
+
+        // when
+        val context = repository.getFriendFcmContext(myId)
+
+        // then
+        assertEquals(limit, context.friendTokens.size)
+    }
+
+    // ------------------------------ 유틸 ------------------------------
+
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
             this.provider = SocialLoginProvider.GOOGLE
             this.providerId = "pid$uniqueValue"
             this.displayId = "did$uniqueValue"
-            this.name = "honggd"
+            this.name = uniqueValue
             this.profileImageUrl = null
-            this.introduce = "hello"
+            this.introduce = "hello$uniqueValue"
             this.isActive = true
             this.lastLoginAt = Instant.now()
         }
@@ -531,6 +625,20 @@ class FriendRepositoryImplTest {
             it[Blocks.blockedId] = EntityID(blockedId.value, Users)
             it[Blocks.reasonId] = EntityID(1L, BlockReasons) // 기존 initData에서 생성된 차단 사유
             it[Blocks.customReason] = null
+        }
+    }
+
+    private suspend fun insertFcmTokenForTest(
+        userId: UserId,
+        token: String,
+        isActive: Boolean,
+        updatedAt: OffsetDateTime = Instant.now().toOffsetDateTime(),
+    ) = TestDatabaseFactory.dbQuery {
+        UserFcmTokens.insert {
+            it[UserFcmTokens.userId] = EntityID(userId.value, Users)
+            it[UserFcmTokens.token] = token
+            it[UserFcmTokens.isActive] = isActive
+            it[UserFcmTokens.updatedAt] = updatedAt
         }
     }
 }
