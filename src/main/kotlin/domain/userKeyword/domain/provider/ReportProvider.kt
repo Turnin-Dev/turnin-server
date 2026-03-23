@@ -3,7 +3,7 @@ package com.peekr.domain.userKeyword.domain.provider
 import com.peekr.common.model.id.UserKeywordId
 
 /**
- * 외부에서 제공되는 신고 BC API 인터페이스
+ * 외부에서 제공되는 신고 API
  */
 interface ReportProvider {
     /**

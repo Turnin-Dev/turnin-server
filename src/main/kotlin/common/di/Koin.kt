@@ -27,6 +27,7 @@ fun Application.configureKoin() {
         slf4jLogger()
         defaultModule()
         modules(
+            // Feature
             jwtModule,
             authModule,
             userModule,
@@ -43,6 +44,8 @@ fun Application.configureKoin() {
             // 3rd service
             embeddingModule,
             firebaseModule,
+            // Util
+            coroutineModule,
         )
     }
 }

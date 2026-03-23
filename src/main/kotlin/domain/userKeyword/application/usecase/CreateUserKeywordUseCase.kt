@@ -1,15 +1,22 @@
 package com.peekr.domain.userKeyword.application.usecase
 
 import com.peekr.common.db.suspendTransaction
+import com.peekr.common.firebase.RefType
+import com.peekr.common.model.NotificationType
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.domain.userKeyword.application.dto.toDto
+import com.peekr.domain.userKeyword.domain.message.KeywordNotificationMessage
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.peekr.domain.userKeyword.domain.provider.FriendProvider
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
+import com.peekr.domain.userKeyword.domain.provider.NotificationProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.exception.UserKeywordException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * 사용자별 키워드를 추가한다.
@@ -24,35 +31,62 @@ import com.peekr.domain.userKeyword.exception.UserKeywordException
 class CreateUserKeywordUseCase(
     private val userKeywordRepository: UserKeywordRepository,
     private val keywordProvider: KeywordProvider,
+    private val notificationProvider: NotificationProvider,
+    private val friendProvider: FriendProvider,
+    private val backgroundScope: CoroutineScope,
 ) {
     /**
      * @param createUserKeywordDto [CreateUserKeywordDto] 사용자별 키워드 DTO
      *
      * @return [UserKeywordDto] 사용자별 키워드 DTO
      */
-    suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto = suspendTransaction {
-        // 1) 사용자 키워드 개수 제한 확인
-        val userKeywordCount = userKeywordRepository.countByUserId(createUserKeywordDto.userId)
-        if (userKeywordCount >= UserKeyword.COUNT_LIMIT) {
-            LOGGER.error("user keyword count exceed: userId=${createUserKeywordDto.userId}")
-            throw UserKeywordException.CountLimitReached()
+    suspend operator fun invoke(createUserKeywordDto: CreateUserKeywordDto): UserKeywordDto =
+        suspendTransaction {
+            // 1) 사용자 키워드 개수 제한 확인
+            val userKeywordCount = userKeywordRepository.countByUserId(createUserKeywordDto.userId)
+            if (userKeywordCount >= UserKeyword.COUNT_LIMIT) {
+                LOGGER.error("user keyword count exceed: userId=${createUserKeywordDto.userId}")
+                throw UserKeywordException.CountLimitReached()
+            }
+
+            // 2) 키워드가 기존에 존재하는지 확인하고 없으면 생성 후 키워드 ID를 반환한다.
+            val keyword = keywordProvider.findByName(createUserKeywordDto.keywordName)
+                ?: keywordProvider.create(
+                    keywordName = createUserKeywordDto.keywordName,
+                    createdBy = createUserKeywordDto.userId,
+                )
+
+            // 3) 사용자 키워드 생성
+            val userKeyword = userKeywordRepository
+                .create(
+                    keyword.id,
+                    createUserKeywordDto.userId,
+                    createUserKeywordDto.description.toDomain(),
+                ).toDto(keyword.name.value)
+
+            // 4) 친구들에게 새 키워드 알림 전송 (비동기 - 사용자 응답과 무관)
+            //    알림 전송 실패 시에도 키워드 생성은 성공으로 처리
+            backgroundScope.launch {
+                runCatching {
+                    val fcmContext = friendProvider.getFriendFcmContext(createUserKeywordDto.userId)
+                    if (fcmContext.friendTokens.isNotEmpty()) {
+                        notificationProvider.sendNotificationToTokens(
+                            tokens = fcmContext.friendTokens,
+                            notiType = NotificationType.NEW_KEYWORD,
+                            title = KeywordNotificationMessage.TITLE,
+                            message = KeywordNotificationMessage.message(fcmContext.senderName),
+                            refId = userKeyword.id,
+                            refType = RefType.KEYWORD,
+                            senderUserId = createUserKeywordDto.userId.value,
+                        )
+                    }
+                }.onFailure { e ->
+                    LOGGER.warn("새 키워드 알림 전송 실패 | userId=${createUserKeywordDto.userId}", e)
+                }
+            }
+
+            userKeyword
         }
-
-        // 2) 키워드가 기존에 존재하는지 확인하고 없으면 생성 후 키워드 ID를 반환한다.
-        val keyword = keywordProvider.findByName(createUserKeywordDto.keywordName)
-            ?: keywordProvider.create(
-                keywordName = createUserKeywordDto.keywordName,
-                createdBy = createUserKeywordDto.userId,
-            )
-
-        // 3) 사용자 키워드 생성
-        userKeywordRepository
-            .create(
-                keyword.id,
-                createUserKeywordDto.userId,
-                createUserKeywordDto.description.toDomain(),
-            ).toDto(keyword.name.value)
-    }
 }
 
 private val LOGGER = AppLoggerFactory.createLogger<CreateUserKeywordUseCase>()

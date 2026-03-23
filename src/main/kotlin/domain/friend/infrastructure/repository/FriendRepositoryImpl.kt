@@ -16,6 +16,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
+import com.peekr.domain.friend.domain.model.FriendFcmContext
 import com.peekr.domain.friend.domain.model.FriendRequestContext
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
@@ -24,6 +25,7 @@ import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -32,6 +34,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.leftJoin
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 class FriendRepositoryImpl : FriendRepository {
     override suspend fun getFriendsPagination(
@@ -180,6 +183,47 @@ class FriendRepositoryImpl : FriendRepository {
                 profileImageUrl = receiverRow[Users.profileImageUrl],
             ),
             isBlocked = isBlocked,
+        )
+    }
+
+    override suspend fun getFriendFcmContext(userId: UserId): FriendFcmContext = suspendTransaction {
+        val sql = """
+        SELECT DISTINCT ON (uft.user_id) uft.token, sender.name as sender_name
+        FROM user_fcm_token uft
+        INNER JOIN (
+            SELECT receiver_id as friend_id FROM friend
+            WHERE requester_id = ? AND status = 'ACCEPTED'
+            UNION
+            SELECT requester_id as friend_id FROM friend
+            WHERE receiver_id = ? AND status = 'ACCEPTED'
+        ) friends ON uft.user_id = friends.friend_id
+        CROSS JOIN (SELECT name FROM "user" WHERE id = ?) sender
+        WHERE uft.is_active = true
+        ORDER BY uft.user_id, uft.updated_at DESC
+        LIMIT 500
+        """.trimIndent()
+
+        val params = listOf(
+            LongColumnType() to userId.value,
+            LongColumnType() to userId.value,
+            LongColumnType() to userId.value,
+        )
+
+        var senderName = ""
+        val tokens = mutableListOf<String>()
+
+        TransactionManager.current().exec(sql, params) { rs ->
+            while (rs.next()) {
+                if (senderName.isEmpty()) {
+                    senderName = rs.getString("sender_name") ?: ""
+                }
+                tokens.add(rs.getString("token"))
+            }
+        }
+
+        FriendFcmContext(
+            friendTokens = tokens,
+            senderName = senderName,
         )
     }
 

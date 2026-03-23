@@ -4,7 +4,7 @@ import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 
 /**
- * 외부에서 제공되는 키워드 BC API 인터페이스
+ * 외부에서 제공되는 키워드 API
  */
 interface KeywordProvider {
     /**

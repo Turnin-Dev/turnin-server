@@ -20,3 +20,14 @@ object FcmDataKey {
     /** 게시자 사용자 ID (NEW_KEYWORD 알림에서 사용) */
     const val USER_ID = "user_id"
 }
+
+/**
+ * 딥링크용 참조 리소스 타입
+ */
+object RefType {
+    /** 사용자 프로필 */
+    const val USER = "USER"
+
+    /** 키워드 게시물 */
+    const val KEYWORD = "KEYWORD"
+}

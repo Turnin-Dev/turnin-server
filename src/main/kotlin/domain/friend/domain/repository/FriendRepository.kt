@@ -3,6 +3,7 @@ package com.peekr.domain.friend.domain.repository
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
+import com.peekr.domain.friend.domain.model.FriendFcmContext
 import com.peekr.domain.friend.domain.model.FriendRequestContext
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
@@ -69,6 +70,16 @@ interface FriendRepository {
         requesterId: UserId,
         receiverId: UserId,
     ): FriendRequestContext?
+
+    /**
+     * 친구들의 FCM 알림 전송에 필요한 컨텍스트를 조회한다.
+     * 발신자 이름 + 친구들의 최신 활성 FCM 토큰을 한 번에 조회한다.
+     * 친구당 가장 최근 updated_at 기준 토큰 1개만 선택하며 최대 500명까지 조회한다.
+     *
+     * @param userId 발신자 ID
+     * @return [FriendFcmContext]
+     */
+    suspend fun getFriendFcmContext(userId: UserId): FriendFcmContext
 
     /**
      * 친구 요청 생성

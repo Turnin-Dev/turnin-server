@@ -15,7 +15,6 @@ object UserFcmTokens : BaseLongIdTable("user_fcm_token") {
     init {
         uniqueIndex("uq_fcm_token", token)
         index("idx_fcm_token_user_id", false, userId)
-        index("idx_fcm_token_active", false, userId, isActive)
     }
 }
 

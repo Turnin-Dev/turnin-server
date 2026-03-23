@@ -1,6 +1,7 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.db.DatabaseException
+import com.peekr.common.firebase.RefType
 import com.peekr.common.model.NotificationType
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.AppLoggerFactory
@@ -70,7 +71,7 @@ class AddFriendUseCase(
                         context.requesterInfo.userName.value,
                     ),
                     refId = requesterId,
-                    refType = "USER",
+                    refType = RefType.USER,
                 ),
             )
         }.onFailure { e ->

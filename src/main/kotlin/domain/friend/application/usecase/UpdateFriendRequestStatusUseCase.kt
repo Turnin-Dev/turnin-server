@@ -1,5 +1,6 @@
 package com.peekr.domain.friend.application.usecase
 
+import com.peekr.common.firebase.RefType
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.NotificationType
 import com.peekr.common.model.id.UserId
@@ -59,7 +60,7 @@ class UpdateFriendRequestStatusUseCase(
                             context.requesterInfo.userName.value,
                         ),
                         refId = requesterId,
-                        refType = "USER",
+                        refType = RefType.USER,
                     ),
                 )
             }.onFailure { e ->
