@@ -8,7 +8,7 @@ import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDomain
 import com.peekr.domain.userKeyword.application.dto.toDto
-import com.peekr.domain.userKeyword.domain.message.KeywordNotificationMessage
+import com.peekr.domain.userKeyword.domain.message.UserKeywordNotificationMessage
 import com.peekr.domain.userKeyword.domain.model.UserKeyword
 import com.peekr.domain.userKeyword.domain.provider.FriendProvider
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
@@ -73,8 +73,8 @@ class CreateUserKeywordUseCase(
                         notificationProvider.sendNotificationToTokens(
                             tokens = fcmContext.friendTokens,
                             notiType = NotificationType.NEW_KEYWORD,
-                            title = KeywordNotificationMessage.TITLE,
-                            message = KeywordNotificationMessage.message(fcmContext.senderName),
+                            title = UserKeywordNotificationMessage.TITLE,
+                            message = UserKeywordNotificationMessage.message(fcmContext.senderName),
                             refId = userKeyword.id,
                             refType = RefType.KEYWORD,
                             senderUserId = createUserKeywordDto.userId.value,

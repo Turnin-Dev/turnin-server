@@ -5,7 +5,7 @@ import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
 import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
-import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
+import com.peekr.domain.userKeyword.domain.model.ExternalKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.exception.UserKeywordException

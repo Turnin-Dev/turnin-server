@@ -1,6 +1,7 @@
 package com.peekr.domain.userKeyword.domain.provider
 
 import com.peekr.common.model.id.UserId
+import com.peekr.domain.userKeyword.domain.model.UserKeywordFriendFcmContext
 
 /**
  * 외부에서 제공되는 키워드 API

@@ -1,9 +1,9 @@
 package com.peekr.domain.userKeyword.domain.message
 
 /**
- * 키워드 알림 메시지
+ * 사용자 키워드 알림 메시지
  */
-object KeywordNotificationMessage {
+object UserKeywordNotificationMessage {
     const val TITLE = "새 키워드"
 
     /**
