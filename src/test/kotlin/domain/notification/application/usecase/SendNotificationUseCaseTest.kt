@@ -7,6 +7,7 @@ import com.peekr.domain.notification.application.dto.toDto
 import com.peekr.domain.notification.domain.model.NotificationCommand
 import com.peekr.domain.notification.domain.repository.FcmTokenRepository
 import com.peekr.domain.notification.domain.repository.NotificationRepository
+import com.peekr.domain.notification.exception.NotificationException
 import com.peekr.domain.notification.notificationFixture
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -16,6 +17,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.jupiter.api.assertThrows
 
 class SendNotificationUseCaseTest {
     private val fcmTokenRepository: FcmTokenRepository = mockk()
@@ -24,7 +26,7 @@ class SendNotificationUseCaseTest {
     private val usecase = SendNotificationUseCase(fcmTokenRepository, notificationRepository, fcmService)
 
     @Test
-    fun `활성 토큰이 있으면 FCM 전송 후 알림을 저장한다`() = runTest {
+    fun `활성 토큰이 있으면 알림을 저장하고 FCM을 전송한다`() = runTest {
         // given
         val userId = UserId(1L)
         val command = NotificationCommand.personal(
@@ -73,5 +75,20 @@ class SendNotificationUseCaseTest {
         assertEquals(expectedNotification.toDto(), result)
         coVerify(exactly = 0) { fcmService.sendToUsers(any(), any()) } // FCM 전송 안 함
         coVerify(exactly = 1) { notificationRepository.save(command) }
+    }
+
+    @Test
+    fun `userId가 없으면 예외가 발생한다`() = runTest {
+        // given
+        val command = NotificationCommand.broadcast(
+            notiType = NotificationType.NOTICE,
+            title = "공지",
+            message = "공지 메시지",
+        )
+
+        // when, then
+        assertThrows<NotificationException.MissingUserIdInPersonalNotification> {
+            usecase(command)
+        }
     }
 }

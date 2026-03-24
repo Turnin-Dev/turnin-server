@@ -16,6 +16,7 @@ import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import com.peekr.domain.userKeyword.domain.provider.NotificationProvider
 import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.peekr.domain.userKeyword.exception.UserKeywordException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -83,6 +84,7 @@ class CreateUserKeywordUseCase(
                     )
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 LOGGER.warn("새 키워드 알림 전송 실패 | userId=${createUserKeywordDto.userId}", e)
             }
         }

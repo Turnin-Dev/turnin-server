@@ -12,6 +12,7 @@ import com.peekr.domain.friend.domain.model.FriendNotificationCommand
 import com.peekr.domain.friend.domain.provider.NotificationProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.exception.FriendException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -72,6 +73,7 @@ class UpdateFriendRequestStatusUseCase(
                         ),
                     )
                 }.onFailure { e ->
+                    if (e is CancellationException) throw e
                     LOGGER.warn("친구 수락 알림 전송 실패 | receiverId=${receiverIdVO.value}", e)
                 }
             }
