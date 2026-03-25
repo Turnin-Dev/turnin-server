@@ -23,13 +23,15 @@ class LogoutUseCase(
      */
     suspend operator fun invoke(
         userId: Long,
-        token: String,
+        token: String?,
     ) {
         val userIDVO = UserId(userId)
 
-        // 1. 토큰 삭제
+        // 1. 기기 정보 해제 (사용자와 매핑된 FCM 토큰 정보 제거)
+        token?.let {
+            notificationProvider.deactivate(userIDVO, it)
+        }
+        // 2. 토큰 삭제
         authProvider.deleteRefreshToken(userIDVO)
-        // 2. 기기 정보 해제 (사용자와 매핑된 FCM 토큰 정보 제거)
-        notificationProvider.deactivate(userIDVO, token)
     }
 }
