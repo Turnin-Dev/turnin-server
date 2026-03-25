@@ -2,16 +2,17 @@ package com.peekr.domain.userKeyword.domain.provider
 
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
+import com.peekr.domain.userKeyword.domain.model.ExternalKeyword
 
 /**
- * 외부에서 제공되는 키워드 BC API 인터페이스
+ * 외부에서 제공되는 키워드 API
  */
 interface KeywordProvider {
     /**
      * 키워드 ID로 키워드 조회
      *
      * @param [keywordId] 키워드 ID
-     * @return [ExternalKeyword]
+     * @return [com.peekr.domain.userKeyword.domain.model.ExternalKeyword]
      */
     suspend fun findById(keywordId: KeywordId): ExternalKeyword?
 

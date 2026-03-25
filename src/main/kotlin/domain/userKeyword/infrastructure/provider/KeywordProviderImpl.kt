@@ -4,7 +4,7 @@ import com.peekr.common.model.KeywordName
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.keyword.application.provider.KeywordProviderApi
-import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
+import com.peekr.domain.userKeyword.domain.model.ExternalKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 
 class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : KeywordProvider {

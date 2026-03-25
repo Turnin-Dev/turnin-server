@@ -74,8 +74,8 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
             }
 
             val result = usecase.updateStatus(
-                userId1 = updateFriendStatusRequest.requesterId,
-                userId2 = updateFriendStatusRequest.receiverId,
+                requesterId = updateFriendStatusRequest.requesterId,
+                receiverId = updateFriendStatusRequest.receiverId,
                 requestStatus = updateFriendStatusRequest.requestStatus,
             )
             if (result) {

@@ -3,6 +3,8 @@ package com.peekr.domain.friend.domain.repository
 import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.domain.model.Friend
+import com.peekr.domain.friend.domain.model.FriendFcmContext
+import com.peekr.domain.friend.domain.model.FriendRequestContext
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
 import com.peekr.domain.friend.domain.model.UserInfo
@@ -55,6 +57,33 @@ interface FriendRepository {
      * @return [Long]타입의 친구 수
      */
     suspend fun countFriends(userId: UserId): Long
+
+    /**
+     * 친구 요청에 필요한 컨텍스트를 조회한다.
+     * 요청자/수신자 정보 + 차단 관계를 한 번에 조회한다.
+     *
+     * @param requesterId 요청자 ID
+     * @param receiverId 수신자 ID
+     * @return [FriendRequestContext] or null (수신자가 존재하지 않는 경우)
+     */
+    suspend fun getFriendRequestContext(
+        requesterId: UserId,
+        receiverId: UserId,
+    ): FriendRequestContext?
+
+    /**
+     * 친구들의 FCM 알림 전송에 필요한 컨텍스트를 조회한다.
+     * 발신자 이름 + 친구들의 최신 활성 FCM 토큰을 한 번에 조회한다.
+     * 친구당 가장 최근 updated_at 기준 토큰 1개만 선택하며 최대 [limit]명까지 조회한다.
+     *
+     * @param userId 발신자 ID
+     * @param limit 조회할 친구 수
+     * @return [FriendFcmContext]
+     */
+    suspend fun getFriendFcmContext(
+        userId: UserId,
+        limit: Int = FriendFcmContext.MAX_NOTIFICATION_RECIPIENTS,
+    ): FriendFcmContext
 
     /**
      * 친구 요청 생성
@@ -120,19 +149,4 @@ interface FriendRepository {
      * **순환 참조를 방지하기 위해 임시방편으로 Users 테이블 조회만 수행한다.**
      */
     suspend fun getUserInfos(userIds: List<UserId>): List<UserInfo>
-
-    /**
-     * 차단 사용자 여부 확인
-     *
-     * [userId1]과 [userId2]의 차단 관계를 확인한다.
-     *
-     * 둘 중 한 명이라도 서로를 차단한 관계라면 `true`를 반환하고 아니라면 `false`를 반환한다.
-     *
-     * @param userId1 차단 관계 사용자 1 ID
-     * @param userId2 차단 관계 사용자 2 ID
-     */
-    suspend fun isBlockedRelationship(
-        userId1: UserId,
-        userId2: UserId,
-    ): Boolean
 }

@@ -12,7 +12,7 @@ import org.junit.Test
 
 class DeleteAllFcmTokensUseCaseTest {
     private val fcmTokenRepository: FcmTokenRepository = mockk()
-    private val useCase = DeleteAllFcmTokensUseCase(fcmTokenRepository)
+    private val usecase = DeleteAllFcmTokensUseCase(fcmTokenRepository)
 
     @Test
     fun `모든 FCM 토큰 삭제 성공`() = runTest {
@@ -21,7 +21,7 @@ class DeleteAllFcmTokensUseCaseTest {
         coEvery { fcmTokenRepository.deleteAll(userId) } just Runs
 
         // when
-        useCase(userId)
+        usecase(userId)
 
         // then
         coVerify(exactly = 1) { fcmTokenRepository.deleteAll(userId) }

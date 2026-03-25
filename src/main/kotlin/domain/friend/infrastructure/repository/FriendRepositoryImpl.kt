@@ -3,7 +3,6 @@ package com.peekr.domain.friend.infrastructure.repository
 import com.peekr.common.db.DatabaseUtils.eqEnum
 import com.peekr.common.db.extension.existsUser
 import com.peekr.common.db.extension.filterActiveUser
-import com.peekr.common.db.extension.isBlockedRelationship
 import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
@@ -17,6 +16,8 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.toOffsetDateTime
 import com.peekr.domain.friend.domain.model.Friend
+import com.peekr.domain.friend.domain.model.FriendFcmContext
+import com.peekr.domain.friend.domain.model.FriendRequestContext
 import com.peekr.domain.friend.domain.model.FriendsPagingData
 import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
 import com.peekr.domain.friend.domain.model.UserInfo
@@ -24,13 +25,17 @@ import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
 import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.IntegerColumnType
+import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.leftJoin
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 class FriendRepositoryImpl : FriendRepository {
     override suspend fun getFriendsPagination(
@@ -124,6 +129,112 @@ class FriendRepositoryImpl : FriendRepository {
         )
     }
 
+    override suspend fun getFriendRequestContext(
+        requesterId: UserId,
+        receiverId: UserId,
+    ): FriendRequestContext? = suspendTransaction {
+        // 사용자 정보 + 차단 관계 한 번에 조회 (LEFT JOIN)
+        val rows = Users
+            .leftJoin(
+                otherTable = Blocks,
+                onColumn = { Users.id },
+                otherColumn = { Blocks.blockerId },
+                additionalConstraint = {
+                    (
+                        (Blocks.blockerId eq requesterId.value) and
+                            (Blocks.blockedId eq receiverId.value)
+                    ) or (
+                        (Blocks.blockerId eq receiverId.value) and
+                            (Blocks.blockedId eq requesterId.value)
+                    )
+                },
+            ).select(
+                Users.id,
+                Users.displayId,
+                Users.name,
+                Users.profileImageUrl,
+                Blocks.id,
+            ).where {
+                (Users.id inList listOf(requesterId.value, receiverId.value)) and
+                    (Users.isActive eq true)
+            }.toList()
+
+        // 요청자/수신자 정보 파싱
+        val requesterRow = rows.find { it[Users.id].value == requesterId.value }
+            ?: return@suspendTransaction null
+        val receiverRow = rows.find { it[Users.id].value == receiverId.value }
+            ?: return@suspendTransaction null
+
+        // 차단 관계 여부 확인
+        val isBlocked = rows.any { row ->
+            row.getOrNull(Blocks.id) != null
+        }
+
+        FriendRequestContext(
+            requesterInfo = UserInfo(
+                userId = UserId(requesterRow[Users.id].value),
+                displayId = DisplayId(requesterRow[Users.displayId]),
+                userName = UserName(requesterRow[Users.name]),
+                profileImageUrl = requesterRow[Users.profileImageUrl],
+            ),
+            receiverInfo = UserInfo(
+                userId = UserId(receiverRow[Users.id].value),
+                displayId = DisplayId(receiverRow[Users.displayId]),
+                userName = UserName(receiverRow[Users.name]),
+                profileImageUrl = receiverRow[Users.profileImageUrl],
+            ),
+            isBlocked = isBlocked,
+        )
+    }
+
+    override suspend fun getFriendFcmContext(
+        userId: UserId,
+        limit: Int,
+    ): FriendFcmContext = suspendTransaction {
+        val sql = """
+            SELECT DISTINCT ON (uft.user_id)
+                uft.token,
+                sender."name" as sender_name,
+                uft.updated_at
+            FROM user_fcm_token uft
+            INNER JOIN (
+                SELECT receiver_id as friend_id FROM friend
+                WHERE requester_id = ? AND status = 'ACCEPTED'
+                UNION
+                SELECT requester_id as friend_id FROM friend
+                WHERE receiver_id = ? AND status = 'ACCEPTED'
+            ) friends ON uft.user_id = friends.friend_id
+            CROSS JOIN (SELECT "name" FROM "user" WHERE id = ?) sender
+            WHERE uft.is_active = true
+            ORDER BY uft.user_id, uft.updated_at DESC
+            LIMIT ?
+        """.trimIndent()
+
+        val params = listOf(
+            LongColumnType() to userId.value,
+            LongColumnType() to userId.value,
+            LongColumnType() to userId.value,
+            IntegerColumnType() to limit,
+        )
+
+        var senderName = ""
+        val tokens = mutableListOf<String>()
+
+        TransactionManager.current().exec(sql, params) { rs ->
+            while (rs.next()) {
+                if (senderName.isEmpty()) {
+                    senderName = rs.getString("sender_name") ?: ""
+                }
+                tokens.add(rs.getString("token"))
+            }
+        }
+
+        FriendFcmContext(
+            friendTokens = tokens,
+            senderName = senderName,
+        )
+    }
+
     override suspend fun createFriend(
         requesterId: UserId,
         receiverId: UserId,
@@ -191,14 +302,5 @@ class FriendRepositoryImpl : FriendRepository {
                     profileImageUrl = it[Users.profileImageUrl],
                 )
             }
-    }
-
-    override suspend fun isBlockedRelationship(
-        userId1: UserId,
-        userId2: UserId,
-    ): Boolean = suspendTransaction {
-        if (userId1 == userId2) return@suspendTransaction false
-
-        Blocks.isBlockedRelationship(userId1, userId2)
     }
 }

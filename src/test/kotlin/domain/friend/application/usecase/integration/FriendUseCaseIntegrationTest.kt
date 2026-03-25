@@ -10,31 +10,40 @@ import com.peekr.domain.friend.application.usecase.AddFriendUseCase
 import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
 import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
 import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
+import com.peekr.domain.friend.domain.provider.NotificationProvider
 import com.peekr.domain.friend.domain.repository.FriendRepository
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import com.peekr.util.db.TestDatabaseFactory
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.just
+import io.mockk.mockk
 import java.time.Instant
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 
 /**
  * 여러 유스케이스들을 활용한 시나리오 테스트 (통합 테스트)
  */
 class FriendUseCaseIntegrationTest {
-    // UserBC의 API
+    private val applicationScope = TestScope()
+    private val notificationProvider: NotificationProvider = mockk()
     private val friendRepository: FriendRepository = FriendRepositoryImpl()
     private val getFriendsUseCase = GetFriendsUseCase(friendRepository)
-    private val addFriendUseCase = AddFriendUseCase(friendRepository)
-    private val updateFriendRequestStatusUseCase = UpdateFriendRequestStatusUseCase(friendRepository)
+    private val addFriendUseCase = AddFriendUseCase(friendRepository, notificationProvider, applicationScope)
+    private val updateFriendRequestStatusUseCase =
+        UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider, applicationScope)
     private val deleteFriendUseCase = DeleteFriendUseCase(friendRepository)
 
     @BeforeTest
     fun setUp() {
         TestDatabaseFactory.init()
+        coEvery { notificationProvider.sendNotification(any()) } just Runs
     }
 
     @AfterTest

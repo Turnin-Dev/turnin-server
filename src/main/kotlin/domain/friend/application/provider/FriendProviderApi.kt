@@ -3,6 +3,7 @@ package com.peekr.domain.friend.application.provider
 import com.peekr.common.model.FriendStatus
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.friend.application.usecase.GetFriendStatusUseCase
+import com.peekr.domain.friend.domain.model.FriendFcmContext
 import com.peekr.domain.friend.domain.repository.FriendRepository
 
 /**
@@ -33,6 +34,15 @@ class FriendProviderApi(
         otherUserId: UserId,
     ): FriendStatus =
         getFriendStatusUseCase(userId, otherUserId)
+
+    /**
+     * 친구들의 FCM 알림 전송에 필요한 컨텍스트를 조회한다.
+     *
+     * @param userId 발신자 ID
+     * @return [FriendFcmContext]
+     */
+    suspend fun getFriendFcmContext(userId: UserId): FriendFcmContext =
+        friendRepository.getFriendFcmContext(userId)
 
     /**
      * 친구 삭제 및 친구 요청 삭제

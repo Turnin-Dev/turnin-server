@@ -96,6 +96,7 @@ object Api {
             const val ROUTE = "/notification"
             const val TAG = "Notification"
             const val TOKEN = "/token"
+            const val DEACTIVATE_TOKEN = "/token/deactivate"
             const val READ = "read"
 
             fun read(pathParam: String): String = "{$pathParam}/$READ"

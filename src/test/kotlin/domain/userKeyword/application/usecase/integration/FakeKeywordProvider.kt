@@ -7,7 +7,7 @@ import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.KeywordName
 import com.peekr.common.model.id.KeywordId
 import com.peekr.common.model.id.UserId
-import com.peekr.domain.userKeyword.domain.provider.ExternalKeyword
+import com.peekr.domain.userKeyword.domain.model.ExternalKeyword
 import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.selectAll
