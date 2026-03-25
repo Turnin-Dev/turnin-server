@@ -11,5 +11,5 @@ object UserKeywordNotificationMessage {
      *
      * @param senderName 키워드를 등록한 사용자 이름
      */
-    fun message(senderName: String) = "${senderName}님이 새 키워드를 등록했어요."
+    fun message(senderName: String) = "$senderName 님이 새 키워드를 등록했어요."
 }
