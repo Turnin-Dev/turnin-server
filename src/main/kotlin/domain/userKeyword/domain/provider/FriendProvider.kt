@@ -4,7 +4,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.domain.userKeyword.domain.model.UserKeywordFriendFcmContext
 
 /**
- * 외부에서 제공되는 키워드 API
+ * 외부에서 제공되는 친구 API
  */
 interface FriendProvider {
     /**

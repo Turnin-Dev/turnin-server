@@ -167,7 +167,7 @@ class FriendRepositoryImpl : FriendRepository {
 
         // 차단 관계 여부 확인
         val isBlocked = rows.any { row ->
-            runCatching { row[Blocks.id] }.getOrNull() != null
+            row.getOrNull(Blocks.id) != null
         }
 
         FriendRequestContext(
