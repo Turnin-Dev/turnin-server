@@ -12,10 +12,12 @@ import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.domain.provider.AuthProvider
 import com.peekr.domain.user.domain.provider.FileProvider
 import com.peekr.domain.user.domain.provider.FriendProvider
+import com.peekr.domain.user.domain.provider.NotificationProvider
 import com.peekr.domain.user.domain.repository.UserRepository
 import com.peekr.domain.user.infrastructure.provider.AuthProviderImpl
 import com.peekr.domain.user.infrastructure.provider.FileProviderImpl
 import com.peekr.domain.user.infrastructure.provider.FriendProviderImpl
+import com.peekr.domain.user.infrastructure.provider.NotificationProviderImpl
 import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
 import org.koin.dsl.module
 
@@ -28,6 +30,7 @@ val userModule = module {
     single<AuthProvider> { AuthProviderImpl(get()) }
     single<FileProvider> { FileProviderImpl(get()) }
     single { UserDeletionSupportApi(get()) }
+    single<NotificationProvider> { NotificationProviderImpl(get()) }
 
     // Repository
     single<UserRepository> { UserRepositoryImpl() }
@@ -38,7 +41,7 @@ val userModule = module {
     single { UpdateUserUseCase(get(), get()) }
     single { UpdateIntroduceUseCase(get()) }
     single { GetUserProfileUseCase(get(), get()) }
-    single { LogoutUseCase(get()) }
+    single { LogoutUseCase(get(), get()) }
     single {
         UserUseCases(
             get(),

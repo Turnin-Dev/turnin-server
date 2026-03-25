@@ -7,6 +7,7 @@ import com.peekr.common.route.Api
 import com.peekr.common.validator.inputValidationAndReturn
 import com.peekr.domain.user.application.usecase.UserUseCases
 import com.peekr.domain.user.exception.UserErrorCode
+import com.peekr.domain.user.presentation.dto.FcmTokenRequest
 import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
 import com.peekr.domain.user.presentation.dto.MyProfileResponse
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
@@ -15,7 +16,6 @@ import com.peekr.domain.user.presentation.dto.UserResponse
 import com.peekr.domain.user.presentation.dto.toDto
 import com.peekr.domain.user.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
-import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.patch
 import io.github.smiley4.ktoropenapi.put
@@ -102,9 +102,10 @@ fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
             }
         }
 
-        delete(route.LOGOUT, { logoutDocs() }) {
+        patch(route.LOGOUT, { logoutDocs() }) {
             val userId = extractUserIdWithToken()
-            usecase.logout(userId.value)
+            val token = call.receive<FcmTokenRequest>()
+            usecase.logout(userId.value, token.token)
             call.respond(HttpStatusCode.OK)
         }
     }
@@ -238,6 +239,14 @@ private fun RouteConfig.patchIntroduceDocs() {
 private fun RouteConfig.logoutDocs() {
     summary = "로그아웃"
     description = "로그아웃을 수행한다."
+    request {
+        body<FcmTokenRequest> {
+            description = "FCM 토큰 요청 바디"
+            example("FcmTokenRequest") {
+                value = FcmTokenRequest.sample
+            }
+        }
+    }
     response {
         code(HttpStatusCode.OK) {
             description = "로그아웃 성공 시"

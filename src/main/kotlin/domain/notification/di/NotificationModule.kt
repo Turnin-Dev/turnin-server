@@ -18,7 +18,7 @@ import org.koin.dsl.module
 
 val notificationModule = module {
     // ------------------------------ Provider ------------------------------
-    single { NotificationProviderApi(get(), get()) }
+    single { NotificationProviderApi(get(), get(), get()) }
 
     // ------------------------------ Repository ------------------------------
     single<FcmTokenRepository> { FcmTokenRepositoryImpl() }
