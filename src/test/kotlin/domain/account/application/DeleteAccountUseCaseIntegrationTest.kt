@@ -6,12 +6,15 @@ import com.peekr.common.db.schema.Blocks
 import com.peekr.common.db.schema.FriendEntity
 import com.peekr.common.db.schema.Friends
 import com.peekr.common.db.schema.KeywordEntity
+import com.peekr.common.db.schema.NotificationEntity
+import com.peekr.common.db.schema.Notifications
 import com.peekr.common.db.schema.RefreshTokens
 import com.peekr.common.db.schema.UserEntity
 import com.peekr.common.db.schema.UserKeywordEntity
 import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.model.FriendRequestStatus
+import com.peekr.common.model.NotificationType
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.domain.account.exception.AccountException
@@ -22,6 +25,9 @@ import com.peekr.domain.block.infrastructure.repository.BlockRepositoryImpl
 import com.peekr.domain.file.application.provider.FileDeletionSupportApi
 import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
 import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
+import com.peekr.domain.notification.application.provider.NotificationDeletionSupportApi
+import com.peekr.domain.notification.infrastructure.repository.FcmTokenRepositoryImpl
+import com.peekr.domain.notification.infrastructure.repository.NotificationRepositoryImpl
 import com.peekr.domain.user.application.dto.toDto
 import com.peekr.domain.user.application.provider.UserDeletionSupportApi
 import com.peekr.domain.user.domain.model.User
@@ -60,6 +66,10 @@ class DeleteAccountUseCaseIntegrationTest {
         blockDeletionSupportApi = BlockDeletionSupportApi(BlockRepositoryImpl()),
         userKeywordDeletionSupportApi = UserKeywordDeletionSupportApi(UserKeywordRepositoryImpl()),
         fileDeletionSupportApi = mockFileDeletionSupportApi,
+        notificationDeletionSupportApi = NotificationDeletionSupportApi(
+            NotificationRepositoryImpl(),
+            FcmTokenRepositoryImpl(),
+        ),
     )
 
     @Before
@@ -82,6 +92,7 @@ class DeleteAccountUseCaseIntegrationTest {
         insertFriend(user.id.value, other.id.value)
         insertBlock(user.id.value, other.id.value)
         insertUserKeyword(user.id.value)
+        insertNotification(user.id.value)
 
         // when
         usecase(user.id.value)
@@ -115,6 +126,10 @@ class DeleteAccountUseCaseIntegrationTest {
 
         // 파일 삭제 검증
         coVerify(exactly = 1) { mockFileDeletionSupportApi.deleteFile("https://r2.example.com/profile.jpg") }
+
+        // notification 삭제 검증
+        val notifications = findNotificationsByUserIdForTest(user.id.value)
+        assertTrue(notifications.isEmpty())
 
         // other 사용자는 영향받지 않아야 함
         val otherUser = findUserByIdForTest(other.id.value)
@@ -189,6 +204,7 @@ class DeleteAccountUseCaseIntegrationTest {
         insertFriend(user.id.value, other.id.value)
         insertBlock(user.id.value, other.id.value)
         insertUserKeyword(user.id.value)
+        insertNotification(user.id.value)
 
         // userDeletionSupportApi.deactivate() 호출 시 예외 발생 (트랜잭션 중간 실패 시뮬레이션)
         val mockUserDeletionSupportApi = mockk<UserDeletionSupportApi> {
@@ -204,6 +220,10 @@ class DeleteAccountUseCaseIntegrationTest {
             blockDeletionSupportApi = BlockDeletionSupportApi(BlockRepositoryImpl()),
             userKeywordDeletionSupportApi = UserKeywordDeletionSupportApi(UserKeywordRepositoryImpl()),
             fileDeletionSupportApi = mockFileDeletionSupportApi,
+            notificationDeletionSupportApi = NotificationDeletionSupportApi(
+                NotificationRepositoryImpl(),
+                FcmTokenRepositoryImpl(),
+            ),
         )
 
         // when & then
@@ -233,6 +253,10 @@ class DeleteAccountUseCaseIntegrationTest {
         // user_keyword 롤백 검증
         val userKeywords = findUserKeywordsByUserIdForTest(user.id.value)
         assertTrue(userKeywords.all { it.isActive })
+
+        // notification 롤백 검증
+        val notifications = findNotificationsByUserIdForTest(user.id.value)
+        assertFalse(notifications.isEmpty())
 
         // 파일 삭제 호출 안됨 검증 (트랜잭션 실패로 파일 삭제 단계까지 도달하지 않아야 함)
         coVerify(exactly = 0) { mockFileDeletionSupportApi.deleteFile(any()) }
@@ -335,5 +359,21 @@ class DeleteAccountUseCaseIntegrationTest {
                 .where { RefreshTokens.user eq userId }
                 .map { it[RefreshTokens.refreshToken] }
                 .singleOrNull()
+        }
+
+    private suspend fun insertNotification(userId: Long) = TestDatabaseFactory.dbQuery {
+        NotificationEntity.new {
+            this.userId = EntityID(userId, Users)
+            this.notiType = NotificationType.NEW_KEYWORD
+            this.message = "test-message"
+        }
+    }
+
+    private suspend fun findNotificationsByUserIdForTest(userId: Long): List<NotificationEntity> =
+        TestDatabaseFactory.dbQuery {
+            NotificationEntity
+                .find {
+                    Notifications.userId eq userId
+                }.toList()
         }
 }
