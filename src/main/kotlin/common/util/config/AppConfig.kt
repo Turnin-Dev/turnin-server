@@ -28,6 +28,13 @@ class AppConfig {
      */
     fun getOrDefault(key: String, default: String): String = get(key) ?: default
 
+    /**
+     * [key]를 통해 설정 파일에서 값을 가져오고 만약, 값이 존재하지 않는다면 에러가 발생한다.
+     *
+     * @param key 설정 값의 키
+     */
+    fun getRequired(key: String): String = get(key) ?: error("Missing required config: $key")
+
     // 실행 환경에 맞게 ApplicationConfig를 가져온다.
     private fun initAppConfig(): ApplicationConfig {
         LOGGER.info("ApplicationConfigManager initializing...")

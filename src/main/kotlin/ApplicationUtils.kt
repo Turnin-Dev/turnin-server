@@ -16,7 +16,8 @@ object ApplicationUtils {
         println(
             "Database initialized successfully. " +
                 "Status: ${dataSource.isRunning}, " +
-                "Active Connections: ${dataSource.hikariPoolMXBean}",
+                "Active Connections: ${dataSource.hikariPoolMXBean?.activeConnections ?: "N/A"}, " +
+                "Idle Connections: ${dataSource.hikariPoolMXBean?.idleConnections ?: "N/A"}",
         )
     }
 

@@ -11,9 +11,9 @@ val databaseModule = module {
     single<HikariDataSource> {
         val appConfig = get<AppConfig>()
         val environment = appConfig.getOrDefault("ktor.environment", "dev").toRunEnvironment()
-        val dbUrl = appConfig.getOrDefault("ktor.db.url", "jdbc:postgresql://localhost:5432/defaultdb")
-        val dbUser = appConfig.getOrDefault("ktor.db.user", "defaultuser")
-        val dbPassword = appConfig.getOrDefault("ktor.db.password", "defaultpassword")
+        val dbUrl = appConfig.getRequired("ktor.db.url")
+        val dbUser = appConfig.getRequired("ktor.db.user")
+        val dbPassword = appConfig.getRequired("ktor.db.password")
 
         DatabaseFactory.initialize(environment, dbUrl, dbUser, dbPassword)
     } onClose {

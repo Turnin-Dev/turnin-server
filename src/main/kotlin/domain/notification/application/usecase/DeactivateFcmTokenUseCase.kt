@@ -14,7 +14,6 @@ class DeactivateFcmTokenUseCase(private val fcmTokenRepository: FcmTokenReposito
      *
      * @param userId 토큰 소유자 ID
      * @param token 비활성화할 FCM 토큰
-     * @return 비활성화 성공 시 true, 토큰을 찾지 못한 경우 false
      */
     suspend operator fun invoke(userId: UserId, token: String) =
         fcmTokenRepository.deactivate(userId, token)

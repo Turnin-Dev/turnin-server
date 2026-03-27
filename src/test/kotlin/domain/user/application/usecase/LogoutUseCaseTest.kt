@@ -9,8 +9,9 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import kotlin.test.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.assertNull
 
 class LogoutUseCaseTest {
     private val authProvider: AuthProvider = mockk()
@@ -33,6 +34,21 @@ class LogoutUseCaseTest {
     }
 
     @Test
+    fun `토큰 비활성화 작업이 실패해도 로그아웃은 성공적으로 완료된다`() = runTest {
+        // given
+        coEvery { authProvider.deleteRefreshToken(TestUserId) } just Runs
+        coEvery { notificationProvider.deactivate(TestUserId, any()) } throws RuntimeException("Error!")
+
+        // when
+        val exception = runCatching {
+            usecase(TestUserId.value, "fcm-token")
+        }.exceptionOrNull()
+
+        // then
+        assertNull(exception)
+    }
+
+    @Test
     fun `토큰이 빈 문자열이면 알림 해제를 수행하지 않는다`() = runTest {
         // given
         coEvery { authProvider.deleteRefreshToken(TestUserId) } just Runs
@@ -41,6 +57,21 @@ class LogoutUseCaseTest {
         usecase(TestUserId.value, "")
 
         // then
+        coVerify(exactly = 0) { notificationProvider.deactivate(TestUserId, any()) }
+    }
+
+    @Test
+    fun `토큰 삭제가 실패하면 예외가 전파된다`() = runTest {
+        // given
+        coEvery { authProvider.deleteRefreshToken(TestUserId) } throws RuntimeException("DB Error")
+
+        // when
+        val exception = runCatching {
+            usecase(TestUserId.value, "fcm-token")
+        }.exceptionOrNull()
+
+        // then
+        assertNotNull(exception)
         coVerify(exactly = 0) { notificationProvider.deactivate(TestUserId, any()) }
     }
 

@@ -27,7 +27,7 @@ class DeactivateFcmTokenUseCaseTest {
     }
 
     @Test
-    fun `존재하지 않는 토큰 비활성화 시 false 반환`() = runTest {
+    fun `존재하지 않는 토큰 비활성화 시 예외 없이 완료된다`() = runTest {
         // given
         val userId = UserId(1L)
         val token = "non_existent_token"
