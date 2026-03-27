@@ -16,6 +16,7 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.or
 
 class NotificationRepositoryImpl : NotificationRepository {
@@ -68,5 +69,12 @@ class NotificationRepositoryImpl : NotificationRepository {
                 it[isRead] = true
             }
             updated > 0
+        }
+
+    override suspend fun deleteAll(userId: UserId): Unit =
+        suspendTransaction {
+            Notifications.deleteWhere {
+                Notifications.userId eq userId.value
+            }
         }
 }

@@ -18,6 +18,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 
 class NotificationRepositoryImplTest {
     private val repository = NotificationRepositoryImpl()
@@ -257,6 +258,74 @@ class NotificationRepositoryImplTest {
         assertFalse(result)
         val notifications = repository.findByUserId(userId1, cursor = null, size = 10)
         assertFalse(notifications.first().isRead) // userId1 의 알림은 그대로
+    }
+
+    // ======================== deleteAll ========================
+
+    @Test
+    fun `사용자의 모든 알림 삭제 성공`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        repeat(3) {
+            repository.save(
+                NotificationCommand.personal(
+                    userId = userId,
+                    notiType = NotificationType.FRIEND_REQUEST,
+                    title = "친구 요청 $it",
+                    message = "message $it",
+                ),
+            )
+        }
+
+        // when
+        repository.deleteAll(userId)
+
+        // then
+        val result = repository.findByUserId(userId, cursor = null, size = 10)
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `다른 사용자의 알림은 삭제되지 않는다`() = runTest {
+        // given
+        val userId1 = insertUserAndReturnId("1")
+        val userId2 = insertUserAndReturnId("2")
+        repeat(3) {
+            repository.save(
+                NotificationCommand.personal(
+                    userId = userId1,
+                    notiType = NotificationType.FRIEND_REQUEST,
+                    title = "친구 요청 $it",
+                    message = "message $it",
+                ),
+            )
+        }
+        repository.save(
+            NotificationCommand.personal(
+                userId = userId2,
+                notiType = NotificationType.FRIEND_REQUEST,
+                title = "친구 요청",
+                message = "message",
+            ),
+        )
+
+        // when
+        repository.deleteAll(userId1)
+
+        // then
+        val result = repository.findByUserId(userId2, cursor = null, size = 10)
+        assertEquals(1, result.size)
+    }
+
+    @Test
+    fun `알림이 없는 사용자 삭제 시 예외가 발생하지 않는다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+
+        // when & then
+        assertDoesNotThrow {
+            repository.deleteAll(userId)
+        }
     }
 
     // ======================== helper ========================

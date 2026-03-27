@@ -13,9 +13,9 @@ import com.peekr.domain.user.application.dto.MyProfileDto
 import com.peekr.domain.user.application.dto.UserPatchDto
 import com.peekr.domain.user.application.dto.UserProfileDto
 import com.peekr.domain.user.application.usecase.UserUseCases
+import com.peekr.domain.user.presentation.dto.FcmTokenRequest
 import com.peekr.domain.user.presentation.dto.IntroducePatchRequest
 import com.peekr.domain.user.presentation.dto.UserPatchRequest
-import com.peekr.util.testDeleteEndpoint
 import com.peekr.util.testGetEndpoint
 import com.peekr.util.testPatchEndpoint
 import com.peekr.util.testPlugin
@@ -519,12 +519,12 @@ class UserRoutesTest {
     @Test
     fun `로그아웃 요청 성공 테스트`() = testApplication {
         // given
-        coEvery { userUseCases.logout(TestMyUserId.value) } just Runs
+        coEvery { userUseCases.logout(TestMyUserId.value, any()) } just Runs
 
         // when, then
-        testDeleteEndpoint(
+        testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.LOGOUT}",
-            queryParameters = null,
+            requestBody = FcmTokenRequest("fcm-token"),
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },
@@ -538,12 +538,12 @@ class UserRoutesTest {
     @Test
     fun `로그아웃 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         // given
-        coEvery { userUseCases.logout(TestMyUserId.value) } just Runs
+        coEvery { userUseCases.logout(TestMyUserId.value, any()) } just Runs
 
         // when, then
-        testDeleteEndpoint(
+        testPatchEndpoint(
             endpoint = "${route.ROUTE}${route.LOGOUT}",
-            queryParameters = null,
+            requestBody = FcmTokenRequest("fcm-token"),
             testPlugin = {
                 testPlugin(
                     authRouting = { userRoutes(route, userUseCases) },

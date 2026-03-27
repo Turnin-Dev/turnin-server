@@ -1,5 +1,6 @@
 package com.peekr.common.di
 
+import com.peekr.common.db.databaseModule
 import com.peekr.common.firebase.firebaseModule
 import com.peekr.common.jwt.di.jwtModule
 import com.peekr.common.ml.embeddingModule
@@ -16,14 +17,14 @@ import com.peekr.domain.report.di.reportModule
 import com.peekr.domain.user.di.userModule
 import com.peekr.domain.userKeyword.di.userKeywordModule
 import io.ktor.server.application.Application
-import io.ktor.server.application.install
+import org.koin.core.context.startKoin
 import org.koin.ksp.generated.defaultModule
-import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
 /** Koin 설정 */
 fun Application.configureKoin() {
-    install(Koin) {
+//    install(Koin) {
+    startKoin {
         slf4jLogger()
         defaultModule()
         modules(
@@ -46,6 +47,7 @@ fun Application.configureKoin() {
             firebaseModule,
             // Util
             coroutineModule,
+            databaseModule,
         )
     }
 }

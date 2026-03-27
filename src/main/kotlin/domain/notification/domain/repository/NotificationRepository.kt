@@ -48,4 +48,11 @@ interface NotificationRepository {
      * @return 읽음 처리 성공 시 true, 알림을 찾지 못한 경우 false
      */
     suspend fun markAsRead(notificationId: NotificationId, userId: UserId): Boolean
+
+    /**
+     * 해당 사용자의 모든 알림을 삭제한다. (회원 탈퇴 시 호출)
+     *
+     * @param userId 알림을 삭제할 사용자 ID
+     */
+    suspend fun deleteAll(userId: UserId)
 }

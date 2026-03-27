@@ -18,7 +18,9 @@ import com.peekr.util.testPlugin
 import com.peekr.util.testPostEndpoint
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.Test
 
@@ -106,9 +108,7 @@ class NotificationRoutesTest {
     @Test
     fun `FCM 토큰 비활성화 - 성공 테스트`() = testApplication {
         // given
-        coEvery {
-            usecase.deactivateToken(TestUserId, any())
-        } returns true
+        coEvery { usecase.deactivateToken(TestUserId, any()) } just Runs
 
         // when, then
         testPatchEndpoint(
@@ -121,33 +121,6 @@ class NotificationRoutesTest {
             },
             tokenSubject = TestUserId.value.toString(),
             expectedStatus = HttpStatusCode.NoContent,
-        )
-    }
-
-    @Test
-    fun `FCM 토큰 비활성화 - 존재하지 않는 토큰 비활성화 시 404를 반환한다`() = testApplication {
-        // given
-        coEvery {
-            usecase.deactivateToken(TestUserId, any())
-        } returns false
-
-        // when, then
-        testPatchEndpoint(
-            endpoint = "${route.ROUTE}/${route.DEACTIVATE_TOKEN}",
-            requestBody = TestRegisterFcmTokenRequest,
-            testPlugin = {
-                testPlugin(
-                    authRouting = { notificationRoutes(route, usecase) },
-                )
-            },
-            tokenSubject = TestUserId.value.toString(),
-            expectedStatus = HttpStatusCode.NotFound,
-            responseValidator = {
-                containsAll(
-                    NotificationErrorCode.FcmTokenNotFound.code,
-                    NotificationErrorCode.FcmTokenNotFound.description,
-                )
-            },
         )
     }
 

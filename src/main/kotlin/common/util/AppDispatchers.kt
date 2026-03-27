@@ -5,4 +5,5 @@ import kotlinx.coroutines.Dispatchers
 
 object AppDispatchers {
     val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 }

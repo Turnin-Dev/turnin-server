@@ -14,6 +14,7 @@ val accountModule = module {
             get(),
             get(),
             get(),
+            get(),
         )
     }
     single {

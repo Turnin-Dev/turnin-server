@@ -7,6 +7,7 @@ import com.peekr.common.model.NotificationType
 import com.peekr.common.model.id.UserId
 import com.peekr.domain.notification.application.usecase.SendNotificationUseCase
 import com.peekr.domain.notification.domain.model.NotificationCommand
+import com.peekr.domain.notification.domain.repository.FcmTokenRepository
 
 /**
  * 외부에 제공할 알림 API
@@ -14,6 +15,7 @@ import com.peekr.domain.notification.domain.model.NotificationCommand
 class NotificationProviderApi(
     private val sendNotification: SendNotificationUseCase,
     private val fcmService: FcmService,
+    private val fcmTokenRepository: FcmTokenRepository,
 ) {
     /**
      * 외부 기능 모듈에서 알림을 전송할 때 사용하는 단일 창구
@@ -84,4 +86,13 @@ class NotificationProviderApi(
             ),
         )
     }
+
+    /**
+     * 특정 FCM 토큰을 비활성화한다. (로그아웃 시 호출)
+     *
+     * @param userId 토큰 소유자 ID
+     * @param token 비활성화할 FCM 토큰
+     */
+    suspend fun deactivate(userId: UserId, token: String) =
+        fcmTokenRepository.deactivate(userId, token)
 }

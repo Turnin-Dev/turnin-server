@@ -8,6 +8,7 @@ import com.peekr.domain.auth.application.provider.AuthDeletionSupportApi
 import com.peekr.domain.block.application.provider.BlockDeletionSupportApi
 import com.peekr.domain.file.application.provider.FileDeletionSupportApi
 import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
+import com.peekr.domain.notification.application.provider.NotificationDeletionSupportApi
 import com.peekr.domain.user.application.provider.UserDeletionSupportApi
 import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
 
@@ -23,6 +24,7 @@ class DeleteAccountUseCase(
     private val blockDeletionSupportApi: BlockDeletionSupportApi,
     private val userKeywordDeletionSupportApi: UserKeywordDeletionSupportApi,
     private val fileDeletionSupportApi: FileDeletionSupportApi,
+    private val notificationDeletionSupportApi: NotificationDeletionSupportApi,
 ) {
     /**
      * 계정을 삭제한다.
@@ -42,7 +44,7 @@ class DeleteAccountUseCase(
             // 1. 사용자 데이터 삭제/비식별화
             // - 피드/탐색 조회 쿼리 때문에 삭제 시 트랜잭션 내부에서 정확한 순서대로 삭제해야 한다.
             authDeletionSupportApi.deleteRefreshToken(userIDVO)
-            // TODO: 이 부분에 추가로 Notification 삭제 구현 예정
+            notificationDeletionSupportApi.deleteAll(userIDVO)
             friendDeletionSupportApi.deleteAll(userIDVO)
             blockDeletionSupportApi.deleteAll(userIDVO)
             // TODO: 사용자, 키워드 비활성화 시 필요없는 부분은 전부 null혹은 빈 문자열로 바꾸는 것을 고려해야 함.
@@ -50,16 +52,11 @@ class DeleteAccountUseCase(
             userDeletionSupportApi.anonymizeProviderId(userIDVO, user.providerId)
             userDeletionSupportApi.deactivate(userIDVO)
 
-            // 2. 로그아웃 과정을 그대로 수행
-            // - 리프레쉬 토큰을 위에서 삭제 완료
-            // - FCM 토큰 삭제
-            // TODO: FCM 토큰 삭제 구현 예정
-
             // 트랜잭션 외부에서 필요한 데이터 반환
             user.profileImageUrl
         }
 
-        // 3. 파일 서버 정리 (스토리지 서버에 있는 사용자의 데이터를 모두 삭제)
+        // 2. 파일 서버 정리 (스토리지 서버에 있는 사용자의 데이터를 모두 삭제)
         profileImageUrl?.let {
             try {
                 fileDeletionSupportApi.deleteFile(it)

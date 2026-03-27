@@ -22,19 +22,18 @@ object DatabaseFactory {
         dbUrl: String,
         dbUser: String,
         dbPassword: String,
-    ) {
-        try {
-            val dataSource = hikariDataSource(dbUrl, dbUser, dbPassword)
-            migrate(environment, dataSource)
-            Database.connect(dataSource)
-            LOGGER.info("Database connection successful: ${redactJdbcUrl(dbUrl)}")
-        } catch (e: FlywayException) {
-            LOGGER.error(e, "Database connection failed: ${e.message}")
-            throw e
-        } catch (e: Exception) {
-            LOGGER.error(e, "Database connection failed: ${e.message}")
-            throw e
-        }
+    ): HikariDataSource = try {
+        val dataSource = hikariDataSource(dbUrl, dbUser, dbPassword)
+        migrate(environment, dataSource)
+        Database.connect(dataSource)
+        LOGGER.info("Database connection successful: ${redactJdbcUrl(dbUrl)}")
+        dataSource
+    } catch (e: FlywayException) {
+        LOGGER.error(e, "Database connection failed: ${e.message}")
+        throw e
+    } catch (e: Exception) {
+        LOGGER.error(e, "Database connection failed: ${e.message}")
+        throw e
     }
 
     private fun hikariDataSource(

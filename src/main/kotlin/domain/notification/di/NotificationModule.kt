@@ -1,5 +1,6 @@
 package com.peekr.domain.notification.di
 
+import com.peekr.domain.notification.application.provider.NotificationDeletionSupportApi
 import com.peekr.domain.notification.application.provider.NotificationProviderApi
 import com.peekr.domain.notification.application.usecase.DeactivateAllFcmTokensUseCase
 import com.peekr.domain.notification.application.usecase.DeactivateFcmTokenUseCase
@@ -18,7 +19,8 @@ import org.koin.dsl.module
 
 val notificationModule = module {
     // ------------------------------ Provider ------------------------------
-    single { NotificationProviderApi(get(), get()) }
+    single { NotificationProviderApi(get(), get(), get()) }
+    single { NotificationDeletionSupportApi(get(), get()) }
 
     // ------------------------------ Repository ------------------------------
     single<FcmTokenRepository> { FcmTokenRepositoryImpl() }

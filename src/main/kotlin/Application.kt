@@ -8,7 +8,6 @@ import com.peekr.common.di.configureKoin
 import com.peekr.common.exception.configureExceptionHandler
 import com.peekr.common.firebase.FirebaseAdmin
 import com.peekr.common.jwt.configureJwtSecurity
-import com.peekr.common.ml.embeddingResourceAutoCleanup
 import com.peekr.common.plugin.configureAPIDocuments
 import com.peekr.common.plugin.configureCallLogging
 import com.peekr.common.plugin.configureContentNegotiation
@@ -16,8 +15,8 @@ import com.peekr.common.plugin.configureCors
 import com.peekr.common.plugin.configureResources
 import com.peekr.common.plugin.configureRouting
 import com.peekr.common.util.AppDispatchers
+import com.peekr.common.util.application.applicationCleanup
 import com.peekr.common.util.getTimeZoneInfo
-import com.peekr.domain.file.util.fileResourceAutoCleanup
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.netty.EngineMain
@@ -68,7 +67,9 @@ fun Application.module() {
         printTimeZone(timeZoneInfo)
     }
 
-    // ------------------------------ Embedding Service cleanup ------------------------------
-    embeddingResourceAutoCleanup()
-    fileResourceAutoCleanup()
+    // ------------------------------ Cleanup ------------------------------
+    // 프로세스 종료 시 아래 순서로 정리된다:
+    // 1. 실행 중인 백그라운드 코루틴 완료 대기
+    // 2. Koin onClose 블록 실행 (DB, 외부 서비스 등 리소스 해제)
+    applicationCleanup()
 }
