@@ -5,7 +5,6 @@ import com.peekr.common.util.AppLoggerFactory
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.getValue
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -13,7 +12,6 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.context.stopKoin
-import org.koin.java.KoinJavaComponent.inject
 import org.koin.ktor.ext.inject
 
 /**
