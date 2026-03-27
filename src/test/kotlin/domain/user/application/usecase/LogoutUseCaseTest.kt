@@ -21,7 +21,7 @@ class LogoutUseCaseTest {
     fun `로그아웃 성공 테스트`() = runTest {
         // given
         coEvery { authProvider.deleteRefreshToken(TestUserId) } just Runs
-        coEvery { notificationProvider.deactivate(TestUserId, any()) } returns true
+        coEvery { notificationProvider.deactivate(TestUserId, any()) } just Runs
 
         // when
         val exception = runCatching {

@@ -5,6 +5,6 @@ import com.peekr.domain.notification.application.provider.NotificationProviderAp
 import com.peekr.domain.user.domain.provider.NotificationProvider
 
 class NotificationProviderImpl(private val notificationProviderApi: NotificationProviderApi) : NotificationProvider {
-    override suspend fun deactivate(userId: UserId, token: String): Boolean =
+    override suspend fun deactivate(userId: UserId, token: String) =
         notificationProviderApi.deactivate(userId, token)
 }

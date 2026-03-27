@@ -42,15 +42,8 @@ fun AuthenticatedRoute.notificationRoutes(
         patch(route.DEACTIVATE_TOKEN, { deactivateFcmTokenDocs() }) {
             val userId = extractUserIdWithToken()
             val request = call.receive<RegisterFcmTokenRequest>()
-            val success = usecase.deactivateToken(userId, request.token)
-            if (success) {
-                call.respond(HttpStatusCode.NoContent)
-            } else {
-                call.respond(
-                    HttpStatusCode.NotFound,
-                    NotificationErrorCode.FcmTokenNotFound.toErrorResponse(HttpStatusCode.NotFound),
-                )
-            }
+            usecase.deactivateToken(userId, request.token)
+            call.respond(HttpStatusCode.NoContent)
         }
 
         // 알림 목록 조회
@@ -128,9 +121,6 @@ private fun RouteConfig.deactivateFcmTokenDocs() {
     response {
         code(HttpStatusCode.NoContent) {
             description = "FCM 토큰 비활성화 성공 시"
-        }
-        code(HttpStatusCode.NotFound) {
-            description = "FCM 토큰을 찾을 수 없는 경우"
         }
         code(HttpStatusCode.Unauthorized) {
             description = "인증 오류 시"

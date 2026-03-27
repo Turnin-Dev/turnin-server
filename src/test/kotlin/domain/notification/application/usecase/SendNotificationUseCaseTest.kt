@@ -9,13 +9,16 @@ import com.peekr.domain.notification.domain.repository.FcmTokenRepository
 import com.peekr.domain.notification.domain.repository.NotificationRepository
 import com.peekr.domain.notification.exception.NotificationException
 import com.peekr.domain.notification.notificationFixture
+import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -24,6 +27,16 @@ class SendNotificationUseCaseTest {
     private val notificationRepository: NotificationRepository = mockk()
     private val fcmService: FcmService = mockk()
     private val usecase = SendNotificationUseCase(fcmTokenRepository, notificationRepository, fcmService)
+
+    @Before
+    fun setUp() {
+        TestDatabaseFactory.init()
+    }
+
+    @After
+    fun tearDown() {
+        TestDatabaseFactory.cleanUp()
+    }
 
     @Test
     fun `활성 토큰이 있으면 알림을 저장하고 FCM을 전송한다`() = runTest {

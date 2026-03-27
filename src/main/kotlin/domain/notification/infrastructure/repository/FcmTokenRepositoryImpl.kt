@@ -35,15 +35,14 @@ class FcmTokenRepositoryImpl : FcmTokenRepository {
                     }.toDomain()
         }
 
-    override suspend fun deactivate(userId: UserId, token: String): Boolean =
+    override suspend fun deactivate(userId: UserId, token: String): Unit =
         suspendTransaction {
-            val updated = UserFcmTokens.updateWithTimestamp({
+            UserFcmTokens.updateWithTimestamp({
                 (UserFcmTokens.userId eq userId.value) and
                     (UserFcmTokens.token eq token)
             }) {
                 it[isActive] = false
             }
-            updated > 0
         }
 
     override suspend fun deactivateAll(userId: UserId): Unit =

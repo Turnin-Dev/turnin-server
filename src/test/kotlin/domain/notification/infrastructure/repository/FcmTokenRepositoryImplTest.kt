@@ -9,11 +9,11 @@ import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 
 class FcmTokenRepositoryImplTest {
     private val repository = FcmTokenRepositoryImpl()
@@ -85,40 +85,35 @@ class FcmTokenRepositoryImplTest {
         repository.upsert(userId, TEST_TOKEN)
 
         // when
-        val result = repository.deactivate(userId, TEST_TOKEN)
+        repository.deactivate(userId, TEST_TOKEN)
 
         // then
-        assertTrue(result)
         val tokens = repository.findActiveTokens(userId)
         assertTrue(tokens.isEmpty())
     }
 
     @Test
-    fun `존재하지 않는 토큰 비활성화 시 false 반환`() = runTest {
+    fun `존재하지 않는 토큰 비활성화 시 예외 없이 완료된다`() = runTest {
         // given
         val userId = insertUserAndReturnId("1")
 
-        // when
-        val result = repository.deactivate(userId, TEST_TOKEN)
-
-        // then
-        assertFalse(result)
+        // when & then
+        assertDoesNotThrow { repository.deactivate(userId, TEST_TOKEN) }
     }
 
     @Test
-    fun `다른 사용자의 토큰은 비활성화할 수 없다`() = runTest {
+    fun `다른 사용자의 토큰은 비활성화되지 않는다`() = runTest {
         // given
         val userId1 = insertUserAndReturnId("1")
         val userId2 = insertUserAndReturnId("2")
         repository.upsert(userId1, TEST_TOKEN)
 
-        // when: userId2 로 userId1 의 토큰 비활성화 시도
-        val result = repository.deactivate(userId2, TEST_TOKEN)
+        // when
+        repository.deactivate(userId2, TEST_TOKEN)
 
         // then
-        assertFalse(result)
         val tokens = repository.findActiveTokens(userId1)
-        assertEquals(1, tokens.size) // userId1 의 토큰은 그대로
+        assertEquals(1, tokens.size) // userId1의 토큰은 그대로
     }
 
     // ======================== deactivateAll ========================
