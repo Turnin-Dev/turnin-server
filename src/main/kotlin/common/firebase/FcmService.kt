@@ -7,6 +7,7 @@ import com.google.firebase.messaging.MulticastMessage
 import com.peekr.common.model.NotificationType
 import com.peekr.common.util.AppLoggerFactory.createLogger
 import com.peekr.common.util.masking
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -45,6 +46,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
                 FirebaseMessaging.getInstance().send(fcmMessage)
                 true
             }.getOrElse { e ->
+                if (e is CancellationException) throw e
                 logger.error(e, "FCM 단일 전송 실패 | token=${message.token?.masking()}")
                 false
             }
@@ -88,6 +90,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
                 }
             }
         }.getOrElse { e ->
+            if (e is CancellationException) throw e
             logger.error(e, "FCM 멀티캐스트 전송 실패 | error=${e.message}")
         }
     }
@@ -115,6 +118,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
             FirebaseMessaging.getInstance().send(fcmMessage)
             true
         }.getOrElse { e ->
+            if (e is CancellationException) throw e
             logger.error(e, "FCM 토픽 전송 실패 | topic=${message.topic}")
             false
         }

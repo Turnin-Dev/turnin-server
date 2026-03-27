@@ -33,7 +33,10 @@ class AppConfig {
      *
      * @param key 설정 값의 키
      */
-    fun getRequired(key: String): String = get(key) ?: error("Missing required config: $key")
+    fun getRequired(key: String): String =
+        get(key)
+            ?.takeIf { it.isNotEmpty() }
+            ?: error("Missing required config: $key")
 
     // 실행 환경에 맞게 ApplicationConfig를 가져온다.
     private fun initAppConfig(): ApplicationConfig {

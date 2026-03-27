@@ -4,6 +4,7 @@ import com.peekr.common.model.id.UserId
 import com.peekr.common.util.AppLoggerFactory
 import com.peekr.domain.user.domain.provider.AuthProvider
 import com.peekr.domain.user.domain.provider.NotificationProvider
+import io.ktor.utils.io.CancellationException
 
 /**
  * 로그아웃
@@ -35,7 +36,10 @@ class LogoutUseCase(
         // 부가 작업이므로 실패 시 계속 진행
         if (token.isNotEmpty()) {
             runCatching { notificationProvider.deactivate(userIDVO, token) }
-                .onFailure { e -> LOGGER.warn("Failed to deactivate notification for user $userId", e) }
+                .onFailure { e ->
+                    if (e is CancellationException) throw e
+                    LOGGER.warn("Failed to deactivate notification for user $userId", e)
+                }
         }
     }
 }
