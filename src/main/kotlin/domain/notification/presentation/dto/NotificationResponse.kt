@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NotificationResponse(
     val id: Long,
+    val userId: Long?,
     val notiType: String,
     val title: String?,
     val message: String,
@@ -36,6 +37,7 @@ data class NotificationResponse(
             items = List(2) {
                 NotificationResponse(
                     id = it + 1L,
+                    userId = it + 1L,
                     notiType = "FRIEND_REQUEST",
                     title = "친구 요청",
                     message = "홍길동님이 친구 요청을 보냈어요.",
@@ -54,6 +56,7 @@ data class NotificationResponse(
 
 fun NotificationDto.toResponse() = NotificationResponse(
     id = this.id,
+    userId = this.userId,
     notiType = this.notiType.name,
     title = this.title,
     message = this.message,

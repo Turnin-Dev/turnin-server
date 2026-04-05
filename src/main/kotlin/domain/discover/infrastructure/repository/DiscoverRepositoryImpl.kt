@@ -5,6 +5,7 @@ import com.peekr.common.db.schema.UserKeywords
 import com.peekr.common.db.schema.Users
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.KeywordName
+import com.peekr.common.model.KeywordSimilarityValues
 import com.peekr.common.model.UserName
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.KeywordId
@@ -50,7 +51,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         """.trimIndent()
 
         val params = buildList {
-            add(DoubleColumnType() to SharedUserKeyword.HIGH_SIMILARITY_THRESHOLD)
+            add(DoubleColumnType() to KeywordSimilarityValues.HIGH_THRESHOLD)
             add(LongColumnType() to targetUserId.value)
             add(LongColumnType() to targetUserId.value)
             add(LongColumnType() to targetUserId.value)

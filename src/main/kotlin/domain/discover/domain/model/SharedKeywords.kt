@@ -26,9 +26,4 @@ data class SharedUserKeyword(
     val userKeywordId: UserKeywordId,
     val keywordId: KeywordId,
     val keywordName: KeywordName,
-) {
-    companion object {
-        const val HIGH_SIMILARITY_THRESHOLD = 0.7
-        const val MEDIUM_SIMILARITY_THRESHOLD = 0.6
-    }
-}
+)
