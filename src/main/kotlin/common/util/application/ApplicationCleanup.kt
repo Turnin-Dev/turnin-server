@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.context.stopKoin
@@ -24,15 +23,15 @@ fun Application.applicationCleanup(
 ) {
     val cleanupDone = AtomicBoolean(false)
 
-    monitor.subscribe(ApplicationStopped) {
+    val hook = Thread {
         performCleanup(cleanupDone, cleanups)
     }
+    Runtime.getRuntime().addShutdownHook(hook)
 
-    Runtime.getRuntime().addShutdownHook(
-        Thread {
-            performCleanup(cleanupDone, cleanups)
-        },
-    )
+    monitor.subscribe(ApplicationStopped) {
+        performCleanup(cleanupDone, cleanups)
+        runCatching { Runtime.getRuntime().removeShutdownHook(hook) }
+    }
 }
 
 // 종료 작업 수행
@@ -63,29 +62,27 @@ private fun Application.performCleanup(
     runBlocking {
         var parentJobGlobal: Job? = null
 
-        // 전체 타임아웃: 참고 수치 (K8s terminationGracePeriodSeconds보다 짧게)
-        withTimeoutOrNull(25_000) {
-            // 1. 새 코루틴 생성 차단
+        // 전체 타임아웃: 참고 수치 (K8s terminationGracePeriodSeconds(30초)보다 짧게)
+        withTimeoutOrNull(20_000) {
+            // 1. 새 코루틴 생성 차단 + 백그라운드 작업 완료 대기
             val parentJob = applicationScope.coroutineContext[Job]
             parentJobGlobal = parentJob
             if (parentJob is CompletableJob) {
+                val childCount = parentJob.children.count()
+                LOGGER.info("[SHUTDOWN] 백그라운드 작업 대기: ${childCount}개")
                 parentJob.complete()
+                parentJob.join()
             }
-
-            // 2. 백그라운드 작업 완료 대기
-            val children = parentJob?.children?.toList() ?: emptyList()
-            LOGGER.info("[SHUTDOWN] 백그라운드 작업 대기: ${children.size}개")
-            children.joinAll()
             LOGGER.info("[SHUTDOWN] 모든 백그라운드 작업 완료")
 
-            // 3. 부가 리소스 정리
+            // 2. 부가 리소스 정리
             cleanups.forEach { cleanup ->
                 runCatching { cleanup() }
                     .onFailure { LOGGER.error(it, "[SHUTDOWN] 리소스 정리 실패") }
             }
             LOGGER.info("[SHUTDOWN] 부가 리소스 정리 완료")
 
-            // 4. Koin 종료 (onClose 트리거 - DB 등)
+            // 3. Koin 종료 (onClose 트리거 - DB 등)
             stopKoin()
             LOGGER.info("[SHUTDOWN] Koin 종료 완료")
 
