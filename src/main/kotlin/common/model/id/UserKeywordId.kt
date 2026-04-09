@@ -5,7 +5,7 @@ import com.peekr.common.validator.ValidatorException
 class UserKeywordIdValidationException(message: String) : ValidatorException(message)
 
 @JvmInline
-value class UserKeywordId(val value: Long) {
+value class UserKeywordId private constructor(val value: Long) {
     /**
      * 사용자 키워드 ID VO
      *
