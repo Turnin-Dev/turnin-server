@@ -83,7 +83,7 @@ class GetFeedsUseCaseTest {
             createdAt = 1000L,
             userKeywordId = 1L,
         )
-        val expectedFallbackPage = createFeed(pageSize + 1)
+        val expectedFallbackPage = createFallbackFeed(pageSize + 1)
 
         coEvery {
             feedRepository.getFallbackFeeds(
@@ -98,13 +98,14 @@ class GetFeedsUseCaseTest {
 
         // then: getFeeds가 아닌 getFallbackFeeds가 호출되어야 함
         coVerify(exactly = 0) {
-            feedRepository.getFeeds(TestUserId, any(), any(), UserKeywordId(fallbackCursor.userKeywordId), any())
+            feedRepository.getFeeds(TestUserId, any(), any(), any(), any())
         }
         coVerify(exactly = 1) {
             feedRepository.getFallbackFeeds(TestUserId, fallbackCursor.createdAt, pageSize + 1)
         }
         assertEquals(expectedFallbackPage.take(pageSize).map { it.toDto() }, result.items)
         assertNotNull(result.nextCursor)
+        assertEquals(0.0, result.nextCursor.score)
     }
 
     @Test

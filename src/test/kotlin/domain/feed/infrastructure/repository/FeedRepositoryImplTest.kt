@@ -298,9 +298,10 @@ class FeedRepositoryImplTest {
         val keyword = createKeyword("keyword", vector.toPgVectorString(), me)
 
         // 순서대로 생성하여 created_at 차이 보장
-        createUserKeyword(user3, keyword, "오래된 글")
-        createUserKeyword(user2, keyword, "중간 글")
-        createUserKeyword(user1, keyword, "최신 글")
+        val now = Instant.now()
+        createUserKeyword(user3, keyword, "오래된 글", createdAt = now.minusSeconds(2))
+        createUserKeyword(user2, keyword, "중간 글", createdAt = now.minusSeconds(1))
+        createUserKeyword(user1, keyword, "최신 글", createdAt = now)
 
         // when
         val feeds = repository.getFallbackFeeds(
@@ -428,7 +429,6 @@ class FeedRepositoryImplTest {
         createUserKeyword(inactiveUser, keyword, "비활성 글")
 
         TestDatabaseFactory.dbQuery {
-            Users.update({ Users.id eq inactiveUser.id }) { it[Users.isActive] = false }
             UserKeywords.update({ UserKeywords.userId eq inactiveUser.id }) { it[UserKeywords.isActive] = false }
         }
 

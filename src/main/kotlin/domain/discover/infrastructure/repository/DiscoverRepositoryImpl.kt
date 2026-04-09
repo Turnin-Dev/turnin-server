@@ -117,7 +117,6 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 CROSS JOIN LATERAL (
                     SELECT id, (1 - (embedding <=> my_keywords.embedding)) AS similarity
                     FROM keyword
-                    WHERE id != my_keywords.keyword_id
                     ORDER BY embedding <=> my_keywords.embedding
                     LIMIT 100
                 ) k_other
