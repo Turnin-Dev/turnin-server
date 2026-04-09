@@ -11,6 +11,7 @@ import com.peekr.domain.feed.domain.model.Feed
 import com.peekr.domain.feed.domain.repository.FeedRepository
 import com.peekr.domain.userKeyword.domain.model.Description
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -26,7 +27,7 @@ class GetFeedsUseCaseTest {
     fun `피드를 커서 페이지네이션으로 두 페이지까지 조회한다`() = runTest {
         // given: 페이지 사이즈, 페이지 개수만큼 피드를 생성한다.
         val pageSize = 2
-        // 실제 리포지토리는 pageSize + 1 개의 데이터를 반환한다.
+        // 리포지토리는 pageSize + 1 개의 데이터를 반환해야 한다.
         val expectedFirstPage = createFeed(pageSize + 1)
         val expectedCursor = FeedCursor(
             score = expectedFirstPage.take(pageSize).last().score,
@@ -44,7 +45,7 @@ class GetFeedsUseCaseTest {
                 null,
                 null,
                 null,
-                pageSize,
+                pageSize + 1,
             )
         } returns expectedFirstPage
         coEvery {
@@ -52,8 +53,8 @@ class GetFeedsUseCaseTest {
                 TestUserId,
                 expectedCursor.score,
                 expectedCursor.createdAt,
-                expectedCursor.userKeywordId?.let { UserKeywordId(it) },
-                pageSize,
+                UserKeywordId(expectedCursor.userKeywordId),
+                pageSize + 1,
             )
         } returns expectedSecondPage
 
@@ -73,6 +74,68 @@ class GetFeedsUseCaseTest {
         assertNull(secondPage.nextCursor)
     }
 
+    @Test
+    fun `score가 0인 커서가 전달되면 폴백 쿼리로 전환된다`() = runTest {
+        // given
+        val pageSize = 2
+        val fallbackCursor = FeedCursor(
+            score = 0.0,
+            createdAt = 1000L,
+            userKeywordId = 1L,
+        )
+        val expectedFallbackPage = createFallbackFeed(pageSize + 1)
+
+        coEvery {
+            feedRepository.getFallbackFeeds(
+                TestUserId,
+                fallbackCursor.createdAt,
+                pageSize + 1,
+            )
+        } returns expectedFallbackPage
+
+        // when
+        val result = usecase(TestUserId.value, fallbackCursor, pageSize)
+
+        // then: getFeeds가 아닌 getFallbackFeeds가 호출되어야 함
+        coVerify(exactly = 0) {
+            feedRepository.getFeeds(TestUserId, any(), any(), any(), any())
+        }
+        coVerify(exactly = 1) {
+            feedRepository.getFallbackFeeds(TestUserId, fallbackCursor.createdAt, pageSize + 1)
+        }
+        assertEquals(expectedFallbackPage.take(pageSize).map { it.toDto() }, result.items)
+        assertNotNull(result.nextCursor)
+        assertEquals(0.0, result.nextCursor.score)
+    }
+
+    @Test
+    fun `폴백 마지막 페이지에서는 nextCursor가 null이다`() = runTest {
+        // given
+        val pageSize = 2
+        val fallbackCursor = FeedCursor(
+            score = 0.0,
+            createdAt = 1000L,
+            userKeywordId = 1L,
+        )
+        // pageSize보다 적은 데이터 -> 마지막 페이지
+        val expectedFallbackPage = createFallbackFeed(pageSize - 1)
+
+        coEvery {
+            feedRepository.getFallbackFeeds(
+                TestUserId,
+                fallbackCursor.createdAt,
+                pageSize + 1,
+            )
+        } returns expectedFallbackPage
+
+        // when
+        val result = usecase(TestUserId.value, fallbackCursor, pageSize)
+
+        // then
+        assertEquals(expectedFallbackPage.map { it.toDto() }, result.items)
+        assertNull(result.nextCursor)
+    }
+
     private fun createFeed(count: Int) =
         List(count) {
             val id = (it + 1).toLong()
@@ -87,6 +150,23 @@ class GetFeedsUseCaseTest {
                 createdAt = 1000L,
                 score = 50.0,
                 similarity = 0.8,
+            )
+        }
+
+    private fun createFallbackFeed(count: Int) =
+        List(count) {
+            val id = (it + 1).toLong()
+            Feed(
+                userKeywordId = UserKeywordId(id),
+                userId = UserId(id),
+                userName = UserName("username$id"),
+                profileImageUrl = "profileImage$id",
+                keywordId = KeywordId(id),
+                keyword = KeywordName("keyword$id"),
+                description = Description("description$id"),
+                createdAt = 1000L,
+                score = 0.0,
+                similarity = 0.0,
             )
         }
 

@@ -39,22 +39,27 @@ class GetFeedsUseCase(private val feedRepository: FeedRepository) {
         val userIdVO = UserId(userId)
         val cursorUkIdVO: UserKeywordId? = cursor?.userKeywordId?.let { UserKeywordId(it) }
 
-        // 1) 피드 목록 조회
-        val feedsWithOneExtra = feedRepository.getFeeds(
-            userId = userIdVO,
-            cursorScore = cursor?.score,
-            cursorCreatedAt = cursor?.createdAt,
-            cursorUkId = cursorUkIdVO,
-            limit = pageSize,
-        )
+        // 1) 피드 목록 조회 (폴백 전환 여부에 따라 쿼리 분기)
+        val isFallback = cursor?.score != null && cursor.score == 0.0
+        val feedsWithOneExtra = if (isFallback) {
+            feedRepository.getFallbackFeeds(
+                userId = userIdVO,
+                cursorCreatedAt = cursor.createdAt,
+                limit = pageSize + 1,
+            )
+        } else {
+            feedRepository.getFeeds(
+                userId = userIdVO,
+                cursorScore = cursor?.score,
+                cursorCreatedAt = cursor?.createdAt,
+                cursorUkId = cursorUkIdVO,
+                limit = pageSize + 1,
+            )
+        }
 
         // 2) 다음 페이지 존재 여부 확인 및 반환할 피드 정제
         val hasNext = feedsWithOneExtra.size > pageSize
-        val feeds = if (hasNext) {
-            feedsWithOneExtra.take(pageSize)
-        } else {
-            feedsWithOneExtra
-        }
+        val feeds = if (hasNext) feedsWithOneExtra.take(pageSize) else feedsWithOneExtra
         val feedsDto = feeds.map { it.toDto() }
 
         // 3) 다음 커서 결정

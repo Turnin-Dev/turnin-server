@@ -38,7 +38,8 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
         val userIdVO = UserId(userId)
 
         // 1) 유사한 키워드를 가지고 있는 사용자 ID 리스트를 조회 (Native SQL)
-        val matchedUserIdsWithOneExtra = discoverRepository.findUserIdsWithSimilarKeywords(userIdVO, cursor, pageSize)
+        val matchedUserIdsWithOneExtra =
+            discoverRepository.findUserIdsWithSimilarKeywords(userIdVO, cursor, pageSize + 1)
 
         if (matchedUserIdsWithOneExtra.isEmpty()) {
             return@suspendTransaction CursorPage(emptyList(), null)
