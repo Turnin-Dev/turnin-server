@@ -11,7 +11,9 @@ import com.peekr.common.jwt.domain.service.JWTTokenService
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserIdValidationException
 import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.masking
+import com.peekr.common.util.LogAction
+import com.peekr.common.util.LogTag
+import com.peekr.common.util.LogType
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
 
@@ -34,22 +36,52 @@ class RefreshTokenUseCase(
         // 토큰에서 Subject(사용자 ID) 추출
         val subject = jwtTokenService.extractSubjectWithToken(token, JWTTokenType.Refresh)?.toLongOrNull()
         if (subject == null) {
-            LOGGER.debug("refresh is Null, token: ${token.masking()}")
+            LOGGER.warn(
+                message = "Token refresh failed: Invalid subject in token",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                    LogTag.ACTION.key to LogAction.TOKEN_REFRESH_FAILURE.value,
+                ),
+            )
             return null
         }
         val userId = UserId(subject)
 
         // 리프레쉬 토큰 갱신 진행
-        LOGGER.debug("refresh called, userId: $userId, token: ${token.masking()}")
+        LOGGER.info(
+            message = "Token refresh attempt: userId=${userId.value}",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.TOKEN_REFRESH_ATTEMPT.value,
+                LogTag.USER_ID.key to userId.value.toString(),
+            ),
+        )
         val newToken = authRefresh(token)
         if (newToken == null) {
-            LOGGER.debug("refresh failed, userId: $userId, token: ${token.masking()}")
+            LOGGER.warn(
+                message = "Token refresh failed: userId=${userId.value}",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                    LogTag.ACTION.key to LogAction.TOKEN_REFRESH_FAILURE.value,
+                    LogTag.USER_ID.key to userId.value.toString(),
+                ),
+            )
             return null
         }
 
         // (갱신 성공) 리프레쉬 토큰 저장 후 반환
         LOGGER.debug("refresh successful")
         refreshTokenRepository.save(userId, newToken.refreshToken)
+
+        LOGGER.info(
+            message = "Token refresh successful: userId=${userId.value}",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.TOKEN_REFRESH_SUCCESS.value,
+                LogTag.USER_ID.key to userId.value.toString(),
+            ),
+        )
+
         return newToken.toDto()
     }
 
@@ -78,7 +110,7 @@ class RefreshTokenUseCase(
             )
             jwtTokenService.generate(payload)
         } catch (e: Exception) {
-            LOGGER.error(e, e.message)
+            LOGGER.error(e, "Unexpected error during authRefresh")
             null
         }
     }
@@ -88,7 +120,7 @@ class RefreshTokenUseCase(
         val verifier = jwtTokenService.createVerifier(JWTTokenType.Refresh)
         verifier.verify(token)
     } catch (e: Exception) {
-        LOGGER.error(e, e.message)
+        LOGGER.debug("JWT verification failed: ${e.message}")
         null
     }
 }

@@ -33,7 +33,6 @@ import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -142,7 +141,8 @@ class LoginUseCaseTransactionTest {
         } throws Exception("database error")
 
         // when
-        val result = usecase(TestLoginDto)
+        val result = runCatching { usecase(TestLoginDto) }
+            .exceptionOrNull()
         val finalLastLoginAt = TestDatabaseFactory.dbQuery {
             UserEntity.findById(userId.value)?.lastLoginAt
         }
@@ -151,7 +151,7 @@ class LoginUseCaseTransactionTest {
         }
 
         // then
-        assertNull(result)
+        assertNotNull(result)
         assertEquals(
             initialLastLoginAt,
             finalLastLoginAt,
