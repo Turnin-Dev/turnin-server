@@ -19,6 +19,13 @@ import io.ktor.server.request.httpMethod
 import io.ktor.server.request.uri
 import io.ktor.server.response.respond
 
+private const val TAG_URL = "request_url"
+private const val TAG_METHOD = "request_method"
+private const val TAG_IP = "client_ip"
+private const val TAG_EXCEPTION = "exception_type"
+private const val TAG_STATUS = "status_code"
+private const val TAG_ERROR_CODE = "error_code"
+
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
         exception<DatabaseException> { call, cause ->
@@ -120,14 +127,14 @@ private fun warnLogging(
     errorCode: ApiErrorCode? = null,
 ) {
     val tags = mutableMapOf(
-        LogTag.REQUEST_URL.key to call.request.uri,
-        LogTag.REQUEST_METHOD.key to call.request.httpMethod.value,
-        LogTag.CLIENT_IP.key to call.request.origin.remoteHost,
-        LogTag.EXCEPTION_TYPE.key to tag,
+        TAG_URL to call.request.uri,
+        TAG_METHOD to call.request.httpMethod.value,
+        TAG_IP to call.request.origin.remoteHost,
+        TAG_EXCEPTION to tag,
         LogTag.LOG_TYPE.key to LogType.NORMAL.value,
     )
 
-    errorCode?.let { tags[LogTag.ERROR_CODE.key] = it.code }
+    errorCode?.let { tags[TAG_ERROR_CODE] = it.code }
 
     val errorCodeMsg = if (errorCode != null) "(${errorCode.code}) " else ""
     LOGGER.warn("[$tag]$errorCodeMsg ${cause.message}", tags, cause)
@@ -139,11 +146,11 @@ private fun errorLogging(
     cause: Throwable,
 ) {
     val tags = mapOf(
-        LogTag.REQUEST_URL.key to call.request.uri,
-        LogTag.REQUEST_METHOD.key to call.request.httpMethod.value,
-        LogTag.CLIENT_IP.key to call.request.origin.remoteHost,
-        LogTag.STATUS_CODE.key to statusCode.value.toString(),
-        LogTag.EXCEPTION_TYPE.key to "CRITICAL_ERROR",
+        TAG_URL to call.request.uri,
+        TAG_METHOD to call.request.httpMethod.value,
+        TAG_IP to call.request.origin.remoteHost,
+        TAG_STATUS to statusCode.value.toString(),
+        TAG_EXCEPTION to "CRITICAL_ERROR",
         LogTag.LOG_TYPE.key to LogType.NORMAL.value,
     )
 
