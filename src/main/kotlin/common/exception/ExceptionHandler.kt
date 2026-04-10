@@ -5,18 +5,24 @@ import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.toHttpStatusCode
 import com.peekr.common.exception.common.CommonErrorCode
 import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.LogTag
+import com.peekr.common.util.LogType
 import com.peekr.common.validator.ValidatorException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.origin
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.httpMethod
+import io.ktor.server.request.uri
 import io.ktor.server.response.respond
 
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
         exception<DatabaseException> { call, cause ->
-            warnLogging("DatabaseException", cause)
+            warnLogging(call, "DatabaseException", cause)
             call.respond(
                 status = cause.toHttpStatusCode(),
                 message = ErrorResponse(
@@ -28,7 +34,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<ApiException> { call, cause ->
-            warnLogging(cause)
+            warnLogging(call, "ApiException", cause)
             call.respond(
                 status = cause.status,
                 message = ErrorResponse(
@@ -40,7 +46,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<ValidatorException> { call, cause ->
-            warnLogging("ValidatorException", cause)
+            warnLogging(call, "ValidatorException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
@@ -52,7 +58,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<DomainException> { call, cause ->
-            warnLogging("DomainException", cause)
+            warnLogging(call, "DomainException", cause)
             call.respond(
                 status = HttpStatusCode.InternalServerError,
                 message = ErrorResponse(
@@ -64,7 +70,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<IllegalArgumentException> { call, cause ->
-            warnLogging("IllegalArgumentException", cause)
+            warnLogging(call, "IllegalArgumentException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
@@ -76,7 +82,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<BadRequestException> { call, cause ->
-            warnLogging("BadRequestException", cause)
+            warnLogging(call, "BadRequestException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
@@ -89,7 +95,7 @@ fun Application.configureExceptionHandler() {
 
         exception<Throwable> { call, cause ->
             val statusCode = call.response.status() ?: HttpStatusCode.InternalServerError
-            errorLogging(statusCode, cause)
+            errorLogging(call, statusCode, cause)
             call.respond(
                 status = statusCode,
                 message = ErrorResponse(
@@ -107,30 +113,43 @@ private const val UNKNOWN_ERROR_CODE = "UEC001"
 
 private val LOGGER = AppLoggerFactory.createLogger("ExceptionHandler")
 
-private fun warnLogging(cause: ApiException) {
-    LOGGER.warn(
-        "[ApiException] " +
-            "code=${cause.errorCode.code}, " +
-            "status=${cause.status.value}, " +
-            "message=${cause.message}",
-        cause,
+private fun warnLogging(
+    call: ApplicationCall,
+    tag: String,
+    cause: Throwable,
+    errorCode: ApiErrorCode? = null,
+) {
+    val tags = mutableMapOf(
+        LogTag.REQUEST_URL.key to call.request.uri,
+        LogTag.REQUEST_METHOD.key to call.request.httpMethod.value,
+        LogTag.CLIENT_IP.key to call.request.origin.remoteHost,
+        LogTag.EXCEPTION_TYPE.key to tag,
+        LogTag.LOG_TYPE.key to LogType.NORMAL.value,
     )
+
+    errorCode?.let { tags[LogTag.ERROR_CODE.key] = it.code }
+
+    val errorCodeMsg = if (errorCode != null) "(${errorCode.code}) " else ""
+    LOGGER.warn("[$tag]$errorCodeMsg ${cause.message}", tags, cause)
 }
 
-private fun warnLogging(tag: String, cause: Throwable) {
-    LOGGER.warn(
-        "[$tag] " +
-            "message=${cause.message}",
-        cause,
+private fun errorLogging(
+    call: ApplicationCall,
+    statusCode: HttpStatusCode,
+    cause: Throwable,
+) {
+    val tags = mapOf(
+        LogTag.REQUEST_URL.key to call.request.uri,
+        LogTag.REQUEST_METHOD.key to call.request.httpMethod.value,
+        LogTag.CLIENT_IP.key to call.request.origin.remoteHost,
+        LogTag.STATUS_CODE.key to statusCode.value.toString(),
+        LogTag.EXCEPTION_TYPE.key to "CRITICAL_ERROR",
+        LogTag.LOG_TYPE.key to LogType.NORMAL.value,
     )
-}
 
-private fun errorLogging(statusCode: HttpStatusCode, cause: Throwable) {
     LOGGER.error(
-        cause,
-        "[Unhandled Throwable] " +
-            "status=${statusCode.value}, " +
-            "code=${UNKNOWN_ERROR_CODE}, " +
-            "message=${UNKNOWN_ERROR_MESSAGE}",
+        message = "[Unhandled Exception] ${cause.message}",
+        tags = tags,
+        e = cause,
     )
 }

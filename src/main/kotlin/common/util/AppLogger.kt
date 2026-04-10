@@ -2,58 +2,49 @@ package com.peekr.common.util
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 
 /**
- * 애플리케이션 로거 타입
+ * 애플리케이션 로거
  */
 class AppLogger(private val logger: Logger) {
-    /**
-     * 디버깅 로그
-     *
-     * @param message 로그 메시지
-     * @param e [Throwable]
-     */
-    fun debug(message: String, e: Throwable? = null) {
-        if (e != null) logger.debug(message, e) else logger.debug(message)
+    // ------------------------------ 태그와 함께 로그 (기본) ------------------------------
+    fun debug(message: String, tags: Map<String, String> = emptyMap(), e: Throwable? = null) {
+        withTags(tags) { if (e != null) logger.debug(message, e) else logger.debug(message) }
     }
 
-    /**
-     * 오류 로그
-     *
-     * @param e [Throwable]
-     * @param message 로그 메시지
-     */
-    fun error(e: Throwable, message: String?) {
-        logger.error(message, e)
+    fun info(message: String, tags: Map<String, String> = emptyMap(), e: Throwable? = null) {
+        withTags(tags) { if (e != null) logger.info(message, e) else logger.info(message) }
     }
 
-    /**
-     * 오류 로그 (호환용 오버로드 메서드)
-     *
-     * @param message 로그 메시지
-     */
-    fun error(message: String) {
-        logger.error(message)
+    fun warn(message: String, tags: Map<String, String> = emptyMap(), e: Throwable? = null) {
+        withTags(tags) { if (e != null) logger.warn(message, e) else logger.warn(message) }
     }
 
-    /**
-     * 경고 로그
-     *
-     * @param message 로그 메시지
-     * @param e [Throwable]
-     */
-    fun warn(message: String, e: Throwable? = null) {
-        if (e != null) logger.warn(message, e) else logger.warn(message)
+    fun error(message: String, tags: Map<String, String> = emptyMap(), e: Throwable? = null) {
+        withTags(tags) { if (e != null) logger.error(message, e) else logger.error(message) }
     }
 
-    /**
-     * 정보 로그
-     *
-     * @param message 로그 메시지
-     * @param e [Throwable]
-     */
-    fun info(message: String, e: Throwable? = null) {
-        if (e != null) logger.info(message, e) else logger.info(message)
+    // ------------------------------ 기존 호환용 (태그 없음) ------------------------------
+    // 내부적으로 위 메서드들을 호출하여 중복을 제거합니다.
+    fun debug(message: String, e: Throwable? = null) = debug(message, emptyMap(), e)
+
+    fun info(message: String, e: Throwable? = null) = info(message, emptyMap(), e)
+
+    fun warn(message: String, e: Throwable? = null) = warn(message, emptyMap(), e)
+
+    fun error(message: String) = error(message, emptyMap(), null)
+
+    fun error(e: Throwable, message: String?) = error(message ?: "Error occurred", emptyMap(), e)
+
+    // 공통 태그 주입 로직
+    private fun withTags(tags: Map<String, String>, block: () -> Unit) {
+        tags.forEach { (k, v) -> MDC.put(k, v) }
+        try {
+            block()
+        } finally {
+            tags.keys.forEach { MDC.remove(it) }
+        }
     }
 }
 

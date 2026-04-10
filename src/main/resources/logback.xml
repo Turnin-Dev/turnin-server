@@ -5,12 +5,21 @@
         </encoder>
     </appender>
 
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <captureCodeAttributes>true</captureCodeAttributes>
+        <captureKeyValuePairAttributes>true</captureKeyValuePairAttributes>
+        <captureExperimentalAttributes>true</captureExperimentalAttributes>
+    </appender>
+
     <!-- 로그 레벨 순서 -->
     <!-- TRACE < DEBUG < INFO < WARN < ERROR -->
-    <!-- TODO: 실제 배포 시 로그 레벨 INFO로 격상 필수 -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="OTEL"/>
     </root>
+
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="exposed" level="WARN"/>
 </configuration>
