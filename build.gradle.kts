@@ -162,4 +162,7 @@ dependencies {
     implementation(libs.firebase.admin) {
         exclude(group = "io.netty")
     }
+
+    // OpenTelemetry
+    implementation(libs.opentelemetry.logback.appender)
 }

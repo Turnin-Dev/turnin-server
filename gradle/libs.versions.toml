@@ -1,4 +1,4 @@
-[versions]
+ [versions]
 exposed-version = "0.61.0"
 h2-version = "2.3.232"
 kotlin-version = "2.1.10"
@@ -21,6 +21,7 @@ onnx-runtime = "1.23.2"
 huggingface-tokenizers = "0.36.0"
 test-container-pg = "1.21.4"
 firebase-admin = "9.8.0"
+ opentelemetry-logback-appender = "2.26.1-alpha"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -84,6 +85,8 @@ huggingface-tokenizers = { module = "ai.djl.huggingface:tokenizers", version.ref
 test-container-postgresql = { module = "org.testcontainers:postgresql", version.ref = "test-container-pg" }
 # Firebase
 firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+ # OpenTelemetry
+ opentelemetry-logback-appender = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0", version.ref = "opentelemetry-logback-appender" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
