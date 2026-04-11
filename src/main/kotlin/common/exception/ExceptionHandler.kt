@@ -41,7 +41,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<ApiException> { call, cause ->
-            warnLogging(call, "ApiException", cause)
+            warnLogging(call, "ApiException", cause, cause.errorCode)
             call.respond(
                 status = cause.status,
                 message = ErrorResponse(

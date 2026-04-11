@@ -9,6 +9,7 @@ import com.peekr.domain.user.application.dto.UserPatchDto
 import com.peekr.domain.user.application.dto.toDomain
 import com.peekr.domain.user.domain.provider.FileProvider
 import com.peekr.domain.user.domain.repository.UserRepository
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * 사용자 정보를 수정한다.
@@ -60,13 +61,15 @@ class UpdateUserUseCase(
             ) {
                 try {
                     fileProvider.deleteFile(patch.oldProfileImageUrl)
-                    LOGGER.debug("Old profile image deleted: ${patch.oldProfileImageUrl}")
+                    LOGGER.debug("Old profile image deleted")
                 } catch (e: Exception) {
+                    if (e is CancellationException) throw e
                     LOGGER.warn(
-                        message = "Failed to delete old profile image: ${patch.oldProfileImageUrl}",
+                        message = "Failed to delete old profile image",
                         tags = mapOf(
                             LogTag.LOG_TYPE.key to LogType.NORMAL.value,
                             LogTag.ACTION.key to LogAction.FILE_DELETE_FAILURE.value,
+                            LogTag.USER_ID.key to userId.value.toString(),
                         ),
                         e = e,
                     )

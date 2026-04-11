@@ -17,6 +17,7 @@ import com.peekr.domain.auth.domain.model.Register
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import com.peekr.domain.auth.exception.AuthException
 import com.peekr.domain.auth.exception.AuthException.DuplicateUserException
 
 class RegisterUseCase(
@@ -47,7 +48,10 @@ class RegisterUseCase(
             val jwtTokenDto = registerResult.jwtToken.toDto()
 
             // 리프레쉬 토큰 저장
-            refreshTokenRepository.save(savedAuthUser.userId, jwtTokenDto.refreshToken)
+            val tokenSaved = refreshTokenRepository.save(savedAuthUser.userId, jwtTokenDto.refreshToken)
+            if (!tokenSaved) {
+                throw AuthException.RefreshTokenSaveFailed()
+            }
 
             // 회원가입 성공 후 결과 반환
             savedAuthUser to RegisterResultDto(savedAuthUser.userId, jwtTokenDto)

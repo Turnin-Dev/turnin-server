@@ -83,10 +83,11 @@ class DeleteAccountUseCase(
                 fileDeletionSupportApi.deleteFile(it)
             } catch (e: Exception) {
                 LOGGER.warn(
-                    message = "Failed to delete profile image during account deletion: url=$it",
+                    message = "Failed to delete profile image during account deletion.",
                     tags = mapOf(
                         LogTag.LOG_TYPE.key to LogType.NORMAL.value,
                         LogTag.ACTION.key to LogAction.FILE_DELETE_FAILURE.value,
+                        LogTag.USER_ID.key to userId.toString(),
                     ),
                     e = e,
                 )

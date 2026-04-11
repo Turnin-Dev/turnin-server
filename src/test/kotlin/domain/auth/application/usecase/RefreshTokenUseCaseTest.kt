@@ -101,6 +101,21 @@ class RefreshTokenUseCaseTest {
         assertNull(jwtTokenDto)
     }
 
+    @Test
+    fun `리프레쉬 토큰 저장 실패 시 null을 반환한다`() = runTest {
+        // given
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery {
+            refreshTokenRepository.save(TestUserId, any())
+        } returns false
+
+        // when
+        val jwtTokenDto = usecase(token.refreshToken)
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
     companion object {
         private const val TEST_SUBJECT = "1"
         private val TestUserId = UserId(TEST_SUBJECT.toLong())

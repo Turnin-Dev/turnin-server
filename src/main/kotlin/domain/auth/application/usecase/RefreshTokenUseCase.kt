@@ -70,8 +70,18 @@ class RefreshTokenUseCase(
         }
 
         // (갱신 성공) 리프레쉬 토큰 저장 후 반환
-        LOGGER.debug("refresh successful")
-        refreshTokenRepository.save(userId, newToken.refreshToken)
+        val saved = refreshTokenRepository.save(userId, newToken.refreshToken)
+        if (!saved) {
+            LOGGER.warn(
+                message = "Token refresh failed during token rotation: userId=${userId.value}",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                    LogTag.ACTION.key to LogAction.TOKEN_SAVE_FAILURE.value,
+                    LogTag.USER_ID.key to userId.value.toString(),
+                ),
+            )
+            return null
+        }
 
         LOGGER.info(
             message = "Token refresh successful: userId=${userId.value}",

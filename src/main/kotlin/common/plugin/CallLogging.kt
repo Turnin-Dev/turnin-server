@@ -1,6 +1,7 @@
 package com.peekr.common.plugin
 
 import com.peekr.common.util.config.AppConfig
+import com.peekr.common.util.log.LogSanitizer
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.calllogging.CallLogging
@@ -59,10 +60,10 @@ fun Application.configureCallLogging() {
                 val statusValue = status?.value ?: "UNKNOWN"
                 "status=$statusValue " +
                     "method=$httpMethod " +
-                    "path=$path " +
-                    "query=\"$queryParams\" " +
-                    "remote=$remoteHost " +
-                    "ua=\"$userAgent\" " +
+                    "path=${LogSanitizer.sanitize(path)} " +
+                    "query=\"${LogSanitizer.sanitize(queryParams)}\" " +
+                    "remote=${LogSanitizer.sanitize(remoteHost)} " +
+                    "ua=\"${LogSanitizer.sanitize(userAgent)}\" " +
                     "duration=${duration}ms"
             }
         }

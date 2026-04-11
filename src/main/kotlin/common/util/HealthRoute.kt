@@ -1,5 +1,6 @@
 package com.peekr.common.util
 
+import com.peekr.common.db.suspendTransaction
 import com.peekr.common.route.Api
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
@@ -9,7 +10,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import java.time.Duration
 import java.time.Instant
-import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Route.healthRoutes(route: Api.Health) {
     val startTime = PeekrDateTime.now()
@@ -24,7 +24,7 @@ fun Route.healthRoutes(route: Api.Health) {
 
         get(route.DETAIL, { healthDetailDocs() }) {
             val dbOk = runCatching {
-                transaction {
+                suspendTransaction {
                     exec("SELECT 1")
                 }
                 true

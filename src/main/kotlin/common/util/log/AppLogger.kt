@@ -37,13 +37,25 @@ class AppLogger(private val logger: Logger) {
 
     fun error(e: Throwable, message: String?) = error(message ?: "Error occurred", emptyMap(), e)
 
-    // 공통 태그 주입 로직
+    /**
+     * MDC 태그를 임시로 주입하고 블록 실행 후 이전 상태로 복원하는 함수
+     *
+     * 중첩 호출 시 외부 컨텍스트의 MDC 값을 손상시키지 않도록 기존 값을 저장 후 복원한다.
+     *
+     * ⚠️ 추후 requestId 등 요청 추적용 값을 MDC에 추가할 경우:
+     * - 코루틴에서 Dispatchers.IO 등으로 스레드 전환 시 MDC 값이 유실될 수 있음
+     * - `kotlinx-coroutines-slf4j` 의존성 추가 후 `MDCContext()`를 코루틴 컨텍스트에 주입 필요
+     * - 참고: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-slf4j/
+     */
     private fun withTags(tags: Map<String, String>, block: () -> Unit) {
+        val previousValues = tags.keys.associateWith { MDC.get(it) }
         tags.forEach { (k, v) -> MDC.put(k, v) }
         try {
             block()
         } finally {
-            tags.keys.forEach { MDC.remove(it) }
+            previousValues.forEach { (k, v) ->
+                if (v == null) MDC.remove(k) else MDC.put(k, v)
+            }
         }
     }
 }
