@@ -5,7 +5,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.MulticastMessage
 import com.peekr.common.model.NotificationType
-import com.peekr.common.util.AppLoggerFactory.createLogger
+import com.peekr.common.util.log.AppLoggerFactory.createLogger
 import com.peekr.common.util.masking
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher

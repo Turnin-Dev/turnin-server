@@ -10,10 +10,10 @@ import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.LogAction
-import com.peekr.common.util.LogTag
-import com.peekr.common.util.LogType
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.domain.model.AuthUser

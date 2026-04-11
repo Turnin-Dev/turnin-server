@@ -6,7 +6,7 @@ import com.peekr.common.model.FriendRequestStatus
 import com.peekr.common.model.NotificationType
 import com.peekr.common.model.id.UserId
 import com.peekr.common.util.AppDispatchers
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.domain.friend.domain.message.FriendNotificationMessage
 import com.peekr.domain.friend.domain.model.FriendNotificationCommand
 import com.peekr.domain.friend.domain.provider.NotificationProvider

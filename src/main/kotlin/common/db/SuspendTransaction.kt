@@ -1,7 +1,7 @@
 package com.peekr.common.db
 
 import com.peekr.common.util.AppDispatchers.ioDispatcher
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import java.sql.SQLException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.transactions.TransactionManager

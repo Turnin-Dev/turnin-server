@@ -1,4 +1,4 @@
-package com.peekr.common.util
+package com.peekr.common.util.log
 
 enum class LogTag(val key: String) {
     /** 로그 유형 */

@@ -1,7 +1,7 @@
 package com.peekr.domain.file.infrastructure.service.impl
 
-import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.config.AppConfig
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.common.util.masking
 import java.net.URI
 import java.time.Duration

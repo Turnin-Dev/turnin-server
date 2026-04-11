@@ -1,4 +1,4 @@
-package com.peekr.common.util
+package com.peekr.common.util.log
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

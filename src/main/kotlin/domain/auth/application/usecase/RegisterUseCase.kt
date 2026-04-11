@@ -5,10 +5,10 @@ import com.peekr.common.jwt.application.dto.toDto
 import com.peekr.common.jwt.domain.model.JWTClaimName
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.LogAction
-import com.peekr.common.util.LogTag
-import com.peekr.common.util.LogType
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.RegisterDto
 import com.peekr.domain.auth.application.dto.RegisterResultDto

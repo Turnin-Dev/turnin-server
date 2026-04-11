@@ -1,7 +1,7 @@
 package com.peekr.domain.friend.application.usecase
 
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.common.util.pagination.offset.PaginationParams
 import com.peekr.common.util.pagination.offset.PagingData
 import com.peekr.domain.friend.application.dto.FriendInfoDto

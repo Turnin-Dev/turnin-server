@@ -3,10 +3,10 @@ package com.peekr.domain.block.application.usecase
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.BlockReasonId
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.LogAction
-import com.peekr.common.util.LogTag
-import com.peekr.common.util.LogType
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.domain.block.application.dto.BlockDetailDto
 import com.peekr.domain.block.domain.model.BlockDetail
 import com.peekr.domain.block.domain.provider.FriendProvider

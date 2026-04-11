@@ -1,7 +1,7 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.application.dto.FindUserResultDto
 import com.peekr.domain.auth.application.mapper.AuthMapper.toDto

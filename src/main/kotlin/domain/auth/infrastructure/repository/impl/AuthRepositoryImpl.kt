@@ -9,8 +9,8 @@ import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.PeekrDateTime
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.common.util.masking
 import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.Register

@@ -1,6 +1,6 @@
 package com.peekr.domain.file.di
 
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.domain.file.application.provider.FileDeletionSupportApi
 import com.peekr.domain.file.application.provider.FileProviderApi
 import com.peekr.domain.file.application.usecase.DeleteFileUseCase

@@ -5,10 +5,10 @@ import com.peekr.common.exception.common.CommonException
 import com.peekr.common.model.id.ReportReasonId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
-import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.LogAction
-import com.peekr.common.util.LogTag
-import com.peekr.common.util.LogType
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.domain.report.application.dto.ReportDetailDto
 import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.domain.report.domain.repository.ReportRepository
