@@ -43,45 +43,6 @@ tasks.withType<JavaExec> {
     if (configFile != null) {
         systemProperty("config.file", configFile)
     }
-
-    // 자바 에이전트 경로
-    jvmArgs(
-        "-javaagent:" +
-            "/Users/kwagsangjin/Documents/MyProjects/Peekr/Backend/release/peekr-server/opentelemetry-javaagent.jar",
-    )
-
-    // 환경 변수 주입
-    // TODO: 액세스 키 따로 관리 예정
-    environment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:5080/api/default")
-    environment("OTEL_EXPORTER_OTLP_HEADERS", "Authorization=Basic a3NqMTIzQHRlc3QuY29tOnlzZ3Jnc1JCQ1Z6MkZWM1g=")
-
-    // 리소스 속성 (프로세스 상세 정보 수집 제외)
-    environment(
-        "OTEL_RESOURCE_ATTRIBUTES",
-        "service.name=peekr-backend," +
-            "telemetry.sdk.name=otel," +
-            "telemetry.sdk.language=java",
-    )
-
-    // 프로토콜 및 내보내기 설정
-    environment("OTEL_EXPORTER_OTLP_PROTOCOL", "http/protobuf")
-    environment("OTEL_LOGS_EXPORTER", "otlp")
-    environment("OTEL_TRACES_EXPORTER", "otlp")
-    environment("OTEL_METRICS_EXPORTER", "none")
-
-    // 불필요한 시스템 리소스 수집기 비활성화
-    environment("OTEL_JAVAAGENT_DISABLED_RESOURCE_PROVIDERS", "os,process")
-    // HikariCP 히스토그램 메트릭 비활성화 (메트릭 none이므로 주석 처리)
-//    environment("OTEL_INSTRUMENTATION_HIKARICP_ENABLED", "false")
-    // JVM 커맨드 인자 수집 비활성화
-    environment(
-        "OTEL_JAVA_DISABLED_RESOURCE_PROVIDERS",
-        "io.opentelemetry.instrumentation.resources.ProcessResourceProvider," +
-            "io.opentelemetry.instrumentation.resources.JarServiceNameDetector",
-    )
-
-    // 부가 메트릭 수집 주기 (메트릭 none이므로 주석 처리)
-//    environment("OTEL_METRIC_EXPORT_INTERVAL", "60000")
 }
 
 fun loadDotenv(environment: String): Map<String, String> {

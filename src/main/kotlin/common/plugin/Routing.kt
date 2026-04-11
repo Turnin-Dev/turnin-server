@@ -1,6 +1,7 @@
 package com.peekr.common.plugin
 
 import com.peekr.common.route.Api
+import com.peekr.common.util.healthRoutes
 import com.peekr.domain.account.application.AccountUseCases
 import com.peekr.domain.account.presentation.accountRoutes
 import com.peekr.domain.auth.application.usecase.AuthUseCases
@@ -53,6 +54,7 @@ fun Application.configureRouting() {
 
         // Add Peekr routes
         route(Api.ROUTE, { description = "Peekr API" }) {
+            healthRoutes(route = Api.Health)
             route(Api.V1.ROUTE, { description = "Peekr API V1" }) {
                 authRoutes(route = Api.V1.Auth, usecase = authUseCases)
                 fileRoutes(route = Api.V1.File, usecase = fileUseCases)

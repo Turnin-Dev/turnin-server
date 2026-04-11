@@ -12,6 +12,12 @@ package com.peekr.common.route
 object Api {
     const val ROUTE = "/api"
 
+    object Health {
+        const val ROUTE = "/health"
+        const val TAG = "Health"
+        const val DETAIL = "/detail"
+    }
+
     object V1 {
         const val ROUTE = "/v1"
 
