@@ -57,7 +57,6 @@ class CreateBlockUseCase(
 
             // 3) 추가 연쇄 작업이 있다면 여기에 추가
             // 예: 알림 삭제, 캐시 무효화, 이벤트 발행 등
-            // TODO: 위 주석 작업 확인
         }
 
         LOGGER.info(

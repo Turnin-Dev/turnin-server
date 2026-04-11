@@ -6,9 +6,9 @@
     </appender>
 
     <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
-        <captureCodeAttributes>true</captureCodeAttributes>
+        <captureCodeAttributes>false</captureCodeAttributes>
+        <captureExperimentalAttributes>false</captureExperimentalAttributes>
         <captureKeyValuePairAttributes>true</captureKeyValuePairAttributes>
-        <captureExperimentalAttributes>true</captureExperimentalAttributes>
     </appender>
 
     <!-- 로그 레벨 순서 -->
