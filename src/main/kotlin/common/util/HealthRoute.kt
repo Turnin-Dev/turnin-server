@@ -7,8 +7,6 @@ import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
-import io.ktor.server.routing.route
 import java.time.Duration
 import java.time.Instant
 import org.jetbrains.exposed.sql.transactions.transaction
