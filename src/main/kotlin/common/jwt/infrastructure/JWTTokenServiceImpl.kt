@@ -5,7 +5,9 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.exceptions.JWTDecodeException
+import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
@@ -14,8 +16,6 @@ import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.util.PeekrDateTime
 import com.peekr.common.util.config.AppConfig
 import java.util.UUID
-
-private typealias JWTChecksum = Pair<String, String>
 
 class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
     override val realm by lazy {
@@ -81,7 +81,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         payload: JWTTokenPayload,
         expiresIn: Long,
     ): String {
-        val checksum = createRandomChecksum()
+        val checksum = UUID.randomUUID().toString()
         val issuedAt = PeekrDateTime.now()
         val expiresAt = issuedAt.plusMillis(expiresIn)
 
@@ -91,7 +91,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
             .withIssuer(issuer)
             .withSubject(payload.userId)
             .withClaim(payload.claimName.name, payload.claim)
-            .withClaim(checksum.first, checksum.second)
+            .withJWTId(checksum)
             .withIssuedAt(issuedAt)
             .withExpiresAt(expiresAt)
             .sign(algorithm)
@@ -101,14 +101,14 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         userId: String,
         expiresIn: Long,
     ): String {
-        val checksum = createRandomChecksum()
+        val checksum = UUID.randomUUID().toString()
         val issuedAt = PeekrDateTime.now()
         val expiresAt = issuedAt.plusMillis(expiresIn)
 
         return JWT
             .create()
             .withSubject(userId)
-            .withJWTId(checksum.second)
+            .withJWTId(checksum)
             .withIssuedAt(issuedAt)
             .withExpiresAt(expiresAt)
             .sign(algorithm)
@@ -122,10 +122,20 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         throw TokenException.TokenExpiredException(e)
     } catch (e: JWTDecodeException) {
         throw TokenException.CannotDecodedException(e)
+    } catch (e: JWTVerificationException) {
+        throw TokenException.VerificationFailedException(e)
     }
 
-    private fun createRandomChecksum(): JWTChecksum {
-        val randomValue = UUID.randomUUID().toString()
-        return JWTChecksum("checksum", randomValue)
+    override fun verify(
+        token: String,
+        type: JWTTokenType,
+    ): DecodedJWT? = try {
+        createVerifier(type).verify(token)
+    } catch (e: TokenExpiredException) {
+        throw TokenException.TokenExpiredException(e)
+    } catch (e: JWTDecodeException) {
+        throw TokenException.CannotDecodedException(e)
+    } catch (e: JWTVerificationException) {
+        throw TokenException.VerificationFailedException(e)
     }
 }

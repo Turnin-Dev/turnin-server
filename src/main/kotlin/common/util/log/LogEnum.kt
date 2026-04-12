@@ -1,5 +1,12 @@
 package com.peekr.common.util.log
 
+enum class LogLevel {
+    INFO,
+    WARN,
+    ERROR,
+    DEBUG,
+}
+
 enum class LogTag(val key: String) {
     /** 로그 유형 */
     LOG_TYPE("log_type"),

@@ -1,5 +1,7 @@
 package com.peekr.domain.auth.application.usecase
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
@@ -32,11 +34,13 @@ class RefreshTokenUseCaseTest {
     @Before
     fun setUp() {
         coEvery {
+            jwtTokenService.verify(any(), any())
+        } returns JWTTestDoubles.getMockJWTToken(TEST_SUBJECT).let {
+            JWT.decode(it.refreshToken) // DecodedJWT 반환
+        }
+        coEvery {
             jwtTokenService.extractSubjectWithToken(any(), any())
         } returns TEST_SUBJECT
-        coEvery {
-            jwtTokenService.createVerifier(any())
-        } returns JWTTestDoubles.MockRefreshTokenVerifier
         coEvery {
             jwtTokenService.generate(any())
         } returns TestJWTToken
@@ -66,23 +70,11 @@ class RefreshTokenUseCaseTest {
     }
 
     @Test
-    fun `토큰에서 Subject(사용자 ID)를 추출에 실패하면 null을 반환한다`() = runTest {
+    fun `토큰에서 Subject(사용자 ID) 추출에 실패하면 null을 반환한다`() = runTest {
         // given
         coEvery {
             jwtTokenService.extractSubjectWithToken(any(), any())
         } returns null
-
-        // when
-        val jwtTokenDto = usecase("aaa.bbb.ccc")
-
-        // then
-        assertNull(jwtTokenDto)
-    }
-
-    @Test
-    fun `리프레쉬 토큰 갱신 과정에서 토큰 검증에 실패하면 null을 반환한다`() = runTest {
-        // given
-        coEvery { jwtTokenService.createVerifier(any()) } throws TokenException.CannotCreateTokenVerifier()
 
         // when
         val jwtTokenDto = usecase("aaa.bbb.ccc")
@@ -114,6 +106,90 @@ class RefreshTokenUseCaseTest {
 
         // when
         val jwtTokenDto = usecase(token.refreshToken)
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `만료된 토큰으로 갱신 시도 시 null을 반환한다 - verify에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.verify(any(), any())
+        } throws TokenException.TokenExpiredException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getExpiredRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `만료된 토큰으로 갱신 시도 시 null을 반환한다 - extractSubjectWithToken에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } throws TokenException.TokenExpiredException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getExpiredRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `변조된 토큰으로 갱신 시도 시 null을 반환한다 - verify에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.verify(any(), any())
+        } throws TokenException.VerificationFailedException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getTamperedRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `변조된 토큰으로 갱신 시도 시 null을 반환한다 - extractSubjectWithToken에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } throws TokenException.VerificationFailedException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getTamperedRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `잘못된 형식의 토큰으로 갱신 시도 시 null을 반환한다 - verify에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.verify(any(), any())
+        } throws TokenException.CannotDecodedException()
+
+        // when
+        val jwtTokenDto = usecase("invalid.token")
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `잘못된 형식의 토큰으로 갱신 시도 시 null을 반환한다 - extractSubjectWithToken에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } throws TokenException.CannotDecodedException()
+
+        // when
+        val jwtTokenDto = usecase("invalid.token")
 
         // then
         assertNull(jwtTokenDto)
