@@ -3,6 +3,7 @@ package com.peekr.domain.auth.application.usecase
 import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
+import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.model.Introduce
 import com.peekr.common.model.Role
 import com.peekr.common.model.SocialLoginProvider
@@ -19,7 +20,9 @@ import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertThrows
 import org.junit.Before
+import org.junit.jupiter.api.assertThrows
 
 class RefreshTokenUseCaseTest {
     private val jwtTokenService = mockk<JWTTokenService>()
@@ -80,7 +83,7 @@ class RefreshTokenUseCaseTest {
     @Test
     fun `리프레쉬 토큰 갱신 과정에서 토큰 검증에 실패하면 null을 반환한다`() = runTest {
         // given
-        coEvery { jwtTokenService.createVerifier(any()) } throws Exception()
+        coEvery { jwtTokenService.createVerifier(any()) } throws TokenException.CannotCreateTokenVerifier()
 
         // when
         val jwtTokenDto = usecase("aaa.bbb.ccc")
@@ -92,10 +95,11 @@ class RefreshTokenUseCaseTest {
     @Test
     fun `리프레쉬 토큰 갱신 과정에서 토큰 생성에 실패하면 null을 반환한다`() = runTest {
         // given
-        coEvery { jwtTokenService.generate(any()) } throws Exception()
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery { jwtTokenService.generate(any()) } throws TokenException.CannotCreateToken()
 
         // when
-        val jwtTokenDto = usecase("aaa.bbb.ccc")
+        val jwtTokenDto = usecase(token.refreshToken)
 
         // then
         assertNull(jwtTokenDto)
@@ -114,6 +118,17 @@ class RefreshTokenUseCaseTest {
 
         // then
         assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `토큰 생성 중 예상치 못한 예외는 전파된다`() = runTest {
+        // given
+        coEvery { jwtTokenService.generate(any()) } throws RuntimeException("unexpected")
+
+        // when, then
+        assertThrows<RuntimeException> {
+            usecase(JWTTestDoubles.getMockJWTToken(TestUserId.value.toString()).refreshToken)
+        }
     }
 
     companion object {

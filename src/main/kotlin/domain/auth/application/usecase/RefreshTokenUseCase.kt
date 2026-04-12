@@ -8,6 +8,7 @@ import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.model.JWTTokenPayload
 import com.peekr.common.jwt.domain.model.JWTTokenType
 import com.peekr.common.jwt.domain.service.JWTTokenService
+import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserIdValidationException
 import com.peekr.common.util.log.AppLoggerFactory
@@ -104,23 +105,31 @@ class RefreshTokenUseCase(
      * (만약 리프레쉬 토큰 만료시 **`null`** 반환)
      */
     private suspend fun authRefresh(token: String): JWTToken? {
+        // 1) 서명/만료 검증 실패 시 즉시 종료
+        verifyRefreshToken(token) ?: return null
+
+        // 2) 저장소 확인
+        val userId = refreshTokenRepository.findUserIdByRefreshToken(token) ?: return null
+        val authUser = authRepository.findUserByUserId(userId) ?: return null
+
+        // 3) 액세스 토큰 재발급
+        val payload = JWTTokenPayload(
+            userId = authUser.userId.value.toString(),
+            claimName = JWTClaimName.DISPLAY_ID,
+            claim = authUser.displayId.value,
+        )
+
         return try {
-            // 1) 서명/만료 검증 실패 시 즉시 종료
-            verifyRefreshToken(token) ?: return null
-
-            // 2) 저장소 확인
-            val userId = refreshTokenRepository.findUserIdByRefreshToken(token) ?: return null
-            val authUser = authRepository.findUserByUserId(userId) ?: return null
-
-            // 3) 액세스 토큰 재발급
-            val payload = JWTTokenPayload(
-                userId = authUser.userId.value.toString(),
-                claimName = JWTClaimName.DISPLAY_ID,
-                claim = authUser.displayId.value,
-            )
             jwtTokenService.generate(payload)
-        } catch (e: Exception) {
-            LOGGER.error(e, "Unexpected error during authRefresh")
+        } catch (e: TokenException) {
+            LOGGER.error(
+                message = "Token refresh failed: token generation error",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                    LogTag.ACTION.key to LogAction.TOKEN_REFRESH_FAILURE.value,
+                ),
+                e = e,
+            )
             null
         }
     }
@@ -129,8 +138,15 @@ class RefreshTokenUseCase(
     private fun verifyRefreshToken(token: String): DecodedJWT? = try {
         val verifier = jwtTokenService.createVerifier(JWTTokenType.Refresh)
         verifier.verify(token)
-    } catch (e: Exception) {
-        LOGGER.debug("JWT verification failed: ${e.message}")
+    } catch (e: TokenException) {
+        LOGGER.debug(
+            message = "Token refresh failed: JWT verification error",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                LogTag.ACTION.key to LogAction.TOKEN_REFRESH_FAILURE.value,
+            ),
+            e = e,
+        )
         null
     }
 }
