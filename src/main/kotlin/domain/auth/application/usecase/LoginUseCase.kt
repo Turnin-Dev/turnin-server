@@ -10,8 +10,10 @@ import com.peekr.common.jwt.exception.TokenException
 import com.peekr.common.model.SocialLoginProvider
 import com.peekr.common.model.id.DisplayId
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.AppLoggerFactory
-import com.peekr.common.util.masking
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.domain.auth.application.dto.LoginDto
 import com.peekr.domain.auth.application.dto.LoginResultDto
 import com.peekr.domain.auth.domain.model.AuthUser
@@ -38,22 +40,38 @@ class LoginUseCase(
      * (로그인 실패 혹은 사용자를 가져올 수 없는 경우 **`null`** 반환)
      */
     suspend operator fun invoke(loginDto: LoginDto): LoginResultDto? {
-        LOGGER.debug("login called, provider: ${loginDto.provider}, providerId: ${loginDto.providerId.masking()}")
+        LOGGER.info(
+            message = "Login attempt: provider=${loginDto.provider}",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.LOGIN_ATTEMPT.value,
+            ),
+        )
+
         return try {
             val result = suspendTransaction {
                 performLogin(loginDto)
             }
-            LOGGER.debug("login successful, userId: ${result?.userId}")
+
+            LOGGER.info(
+                message = "Login successful: userId=${result.userId.value}",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                    LogTag.ACTION.key to LogAction.LOGIN_SUCCESS.value,
+                    LogTag.USER_ID.key to result.userId.value.toString(),
+                ),
+            )
+
             result
         } catch (e: AuthException) {
-            LOGGER.debug("login failed, ${e.message}")
+            LOGGER.debug("Login failed, ${e.message}")
             throw e
         } catch (e: TokenException) {
-            LOGGER.debug("login failed, ${e.message}")
+            LOGGER.debug("Login failed, ${e.message}")
             throw e
         } catch (e: Exception) {
-            LOGGER.debug("unexpected error during login", e)
-            null
+            LOGGER.warn("Login process failed: ${e.message}")
+            throw e
         }
     }
 
@@ -75,7 +93,14 @@ class LoginUseCase(
         // 4) 리프레쉬 토큰 저장
         val saved = saveRefreshToken(authUser.userId, jwtToken.refreshToken)
         if (!saved) {
-            LOGGER.debug("token refresh failed, userId: ${authUser.userId}")
+            LOGGER.error(
+                message = "RefreshToken save failed during login: userId=${authUser.userId.value}",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                    LogTag.ACTION.key to LogAction.TOKEN_SAVE_FAILURE.value,
+                    LogTag.USER_ID.key to authUser.userId.value.toString(),
+                ),
+            )
             throw AuthException.RefreshTokenSaveFailed()
         }
 

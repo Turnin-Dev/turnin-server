@@ -4,19 +4,35 @@ import com.peekr.common.db.DatabaseErrorMessage
 import com.peekr.common.db.DatabaseException
 import com.peekr.common.db.toHttpStatusCode
 import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.common.validator.ValidatorException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.httpMethod
+import io.ktor.server.request.uri
 import io.ktor.server.response.respond
+
+// TODO: 트래픽/보안 이슈 발생 시 IP 수집 활성화 고려
+//  - 활성화 시 LogType.PRIVACY로 변경 필요 (1년 보관, 저장 용량 증가)
+//  - 활성화 시 MDC 태그에 'TAG_IP to call.request.origin.remoteHost'처럼 추가
+//  - 일단은 오라클 VCN Flow Logs로 대체 (인프라 레벨 IP 기록)
+// private const val TAG_IP = "client_ip"
+private const val TAG_URL = "request_url"
+private const val TAG_METHOD = "request_method"
+private const val TAG_EXCEPTION = "exception_type"
+private const val TAG_STATUS = "status_code"
+private const val TAG_ERROR_CODE = "error_code"
 
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
         exception<DatabaseException> { call, cause ->
-            warnLogging("DatabaseException", cause)
+            warnLogging(call, "DatabaseException", cause)
             call.respond(
                 status = cause.toHttpStatusCode(),
                 message = ErrorResponse(
@@ -28,7 +44,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<ApiException> { call, cause ->
-            warnLogging(cause)
+            warnLogging(call, "ApiException", cause, cause.errorCode)
             call.respond(
                 status = cause.status,
                 message = ErrorResponse(
@@ -40,7 +56,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<ValidatorException> { call, cause ->
-            warnLogging("ValidatorException", cause)
+            warnLogging(call, "ValidatorException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
@@ -52,7 +68,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<DomainException> { call, cause ->
-            warnLogging("DomainException", cause)
+            warnLogging(call, "DomainException", cause)
             call.respond(
                 status = HttpStatusCode.InternalServerError,
                 message = ErrorResponse(
@@ -64,7 +80,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<IllegalArgumentException> { call, cause ->
-            warnLogging("IllegalArgumentException", cause)
+            warnLogging(call, "IllegalArgumentException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
@@ -76,7 +92,7 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<BadRequestException> { call, cause ->
-            warnLogging("BadRequestException", cause)
+            warnLogging(call, "BadRequestException", cause)
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 message = ErrorResponse(
@@ -88,8 +104,8 @@ fun Application.configureExceptionHandler() {
         }
 
         exception<Throwable> { call, cause ->
-            val statusCode = call.response.status() ?: HttpStatusCode.InternalServerError
-            errorLogging(statusCode, cause)
+            val statusCode = HttpStatusCode.InternalServerError
+            errorLogging(call, statusCode, cause)
             call.respond(
                 status = statusCode,
                 message = ErrorResponse(
@@ -107,30 +123,48 @@ private const val UNKNOWN_ERROR_CODE = "UEC001"
 
 private val LOGGER = AppLoggerFactory.createLogger("ExceptionHandler")
 
-private fun warnLogging(cause: ApiException) {
-    LOGGER.warn(
-        "[ApiException] " +
-            "code=${cause.errorCode.code}, " +
-            "status=${cause.status.value}, " +
-            "message=${cause.message}",
-        cause,
+private fun warnLogging(
+    call: ApplicationCall,
+    tag: String,
+    cause: Throwable,
+    errorCode: ApiErrorCode? = null,
+) {
+    val tags = mutableMapOf(
+        TAG_URL to call.request.uri,
+        TAG_METHOD to call.request.httpMethod.value,
+        TAG_EXCEPTION to tag,
+        LogTag.LOG_TYPE.key to LogType.NORMAL.value,
     )
+
+    errorCode?.let { tags[TAG_ERROR_CODE] = it.code }
+
+    val errorCodeMsg = if (errorCode != null) "(${errorCode.code}) " else ""
+    // ApiException 타입인 경우 내부의 cause(원인 예외)가 있는지 확인
+    val hasRootCause = (cause as? ApiException)?.cause != null || cause.cause != null
+
+    if (hasRootCause) {
+        LOGGER.warn("[$tag]$errorCodeMsg ${cause.message}", tags, cause)
+    } else {
+        LOGGER.warn("[$tag]$errorCodeMsg ${cause.message}", tags)
+    }
 }
 
-private fun warnLogging(tag: String, cause: Throwable) {
-    LOGGER.warn(
-        "[$tag] " +
-            "message=${cause.message}",
-        cause,
+private fun errorLogging(
+    call: ApplicationCall,
+    statusCode: HttpStatusCode,
+    cause: Throwable,
+) {
+    val tags = mapOf(
+        TAG_URL to call.request.uri,
+        TAG_METHOD to call.request.httpMethod.value,
+        TAG_STATUS to statusCode.value.toString(),
+        TAG_EXCEPTION to "CRITICAL_ERROR",
+        LogTag.LOG_TYPE.key to LogType.NORMAL.value,
     )
-}
 
-private fun errorLogging(statusCode: HttpStatusCode, cause: Throwable) {
     LOGGER.error(
-        cause,
-        "[Unhandled Throwable] " +
-            "status=${statusCode.value}, " +
-            "code=${UNKNOWN_ERROR_CODE}, " +
-            "message=${UNKNOWN_ERROR_MESSAGE}",
+        message = "[Unhandled Exception] ${cause.message}",
+        tags = tags,
+        e = cause,
     )
 }

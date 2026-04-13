@@ -1,10 +1,15 @@
 package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.id.UserId
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.domain.user.application.dto.UserPatchDto
 import com.peekr.domain.user.application.dto.toDomain
 import com.peekr.domain.user.domain.provider.FileProvider
 import com.peekr.domain.user.domain.repository.UserRepository
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * 사용자 정보를 수정한다.
@@ -28,17 +33,52 @@ class UpdateUserUseCase(
         userId: UserId,
         patch: UserPatchDto,
     ): Boolean {
+        LOGGER.info(
+            message = "User update attempt: userId=${userId.value}",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.USER_UPDATE_ATTEMPT.value,
+                LogTag.USER_ID.key to userId.value.toString(),
+            ),
+        )
+
         // 1. 사용자 정보 업데이트 수행
         val result = userRepository.update(userId, patch.toDomain())
 
-        // 2. 프로필 사진 업데이트 유무 판별 후 파일 삭제 진행
-        if (result &&
-            patch.oldProfileImageUrl != null &&
-            patch.newProfileImageUrl != patch.oldProfileImageUrl
-        ) {
-            fileProvider.deleteFile(patch.oldProfileImageUrl)
+        if (result) {
+            LOGGER.info(
+                message = "User update successful: userId=${userId.value}",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                    LogTag.ACTION.key to LogAction.USER_UPDATE_SUCCESS.value,
+                    LogTag.USER_ID.key to userId.value.toString(),
+                ),
+            )
+
+            // 2. 프로필 사진 업데이트 유무 판별 후 파일 삭제 진행
+            if (patch.oldProfileImageUrl != null &&
+                patch.newProfileImageUrl != patch.oldProfileImageUrl
+            ) {
+                try {
+                    fileProvider.deleteFile(patch.oldProfileImageUrl)
+                    LOGGER.debug("Old profile image deleted")
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    LOGGER.warn(
+                        message = "Failed to delete old profile image",
+                        tags = mapOf(
+                            LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                            LogTag.ACTION.key to LogAction.FILE_DELETE_FAILURE.value,
+                            LogTag.USER_ID.key to userId.value.toString(),
+                        ),
+                        e = e,
+                    )
+                }
+            }
         }
 
         return result
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger<UpdateUserUseCase>()

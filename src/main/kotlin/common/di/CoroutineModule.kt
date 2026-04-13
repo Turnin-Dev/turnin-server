@@ -1,7 +1,7 @@
 package com.peekr.common.di
 
 import com.peekr.common.util.AppDispatchers
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope

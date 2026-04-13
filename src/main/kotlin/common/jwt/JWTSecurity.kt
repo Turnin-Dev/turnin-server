@@ -10,7 +10,9 @@ import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import org.koin.ktor.ext.inject
 
-// TODO: 추후에 새로운 토큰 발급 후 이전토큰 무효화하는 로직 추가 (1. 버전 업 방식, 2. 블랙리스트 방식)
+// TODO: 보안 강화 로직 추가 예정
+//  1. 새로운 토큰 발급 후 이전토큰 무효화하는 로직 추가 (1. 버전 업 방식, 2. 블랙리스트 방식)
+//  2. jti DB 대조 로직 추가
 fun Application.configureJwtSecurity() {
     val jwtService: JWTTokenService by inject()
     val verifier = jwtService.createVerifier(JWTTokenType.Access)
@@ -21,8 +23,8 @@ fun Application.configureJwtSecurity() {
             realm = jwtService.realm
             validate { credential ->
                 val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
-                val hasAudience = credential.payload.audience.contains(jwtService.audience)
-                if (displayIdClaim?.isNotEmpty() == true && hasAudience) {
+                val jwtId = credential.payload.id
+                if (displayIdClaim?.isNotEmpty() == true && jwtId?.isNotEmpty() == true) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

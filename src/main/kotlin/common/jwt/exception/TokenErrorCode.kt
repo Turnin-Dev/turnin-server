@@ -23,6 +23,9 @@ sealed class TokenErrorCode(
 
     data object TokenExpired :
         TokenErrorCode(raw = T006, description = "토큰이 만료되었습니다.")
+
+    data object VerificationFailed :
+        TokenErrorCode(raw = T007, description = "토큰 검증에 실패했습니다.")
 }
 
 private const val T001 = "T001"
@@ -31,3 +34,4 @@ private const val T003 = "T003"
 private const val T004 = "T004"
 private const val T005 = "T005"
 private const val T006 = "T006"
+private const val T007 = "T007"

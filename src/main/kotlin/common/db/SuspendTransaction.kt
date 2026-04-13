@@ -1,9 +1,10 @@
 package com.peekr.common.db
 
 import com.peekr.common.util.AppDispatchers.ioDispatcher
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import java.sql.SQLException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
+import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -23,10 +24,10 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
  * @throws DatabaseException.DuplicatedDataException 중복 데이터 저장 시도 시
  * @throws DatabaseException.ForeignKeyViolationException 외래키 제약조건 위반 시
  */
-suspend fun <T> suspendTransaction(block: suspend () -> T): T =
+suspend fun <T> suspendTransaction(block: suspend Transaction.() -> T): T =
     try {
         if (TransactionManager.currentOrNull() != null) {
-            block()
+            block(TransactionManager.current())
         } else {
             newSuspendedTransaction(ioDispatcher) {
                 block()

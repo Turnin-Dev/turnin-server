@@ -1,8 +1,8 @@
 package com.peekr.common.db
 
-import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.config.AppConfig
 import com.peekr.common.util.config.RunEnvironment.Companion.toRunEnvironment
+import com.peekr.common.util.log.AppLoggerFactory
 import com.zaxxer.hikari.HikariDataSource
 import org.koin.dsl.module
 import org.koin.dsl.onClose

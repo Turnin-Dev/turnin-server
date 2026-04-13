@@ -2,7 +2,7 @@ package com.peekr.domain.discover.application.usecase
 
 import com.peekr.common.db.suspendTransaction
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.common.util.pagination.cursor.CursorPage
 import com.peekr.domain.discover.application.dto.DiscoverContextDto
 import com.peekr.domain.discover.application.dto.DiscoverKeywordDto

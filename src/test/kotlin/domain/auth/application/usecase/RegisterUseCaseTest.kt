@@ -14,6 +14,7 @@ import com.peekr.domain.auth.domain.model.AuthUser
 import com.peekr.domain.auth.domain.model.RegisterResult
 import com.peekr.domain.auth.domain.repository.AuthRepository
 import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import com.peekr.domain.auth.exception.AuthException
 import com.peekr.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -68,6 +69,19 @@ class RegisterUseCaseTest {
         // when, then
         assertThrows<DisplayIdValidationException> {
             usecase(TestRegisterDto.copy(displayId = invalidDisplayId))
+        }
+    }
+
+    @Test
+    fun `리프레쉬 토큰 저장 실패 시 예외가 발생한다`() = runTest {
+        // given: 리프레쉬 토큰 저장 실패 설정
+        coEvery {
+            refreshTokenRepository.save(TestUserId, TestRegisterResult.jwtToken.refreshToken)
+        } returns false
+
+        // when, then
+        assertThrows<AuthException.RefreshTokenSaveFailed> {
+            usecase(TestRegisterDto)
         }
     }
 

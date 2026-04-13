@@ -1,7 +1,10 @@
 package com.peekr.domain.user.application.usecase
 
 import com.peekr.common.model.id.UserId
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.domain.user.domain.provider.AuthProvider
 import com.peekr.domain.user.domain.provider.NotificationProvider
 import io.ktor.utils.io.CancellationException
@@ -27,6 +30,15 @@ class LogoutUseCase(
         userId: Long,
         token: String,
     ) {
+        LOGGER.info(
+            message = "Logout attempt: userId=$userId",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.LOGOUT_ATTEMPT.value,
+                LogTag.USER_ID.key to userId.toString(),
+            ),
+        )
+
         val userIDVO = UserId(userId)
 
         // 1. 토큰 삭제
@@ -38,9 +50,26 @@ class LogoutUseCase(
             runCatching { notificationProvider.deactivate(userIDVO, token) }
                 .onFailure { e ->
                     if (e is CancellationException) throw e
-                    LOGGER.warn("Failed to deactivate notification for user $userId", e)
+
+                    LOGGER.warn(
+                        message = "Failed to deactivate notification for user $userId",
+                        tags = mapOf(
+                            LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                            LogTag.ACTION.key to LogAction.FCM_DEACTIVATE_FAILURE.value,
+                        ),
+                        e = e,
+                    )
                 }
         }
+
+        LOGGER.info(
+            message = "Logout successful: userId=$userId",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.LOGOUT_SUCCESS.value,
+                LogTag.USER_ID.key to userId.toString(),
+            ),
+        )
     }
 }
 

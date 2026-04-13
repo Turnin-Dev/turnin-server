@@ -1,7 +1,7 @@
 package com.peekr.common.db
 
-import com.peekr.common.util.AppLoggerFactory
 import com.peekr.common.util.config.RunEnvironment
+import com.peekr.common.util.log.AppLoggerFactory
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource

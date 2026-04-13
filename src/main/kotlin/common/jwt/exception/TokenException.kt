@@ -2,6 +2,7 @@ package com.peekr.common.jwt.exception
 
 import com.peekr.common.exception.ApiErrorCode
 import com.peekr.common.exception.ApiException
+import com.peekr.common.util.log.LogLevel
 import io.ktor.http.HttpStatusCode
 
 /**
@@ -16,12 +17,14 @@ sealed class TokenException(
     code: ApiErrorCode,
     status: HttpStatusCode = HttpStatusCode.Unauthorized,
     message: String,
+    val logLevel: LogLevel,
     cause: Throwable? = null,
 ) : ApiException(errorCode = code, message = message, status = status, cause = cause) {
     class InvalidTokenException(cause: Throwable? = null) :
         TokenException(
             code = TokenErrorCode.InvalidToken,
             message = TokenErrorCode.InvalidToken.description,
+            logLevel = LogLevel.WARN,
             cause = cause,
         )
 
@@ -30,6 +33,7 @@ sealed class TokenException(
             code = TokenErrorCode.InvalidVerifier,
             status = HttpStatusCode.InternalServerError,
             message = TokenErrorCode.InvalidVerifier.description,
+            logLevel = LogLevel.ERROR,
             cause = cause,
         )
 
@@ -37,6 +41,7 @@ sealed class TokenException(
         TokenException(
             code = TokenErrorCode.GenerateTokenError,
             message = TokenErrorCode.GenerateTokenError.description,
+            logLevel = LogLevel.ERROR,
             cause = cause,
         )
 
@@ -44,6 +49,7 @@ sealed class TokenException(
         TokenException(
             code = TokenErrorCode.DecodeTokenError,
             message = TokenErrorCode.DecodeTokenError.description,
+            logLevel = LogLevel.WARN,
             cause = cause,
         )
 
@@ -52,6 +58,7 @@ sealed class TokenException(
             code = TokenErrorCode.UnauthorizedUser,
             status = HttpStatusCode.Forbidden,
             message = TokenErrorCode.UnauthorizedUser.description,
+            logLevel = LogLevel.WARN,
             cause = cause,
         )
 
@@ -60,6 +67,16 @@ sealed class TokenException(
             code = TokenErrorCode.TokenExpired,
             status = HttpStatusCode.Unauthorized,
             message = TokenErrorCode.TokenExpired.description,
+            logLevel = LogLevel.DEBUG,
+            cause = cause,
+        )
+
+    class VerificationFailedException(cause: Throwable? = null) :
+        TokenException(
+            code = TokenErrorCode.VerificationFailed,
+            status = HttpStatusCode.Unauthorized,
+            message = TokenErrorCode.VerificationFailed.description,
+            logLevel = LogLevel.WARN,
             cause = cause,
         )
 }

@@ -65,6 +65,20 @@ tasks.register<JavaExec>("runDev") {
     mainClass.set("io.ktor.server.netty.EngineMain")
     systemProperty("config.resource", "application-dev.conf")
     systemProperty("io.ktor.development", "true")
+    systemProperty("logback.configurationFile", "logback-dev.xml")
+    envDev.forEach { (key, value) ->
+        environment(key, value)
+    }
+}
+
+tasks.register<JavaExec>("runDevWithOTel") {
+    group = "application"
+    description = "Run the application in development mode"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("io.ktor.server.netty.EngineMain")
+    systemProperty("config.resource", "application-dev.conf")
+    systemProperty("io.ktor.development", "true")
+    systemProperty("logback.configurationFile", "logback-prod.xml")
     envDev.forEach { (key, value) ->
         environment(key, value)
     }
@@ -77,6 +91,7 @@ tasks.register<JavaExec>("runProd") {
     mainClass.set("io.ktor.server.netty.EngineMain")
     systemProperty("config.resource", "application-prod.conf")
     systemProperty("io.ktor.development", "false")
+    systemProperty("logback.configurationFile", "logback-prod.xml")
     envProd.forEach { (key, value) -> environment(key, value) }
 }
 
@@ -162,4 +177,7 @@ dependencies {
     implementation(libs.firebase.admin) {
         exclude(group = "io.netty")
     }
+
+    // OpenTelemetry
+    implementation(libs.opentelemetry.logback.appender)
 }

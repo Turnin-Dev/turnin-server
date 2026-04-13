@@ -23,7 +23,6 @@ import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -90,11 +89,10 @@ class LoginUseCaseTest {
             jwtTokenService.generate(any())
         } throws Exception()
 
-        // when
-        val result = usecase(TestLoginDto)
-
-        // then
-        assertNull(result)
+        // when & then
+        assertThrows<Exception> {
+            usecase(TestLoginDto)
+        }
     }
 
     companion object {

@@ -4,7 +4,7 @@ import com.peekr.common.db.suspendTransaction
 import com.peekr.common.firebase.RefType
 import com.peekr.common.model.NotificationType
 import com.peekr.common.util.AppDispatchers
-import com.peekr.common.util.AppLoggerFactory
+import com.peekr.common.util.log.AppLoggerFactory
 import com.peekr.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
 import com.peekr.domain.userKeyword.application.dto.toDomain

@@ -5,6 +5,10 @@ import com.peekr.common.exception.common.CommonException
 import com.peekr.common.model.id.ReportReasonId
 import com.peekr.common.model.id.UserId
 import com.peekr.common.model.id.UserKeywordId
+import com.peekr.common.util.log.AppLoggerFactory
+import com.peekr.common.util.log.LogAction
+import com.peekr.common.util.log.LogTag
+import com.peekr.common.util.log.LogType
 import com.peekr.domain.report.application.dto.ReportDetailDto
 import com.peekr.domain.report.domain.model.ReportDetail
 import com.peekr.domain.report.domain.repository.ReportRepository
@@ -36,6 +40,17 @@ class CreateReportUseCase(private val reportRepository: ReportRepository) {
         val reportedId = reportDetailDto.reportedId?.let { UserId(it) }
         val reportedUserKeywordId = reportDetailDto.reportedUserKeywordId?.let { UserKeywordId(it) }
         val reasonId = ReportReasonId(reportDetailDto.reasonId)
+
+        LOGGER.info(
+            message = "Report creation attempt: " +
+                "reporter=$reporterId, targetUser=$reportedId, targetKeyword=$reportedUserKeywordId",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.REPORT_ATTEMPT.value,
+                LogTag.USER_ID.key to reporterId.value.toString(),
+            ),
+        )
+
         val reportDetail = ReportDetail.create(
             reporterId = reporterId,
             reportedId = reportedId,
@@ -44,5 +59,21 @@ class CreateReportUseCase(private val reportRepository: ReportRepository) {
             customReason = reportDetailDto.customReason,
         )
         reportRepository.createReport(reportDetail)
+
+        LOGGER.info(
+            message = "Report created successfully: reasonId=${reasonId.value}",
+            tags = mutableMapOf(
+                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                LogTag.ACTION.key to LogAction.REPORT_SUCCESS.value,
+                LogTag.USER_ID.key to reporterId.value.toString(),
+                "report_reason_id" to reasonId.value.toString(),
+            ).apply {
+                // 신고 대상에 따라 태그 동적 추가
+                reportedId?.let { put("reported_user_id", it.value.toString()) }
+                reportedUserKeywordId?.let { put("reported_keyword_id", it.value.toString()) }
+            },
+        )
     }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger<CreateReportUseCase>()
