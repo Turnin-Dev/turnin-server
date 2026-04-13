@@ -139,7 +139,14 @@ private fun warnLogging(
     errorCode?.let { tags[TAG_ERROR_CODE] = it.code }
 
     val errorCodeMsg = if (errorCode != null) "(${errorCode.code}) " else ""
-    LOGGER.warn("[$tag]$errorCodeMsg ${cause.message}", tags, cause)
+    // ApiException 타입인 경우 내부의 cause(원인 예외)가 있는지 확인
+    val hasRootCause = (cause as? ApiException)?.cause != null || cause.cause != null
+
+    if (hasRootCause) {
+        LOGGER.warn("[$tag]$errorCodeMsg ${cause.message}", tags, cause)
+    } else {
+        LOGGER.warn("[$tag]$errorCodeMsg ${cause.message}", tags)
+    }
 }
 
 private fun errorLogging(

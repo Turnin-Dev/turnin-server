@@ -1,7 +1,6 @@
 package com.peekr.domain.auth.application.usecase
 
 import com.auth0.jwt.JWT
-import com.auth0.jwt.exceptions.TokenExpiredException
 import com.peekr.common.jwt.JWTTestDoubles
 import com.peekr.common.jwt.domain.model.JWTToken
 import com.peekr.common.jwt.domain.service.JWTTokenService
