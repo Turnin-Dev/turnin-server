@@ -6,7 +6,7 @@ import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
-import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.TurninDateTime
 import com.turnin.domain.auth.domain.model.Register
 import com.turnin.util.db.TestDatabaseFactory
 import com.turnin.util.db.setUserInactiveForTest
@@ -132,9 +132,9 @@ class AuthRepositoryImplTest {
         val userId = savedUser.userId
 
         // when
-        val before = PeekrDateTime.now()
+        val before = TurninDateTime.now()
         repository.updateLastLoginAt(userId)
-        val after = PeekrDateTime.now()
+        val after = TurninDateTime.now()
 
         // then
         val updatedUser = repository.findUserByUserId(userId)
@@ -150,8 +150,8 @@ class AuthRepositoryImplTest {
 
         // when
         repository.updateLastLoginAt(userId)
-        val before = PeekrDateTime.now().plusSeconds(1)
-        val after = PeekrDateTime.now().plusSeconds(2)
+        val before = TurninDateTime.now().plusSeconds(1)
+        val after = TurninDateTime.now().plusSeconds(2)
 
         // then
         val updatedUser = repository.findUserByUserId(userId)

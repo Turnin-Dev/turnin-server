@@ -5,7 +5,7 @@ import com.turnin.common.exception.common.CommonErrorCode
 import io.ktor.http.HttpStatusCode
 
 /** 유효성 검사 유틸 */
-object PeekrValidator {
+object TurninValidator {
     /**
      * 유효성 검사에서 사용하고, [require] 대신 사용
      *

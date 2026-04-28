@@ -3,7 +3,7 @@ package com.turnin.common.db
 import com.turnin.common.db.schema.Users
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
-import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.toOffsetDateTime
 import com.turnin.util.db.TestDatabaseFactory
 import java.time.OffsetDateTime
@@ -33,7 +33,7 @@ class UpdateUpsertWithTimestampTest {
         providerId: String = "test_provider_id",
         displayId: String = "test_display_id",
         name: String = "테스트유저",
-        now: OffsetDateTime = PeekrDateTime.now().toOffsetDateTime(),
+        now: OffsetDateTime = TurninDateTime.now().toOffsetDateTime(),
     ) = TestDatabaseFactory.dbQuery {
         Users.insertAndGetId { stmt ->
             stmt[Users.role] = Role.USER
@@ -55,7 +55,7 @@ class UpdateUpsertWithTimestampTest {
     @Test
     fun `updateWithTimestamp - UPDATE 시 updated_at이 자동으로 갱신된다`() = runTest {
         // given
-        val now = PeekrDateTime.now().toOffsetDateTime()
+        val now = TurninDateTime.now().toOffsetDateTime()
         val userId = insertTestUser(now = now)
         Thread.sleep(10)
 
@@ -78,7 +78,7 @@ class UpdateUpsertWithTimestampTest {
     @Test
     fun `updateWithTimestamp - updated_at을 명시적으로 지정하면 해당 값으로 갱신된다`() = runTest {
         // given
-        val now = PeekrDateTime.now().toOffsetDateTime()
+        val now = TurninDateTime.now().toOffsetDateTime()
         val specificTime = now.minusDays(1)
         val userId = insertTestUser(now = now)
 
@@ -108,7 +108,7 @@ class UpdateUpsertWithTimestampTest {
     @Test
     fun `upsertWithTimestamp - 존재하지 않는 경우 INSERT된다`() = runTest {
         // given
-        val now = PeekrDateTime.now().toOffsetDateTime()
+        val now = TurninDateTime.now().toOffsetDateTime()
 
         // when
         TestDatabaseFactory.dbQuery {
@@ -139,7 +139,7 @@ class UpdateUpsertWithTimestampTest {
     @Test
     fun `upsertWithTimestamp - 이미 존재하는 경우 UPDATE되고 updated_at이 자동으로 갱신된다`() = runTest {
         // given
-        val now = PeekrDateTime.now().toOffsetDateTime()
+        val now = TurninDateTime.now().toOffsetDateTime()
         insertTestUser(providerId = "existing_provider_id", now = now)
         Thread.sleep(10)
 

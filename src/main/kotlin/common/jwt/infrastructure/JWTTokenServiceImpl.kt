@@ -13,7 +13,7 @@ import com.turnin.common.jwt.domain.model.JWTTokenPayload
 import com.turnin.common.jwt.domain.model.JWTTokenType
 import com.turnin.common.jwt.domain.service.JWTTokenService
 import com.turnin.common.jwt.exception.TokenException
-import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.config.AppConfig
 import java.util.UUID
 
@@ -82,7 +82,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         expiresIn: Long,
     ): String {
         val checksum = UUID.randomUUID().toString()
-        val issuedAt = PeekrDateTime.now()
+        val issuedAt = TurninDateTime.now()
         val expiresAt = issuedAt.plusMillis(expiresIn)
 
         return JWT
@@ -102,7 +102,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         expiresIn: Long,
     ): String {
         val checksum = UUID.randomUUID().toString()
-        val issuedAt = PeekrDateTime.now()
+        val issuedAt = TurninDateTime.now()
         val expiresAt = issuedAt.plusMillis(expiresIn)
 
         return JWT

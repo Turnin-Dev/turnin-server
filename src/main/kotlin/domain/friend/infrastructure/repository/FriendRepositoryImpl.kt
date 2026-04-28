@@ -13,7 +13,7 @@ import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
-import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.toOffsetDateTime
 import com.turnin.domain.friend.domain.model.Friend
 import com.turnin.domain.friend.domain.model.FriendFcmContext
@@ -260,7 +260,7 @@ class FriendRepositoryImpl : FriendRepository {
         }
         Friends.updateWithTimestamp({ updateCondition }) {
             it[this.status] = requestStatus
-            it[this.respondedAt] = PeekrDateTime.now().toOffsetDateTime()
+            it[this.respondedAt] = TurninDateTime.now().toOffsetDateTime()
         } > 0
     }
 

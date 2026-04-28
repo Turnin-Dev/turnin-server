@@ -2,7 +2,7 @@ package com.turnin.domain.auth.presentation.validation
 
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
-import com.turnin.common.validator.PeekrValidator.validation
+import com.turnin.common.validator.TurninValidator.validation
 
 internal fun String.validateDisplayId() {
     validation(

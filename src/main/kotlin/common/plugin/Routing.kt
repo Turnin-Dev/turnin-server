@@ -52,10 +52,10 @@ fun Application.configureRouting() {
     routing {
         customRoutingOption()
 
-        // Add Peekr routes
-        route(Api.ROUTE, { description = "Peekr API" }) {
+        // Add Turnin routes
+        route(Api.ROUTE, { description = "Turnin API" }) {
             healthRoutes(route = Api.Health)
-            route(Api.V1.ROUTE, { description = "Peekr API V1" }) {
+            route(Api.V1.ROUTE, { description = "Turnin API V1" }) {
                 authRoutes(route = Api.V1.Auth, usecase = authUseCases)
                 fileRoutes(route = Api.V1.File, usecase = fileUseCases)
                 authenticatedRoute {

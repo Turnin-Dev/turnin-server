@@ -1,7 +1,7 @@
 package com.turnin.domain.auth.presentation.dto
 
 import com.turnin.common.model.SocialLoginProvider
-import com.turnin.common.validator.PeekrValidator.validation
+import com.turnin.common.validator.TurninValidator.validation
 import com.turnin.domain.auth.application.dto.LoginDto
 import kotlinx.serialization.Serializable
 

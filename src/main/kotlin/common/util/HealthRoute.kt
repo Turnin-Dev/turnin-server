@@ -12,7 +12,7 @@ import java.time.Duration
 import java.time.Instant
 
 fun Route.healthRoutes(route: Api.Health) {
-    val startTime = PeekrDateTime.now()
+    val startTime = TurninDateTime.now()
 
     route(route.ROUTE, {
         tags = setOf(route.TAG)
@@ -46,7 +46,7 @@ fun Route.healthRoutes(route: Api.Health) {
 }
 
 private fun formatUptime(startTime: Instant): String {
-    val seconds = Duration.between(startTime, PeekrDateTime.now()).seconds
+    val seconds = Duration.between(startTime, TurninDateTime.now()).seconds
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     val secs = seconds % 60

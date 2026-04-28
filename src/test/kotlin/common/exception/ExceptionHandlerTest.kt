@@ -3,7 +3,7 @@ package com.turnin.common.exception
 import com.turnin.common.exception.ExceptionTestDoubles.MockEmptyTestRequest
 import com.turnin.common.exception.common.CommonErrorCode
 import com.turnin.common.plugin.configureContentNegotiation
-import com.turnin.common.validator.PeekrValidator.validation
+import com.turnin.common.validator.TurninValidator.validation
 import com.turnin.util.TestClientFactory.createTestClient
 import io.ktor.client.request.get
 import io.ktor.client.request.post

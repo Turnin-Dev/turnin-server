@@ -9,7 +9,7 @@ import com.turnin.common.db.updateWithTimestamp
 import com.turnin.common.model.Introduce
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
-import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.TurninDateTime
 import com.turnin.domain.user.domain.model.User
 import com.turnin.domain.user.domain.model.UserPatch
 import com.turnin.domain.user.domain.repository.UserRepository
@@ -114,7 +114,7 @@ class UserRepositoryImpl : UserRepository {
         userId: UserId,
         providerId: String,
     ): Boolean = suspendTransaction {
-        val now = PeekrDateTime.now().epochSecond
+        val now = TurninDateTime.now().epochSecond
         Users.updateWithTimestamp({ Users.id eq userId.value }) {
             it[Users.providerId] = "DELETED_${now}_$providerId"
         } > 0

@@ -1,6 +1,6 @@
 package com.turnin.domain.file.presentation.validation
 
-import com.turnin.common.validator.PeekrValidator.validation
+import com.turnin.common.validator.TurninValidator.validation
 
 internal fun String?.validateFileNameAndReturn(): String {
     validation(!this.isNullOrBlank()) {

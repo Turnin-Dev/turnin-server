@@ -8,16 +8,16 @@ import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.jetbrains.exposed.sql.javatime.CurrentTimestampBase
 
 /**
- * Peekr 날짜/시간 유틸
+ * Turnin 날짜/시간 유틸
  *
  * [Instant] 타입을 반환
  */
-object PeekrDateTime {
+object TurninDateTime {
     /**
      * DDL 용 DB의 CURRENT_TIMESTAMP 사용
      * ##### 사용 예시
      * ```
-     * val createdAt = timestamp("created_at").defaultExpression(PeekrDateTime.timestamp)
+     * val createdAt = timestamp("created_at").defaultExpression(TurninDateTime.timestamp)
      * ```
      */
     val timestamp: CurrentTimestampBase<Instant> = CurrentTimestamp

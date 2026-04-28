@@ -9,7 +9,7 @@ import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
-import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.masking
 import com.turnin.domain.auth.domain.model.AuthUser
@@ -55,7 +55,7 @@ class AuthRepositoryImpl : AuthRepository {
     override suspend fun save(register: Register): AuthUser = suspendTransaction {
         val role = Role.USER
         val isActive = true
-        val lastLoginAt = PeekrDateTime.now()
+        val lastLoginAt = TurninDateTime.now()
 
         val savedUserEntity = UserEntity.new {
             this.role = role
@@ -79,7 +79,7 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun updateLastLoginAt(userId: UserId) = suspendTransaction<Unit> {
         UserEntity.findByIdAndUpdate(userId.value) {
-            it.lastLoginAt = PeekrDateTime.now()
+            it.lastLoginAt = TurninDateTime.now()
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.value.masking()}")
     }
 }
