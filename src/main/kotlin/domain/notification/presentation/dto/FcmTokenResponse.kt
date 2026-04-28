@@ -1,6 +1,6 @@
-package com.peekr.domain.notification.presentation.dto
+package com.turnin.domain.notification.presentation.dto
 
-import com.peekr.domain.notification.application.dto.FcmTokenDto
+import com.turnin.domain.notification.application.dto.FcmTokenDto
 import kotlinx.serialization.Serializable
 
 /**

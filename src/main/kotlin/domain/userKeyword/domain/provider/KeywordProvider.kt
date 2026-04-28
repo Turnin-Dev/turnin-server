@@ -1,8 +1,8 @@
-package com.peekr.domain.userKeyword.domain.provider
+package com.turnin.domain.userKeyword.domain.provider
 
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.userKeyword.domain.model.ExternalKeyword
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.userKeyword.domain.model.ExternalKeyword
 
 /**
  * 외부에서 제공되는 키워드 API
@@ -12,7 +12,7 @@ interface KeywordProvider {
      * 키워드 ID로 키워드 조회
      *
      * @param [keywordId] 키워드 ID
-     * @return [com.peekr.domain.userKeyword.domain.model.ExternalKeyword]
+     * @return [com.turnin.domain.userKeyword.domain.model.ExternalKeyword]
      */
     suspend fun findById(keywordId: KeywordId): ExternalKeyword?
 

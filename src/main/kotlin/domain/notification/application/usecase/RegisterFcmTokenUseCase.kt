@@ -1,10 +1,10 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.application.dto.FcmTokenDto
-import com.peekr.domain.notification.application.dto.toDto
-import com.peekr.domain.notification.domain.model.FcmToken
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.application.dto.FcmTokenDto
+import com.turnin.domain.notification.application.dto.toDto
+import com.turnin.domain.notification.domain.model.FcmToken
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
 
 /**
  * FCM 토큰 등록

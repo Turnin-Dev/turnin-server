@@ -1,7 +1,7 @@
-package com.peekr.domain.userKeyword.application.provider
+package com.turnin.domain.userKeyword.application.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
 
 /**
  * 외부에 제공할 UserKeyword 삭제 제공 API

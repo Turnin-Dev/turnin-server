@@ -1,6 +1,6 @@
-package com.peekr.domain.userKeyword.application.dto
+package com.turnin.domain.userKeyword.application.dto
 
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.id.UserId
 
 /**
  * 사용자별 키워드 DTO

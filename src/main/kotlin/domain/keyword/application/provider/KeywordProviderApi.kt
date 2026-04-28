@@ -1,13 +1,13 @@
-package com.peekr.domain.keyword.application.provider
+package com.turnin.domain.keyword.application.provider
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.keyword.application.dto.KeywordDto
-import com.peekr.domain.keyword.application.dto.toDto
-import com.peekr.domain.keyword.application.usecase.CreateKeywordUseCase
-import com.peekr.domain.keyword.domain.repository.KeywordRepository
-import com.peekr.domain.keyword.exception.KeywordException
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.keyword.application.dto.KeywordDto
+import com.turnin.domain.keyword.application.dto.toDto
+import com.turnin.domain.keyword.application.usecase.CreateKeywordUseCase
+import com.turnin.domain.keyword.domain.repository.KeywordRepository
+import com.turnin.domain.keyword.exception.KeywordException
 
 /**
  * 외부로 제공할 키워드 API

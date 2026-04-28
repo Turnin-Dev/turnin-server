@@ -1,4 +1,4 @@
-package com.peekr.common.util.pagination.cursor
+package com.turnin.common.util.pagination.cursor
 
 /**
  * 페이지네이션(커서 기반) 파라미터

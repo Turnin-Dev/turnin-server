@@ -1,10 +1,10 @@
-package com.peekr.domain.userKeyword.application.usecase
+package com.turnin.domain.userKeyword.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.application.dto.UserKeywordDetailDto
-import com.peekr.domain.userKeyword.application.dto.toDto
-import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.userKeyword.application.dto.UserKeywordDetailDto
+import com.turnin.domain.userKeyword.application.dto.toDto
+import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
 
 /**
  * 사용자 키워드 ID로 사용자 키워드 상세 정보 조회

@@ -1,7 +1,7 @@
-package com.peekr
+package com.turnin
 
-import com.peekr.common.util.TimeZoneInfo
-import com.peekr.common.util.config.AppConfig
+import com.turnin.common.util.TimeZoneInfo
+import com.turnin.common.util.config.AppConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
 import kotlin.getValue

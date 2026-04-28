@@ -1,6 +1,6 @@
-package com.peekr.domain.userKeyword.domain.provider
+package com.turnin.domain.userKeyword.domain.provider
 
-import com.peekr.common.model.NotificationType
+import com.turnin.common.model.NotificationType
 
 /**
  * 외부에서 제공받은 알림 API

@@ -1,6 +1,6 @@
-package com.peekr.domain.notification.application.dto
+package com.turnin.domain.notification.application.dto
 
-import com.peekr.domain.notification.domain.model.FcmToken
+import com.turnin.domain.notification.domain.model.FcmToken
 
 /**
  * FCM 토큰 DTO

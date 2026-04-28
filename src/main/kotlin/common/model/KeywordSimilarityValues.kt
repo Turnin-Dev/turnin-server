@@ -1,4 +1,4 @@
-package com.peekr.common.model
+package com.turnin.common.model
 
 /**
  * 키워드 유사도 관련 수치

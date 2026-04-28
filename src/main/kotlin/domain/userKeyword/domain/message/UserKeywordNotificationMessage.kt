@@ -1,4 +1,4 @@
-package com.peekr.domain.userKeyword.domain.message
+package com.turnin.domain.userKeyword.domain.message
 
 /**
  * 사용자 키워드 알림 메시지

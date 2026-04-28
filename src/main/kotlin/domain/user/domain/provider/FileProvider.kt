@@ -1,4 +1,4 @@
-package com.peekr.domain.user.domain.provider
+package com.turnin.domain.user.domain.provider
 
 /**
  * 외부에서 제공되는 File BC API 인터페이스

@@ -1,12 +1,12 @@
-package com.peekr.domain.userKeyword.application.usecase
+package com.turnin.domain.userKeyword.application.usecase
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.userKeyword.application.dto.UserKeywordPatchDto
-import com.peekr.domain.userKeyword.application.dto.toDomain
-import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
-import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
-import com.peekr.domain.userKeyword.exception.UserKeywordException
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.userKeyword.application.dto.UserKeywordPatchDto
+import com.turnin.domain.userKeyword.application.dto.toDomain
+import com.turnin.domain.userKeyword.domain.provider.KeywordProvider
+import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.turnin.domain.userKeyword.exception.UserKeywordException
 
 /**
  * 사용자 키워드 업데이트

@@ -1,13 +1,13 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.firebase.FcmMessage
-import com.peekr.common.firebase.FcmService
-import com.peekr.common.firebase.FcmTopic
-import com.peekr.domain.notification.application.dto.NotificationDto
-import com.peekr.domain.notification.application.dto.toDto
-import com.peekr.domain.notification.domain.model.Notification
-import com.peekr.domain.notification.domain.model.NotificationCommand
-import com.peekr.domain.notification.domain.repository.NotificationRepository
+import com.turnin.common.firebase.FcmMessage
+import com.turnin.common.firebase.FcmService
+import com.turnin.common.firebase.FcmTopic
+import com.turnin.domain.notification.application.dto.NotificationDto
+import com.turnin.domain.notification.application.dto.toDto
+import com.turnin.domain.notification.domain.model.Notification
+import com.turnin.domain.notification.domain.model.NotificationCommand
+import com.turnin.domain.notification.domain.repository.NotificationRepository
 
 /**
  * 전체 사용자에게 브로드캐스트 알림 전송 및 저장

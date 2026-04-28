@@ -1,7 +1,7 @@
-package com.peekr.domain.file.domain.service
+package com.turnin.domain.file.domain.service
 
-import com.peekr.domain.file.domain.model.UploadFileInfo
-import com.peekr.domain.file.exception.FileException
+import com.turnin.domain.file.domain.model.UploadFileInfo
+import com.turnin.domain.file.exception.FileException
 
 /**
  * 파일 서비스

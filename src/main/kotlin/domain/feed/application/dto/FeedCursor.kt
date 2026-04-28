@@ -1,4 +1,4 @@
-package com.peekr.domain.feed.application.dto
+package com.turnin.domain.feed.application.dto
 
 import kotlinx.serialization.Serializable
 

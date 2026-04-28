@@ -1,4 +1,4 @@
-package com.peekr.domain.block.application.usecase
+package com.turnin.domain.block.application.usecase
 
 data class BlockUseCases(
     /** @see GetBlockReasonsUseCase */

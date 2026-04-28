@@ -1,8 +1,8 @@
-package com.peekr.domain.notification.domain.model
+package com.turnin.domain.notification.domain.model
 
-import com.peekr.common.model.NotificationType
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.exception.NotificationErrorCode
+import com.turnin.common.model.NotificationType
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.exception.NotificationErrorCode
 
 /**
  * 알림 저장 요청용 모델

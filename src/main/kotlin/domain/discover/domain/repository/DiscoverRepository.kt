@@ -1,8 +1,8 @@
-package com.peekr.domain.discover.domain.repository
+package com.turnin.domain.discover.domain.repository
 
-import com.peekr.common.model.KeywordSimilarityValues
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.discover.domain.model.SharedUserKeyword
+import com.turnin.common.model.KeywordSimilarityValues
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.discover.domain.model.SharedUserKeyword
 
 /**
  * 탐색 리포지토리

@@ -1,11 +1,11 @@
-package com.peekr.domain.account.presentation
+package com.turnin.domain.account.presentation
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.route.Api
-import com.peekr.domain.account.application.AccountUseCases
-import com.peekr.domain.account.exception.AccountException
-import com.peekr.util.testDeleteEndpoint
-import com.peekr.util.testPlugin
+import com.turnin.common.model.id.UserId
+import com.turnin.common.route.Api
+import com.turnin.domain.account.application.AccountUseCases
+import com.turnin.domain.account.exception.AccountException
+import com.turnin.util.testDeleteEndpoint
+import com.turnin.util.testPlugin
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery

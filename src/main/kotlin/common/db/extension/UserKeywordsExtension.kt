@@ -1,6 +1,6 @@
-package com.peekr.common.db.extension
+package com.turnin.common.db.extension
 
-import com.peekr.common.db.schema.UserKeywords
+import com.turnin.common.db.schema.UserKeywords
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.andWhere
 

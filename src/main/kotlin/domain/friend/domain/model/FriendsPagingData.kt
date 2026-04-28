@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.domain.model
+package com.turnin.domain.friend.domain.model
 
 /**
  * 페이지네이션용 친구 목록

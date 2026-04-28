@@ -1,11 +1,11 @@
-package com.peekr.domain.friend.infrastructure.mapper
+package com.turnin.domain.friend.infrastructure.mapper
 
-import com.peekr.common.db.schema.FriendEntity
-import com.peekr.common.db.schema.Friends
-import com.peekr.common.model.id.FriendId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.model.Friend
-import com.peekr.domain.friend.domain.model.IncomingRequest
+import com.turnin.common.db.schema.FriendEntity
+import com.turnin.common.db.schema.Friends
+import com.turnin.common.model.id.FriendId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.model.Friend
+import com.turnin.domain.friend.domain.model.IncomingRequest
 import org.jetbrains.exposed.sql.ResultRow
 
 object FriendMapper {

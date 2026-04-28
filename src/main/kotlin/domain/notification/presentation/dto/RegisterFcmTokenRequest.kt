@@ -1,4 +1,4 @@
-package com.peekr.domain.notification.presentation.dto
+package com.turnin.domain.notification.presentation.dto
 
 import kotlinx.serialization.Serializable
 

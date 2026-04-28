@@ -1,19 +1,19 @@
-package com.peekr.domain.account.application
+package com.turnin.domain.account.application
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.log.LogAction
-import com.peekr.common.util.log.LogTag
-import com.peekr.common.util.log.LogType
-import com.peekr.domain.account.exception.AccountException
-import com.peekr.domain.auth.application.provider.AuthDeletionSupportApi
-import com.peekr.domain.block.application.provider.BlockDeletionSupportApi
-import com.peekr.domain.file.application.provider.FileDeletionSupportApi
-import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
-import com.peekr.domain.notification.application.provider.NotificationDeletionSupportApi
-import com.peekr.domain.user.application.provider.UserDeletionSupportApi
-import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
+import com.turnin.domain.account.exception.AccountException
+import com.turnin.domain.auth.application.provider.AuthDeletionSupportApi
+import com.turnin.domain.block.application.provider.BlockDeletionSupportApi
+import com.turnin.domain.file.application.provider.FileDeletionSupportApi
+import com.turnin.domain.friend.application.provider.FriendDeletionSupportApi
+import com.turnin.domain.notification.application.provider.NotificationDeletionSupportApi
+import com.turnin.domain.user.application.provider.UserDeletionSupportApi
+import com.turnin.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
 
 /**
  * 계정 삭제

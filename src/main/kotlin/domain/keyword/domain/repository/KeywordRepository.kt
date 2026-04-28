@@ -1,9 +1,9 @@
-package com.peekr.domain.keyword.domain.repository
+package com.turnin.domain.keyword.domain.repository
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.keyword.domain.model.Keyword
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.keyword.domain.model.Keyword
 
 interface KeywordRepository {
     /**

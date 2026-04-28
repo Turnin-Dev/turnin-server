@@ -1,8 +1,8 @@
-package com.peekr.domain.friend.infrastructure.provider
+package com.turnin.domain.friend.infrastructure.provider
 
-import com.peekr.domain.friend.domain.model.FriendNotificationCommand
-import com.peekr.domain.friend.domain.provider.NotificationProvider
-import com.peekr.domain.notification.application.provider.NotificationProviderApi
+import com.turnin.domain.friend.domain.model.FriendNotificationCommand
+import com.turnin.domain.friend.domain.provider.NotificationProvider
+import com.turnin.domain.notification.application.provider.NotificationProviderApi
 
 class NotificationProviderImpl(private val notificationProviderApi: NotificationProviderApi) : NotificationProvider {
     override suspend fun sendNotification(command: FriendNotificationCommand) {

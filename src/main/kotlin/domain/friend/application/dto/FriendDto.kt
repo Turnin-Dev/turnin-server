@@ -1,7 +1,7 @@
-package com.peekr.domain.friend.application.dto
+package com.turnin.domain.friend.application.dto
 
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.domain.friend.domain.model.Friend
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.domain.friend.domain.model.Friend
 
 /**
  * 친구 DTO

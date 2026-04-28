@@ -1,9 +1,9 @@
-package com.peekr.domain.feed.domain.repository
+package com.turnin.domain.feed.domain.repository
 
-import com.peekr.common.model.KeywordSimilarityValues
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.feed.domain.model.Feed
+import com.turnin.common.model.KeywordSimilarityValues
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.feed.domain.model.Feed
 
 /**
  * 피드 리포지토리

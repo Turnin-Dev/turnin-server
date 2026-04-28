@@ -1,12 +1,12 @@
-package com.peekr.domain.user.infrastructure.mapper
+package com.turnin.domain.user.infrastructure.mapper
 
-import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.db.schema.Users
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.domain.model.User
+import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.db.schema.Users
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.domain.model.User
 import org.jetbrains.exposed.sql.ResultRow
 
 /** ##### 반드시 db transaction 범위 내에서 실행되어야 한다. */

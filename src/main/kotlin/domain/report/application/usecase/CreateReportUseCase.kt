@@ -1,18 +1,18 @@
-package com.peekr.domain.report.application.usecase
+package com.turnin.domain.report.application.usecase
 
-import com.peekr.common.db.DatabaseException
-import com.peekr.common.exception.common.CommonException
-import com.peekr.common.model.id.ReportReasonId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.log.LogAction
-import com.peekr.common.util.log.LogTag
-import com.peekr.common.util.log.LogType
-import com.peekr.domain.report.application.dto.ReportDetailDto
-import com.peekr.domain.report.domain.model.ReportDetail
-import com.peekr.domain.report.domain.repository.ReportRepository
-import com.peekr.domain.report.exception.ReportException
+import com.turnin.common.db.DatabaseException
+import com.turnin.common.exception.common.CommonException
+import com.turnin.common.model.id.ReportReasonId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
+import com.turnin.domain.report.application.dto.ReportDetailDto
+import com.turnin.domain.report.domain.model.ReportDetail
+import com.turnin.domain.report.domain.repository.ReportRepository
+import com.turnin.domain.report.exception.ReportException
 
 /**
  * 신고 생성

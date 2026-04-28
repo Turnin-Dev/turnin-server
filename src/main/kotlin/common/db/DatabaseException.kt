@@ -1,4 +1,4 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
 import io.ktor.http.HttpStatusCode
 

@@ -1,9 +1,9 @@
-package com.peekr.domain.block.domain.model
+package com.turnin.domain.block.domain.model
 
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.BlockId
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.BlockId
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
 
 /**
  * 차단 사용자 모델

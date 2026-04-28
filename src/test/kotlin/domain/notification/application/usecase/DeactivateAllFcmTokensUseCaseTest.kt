@@ -1,7 +1,7 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify

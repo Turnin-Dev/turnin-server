@@ -1,9 +1,9 @@
-package com.peekr.domain.userKeyword.infrastructure.provider
+package com.turnin.domain.userKeyword.infrastructure.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.application.provider.FriendProviderApi
-import com.peekr.domain.userKeyword.domain.model.UserKeywordFriendFcmContext
-import com.peekr.domain.userKeyword.domain.provider.FriendProvider
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.application.provider.FriendProviderApi
+import com.turnin.domain.userKeyword.domain.model.UserKeywordFriendFcmContext
+import com.turnin.domain.userKeyword.domain.provider.FriendProvider
 
 class FriendProviderImpl(private val friendProviderApi: FriendProviderApi) : FriendProvider {
     override suspend fun getFriendFcmContext(userId: UserId): UserKeywordFriendFcmContext {

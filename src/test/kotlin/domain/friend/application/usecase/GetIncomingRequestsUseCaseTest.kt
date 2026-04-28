@@ -1,15 +1,15 @@
-package com.peekr.domain.friend.application.usecase
+package com.turnin.domain.friend.application.usecase
 
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.FriendId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.offset.PaginationParams
-import com.peekr.domain.friend.domain.model.IncomingRequest
-import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
-import com.peekr.domain.friend.domain.model.UserInfo
-import com.peekr.domain.friend.domain.repository.FriendRepository
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.FriendId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.pagination.offset.PaginationParams
+import com.turnin.domain.friend.domain.model.IncomingRequest
+import com.turnin.domain.friend.domain.model.IncomingRequestPagingData
+import com.turnin.domain.friend.domain.model.UserInfo
+import com.turnin.domain.friend.domain.repository.FriendRepository
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify

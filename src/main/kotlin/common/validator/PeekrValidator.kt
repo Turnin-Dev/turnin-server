@@ -1,7 +1,7 @@
-package com.peekr.common.validator
+package com.turnin.common.validator
 
-import com.peekr.common.exception.ApiException
-import com.peekr.common.exception.common.CommonErrorCode
+import com.turnin.common.exception.ApiException
+import com.turnin.common.exception.common.CommonErrorCode
 import io.ktor.http.HttpStatusCode
 
 /** 유효성 검사 유틸 */

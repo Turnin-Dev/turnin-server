@@ -1,15 +1,15 @@
-package com.peekr.domain.discover.application.usecase
+package com.turnin.domain.discover.application.usecase
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.discover.application.dto.DiscoverContextDto
-import com.peekr.domain.discover.application.dto.DiscoverKeywordDto
-import com.peekr.domain.discover.application.dto.DiscoverUserDto
-import com.peekr.domain.discover.domain.model.DiscoverContext
-import com.peekr.domain.discover.domain.repository.DiscoverRepository
-import com.peekr.domain.discover.exception.DiscoverException
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.domain.discover.application.dto.DiscoverContextDto
+import com.turnin.domain.discover.application.dto.DiscoverKeywordDto
+import com.turnin.domain.discover.application.dto.DiscoverUserDto
+import com.turnin.domain.discover.domain.model.DiscoverContext
+import com.turnin.domain.discover.domain.repository.DiscoverRepository
+import com.turnin.domain.discover.exception.DiscoverException
 
 /**
  * 탐색 컨텍스트 페이지네이션 조회

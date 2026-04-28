@@ -1,4 +1,4 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
 data class UserUseCases(
     /** @see [GetUserUseCase] */

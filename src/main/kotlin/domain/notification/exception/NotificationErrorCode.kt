@@ -1,6 +1,6 @@
-package com.peekr.domain.notification.exception
+package com.turnin.domain.notification.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class NotificationErrorCode(
     raw: String,

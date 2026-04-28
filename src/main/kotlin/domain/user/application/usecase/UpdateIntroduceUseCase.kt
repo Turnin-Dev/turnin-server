@@ -1,8 +1,8 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.domain.repository.UserRepository
 
 class UpdateIntroduceUseCase(private val userRepository: UserRepository) {
     suspend operator fun invoke(

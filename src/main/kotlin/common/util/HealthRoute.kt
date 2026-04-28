@@ -1,7 +1,7 @@
-package com.peekr.common.util
+package com.turnin.common.util
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.route.Api
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.route.Api
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route

@@ -1,15 +1,15 @@
-package com.peekr.domain.block.di
+package com.turnin.domain.block.di
 
-import com.peekr.domain.block.application.provider.BlockDeletionSupportApi
-import com.peekr.domain.block.application.usecase.BlockUseCases
-import com.peekr.domain.block.application.usecase.CreateBlockUseCase
-import com.peekr.domain.block.application.usecase.DeleteBlockUseCase
-import com.peekr.domain.block.application.usecase.GetBlockReasonsUseCase
-import com.peekr.domain.block.application.usecase.GetBlockedUsersUseCase
-import com.peekr.domain.block.domain.provider.FriendProvider
-import com.peekr.domain.block.domain.repository.BlockRepository
-import com.peekr.domain.block.infrastructure.provider.FriendProviderImpl
-import com.peekr.domain.block.infrastructure.repository.BlockRepositoryImpl
+import com.turnin.domain.block.application.provider.BlockDeletionSupportApi
+import com.turnin.domain.block.application.usecase.BlockUseCases
+import com.turnin.domain.block.application.usecase.CreateBlockUseCase
+import com.turnin.domain.block.application.usecase.DeleteBlockUseCase
+import com.turnin.domain.block.application.usecase.GetBlockReasonsUseCase
+import com.turnin.domain.block.application.usecase.GetBlockedUsersUseCase
+import com.turnin.domain.block.domain.provider.FriendProvider
+import com.turnin.domain.block.domain.repository.BlockRepository
+import com.turnin.domain.block.infrastructure.provider.FriendProviderImpl
+import com.turnin.domain.block.infrastructure.repository.BlockRepositoryImpl
 import org.koin.dsl.module
 
 val blockModule = module {

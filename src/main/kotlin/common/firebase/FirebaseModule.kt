@@ -1,6 +1,6 @@
-package com.peekr.common.firebase
+package com.turnin.common.firebase
 
-import com.peekr.common.util.AppDispatchers
+import com.turnin.common.util.AppDispatchers
 import org.koin.dsl.module
 
 val firebaseModule = module {

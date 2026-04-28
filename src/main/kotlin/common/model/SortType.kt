@@ -1,4 +1,4 @@
-package com.peekr.common.model
+package com.turnin.common.model
 
 /**
  * 정렬 타입

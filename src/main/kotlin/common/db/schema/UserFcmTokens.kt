@@ -1,8 +1,8 @@
-package com.peekr.common.db.schema
+package com.turnin.common.db.schema
 
-import com.peekr.common.db.BaseEntity
-import com.peekr.common.db.BaseEntityClass
-import com.peekr.common.db.BaseLongIdTable
+import com.turnin.common.db.BaseEntity
+import com.turnin.common.db.BaseEntityClass
+import com.turnin.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 

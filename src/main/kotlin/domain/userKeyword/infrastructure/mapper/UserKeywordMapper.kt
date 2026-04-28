@@ -1,18 +1,18 @@
-package com.peekr.domain.userKeyword.infrastructure.mapper
+package com.turnin.domain.userKeyword.infrastructure.mapper
 
-import com.peekr.common.db.schema.Keywords
-import com.peekr.common.db.schema.UserKeywordEntity
-import com.peekr.common.db.schema.UserKeywords
-import com.peekr.common.db.schema.Users
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.domain.model.Description
-import com.peekr.domain.userKeyword.domain.model.UserInfo
-import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
+import com.turnin.common.db.schema.Keywords
+import com.turnin.common.db.schema.UserKeywordEntity
+import com.turnin.common.db.schema.UserKeywords
+import com.turnin.common.db.schema.Users
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.userKeyword.domain.model.Description
+import com.turnin.domain.userKeyword.domain.model.UserInfo
+import com.turnin.domain.userKeyword.domain.model.UserKeyword
+import com.turnin.domain.userKeyword.domain.model.UserKeywordDetail
 import org.jetbrains.exposed.sql.ResultRow
 
 internal object UserKeywordMapper {

@@ -1,12 +1,12 @@
-package com.peekr.common.firebase
+package com.turnin.common.firebase
 
 import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.MulticastMessage
-import com.peekr.common.model.NotificationType
-import com.peekr.common.util.log.AppLoggerFactory.createLogger
-import com.peekr.common.util.masking
+import com.turnin.common.model.NotificationType
+import com.turnin.common.util.log.AppLoggerFactory.createLogger
+import com.turnin.common.util.masking
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

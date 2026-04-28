@@ -1,6 +1,6 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.util.db.TestDatabaseFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest

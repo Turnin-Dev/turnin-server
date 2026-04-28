@@ -1,4 +1,4 @@
-package com.peekr.domain.discover.application.dto
+package com.turnin.domain.discover.application.dto
 
 /**
  * 탐색 컨텍스트 DTO

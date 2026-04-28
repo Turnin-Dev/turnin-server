@@ -1,11 +1,11 @@
-package com.peekr.util
+package com.turnin.util
 
-import com.peekr.common.exception.configureExceptionHandler
-import com.peekr.common.jwt.JWTTestDoubles
-import com.peekr.common.jwt.domain.model.JWTClaimName
-import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.plugin.AuthenticatedRoute
-import com.peekr.common.plugin.authenticatedRoute
+import com.turnin.common.exception.configureExceptionHandler
+import com.turnin.common.jwt.JWTTestDoubles
+import com.turnin.common.jwt.domain.model.JWTClaimName
+import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.plugin.authenticatedRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install

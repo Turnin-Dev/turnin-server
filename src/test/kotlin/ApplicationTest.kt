@@ -1,4 +1,4 @@
-package com.peekr
+package com.turnin
 
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode

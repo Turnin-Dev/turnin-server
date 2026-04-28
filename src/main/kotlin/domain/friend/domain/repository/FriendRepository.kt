@@ -1,13 +1,13 @@
-package com.peekr.domain.friend.domain.repository
+package com.turnin.domain.friend.domain.repository
 
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.model.Friend
-import com.peekr.domain.friend.domain.model.FriendFcmContext
-import com.peekr.domain.friend.domain.model.FriendRequestContext
-import com.peekr.domain.friend.domain.model.FriendsPagingData
-import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
-import com.peekr.domain.friend.domain.model.UserInfo
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.model.Friend
+import com.turnin.domain.friend.domain.model.FriendFcmContext
+import com.turnin.domain.friend.domain.model.FriendRequestContext
+import com.turnin.domain.friend.domain.model.FriendsPagingData
+import com.turnin.domain.friend.domain.model.IncomingRequestPagingData
+import com.turnin.domain.friend.domain.model.UserInfo
 
 interface FriendRepository {
     /**

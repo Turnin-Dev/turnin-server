@@ -1,11 +1,11 @@
-package com.peekr.domain.keyword.infrastructure.mapper
+package com.turnin.domain.keyword.infrastructure.mapper
 
-import com.peekr.common.db.schema.KeywordEntity
-import com.peekr.common.db.schema.Keywords
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.keyword.domain.model.Keyword
+import com.turnin.common.db.schema.KeywordEntity
+import com.turnin.common.db.schema.Keywords
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.keyword.domain.model.Keyword
 import org.jetbrains.exposed.sql.ResultRow
 
 object KeywordMapper {

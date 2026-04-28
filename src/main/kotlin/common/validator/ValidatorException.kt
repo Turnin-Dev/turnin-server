@@ -1,4 +1,4 @@
-package com.peekr.common.validator
+package com.turnin.common.validator
 
 /**
  * [PeekrValidator]에서 사용하는 예외 타입

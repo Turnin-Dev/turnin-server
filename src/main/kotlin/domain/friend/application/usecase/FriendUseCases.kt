@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.application.usecase
+package com.turnin.domain.friend.application.usecase
 
 data class FriendUseCases(
     /** @see GetFriendsUseCase */

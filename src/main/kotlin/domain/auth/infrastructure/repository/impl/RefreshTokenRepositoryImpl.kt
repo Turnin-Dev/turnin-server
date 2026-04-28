@@ -1,11 +1,11 @@
-package com.peekr.domain.auth.infrastructure.repository.impl
+package com.turnin.domain.auth.infrastructure.repository.impl
 
-import com.peekr.common.db.extension.filterActiveUser
-import com.peekr.common.db.schema.RefreshTokens
-import com.peekr.common.db.schema.Users
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import com.turnin.common.db.extension.filterActiveUser
+import com.turnin.common.db.schema.RefreshTokens
+import com.turnin.common.db.schema.Users
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

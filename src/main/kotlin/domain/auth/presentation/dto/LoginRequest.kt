@@ -1,8 +1,8 @@
-package com.peekr.domain.auth.presentation.dto
+package com.turnin.domain.auth.presentation.dto
 
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.validator.PeekrValidator.validation
-import com.peekr.domain.auth.application.dto.LoginDto
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.validator.PeekrValidator.validation
+import com.turnin.domain.auth.application.dto.LoginDto
 import kotlinx.serialization.Serializable
 
 /**

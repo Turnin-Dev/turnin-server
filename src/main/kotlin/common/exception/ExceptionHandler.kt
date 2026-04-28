@@ -1,13 +1,13 @@
-package com.peekr.common.exception
+package com.turnin.common.exception
 
-import com.peekr.common.db.DatabaseErrorMessage
-import com.peekr.common.db.DatabaseException
-import com.peekr.common.db.toHttpStatusCode
-import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.log.LogTag
-import com.peekr.common.util.log.LogType
-import com.peekr.common.validator.ValidatorException
+import com.turnin.common.db.DatabaseErrorMessage
+import com.turnin.common.db.DatabaseException
+import com.turnin.common.db.toHttpStatusCode
+import com.turnin.common.exception.common.CommonErrorCode
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
+import com.turnin.common.validator.ValidatorException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall

@@ -1,6 +1,6 @@
-package com.peekr.domain.keyword.presentation.dto
+package com.turnin.domain.keyword.presentation.dto
 
-import com.peekr.domain.keyword.application.dto.KeywordDto
+import com.turnin.domain.keyword.application.dto.KeywordDto
 import kotlinx.serialization.Serializable
 
 /**

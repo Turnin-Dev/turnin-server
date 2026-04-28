@@ -1,6 +1,6 @@
-package com.peekr.domain.file.application.usecase
+package com.turnin.domain.file.application.usecase
 
-import com.peekr.domain.file.domain.service.FileService
+import com.turnin.domain.file.domain.service.FileService
 
 /**
  * 파일 삭제

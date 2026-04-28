@@ -1,11 +1,11 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
-import com.peekr.common.db.schema.Users
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.toOffsetDateTime
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.db.schema.Users
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.toOffsetDateTime
+import com.turnin.util.db.TestDatabaseFactory
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest

@@ -1,7 +1,7 @@
-package com.peekr.domain.auth.application.provider
+package com.turnin.domain.auth.application.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
 
 /**
  * 외부에 제공할 Auth API

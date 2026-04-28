@@ -1,7 +1,7 @@
-package com.peekr.domain.auth.application.dto
+package com.turnin.domain.auth.application.dto
 
-import com.peekr.common.jwt.application.dto.JWTTokenDto
-import com.peekr.common.model.id.UserId
+import com.turnin.common.jwt.application.dto.JWTTokenDto
+import com.turnin.common.model.id.UserId
 
 /**
  * 회원가입 결과 DTO

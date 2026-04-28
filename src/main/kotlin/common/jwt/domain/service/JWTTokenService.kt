@@ -1,11 +1,11 @@
-package com.peekr.common.jwt.domain.service
+package com.turnin.common.jwt.domain.service
 
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.common.jwt.domain.model.JWTTokenPayload
-import com.peekr.common.jwt.domain.model.JWTTokenType
-import com.peekr.common.jwt.exception.TokenException
+import com.turnin.common.jwt.domain.model.JWTToken
+import com.turnin.common.jwt.domain.model.JWTTokenPayload
+import com.turnin.common.jwt.domain.model.JWTTokenType
+import com.turnin.common.jwt.exception.TokenException
 
 /** JWT Token 을 생성하고 검증에 필요한 정보를 제공한다. */
 interface JWTTokenService {

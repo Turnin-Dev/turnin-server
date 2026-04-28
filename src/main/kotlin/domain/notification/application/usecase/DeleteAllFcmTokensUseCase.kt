@@ -1,7 +1,7 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
 
 /**
  * 모든 FCM 토큰 삭제

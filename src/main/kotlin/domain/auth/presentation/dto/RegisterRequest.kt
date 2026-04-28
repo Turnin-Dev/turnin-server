@@ -1,12 +1,12 @@
-package com.peekr.domain.auth.presentation.dto
+package com.turnin.domain.auth.presentation.dto
 
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.domain.auth.application.dto.RegisterDto
-import com.peekr.domain.auth.presentation.validation.validateDisplayId
-import com.peekr.domain.auth.presentation.validation.validateIntroduce
-import com.peekr.domain.auth.presentation.validation.validateName
-import com.peekr.domain.auth.presentation.validation.validateProfileImageUrl
-import com.peekr.domain.auth.presentation.validation.validateProviderId
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.domain.auth.application.dto.RegisterDto
+import com.turnin.domain.auth.presentation.validation.validateDisplayId
+import com.turnin.domain.auth.presentation.validation.validateIntroduce
+import com.turnin.domain.auth.presentation.validation.validateName
+import com.turnin.domain.auth.presentation.validation.validateProfileImageUrl
+import com.turnin.domain.auth.presentation.validation.validateProviderId
 import kotlinx.serialization.Serializable
 
 /**

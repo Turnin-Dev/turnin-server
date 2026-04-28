@@ -1,7 +1,7 @@
-package com.peekr.domain.friend.domain.model
+package com.turnin.domain.friend.domain.model
 
-import com.peekr.common.model.NotificationType
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.NotificationType
+import com.turnin.common.model.id.UserId
 
 data class FriendNotificationCommand(
     val userId: UserId,

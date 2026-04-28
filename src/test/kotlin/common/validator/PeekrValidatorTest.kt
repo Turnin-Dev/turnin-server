@@ -1,8 +1,8 @@
-package com.peekr.common.validator
+package com.turnin.common.validator
 
-import com.peekr.common.exception.ApiException
-import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.validator.PeekrValidator.validation
+import com.turnin.common.exception.ApiException
+import com.turnin.common.exception.common.CommonErrorCode
+import com.turnin.common.validator.PeekrValidator.validation
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue

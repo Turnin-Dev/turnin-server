@@ -1,6 +1,6 @@
-package com.peekr.domain.feed.application.dto
+package com.turnin.domain.feed.application.dto
 
-import com.peekr.domain.feed.domain.model.Feed
+import com.turnin.domain.feed.domain.model.Feed
 
 /**
  * 피드 DTO

@@ -1,7 +1,7 @@
-package com.peekr.util
+package com.turnin.util
 
-import com.peekr.common.jwt.JWTTestDoubles
-import com.peekr.util.TestClientFactory.createTestClient
+import com.turnin.common.jwt.JWTTestDoubles
+import com.turnin.util.TestClientFactory.createTestClient
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.request

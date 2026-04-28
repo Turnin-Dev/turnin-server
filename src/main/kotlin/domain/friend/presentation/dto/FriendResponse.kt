@@ -1,7 +1,7 @@
-package com.peekr.domain.friend.presentation.dto
+package com.turnin.domain.friend.presentation.dto
 
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.domain.friend.application.dto.FriendDto
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.domain.friend.application.dto.FriendDto
 import kotlinx.serialization.Serializable
 
 /**

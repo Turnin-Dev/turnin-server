@@ -1,6 +1,6 @@
-package com.peekr.domain.report.exception
+package com.turnin.domain.report.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class ReportErrorCode(
     raw: String,

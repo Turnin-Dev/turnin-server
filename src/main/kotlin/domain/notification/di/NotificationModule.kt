@@ -1,20 +1,20 @@
-package com.peekr.domain.notification.di
+package com.turnin.domain.notification.di
 
-import com.peekr.domain.notification.application.provider.NotificationDeletionSupportApi
-import com.peekr.domain.notification.application.provider.NotificationProviderApi
-import com.peekr.domain.notification.application.usecase.DeactivateAllFcmTokensUseCase
-import com.peekr.domain.notification.application.usecase.DeactivateFcmTokenUseCase
-import com.peekr.domain.notification.application.usecase.DeleteAllFcmTokensUseCase
-import com.peekr.domain.notification.application.usecase.GetNotificationsUseCase
-import com.peekr.domain.notification.application.usecase.MarkAsReadUseCase
-import com.peekr.domain.notification.application.usecase.NotificationUseCases
-import com.peekr.domain.notification.application.usecase.RegisterFcmTokenUseCase
-import com.peekr.domain.notification.application.usecase.SendBroadcastUseCase
-import com.peekr.domain.notification.application.usecase.SendNotificationUseCase
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
-import com.peekr.domain.notification.domain.repository.NotificationRepository
-import com.peekr.domain.notification.infrastructure.repository.FcmTokenRepositoryImpl
-import com.peekr.domain.notification.infrastructure.repository.NotificationRepositoryImpl
+import com.turnin.domain.notification.application.provider.NotificationDeletionSupportApi
+import com.turnin.domain.notification.application.provider.NotificationProviderApi
+import com.turnin.domain.notification.application.usecase.DeactivateAllFcmTokensUseCase
+import com.turnin.domain.notification.application.usecase.DeactivateFcmTokenUseCase
+import com.turnin.domain.notification.application.usecase.DeleteAllFcmTokensUseCase
+import com.turnin.domain.notification.application.usecase.GetNotificationsUseCase
+import com.turnin.domain.notification.application.usecase.MarkAsReadUseCase
+import com.turnin.domain.notification.application.usecase.NotificationUseCases
+import com.turnin.domain.notification.application.usecase.RegisterFcmTokenUseCase
+import com.turnin.domain.notification.application.usecase.SendBroadcastUseCase
+import com.turnin.domain.notification.application.usecase.SendNotificationUseCase
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.domain.notification.domain.repository.NotificationRepository
+import com.turnin.domain.notification.infrastructure.repository.FcmTokenRepositoryImpl
+import com.turnin.domain.notification.infrastructure.repository.NotificationRepositoryImpl
 import org.koin.dsl.module
 
 val notificationModule = module {

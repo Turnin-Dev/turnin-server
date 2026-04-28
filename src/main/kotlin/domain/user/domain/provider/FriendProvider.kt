@@ -1,7 +1,7 @@
-package com.peekr.domain.user.domain.provider
+package com.turnin.domain.user.domain.provider
 
-import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.FriendStatus
+import com.turnin.common.model.id.UserId
 
 /**
  * 외부에서 제공되는 Friend BC API 인터페이스

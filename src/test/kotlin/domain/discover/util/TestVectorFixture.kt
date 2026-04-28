@@ -1,4 +1,4 @@
-package com.peekr.domain.discover.util
+package com.turnin.domain.discover.util
 
 object TestVectorFixture {
     // 768차원의 단위 벡터 (모든 요소가 0이고 첫 번째 요소만 1)

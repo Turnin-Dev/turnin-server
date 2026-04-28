@@ -1,14 +1,14 @@
-package com.peekr.common.db.extension
+package com.turnin.common.db.extension
 
-import com.peekr.common.db.schema.BlockEntity
-import com.peekr.common.db.schema.BlockReasons
-import com.peekr.common.db.schema.Blocks
-import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.db.schema.Users
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.id.UserId
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.db.schema.BlockEntity
+import com.turnin.common.db.schema.BlockReasons
+import com.turnin.common.db.schema.Blocks
+import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.db.schema.Users
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.id.UserId
+import com.turnin.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

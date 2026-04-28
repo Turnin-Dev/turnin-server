@@ -1,6 +1,6 @@
-package com.peekr.domain.discover.application.dto
+package com.turnin.domain.discover.application.dto
 
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.id.UserId
 
 /**
  * 탐색용 사용자 DTO

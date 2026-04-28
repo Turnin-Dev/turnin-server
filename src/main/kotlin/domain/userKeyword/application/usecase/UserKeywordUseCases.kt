@@ -1,4 +1,4 @@
-package com.peekr.domain.userKeyword.application.usecase
+package com.turnin.domain.userKeyword.application.usecase
 
 data class UserKeywordUseCases(
     /** @see GetUserKeywordsUseCase */

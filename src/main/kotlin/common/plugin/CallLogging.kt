@@ -1,7 +1,7 @@
-package com.peekr.common.plugin
+package com.turnin.common.plugin
 
-import com.peekr.common.util.config.AppConfig
-import com.peekr.common.util.log.LogSanitizer
+import com.turnin.common.util.config.AppConfig
+import com.turnin.common.util.log.LogSanitizer
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.calllogging.CallLogging

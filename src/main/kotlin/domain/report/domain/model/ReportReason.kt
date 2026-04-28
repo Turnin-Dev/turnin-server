@@ -1,6 +1,6 @@
-package com.peekr.domain.report.domain.model
+package com.turnin.domain.report.domain.model
 
-import com.peekr.common.model.id.ReportReasonId
+import com.turnin.common.model.id.ReportReasonId
 
 /**
  * 신고 사유 엔티티 모델

@@ -1,9 +1,9 @@
-package com.peekr.domain.friend.application.usecase
+package com.turnin.domain.friend.application.usecase
 
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.repository.FriendRepository
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.common.model.FriendStatus
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.repository.FriendRepository
 
 /**
  * 친구 상태 조회

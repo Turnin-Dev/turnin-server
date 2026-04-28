@@ -1,8 +1,8 @@
-package com.peekr.domain.file.infrastructure.service.impl
+package com.turnin.domain.file.infrastructure.service.impl
 
-import com.peekr.common.util.config.AppConfig
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.masking
+import com.turnin.common.util.config.AppConfig
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.masking
 import java.net.URI
 import java.time.Duration
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials

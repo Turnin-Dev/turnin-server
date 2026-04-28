@@ -1,7 +1,7 @@
-package com.peekr.common.util.application
+package com.turnin.common.util.application
 
-import com.peekr.common.di.ApplicationScopeQualifier
-import com.peekr.common.util.log.AppLoggerFactory
+import com.turnin.common.di.ApplicationScopeQualifier
+import com.turnin.common.util.log.AppLoggerFactory
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import java.util.concurrent.atomic.AtomicBoolean

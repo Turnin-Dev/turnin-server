@@ -1,4 +1,4 @@
-package com.peekr.common.route
+package com.turnin.common.route
 
 /**
  * API 경로

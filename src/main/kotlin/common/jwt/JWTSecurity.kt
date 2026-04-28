@@ -1,9 +1,9 @@
-package com.peekr.common.jwt
+package com.turnin.common.jwt
 
-import com.peekr.common.jwt.domain.model.JWTClaimName
-import com.peekr.common.jwt.domain.model.JWTTokenType
-import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.jwt.exception.TokenException
+import com.turnin.common.jwt.domain.model.JWTClaimName
+import com.turnin.common.jwt.domain.model.JWTTokenType
+import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.jwt.exception.TokenException
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal

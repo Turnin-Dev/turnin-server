@@ -1,4 +1,4 @@
-package com.peekr.domain.report.application.dto
+package com.turnin.domain.report.application.dto
 
 /**
  * 신고 DTO

@@ -1,6 +1,6 @@
-package com.peekr.common.firebase
+package com.turnin.common.firebase
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class FcmErrorCode(
     raw: String,

@@ -1,4 +1,4 @@
-package com.peekr.domain.discover.application.usecase
+package com.turnin.domain.discover.application.usecase
 
 data class DiscoverUseCases(
     /** @see GetDiscoverContextUseCase */

@@ -1,4 +1,4 @@
-package com.peekr.common.util
+package com.turnin.common.util
 
 import io.ktor.server.application.Application
 import java.time.Instant

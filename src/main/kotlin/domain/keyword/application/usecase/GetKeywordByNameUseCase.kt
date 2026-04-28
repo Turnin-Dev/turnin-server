@@ -1,9 +1,9 @@
-package com.peekr.domain.keyword.application.usecase
+package com.turnin.domain.keyword.application.usecase
 
-import com.peekr.common.model.KeywordName
-import com.peekr.domain.keyword.application.dto.KeywordDto
-import com.peekr.domain.keyword.application.dto.toDto
-import com.peekr.domain.keyword.domain.repository.KeywordRepository
+import com.turnin.common.model.KeywordName
+import com.turnin.domain.keyword.application.dto.KeywordDto
+import com.turnin.domain.keyword.application.dto.toDto
+import com.turnin.domain.keyword.domain.repository.KeywordRepository
 
 class GetKeywordByNameUseCase(private val keywordRepository: KeywordRepository) {
     /**

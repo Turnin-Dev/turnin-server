@@ -1,11 +1,11 @@
-package com.peekr.domain.file.presentation.route
+package com.turnin.domain.file.presentation.route
 
-import com.peekr.common.route.Api
-import com.peekr.domain.file.application.dto.UploadFileInfoDto
-import com.peekr.domain.file.application.usecase.FileUseCases
-import com.peekr.domain.file.exception.FileException
-import com.peekr.util.TestClientFactory.createTestClient
-import com.peekr.util.testPlugin
+import com.turnin.common.route.Api
+import com.turnin.domain.file.application.dto.UploadFileInfoDto
+import com.turnin.domain.file.application.usecase.FileUseCases
+import com.turnin.domain.file.exception.FileException
+import com.turnin.util.TestClientFactory.createTestClient
+import com.turnin.util.testPlugin
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode

@@ -1,6 +1,6 @@
-package com.peekr.domain.friend.presentation.dto
+package com.turnin.domain.friend.presentation.dto
 
-import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
+import com.turnin.domain.friend.application.dto.FriendsPagingDataDto
 import kotlinx.serialization.Serializable
 
 /**

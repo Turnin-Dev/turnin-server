@@ -1,4 +1,4 @@
-package com.peekr.common.firebase
+package com.turnin.common.firebase
 
 /** FCM 토픽 상수 */
 object FcmTopic {

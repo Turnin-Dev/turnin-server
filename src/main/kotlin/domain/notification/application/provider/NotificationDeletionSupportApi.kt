@@ -1,8 +1,8 @@
-package com.peekr.domain.notification.application.provider
+package com.turnin.domain.notification.application.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
-import com.peekr.domain.notification.domain.repository.NotificationRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.domain.notification.domain.repository.NotificationRepository
 
 /**
  * 외부에 제공할 Notification 삭제 제공 API

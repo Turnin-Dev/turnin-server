@@ -1,9 +1,9 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.application.dto.toDto
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
-import com.peekr.domain.notification.fcmTokenFixture
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.application.dto.toDto
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.domain.notification.fcmTokenFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

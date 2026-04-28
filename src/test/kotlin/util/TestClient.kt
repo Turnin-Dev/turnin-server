@@ -1,4 +1,4 @@
-package com.peekr.util
+package com.turnin.util
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

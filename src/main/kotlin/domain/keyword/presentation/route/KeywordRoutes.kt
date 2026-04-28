@@ -1,14 +1,14 @@
-package com.peekr.domain.keyword.presentation.route
+package com.turnin.domain.keyword.presentation.route
 
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.plugin.AuthenticatedRoute
-import com.peekr.common.route.Api
-import com.peekr.common.route.Api.byPathParam
-import com.peekr.common.validator.inputValidationAndReturn
-import com.peekr.domain.keyword.application.usecase.KeywordUseCases
-import com.peekr.domain.keyword.presentation.dto.CreateKeywordRequest
-import com.peekr.domain.keyword.presentation.dto.KeywordResponse
-import com.peekr.domain.keyword.presentation.dto.toResponse
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.route.Api
+import com.turnin.common.route.Api.byPathParam
+import com.turnin.common.validator.inputValidationAndReturn
+import com.turnin.domain.keyword.application.usecase.KeywordUseCases
+import com.turnin.domain.keyword.presentation.dto.CreateKeywordRequest
+import com.turnin.domain.keyword.presentation.dto.KeywordResponse
+import com.turnin.domain.keyword.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post

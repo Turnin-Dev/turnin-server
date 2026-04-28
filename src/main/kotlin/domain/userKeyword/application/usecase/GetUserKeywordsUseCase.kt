@@ -1,11 +1,11 @@
-package com.peekr.domain.userKeyword.application.usecase
+package com.turnin.domain.userKeyword.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.domain.userKeyword.application.dto.UserKeywordDto
-import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
-import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
-import com.peekr.domain.userKeyword.exception.UserKeywordException
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.domain.userKeyword.application.dto.UserKeywordDto
+import com.turnin.domain.userKeyword.domain.provider.KeywordProvider
+import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.turnin.domain.userKeyword.exception.UserKeywordException
 
 /**
  * 사용자 ID로 사용자별 키워드 리스트를 조회한다.

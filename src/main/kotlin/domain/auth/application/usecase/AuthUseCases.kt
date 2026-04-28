@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.application.usecase
+package com.turnin.domain.auth.application.usecase
 
 data class AuthUseCases(
     /** 로그인 */

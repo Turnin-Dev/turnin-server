@@ -1,7 +1,7 @@
-package com.peekr.common.ml
+package com.turnin.common.ml
 
-import com.peekr.common.exception.ApiErrorCode
-import com.peekr.common.exception.ApiException
+import com.turnin.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiException
 import io.ktor.http.HttpStatusCode
 
 /**

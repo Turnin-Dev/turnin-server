@@ -1,15 +1,15 @@
-package com.peekr.common.jwt
+package com.turnin.common.jwt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.peekr.common.jwt.JWTTestDoubles.ACCESS_TOKEN_EXPIRES_IN
-import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
-import com.peekr.common.jwt.JWTTestDoubles.ISSUER
-import com.peekr.common.jwt.JWTTestDoubles.MockAlgorithm
-import com.peekr.common.jwt.JWTTestDoubles.REFRESH_TOKEN_EXPIRES_IN
-import com.peekr.common.jwt.domain.model.JWTClaimName
-import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.common.jwt.domain.model.JWTTokenPayload
+import com.turnin.common.jwt.JWTTestDoubles.ACCESS_TOKEN_EXPIRES_IN
+import com.turnin.common.jwt.JWTTestDoubles.AUDIENCE
+import com.turnin.common.jwt.JWTTestDoubles.ISSUER
+import com.turnin.common.jwt.JWTTestDoubles.MockAlgorithm
+import com.turnin.common.jwt.JWTTestDoubles.REFRESH_TOKEN_EXPIRES_IN
+import com.turnin.common.jwt.domain.model.JWTClaimName
+import com.turnin.common.jwt.domain.model.JWTToken
+import com.turnin.common.jwt.domain.model.JWTTokenPayload
 import java.time.Instant
 import java.util.Date
 

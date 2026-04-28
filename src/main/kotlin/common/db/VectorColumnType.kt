@@ -1,4 +1,4 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
 import org.jetbrains.exposed.sql.ColumnType
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect

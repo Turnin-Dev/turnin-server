@@ -1,8 +1,8 @@
-package com.peekr.domain.userKeyword.domain.model
+package com.turnin.domain.userKeyword.domain.model
 
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
 
 /**
  * 사용자 키워드 기본 모델

@@ -1,6 +1,6 @@
-package com.peekr.domain.block.exception
+package com.turnin.domain.block.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class BlockErrorCode(
     raw: String,

@@ -1,7 +1,7 @@
-package com.peekr.domain.block.presentation.dto
+package com.turnin.domain.block.presentation.dto
 
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.block.application.dto.BlockedUserDto
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.domain.block.application.dto.BlockedUserDto
 import kotlinx.serialization.Serializable
 
 /**

@@ -1,14 +1,14 @@
-package com.peekr.domain.file.presentation.route
+package com.turnin.domain.file.presentation.route
 
-import com.peekr.common.exception.ErrorResponse
-import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.exception.toErrorResponse
-import com.peekr.common.route.Api
-import com.peekr.domain.file.application.usecase.FileUseCases
-import com.peekr.domain.file.presentation.dto.UploadFileResponse
-import com.peekr.domain.file.presentation.dto.toResponse
-import com.peekr.domain.file.presentation.validation.validateFileNameAndReturn
-import com.peekr.domain.file.presentation.validation.validateImageMimeAndReturn
+import com.turnin.common.exception.ErrorResponse
+import com.turnin.common.exception.common.CommonErrorCode
+import com.turnin.common.exception.toErrorResponse
+import com.turnin.common.route.Api
+import com.turnin.domain.file.application.usecase.FileUseCases
+import com.turnin.domain.file.presentation.dto.UploadFileResponse
+import com.turnin.domain.file.presentation.dto.toResponse
+import com.turnin.domain.file.presentation.validation.validateFileNameAndReturn
+import com.turnin.domain.file.presentation.validation.validateImageMimeAndReturn
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
@@ -81,7 +81,7 @@ private fun RouteConfig.uploadFileDocs() {
                         .toErrorResponse(HttpStatusCode.BadRequest)
                 }
                 example("InvalidS3PresignerArgument") {
-                    value = com.peekr.domain.file.exception.FileErrorCode.InvalidS3PresignerArgument
+                    value = com.turnin.domain.file.exception.FileErrorCode.InvalidS3PresignerArgument
                         .toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
@@ -90,7 +90,7 @@ private fun RouteConfig.uploadFileDocs() {
         code(HttpStatusCode.InternalServerError) {
             body<ErrorResponse> {
                 example("S3CredentialFailed") {
-                    value = com.peekr.domain.file.exception.FileErrorCode.S3CredentialFailed
+                    value = com.turnin.domain.file.exception.FileErrorCode.S3CredentialFailed
                         .toErrorResponse(HttpStatusCode.InternalServerError)
                 }
             }
@@ -132,7 +132,7 @@ private fun RouteConfig.updateFileDocs() {
                         .toErrorResponse(HttpStatusCode.BadRequest)
                 }
                 example("InvalidS3PresignerArgument") {
-                    value = com.peekr.domain.file.exception.FileErrorCode.InvalidS3PresignerArgument
+                    value = com.turnin.domain.file.exception.FileErrorCode.InvalidS3PresignerArgument
                         .toErrorResponse(HttpStatusCode.BadRequest)
                 }
             }
@@ -141,7 +141,7 @@ private fun RouteConfig.updateFileDocs() {
         code(HttpStatusCode.InternalServerError) {
             body<ErrorResponse> {
                 example("S3CredentialFailed") {
-                    value = com.peekr.domain.file.exception.FileErrorCode.S3CredentialFailed
+                    value = com.turnin.domain.file.exception.FileErrorCode.S3CredentialFailed
                         .toErrorResponse(HttpStatusCode.InternalServerError)
                 }
             }

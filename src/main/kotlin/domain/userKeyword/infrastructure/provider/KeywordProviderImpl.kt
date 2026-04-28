@@ -1,11 +1,11 @@
-package com.peekr.domain.userKeyword.infrastructure.provider
+package com.turnin.domain.userKeyword.infrastructure.provider
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.keyword.application.provider.KeywordProviderApi
-import com.peekr.domain.userKeyword.domain.model.ExternalKeyword
-import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.keyword.application.provider.KeywordProviderApi
+import com.turnin.domain.userKeyword.domain.model.ExternalKeyword
+import com.turnin.domain.userKeyword.domain.provider.KeywordProvider
 
 class KeywordProviderImpl(private val keywordProviderApi: KeywordProviderApi) : KeywordProvider {
     override suspend fun findById(keywordId: KeywordId): ExternalKeyword? {

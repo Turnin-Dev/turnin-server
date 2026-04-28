@@ -1,16 +1,16 @@
-package com.peekr.domain.block.application.usecase
+package com.turnin.domain.block.application.usecase
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.id.BlockReasonId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.log.LogAction
-import com.peekr.common.util.log.LogTag
-import com.peekr.common.util.log.LogType
-import com.peekr.domain.block.application.dto.BlockDetailDto
-import com.peekr.domain.block.domain.model.BlockDetail
-import com.peekr.domain.block.domain.provider.FriendProvider
-import com.peekr.domain.block.domain.repository.BlockRepository
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.id.BlockReasonId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
+import com.turnin.domain.block.application.dto.BlockDetailDto
+import com.turnin.domain.block.domain.model.BlockDetail
+import com.turnin.domain.block.domain.provider.FriendProvider
+import com.turnin.domain.block.domain.repository.BlockRepository
 
 /**
  * 차단 생성

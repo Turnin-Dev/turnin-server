@@ -1,8 +1,8 @@
-package com.peekr.domain.block.application.usecase
+package com.turnin.domain.block.application.usecase
 
-import com.peekr.domain.block.application.dto.BlockReasonDto
-import com.peekr.domain.block.application.dto.toDto
-import com.peekr.domain.block.domain.repository.BlockRepository
+import com.turnin.domain.block.application.dto.BlockReasonDto
+import com.turnin.domain.block.application.dto.toDto
+import com.turnin.domain.block.domain.repository.BlockRepository
 
 /**
  * 차단 사유 목록 조회

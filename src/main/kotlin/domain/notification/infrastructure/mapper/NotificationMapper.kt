@@ -1,12 +1,12 @@
-package com.peekr.domain.notification.infrastructure.mapper
+package com.turnin.domain.notification.infrastructure.mapper
 
-import com.peekr.common.db.schema.NotificationEntity
-import com.peekr.common.db.schema.UserFcmTokenEntity
-import com.peekr.common.model.id.FcmTokenId
-import com.peekr.common.model.id.NotificationId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.model.FcmToken
-import com.peekr.domain.notification.domain.model.Notification
+import com.turnin.common.db.schema.NotificationEntity
+import com.turnin.common.db.schema.UserFcmTokenEntity
+import com.turnin.common.model.id.FcmTokenId
+import com.turnin.common.model.id.NotificationId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.model.FcmToken
+import com.turnin.domain.notification.domain.model.Notification
 
 object NotificationMapper {
     fun NotificationEntity.toDomain() = Notification(

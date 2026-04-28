@@ -1,8 +1,8 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
-import com.peekr.common.db.DatabaseUtils.timestamptz
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.toOffsetDateTime
+import com.turnin.common.db.DatabaseUtils.timestamptz
+import com.turnin.common.util.PeekrDateTime
+import com.turnin.common.util.toOffsetDateTime
 import io.ktor.util.logging.KtorSimpleLogger
 import org.jetbrains.exposed.dao.EntityChangeType
 import org.jetbrains.exposed.dao.EntityHook

@@ -1,6 +1,6 @@
-package com.peekr.domain.auth.presentation.dto
+package com.turnin.domain.auth.presentation.dto
 
-import com.peekr.domain.auth.application.dto.FindUserResultDto
+import com.turnin.domain.auth.application.dto.FindUserResultDto
 import kotlinx.serialization.Serializable
 
 /** 사용자 찾기 결과 응답 바디 */

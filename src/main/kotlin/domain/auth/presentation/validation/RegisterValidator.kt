@@ -1,8 +1,8 @@
-package com.peekr.domain.auth.presentation.validation
+package com.turnin.domain.auth.presentation.validation
 
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.validator.PeekrValidator.validation
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.validator.PeekrValidator.validation
 
 internal fun String.validateDisplayId() {
     validation(

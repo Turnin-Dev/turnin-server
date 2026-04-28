@@ -1,10 +1,10 @@
-package com.peekr.common.exception
+package com.turnin.common.exception
 
-import com.peekr.common.exception.ExceptionTestDoubles.MockEmptyTestRequest
-import com.peekr.common.exception.common.CommonErrorCode
-import com.peekr.common.plugin.configureContentNegotiation
-import com.peekr.common.validator.PeekrValidator.validation
-import com.peekr.util.TestClientFactory.createTestClient
+import com.turnin.common.exception.ExceptionTestDoubles.MockEmptyTestRequest
+import com.turnin.common.exception.common.CommonErrorCode
+import com.turnin.common.plugin.configureContentNegotiation
+import com.turnin.common.validator.PeekrValidator.validation
+import com.turnin.util.TestClientFactory.createTestClient
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

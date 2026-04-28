@@ -1,4 +1,4 @@
-package com.peekr.common.util
+package com.turnin.common.util
 
 /**
  * 민감 정보를 포함한 문자열을 마스킹한다.

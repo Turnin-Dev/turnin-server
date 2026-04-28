@@ -1,6 +1,6 @@
-package com.peekr.common.util
+package com.turnin.common.util
 
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.util.db.TestDatabaseFactory
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Collections

@@ -1,7 +1,7 @@
-package com.peekr.domain.friend.application.usecase
+package com.turnin.domain.friend.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.repository.FriendRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.repository.FriendRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertTrue

@@ -1,9 +1,9 @@
-package com.peekr.domain.user.application.dto
+package com.turnin.domain.user.application.dto
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.domain.user.domain.model.UserPatch
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.domain.user.domain.model.UserPatch
 
 /**
  * 애플리케이션 계층에서 사용하는 UserPatch DTO

@@ -1,6 +1,6 @@
-package com.peekr.common.model
+package com.turnin.common.model
 
-import com.peekr.common.validator.ValidatorException
+import com.turnin.common.validator.ValidatorException
 
 class NameValidationException(message: String) : ValidatorException(message)
 

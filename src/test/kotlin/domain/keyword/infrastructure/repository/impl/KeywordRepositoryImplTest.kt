@@ -1,12 +1,12 @@
-package com.peekr.domain.keyword.infrastructure.repository.impl
+package com.turnin.domain.keyword.infrastructure.repository.impl
 
-import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals

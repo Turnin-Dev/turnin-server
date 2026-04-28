@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.domain.model
+package com.turnin.domain.friend.domain.model
 
 /**
  * 나에게 들어온 친구 요청 페이징 데이터

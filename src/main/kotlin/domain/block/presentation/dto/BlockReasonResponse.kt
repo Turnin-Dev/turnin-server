@@ -1,6 +1,6 @@
-package com.peekr.domain.block.presentation.dto
+package com.turnin.domain.block.presentation.dto
 
-import com.peekr.domain.block.application.dto.BlockReasonDto
+import com.turnin.domain.block.application.dto.BlockReasonDto
 import kotlinx.serialization.Serializable
 
 /**

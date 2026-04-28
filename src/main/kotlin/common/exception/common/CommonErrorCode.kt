@@ -1,6 +1,6 @@
-package com.peekr.common.exception.common
+package com.turnin.common.exception.common
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class CommonErrorCode(
     code: String,

@@ -1,4 +1,4 @@
-package com.peekr.common.plugin
+package com.turnin.common.plugin
 
 import io.github.smiley4.ktoropenapi.OpenApi
 import io.github.smiley4.ktoropenapi.config.OutputFormat

@@ -1,4 +1,4 @@
-package com.peekr.domain.file.infrastructure.service.impl
+package com.turnin.domain.file.infrastructure.service.impl
 
 import java.net.URI
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials

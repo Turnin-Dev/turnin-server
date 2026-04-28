@@ -1,8 +1,8 @@
-package com.peekr.common.db.schema
+package com.turnin.common.db.schema
 
-import com.peekr.common.db.BaseEntityClassWithoutTimestamp
-import com.peekr.common.db.BaseEntityWithoutTimestamp
-import com.peekr.common.db.BaseLongIdTableWithoutTimestamp
+import com.turnin.common.db.BaseEntityClassWithoutTimestamp
+import com.turnin.common.db.BaseEntityWithoutTimestamp
+import com.turnin.common.db.BaseLongIdTableWithoutTimestamp
 import org.jetbrains.exposed.dao.id.EntityID
 
 /** 신고 사유 엔티티 클래스 (Exposed DSL 방식) */

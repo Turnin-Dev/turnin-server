@@ -1,9 +1,9 @@
-package com.peekr.domain.discover.di
+package com.turnin.domain.discover.di
 
-import com.peekr.domain.discover.application.usecase.DiscoverUseCases
-import com.peekr.domain.discover.application.usecase.GetDiscoverContextUseCase
-import com.peekr.domain.discover.domain.repository.DiscoverRepository
-import com.peekr.domain.discover.infrastructure.repository.DiscoverRepositoryImpl
+import com.turnin.domain.discover.application.usecase.DiscoverUseCases
+import com.turnin.domain.discover.application.usecase.GetDiscoverContextUseCase
+import com.turnin.domain.discover.domain.repository.DiscoverRepository
+import com.turnin.domain.discover.infrastructure.repository.DiscoverRepositoryImpl
 import org.koin.dsl.module
 
 val discoverModule = module {

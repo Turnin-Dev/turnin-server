@@ -1,4 +1,4 @@
-package com.peekr.common.firebase
+package com.turnin.common.firebase
 
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp

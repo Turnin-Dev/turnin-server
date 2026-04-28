@@ -1,6 +1,6 @@
-package com.peekr.domain.keyword.exception
+package com.turnin.domain.keyword.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class KeywordErrorCode(
     raw: String,

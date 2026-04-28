@@ -1,7 +1,7 @@
-package com.peekr.domain.discover.presentation.dto
+package com.turnin.domain.discover.presentation.dto
 
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.discover.application.dto.DiscoverContextDto
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.domain.discover.application.dto.DiscoverContextDto
 import kotlinx.serialization.Serializable
 
 /**

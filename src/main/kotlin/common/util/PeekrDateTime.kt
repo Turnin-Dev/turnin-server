@@ -1,4 +1,4 @@
-package com.peekr.common.util
+package com.turnin.common.util
 
 import java.time.Instant
 import java.time.OffsetDateTime

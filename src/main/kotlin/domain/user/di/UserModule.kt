@@ -1,24 +1,24 @@
-package com.peekr.domain.user.di
+package com.turnin.domain.user.di
 
-import com.peekr.domain.user.application.provider.UserDeletionSupportApi
-import com.peekr.domain.user.application.provider.UserProviderApi
-import com.peekr.domain.user.application.usecase.GetMyProfileUseCase
-import com.peekr.domain.user.application.usecase.GetUserProfileUseCase
-import com.peekr.domain.user.application.usecase.GetUserUseCase
-import com.peekr.domain.user.application.usecase.LogoutUseCase
-import com.peekr.domain.user.application.usecase.UpdateIntroduceUseCase
-import com.peekr.domain.user.application.usecase.UpdateUserUseCase
-import com.peekr.domain.user.application.usecase.UserUseCases
-import com.peekr.domain.user.domain.provider.AuthProvider
-import com.peekr.domain.user.domain.provider.FileProvider
-import com.peekr.domain.user.domain.provider.FriendProvider
-import com.peekr.domain.user.domain.provider.NotificationProvider
-import com.peekr.domain.user.domain.repository.UserRepository
-import com.peekr.domain.user.infrastructure.provider.AuthProviderImpl
-import com.peekr.domain.user.infrastructure.provider.FileProviderImpl
-import com.peekr.domain.user.infrastructure.provider.FriendProviderImpl
-import com.peekr.domain.user.infrastructure.provider.NotificationProviderImpl
-import com.peekr.domain.user.infrastructure.repository.impl.UserRepositoryImpl
+import com.turnin.domain.user.application.provider.UserDeletionSupportApi
+import com.turnin.domain.user.application.provider.UserProviderApi
+import com.turnin.domain.user.application.usecase.GetMyProfileUseCase
+import com.turnin.domain.user.application.usecase.GetUserProfileUseCase
+import com.turnin.domain.user.application.usecase.GetUserUseCase
+import com.turnin.domain.user.application.usecase.LogoutUseCase
+import com.turnin.domain.user.application.usecase.UpdateIntroduceUseCase
+import com.turnin.domain.user.application.usecase.UpdateUserUseCase
+import com.turnin.domain.user.application.usecase.UserUseCases
+import com.turnin.domain.user.domain.provider.AuthProvider
+import com.turnin.domain.user.domain.provider.FileProvider
+import com.turnin.domain.user.domain.provider.FriendProvider
+import com.turnin.domain.user.domain.provider.NotificationProvider
+import com.turnin.domain.user.domain.repository.UserRepository
+import com.turnin.domain.user.infrastructure.provider.AuthProviderImpl
+import com.turnin.domain.user.infrastructure.provider.FileProviderImpl
+import com.turnin.domain.user.infrastructure.provider.FriendProviderImpl
+import com.turnin.domain.user.infrastructure.provider.NotificationProviderImpl
+import com.turnin.domain.user.infrastructure.repository.impl.UserRepositoryImpl
 import org.koin.dsl.module
 
 val userModule = module {

@@ -1,4 +1,4 @@
-package com.peekr.domain.feed.application.usecase
+package com.turnin.domain.feed.application.usecase
 
 data class FeedUseCases(
     /** @see GetFeedsUseCase */

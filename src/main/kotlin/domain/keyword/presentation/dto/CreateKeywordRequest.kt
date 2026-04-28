@@ -1,4 +1,4 @@
-package com.peekr.domain.keyword.presentation.dto
+package com.turnin.domain.keyword.presentation.dto
 
 import kotlinx.serialization.Serializable
 

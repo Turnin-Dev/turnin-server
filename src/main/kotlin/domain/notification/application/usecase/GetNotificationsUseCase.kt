@@ -1,10 +1,10 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.notification.application.dto.NotificationDto
-import com.peekr.domain.notification.application.dto.toDto
-import com.peekr.domain.notification.domain.repository.NotificationRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.domain.notification.application.dto.NotificationDto
+import com.turnin.domain.notification.application.dto.toDto
+import com.turnin.domain.notification.domain.repository.NotificationRepository
 
 /**
  * 알림 목록 조회

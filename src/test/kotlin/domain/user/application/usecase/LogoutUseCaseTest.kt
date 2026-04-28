@@ -1,8 +1,8 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.domain.provider.AuthProvider
-import com.peekr.domain.user.domain.provider.NotificationProvider
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.domain.provider.AuthProvider
+import com.turnin.domain.user.domain.provider.NotificationProvider
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify

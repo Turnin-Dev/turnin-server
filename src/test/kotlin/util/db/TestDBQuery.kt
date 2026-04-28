@@ -1,9 +1,9 @@
-package com.peekr.util.db
+package com.turnin.util.db
 
-import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.db.schema.UserKeywordEntity
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
+import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.db.schema.UserKeywordEntity
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
 
 /**
  * 사용자를 비활성화 상태로 업데이트한다.

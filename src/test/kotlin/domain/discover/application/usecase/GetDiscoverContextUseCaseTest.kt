@@ -1,14 +1,14 @@
-package com.peekr.domain.discover.application.usecase
+package com.turnin.domain.discover.application.usecase
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.discover.domain.model.SharedUserKeyword
-import com.peekr.domain.discover.domain.repository.DiscoverRepository
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.discover.domain.model.SharedUserKeyword
+import com.turnin.domain.discover.domain.repository.DiscoverRepository
+import com.turnin.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

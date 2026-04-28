@@ -1,4 +1,4 @@
-package com.peekr.util
+package com.turnin.util
 
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.test.Test

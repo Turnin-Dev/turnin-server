@@ -1,6 +1,6 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
-import com.peekr.common.db.schema.Blocks
+import com.turnin.common.db.schema.Blocks
 import java.time.OffsetDateTime
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Column

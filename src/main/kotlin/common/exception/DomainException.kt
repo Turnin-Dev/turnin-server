@@ -1,4 +1,4 @@
-package com.peekr.common.exception
+package com.turnin.common.exception
 
 /**
  * 베이스 도메인 예외

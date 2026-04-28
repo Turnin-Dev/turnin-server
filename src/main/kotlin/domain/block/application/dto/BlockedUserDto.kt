@@ -1,6 +1,6 @@
-package com.peekr.domain.block.application.dto
+package com.turnin.domain.block.application.dto
 
-import com.peekr.domain.block.domain.model.BlockedUser
+import com.turnin.domain.block.domain.model.BlockedUser
 
 /**
  * 차단 사용자 DTO

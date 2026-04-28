@@ -1,12 +1,12 @@
-package com.peekr.domain.block.application.usecase
+package com.turnin.domain.block.application.usecase
 
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.BlockId
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.block.application.dto.toDto
-import com.peekr.domain.block.domain.model.BlockedUser
-import com.peekr.domain.block.domain.repository.BlockRepository
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.BlockId
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.block.application.dto.toDto
+import com.turnin.domain.block.domain.model.BlockedUser
+import com.turnin.domain.block.domain.repository.BlockRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals

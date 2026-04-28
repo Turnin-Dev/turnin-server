@@ -1,11 +1,11 @@
-package com.peekr.domain.block.domain.repository
+package com.turnin.domain.block.domain.repository
 
-import com.peekr.common.db.schema.BlockEntity
-import com.peekr.common.model.id.BlockId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.block.domain.model.BlockDetail
-import com.peekr.domain.block.domain.model.BlockReason
-import com.peekr.domain.block.domain.model.BlockedUser
+import com.turnin.common.db.schema.BlockEntity
+import com.turnin.common.model.id.BlockId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.block.domain.model.BlockDetail
+import com.turnin.domain.block.domain.model.BlockReason
+import com.turnin.domain.block.domain.model.BlockedUser
 
 interface BlockRepository {
     /**

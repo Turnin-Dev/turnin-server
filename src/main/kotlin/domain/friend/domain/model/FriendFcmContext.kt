@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.domain.model
+package com.turnin.domain.friend.domain.model
 
 /**
  * 친구들의 FCM 알림 전송에 필요한 컨텍스트

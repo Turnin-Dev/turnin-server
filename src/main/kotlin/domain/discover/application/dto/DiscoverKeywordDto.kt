@@ -1,7 +1,7 @@
-package com.peekr.domain.discover.application.dto
+package com.turnin.domain.discover.application.dto
 
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserKeywordId
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserKeywordId
 
 /**
  * 탐색용 키워드 DTO

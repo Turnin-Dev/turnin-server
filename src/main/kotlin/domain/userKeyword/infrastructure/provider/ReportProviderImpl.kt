@@ -1,8 +1,8 @@
-package com.peekr.domain.userKeyword.infrastructure.provider
+package com.turnin.domain.userKeyword.infrastructure.provider
 
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.report.application.provider.ReportProviderApi
-import com.peekr.domain.userKeyword.domain.provider.ReportProvider
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.report.application.provider.ReportProviderApi
+import com.turnin.domain.userKeyword.domain.provider.ReportProvider
 
 class ReportProviderImpl(private val reportProviderApi: ReportProviderApi) : ReportProvider {
     override suspend fun existsByUserKeywordId(userKeywordId: UserKeywordId): Boolean =

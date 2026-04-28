@@ -1,17 +1,17 @@
-package com.peekr.domain.block.infrastructure.mapper
+package com.turnin.domain.block.infrastructure.mapper
 
-import com.peekr.common.db.schema.BlockReasons
-import com.peekr.common.db.schema.Blocks
-import com.peekr.common.db.schema.Users
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.BlockId
-import com.peekr.common.model.id.BlockReasonId
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.block.domain.model.Block
-import com.peekr.domain.block.domain.model.BlockDetail
-import com.peekr.domain.block.domain.model.BlockReason
-import com.peekr.domain.block.domain.model.BlockedUser
+import com.turnin.common.db.schema.BlockReasons
+import com.turnin.common.db.schema.Blocks
+import com.turnin.common.db.schema.Users
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.BlockId
+import com.turnin.common.model.id.BlockReasonId
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.block.domain.model.Block
+import com.turnin.domain.block.domain.model.BlockDetail
+import com.turnin.domain.block.domain.model.BlockReason
+import com.turnin.domain.block.domain.model.BlockedUser
 import org.jetbrains.exposed.sql.ResultRow
 
 object BlockMapper {

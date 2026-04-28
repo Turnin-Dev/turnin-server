@@ -1,8 +1,8 @@
-package com.peekr.domain.userKeyword.infrastructure.provider
+package com.turnin.domain.userKeyword.infrastructure.provider
 
-import com.peekr.common.model.NotificationType
-import com.peekr.domain.notification.application.provider.NotificationProviderApi
-import com.peekr.domain.userKeyword.domain.provider.NotificationProvider
+import com.turnin.common.model.NotificationType
+import com.turnin.domain.notification.application.provider.NotificationProviderApi
+import com.turnin.domain.userKeyword.domain.provider.NotificationProvider
 
 class NotificationProviderImpl(private val notificationProviderApi: NotificationProviderApi) : NotificationProvider {
     override suspend fun sendNotificationToTokens(
