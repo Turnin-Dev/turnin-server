@@ -14,15 +14,15 @@ import com.turnin.common.plugin.configureContentNegotiation
 import com.turnin.common.plugin.configureCors
 import com.turnin.common.plugin.configureResources
 import com.turnin.common.plugin.configureRouting
-import com.turnin.common.util.AppDispatchers
 import com.turnin.common.util.application.applicationCleanup
+import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.getTimeZoneInfo
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.netty.EngineMain
 import java.util.TimeZone
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import org.koin.ktor.ext.inject
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -42,10 +42,9 @@ fun Application.module() {
     configureKoin()
 
     // ------------------------------ Initialize ------------------------------
+    val appConfig: AppConfig by inject()
     initDatabase()
-    runBlocking(AppDispatchers.ioDispatcher) {
-        FirebaseAdmin.initialize()
-    }
+    FirebaseAdmin.initialize(appConfig)
 
     // ------------------------------ Plugins ------------------------------
     configureResources()
