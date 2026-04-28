@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-group = "com.peekr"
+group = "com.turnin"
 version = "0.0.1"
 
 application {

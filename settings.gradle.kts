@@ -1,1 +1,1 @@
-rootProject.name = "peekr-server"
+rootProject.name = "turnin-server"
