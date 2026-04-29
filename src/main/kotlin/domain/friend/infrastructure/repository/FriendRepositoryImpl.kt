@@ -1,29 +1,29 @@
-package com.peekr.domain.friend.infrastructure.repository
+package com.turnin.domain.friend.infrastructure.repository
 
-import com.peekr.common.db.DatabaseUtils.eqEnum
-import com.peekr.common.db.extension.existsUser
-import com.peekr.common.db.extension.filterActiveUser
-import com.peekr.common.db.schema.Blocks
-import com.peekr.common.db.schema.FriendEntity
-import com.peekr.common.db.schema.Friends
-import com.peekr.common.db.schema.Users
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.db.updateWithTimestamp
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.toOffsetDateTime
-import com.peekr.domain.friend.domain.model.Friend
-import com.peekr.domain.friend.domain.model.FriendFcmContext
-import com.peekr.domain.friend.domain.model.FriendRequestContext
-import com.peekr.domain.friend.domain.model.FriendsPagingData
-import com.peekr.domain.friend.domain.model.IncomingRequestPagingData
-import com.peekr.domain.friend.domain.model.UserInfo
-import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomain
-import com.peekr.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
+import com.turnin.common.db.DatabaseUtils.eqEnum
+import com.turnin.common.db.extension.existsUser
+import com.turnin.common.db.extension.filterActiveUser
+import com.turnin.common.db.schema.Blocks
+import com.turnin.common.db.schema.FriendEntity
+import com.turnin.common.db.schema.Friends
+import com.turnin.common.db.schema.Users
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.db.updateWithTimestamp
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.TurninDateTime
+import com.turnin.common.util.toOffsetDateTime
+import com.turnin.domain.friend.domain.model.Friend
+import com.turnin.domain.friend.domain.model.FriendFcmContext
+import com.turnin.domain.friend.domain.model.FriendRequestContext
+import com.turnin.domain.friend.domain.model.FriendsPagingData
+import com.turnin.domain.friend.domain.model.IncomingRequestPagingData
+import com.turnin.domain.friend.domain.model.UserInfo
+import com.turnin.domain.friend.domain.repository.FriendRepository
+import com.turnin.domain.friend.infrastructure.mapper.FriendMapper.toDomain
+import com.turnin.domain.friend.infrastructure.mapper.FriendMapper.toDomainIncomingRequester
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.IntegerColumnType
 import org.jetbrains.exposed.sql.LongColumnType
@@ -260,7 +260,7 @@ class FriendRepositoryImpl : FriendRepository {
         }
         Friends.updateWithTimestamp({ updateCondition }) {
             it[this.status] = requestStatus
-            it[this.respondedAt] = PeekrDateTime.now().toOffsetDateTime()
+            it[this.respondedAt] = TurninDateTime.now().toOffsetDateTime()
         } > 0
     }
 

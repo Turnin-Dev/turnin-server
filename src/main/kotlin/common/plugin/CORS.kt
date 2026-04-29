@@ -1,4 +1,4 @@
-package com.peekr.common.plugin
+package com.turnin.common.plugin
 
 import io.ktor.http.HttpHeaders
 import io.ktor.server.application.Application

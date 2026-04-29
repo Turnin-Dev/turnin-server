@@ -1,19 +1,19 @@
-package com.peekr.domain.friend.di
+package com.turnin.domain.friend.di
 
-import com.peekr.common.di.ApplicationScopeQualifier
-import com.peekr.domain.friend.application.provider.FriendDeletionSupportApi
-import com.peekr.domain.friend.application.provider.FriendProviderApi
-import com.peekr.domain.friend.application.usecase.AddFriendUseCase
-import com.peekr.domain.friend.application.usecase.DeleteFriendUseCase
-import com.peekr.domain.friend.application.usecase.FriendUseCases
-import com.peekr.domain.friend.application.usecase.GetFriendStatusUseCase
-import com.peekr.domain.friend.application.usecase.GetFriendsUseCase
-import com.peekr.domain.friend.application.usecase.GetIncomingRequestsUseCase
-import com.peekr.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
-import com.peekr.domain.friend.domain.provider.NotificationProvider
-import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.infrastructure.provider.NotificationProviderImpl
-import com.peekr.domain.friend.infrastructure.repository.FriendRepositoryImpl
+import com.turnin.common.di.ApplicationScopeQualifier
+import com.turnin.domain.friend.application.provider.FriendDeletionSupportApi
+import com.turnin.domain.friend.application.provider.FriendProviderApi
+import com.turnin.domain.friend.application.usecase.AddFriendUseCase
+import com.turnin.domain.friend.application.usecase.DeleteFriendUseCase
+import com.turnin.domain.friend.application.usecase.FriendUseCases
+import com.turnin.domain.friend.application.usecase.GetFriendStatusUseCase
+import com.turnin.domain.friend.application.usecase.GetFriendsUseCase
+import com.turnin.domain.friend.application.usecase.GetIncomingRequestsUseCase
+import com.turnin.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
+import com.turnin.domain.friend.domain.provider.NotificationProvider
+import com.turnin.domain.friend.domain.repository.FriendRepository
+import com.turnin.domain.friend.infrastructure.provider.NotificationProviderImpl
+import com.turnin.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import org.koin.dsl.module
 
 val friendModule = module {

@@ -1,4 +1,4 @@
-package com.peekr.common.jwt.domain.model
+package com.turnin.common.jwt.domain.model
 
 data class JWTTokenPayload(
     val userId: String,

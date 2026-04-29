@@ -1,6 +1,6 @@
-package com.peekr.common.jwt.application.dto
+package com.turnin.common.jwt.application.dto
 
-import com.peekr.common.jwt.domain.model.JWTToken
+import com.turnin.common.jwt.domain.model.JWTToken
 
 data class JWTTokenDto(
     val accessToken: String,

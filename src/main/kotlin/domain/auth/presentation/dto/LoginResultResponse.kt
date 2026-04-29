@@ -1,6 +1,6 @@
-package com.peekr.domain.auth.presentation.dto
+package com.turnin.domain.auth.presentation.dto
 
-import com.peekr.domain.auth.application.dto.LoginResultDto
+import com.turnin.domain.auth.application.dto.LoginResultDto
 import kotlinx.serialization.Serializable
 
 /**

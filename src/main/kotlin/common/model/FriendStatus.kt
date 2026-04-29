@@ -1,4 +1,4 @@
-package com.peekr.common.model
+package com.turnin.common.model
 
 /**
  * 친구 상태

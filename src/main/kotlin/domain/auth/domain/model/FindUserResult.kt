@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.domain.model
+package com.turnin.domain.auth.domain.model
 
 /**
  * 사용자를 찾을 때 결과

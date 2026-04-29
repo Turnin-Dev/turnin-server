@@ -1,4 +1,4 @@
-package com.peekr.domain.file.application.usecase
+package com.turnin.domain.file.application.usecase
 
 data class FileUseCases(
     /**

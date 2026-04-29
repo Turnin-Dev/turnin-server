@@ -1,11 +1,11 @@
-package com.peekr.domain.report.application.usecase
+package com.turnin.domain.report.application.usecase
 
-import com.peekr.common.model.id.ReportReasonId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.report.application.dto.ReportDetailDto
-import com.peekr.domain.report.domain.repository.ReportRepository
-import com.peekr.domain.report.exception.ReportException
+import com.turnin.common.model.id.ReportReasonId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.report.application.dto.ReportDetailDto
+import com.turnin.domain.report.domain.repository.ReportRepository
+import com.turnin.domain.report.exception.ReportException
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just

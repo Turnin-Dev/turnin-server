@@ -1,9 +1,9 @@
-package com.peekr.domain.report.infrastructure.mapper
+package com.turnin.domain.report.infrastructure.mapper
 
-import com.peekr.common.db.schema.ReportReasonEntity
-import com.peekr.common.db.schema.ReportReasons
-import com.peekr.common.model.id.ReportReasonId
-import com.peekr.domain.report.domain.model.ReportReason
+import com.turnin.common.db.schema.ReportReasonEntity
+import com.turnin.common.db.schema.ReportReasons
+import com.turnin.common.model.id.ReportReasonId
+import com.turnin.domain.report.domain.model.ReportReason
 import org.jetbrains.exposed.sql.ResultRow
 
 object ReportReasonMapper {

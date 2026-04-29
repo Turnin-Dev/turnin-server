@@ -1,4 +1,4 @@
-package com.peekr.common.util.config
+package com.turnin.common.util.config
 
 /**
  * 실행 환경 구분

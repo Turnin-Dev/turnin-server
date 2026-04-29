@@ -1,6 +1,6 @@
-package com.peekr.common.util.config
+package com.turnin.common.util.config
 
-import com.peekr.common.util.config.RunEnvironment.Companion.toRunEnvironment
+import com.turnin.common.util.config.RunEnvironment.Companion.toRunEnvironment
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.config.ApplicationConfig
 import io.ktor.util.logging.KtorSimpleLogger

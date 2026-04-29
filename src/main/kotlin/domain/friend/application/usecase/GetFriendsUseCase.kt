@@ -1,12 +1,12 @@
-package com.peekr.domain.friend.application.usecase
+package com.turnin.domain.friend.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.pagination.offset.PaginationParams
-import com.peekr.common.util.pagination.offset.PagingData
-import com.peekr.domain.friend.application.dto.FriendInfoDto
-import com.peekr.domain.friend.application.dto.FriendsPagingDataDto
-import com.peekr.domain.friend.domain.repository.FriendRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.pagination.offset.PaginationParams
+import com.turnin.common.util.pagination.offset.PagingData
+import com.turnin.domain.friend.application.dto.FriendInfoDto
+import com.turnin.domain.friend.application.dto.FriendsPagingDataDto
+import com.turnin.domain.friend.domain.repository.FriendRepository
 
 // TODO: 추후 '차단 목록 조회'처럼 조인 방식으로 리팩토링 필요
 

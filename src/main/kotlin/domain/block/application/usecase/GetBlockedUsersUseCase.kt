@@ -1,10 +1,10 @@
-package com.peekr.domain.block.application.usecase
+package com.turnin.domain.block.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.block.application.dto.BlockedUserDto
-import com.peekr.domain.block.application.dto.toDto
-import com.peekr.domain.block.domain.repository.BlockRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.domain.block.application.dto.BlockedUserDto
+import com.turnin.domain.block.application.dto.toDto
+import com.turnin.domain.block.domain.repository.BlockRepository
 
 /**
  * 차단 사용자 목록 조회

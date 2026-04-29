@@ -1,10 +1,10 @@
-package com.peekr.common.ml
+package com.turnin.common.ml
 
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
-import com.peekr.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.AppLoggerFactory
 import java.io.File
 import java.nio.LongBuffer
 import java.nio.file.Paths

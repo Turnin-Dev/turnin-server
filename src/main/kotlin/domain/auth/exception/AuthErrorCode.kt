@@ -1,6 +1,6 @@
-package com.peekr.domain.auth.exception
+package com.turnin.domain.auth.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class AuthErrorCode(
     raw: String,

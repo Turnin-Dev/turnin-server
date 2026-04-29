@@ -1,6 +1,6 @@
-package com.peekr.domain.account.exception
+package com.turnin.domain.account.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class AccountErrorCode(
     raw: String,

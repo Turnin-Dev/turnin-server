@@ -1,4 +1,4 @@
-package com.peekr.domain.report.application.usecase
+package com.turnin.domain.report.application.usecase
 
 data class ReportUseCases(
     /** @see GetReportReasonsUseCase */

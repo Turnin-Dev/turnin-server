@@ -1,7 +1,7 @@
-package com.peekr.domain.auth.application.usecase
+package com.turnin.domain.auth.application.usecase
 
-import com.peekr.common.model.id.DisplayId
-import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.turnin.common.model.id.DisplayId
+import com.turnin.domain.auth.domain.repository.AuthRepository
 
 class ExistsDisplayIdUseCase(private val authRepository: AuthRepository) {
     /**

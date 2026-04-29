@@ -1,9 +1,9 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.application.dto.UserDto
-import com.peekr.domain.user.application.dto.toDto
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.application.dto.UserDto
+import com.turnin.domain.user.application.dto.toDto
+import com.turnin.domain.user.domain.repository.UserRepository
 
 /**
  * 사용자 ID로 사용자를 조회한다.

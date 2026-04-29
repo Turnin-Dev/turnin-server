@@ -1,6 +1,6 @@
-package com.peekr.domain.friend.exception
+package com.turnin.domain.friend.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class FriendErrorCode(
     raw: String,

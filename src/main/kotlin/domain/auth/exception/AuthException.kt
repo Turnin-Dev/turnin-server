@@ -1,7 +1,7 @@
-package com.peekr.domain.auth.exception
+package com.turnin.domain.auth.exception
 
-import com.peekr.common.exception.ApiErrorCode
-import com.peekr.common.exception.ApiException
+import com.turnin.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiException
 import io.ktor.http.HttpStatusCode
 
 /**

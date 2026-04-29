@@ -1,9 +1,9 @@
-package com.peekr.domain.user.application.provider
+package com.turnin.domain.user.application.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.application.dto.UserDto
-import com.peekr.domain.user.application.dto.toDto
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.application.dto.UserDto
+import com.turnin.domain.user.application.dto.toDto
+import com.turnin.domain.user.domain.repository.UserRepository
 
 /**
  * 외부에 제공할 User 삭제 제공 API

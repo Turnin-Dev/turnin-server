@@ -1,15 +1,15 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.application.dto.toDto
-import com.peekr.domain.user.domain.model.User
-import com.peekr.domain.user.domain.repository.UserRepository
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.application.dto.toDto
+import com.turnin.domain.user.domain.model.User
+import com.turnin.domain.user.domain.repository.UserRepository
+import com.turnin.util.db.TestDatabaseFactory
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant

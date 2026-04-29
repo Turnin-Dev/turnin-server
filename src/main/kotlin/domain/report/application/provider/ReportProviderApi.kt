@@ -1,7 +1,7 @@
-package com.peekr.domain.report.application.provider
+package com.turnin.domain.report.application.provider
 
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.report.domain.repository.ReportRepository
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.report.domain.repository.ReportRepository
 
 /**
  * 외부에 제공할 Report API

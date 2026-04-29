@@ -1,6 +1,6 @@
-package com.peekr.domain.block.domain.model
+package com.turnin.domain.block.domain.model
 
-import com.peekr.common.model.id.BlockReasonId
+import com.turnin.common.model.id.BlockReasonId
 
 /**
  * 차단 사유 엔티티 모델

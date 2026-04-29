@@ -1,11 +1,11 @@
-package com.peekr.domain.keyword.application.usecase
+package com.turnin.domain.keyword.application.usecase
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.keyword.application.dto.toDto
-import com.peekr.domain.keyword.domain.model.Keyword
-import com.peekr.domain.keyword.domain.repository.KeywordRepository
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.keyword.application.dto.toDto
+import com.turnin.domain.keyword.domain.model.Keyword
+import com.turnin.domain.keyword.domain.repository.KeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertEquals

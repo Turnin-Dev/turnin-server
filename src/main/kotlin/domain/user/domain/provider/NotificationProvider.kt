@@ -1,6 +1,6 @@
-package com.peekr.domain.user.domain.provider
+package com.turnin.domain.user.domain.provider
 
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.id.UserId
 
 /**
  * 외부에서 제공받은 알림 API

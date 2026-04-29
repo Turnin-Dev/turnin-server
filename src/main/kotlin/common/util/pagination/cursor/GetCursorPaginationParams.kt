@@ -1,7 +1,7 @@
-package com.peekr.common.util.pagination.cursor
+package com.turnin.common.util.pagination.cursor
 
-import com.peekr.common.validator.inputValidationAndReturn
-import com.peekr.domain.feed.application.dto.FeedCursor
+import com.turnin.common.validator.inputValidationAndReturn
+import com.turnin.domain.feed.application.dto.FeedCursor
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.routing.RoutingContext
 

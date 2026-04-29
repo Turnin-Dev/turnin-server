@@ -1,15 +1,15 @@
-package com.peekr.common.jwt
+package com.turnin.common.jwt
 
-import com.peekr.common.exception.ErrorResponse
-import com.peekr.common.jwt.JWTTestDoubles.AUDIENCE
-import com.peekr.common.jwt.JWTTestDoubles.ISSUER
-import com.peekr.common.jwt.JWTTestDoubles.MockVerifier
-import com.peekr.common.jwt.JWTTestDoubles.REALM
-import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.jwt.exception.TokenException
-import com.peekr.util.TestSerialization.decode
-import com.peekr.util.testPlugin
+import com.turnin.common.exception.ErrorResponse
+import com.turnin.common.jwt.JWTTestDoubles.AUDIENCE
+import com.turnin.common.jwt.JWTTestDoubles.ISSUER
+import com.turnin.common.jwt.JWTTestDoubles.MockVerifier
+import com.turnin.common.jwt.JWTTestDoubles.REALM
+import com.turnin.common.jwt.domain.model.JWTToken
+import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.jwt.exception.TokenException
+import com.turnin.util.TestSerialization.decode
+import com.turnin.util.testPlugin
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText

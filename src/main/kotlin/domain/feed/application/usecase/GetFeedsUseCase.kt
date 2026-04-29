@@ -1,13 +1,13 @@
-package com.peekr.domain.feed.application.usecase
+package com.turnin.domain.feed.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.feed.application.dto.FeedCursor
-import com.peekr.domain.feed.application.dto.FeedDto
-import com.peekr.domain.feed.application.dto.toCursor
-import com.peekr.domain.feed.application.dto.toDto
-import com.peekr.domain.feed.domain.repository.FeedRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.domain.feed.application.dto.FeedCursor
+import com.turnin.domain.feed.application.dto.FeedDto
+import com.turnin.domain.feed.application.dto.toCursor
+import com.turnin.domain.feed.application.dto.toDto
+import com.turnin.domain.feed.domain.repository.FeedRepository
 
 /**
  * 피드 조회

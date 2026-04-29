@@ -1,9 +1,9 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.IntroduceValidationException
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.IntroduceValidationException
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test

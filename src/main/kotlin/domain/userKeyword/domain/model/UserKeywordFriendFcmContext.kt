@@ -1,4 +1,4 @@
-package com.peekr.domain.userKeyword.domain.model
+package com.turnin.domain.userKeyword.domain.model
 
 /**
  * 새 키워드 알림 전송에 필요한 친구 FCM 컨텍스트

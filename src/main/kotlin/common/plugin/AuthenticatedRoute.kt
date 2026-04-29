@@ -1,8 +1,8 @@
-package com.peekr.common.plugin
+package com.turnin.common.plugin
 
-import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.model.id.UserId
-import com.peekr.common.validator.ValidatorException
+import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.model.id.UserId
+import com.turnin.common.validator.ValidatorException
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal

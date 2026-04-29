@@ -1,6 +1,6 @@
-package com.peekr.domain.file.application.provider
+package com.turnin.domain.file.application.provider
 
-import com.peekr.domain.file.application.usecase.DeleteFileUseCase
+import com.turnin.domain.file.application.usecase.DeleteFileUseCase
 
 /**
  * 외부에 제공할 File API

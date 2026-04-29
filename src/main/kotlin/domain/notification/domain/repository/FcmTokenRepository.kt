@@ -1,7 +1,7 @@
-package com.peekr.domain.notification.domain.repository
+package com.turnin.domain.notification.domain.repository
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.model.FcmToken
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.model.FcmToken
 
 /** UserFcmToken 리포지토리 */
 interface FcmTokenRepository {

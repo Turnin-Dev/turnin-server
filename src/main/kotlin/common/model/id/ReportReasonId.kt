@@ -1,6 +1,6 @@
-package com.peekr.common.model.id
+package com.turnin.common.model.id
 
-import com.peekr.common.validator.ValidatorException
+import com.turnin.common.validator.ValidatorException
 
 class ReportReasonIdValidationException(message: String) : ValidatorException(message)
 

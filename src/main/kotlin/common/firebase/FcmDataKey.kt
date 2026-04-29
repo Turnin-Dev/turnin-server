@@ -1,4 +1,4 @@
-package com.peekr.common.firebase
+package com.turnin.common.firebase
 
 /** FCM data 필드 키 상수 */
 object FcmDataKey {

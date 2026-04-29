@@ -1,6 +1,6 @@
-package com.peekr.domain.file.application.dto
+package com.turnin.domain.file.application.dto
 
-import com.peekr.domain.file.domain.model.UploadFileInfo
+import com.turnin.domain.file.domain.model.UploadFileInfo
 
 /**
  * 사전 정의된 URL과 함께 클라이언트가 필요한 정보

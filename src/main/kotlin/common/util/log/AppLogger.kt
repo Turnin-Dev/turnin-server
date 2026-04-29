@@ -1,4 +1,4 @@
-package com.peekr.common.util.log
+package com.turnin.common.util.log
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

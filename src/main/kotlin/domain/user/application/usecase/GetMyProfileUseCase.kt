@@ -1,10 +1,10 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.application.dto.MyProfileDto
-import com.peekr.domain.user.application.dto.toDto
-import com.peekr.domain.user.domain.provider.FriendProvider
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.application.dto.MyProfileDto
+import com.turnin.domain.user.application.dto.toDto
+import com.turnin.domain.user.domain.provider.FriendProvider
+import com.turnin.domain.user.domain.repository.UserRepository
 
 /**
  * 나의 사용자 ID로 나의 프로필을 조회한다.

@@ -1,8 +1,8 @@
-package com.peekr.domain.block.domain.model
+package com.turnin.domain.block.domain.model
 
-import com.peekr.common.model.id.BlockReasonId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.block.exception.BlockException
+import com.turnin.common.model.id.BlockReasonId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.block.exception.BlockException
 
 /**
  * 차단 디테일 엔티티 모델

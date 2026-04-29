@@ -1,4 +1,4 @@
-package com.peekr.domain.account.application
+package com.turnin.domain.account.application
 
 data class AccountUseCases(
     /** @see DeleteAccountUseCase */

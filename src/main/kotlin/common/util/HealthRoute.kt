@@ -1,7 +1,7 @@
-package com.peekr.common.util
+package com.turnin.common.util
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.route.Api
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.route.Api
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route
@@ -12,7 +12,7 @@ import java.time.Duration
 import java.time.Instant
 
 fun Route.healthRoutes(route: Api.Health) {
-    val startTime = PeekrDateTime.now()
+    val startTime = TurninDateTime.now()
 
     route(route.ROUTE, {
         tags = setOf(route.TAG)
@@ -46,7 +46,7 @@ fun Route.healthRoutes(route: Api.Health) {
 }
 
 private fun formatUptime(startTime: Instant): String {
-    val seconds = Duration.between(startTime, PeekrDateTime.now()).seconds
+    val seconds = Duration.between(startTime, TurninDateTime.now()).seconds
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     val secs = seconds % 60

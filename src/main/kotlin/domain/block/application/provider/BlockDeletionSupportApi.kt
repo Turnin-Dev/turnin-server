@@ -1,7 +1,7 @@
-package com.peekr.domain.block.application.provider
+package com.turnin.domain.block.application.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.block.domain.repository.BlockRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.block.domain.repository.BlockRepository
 
 /**
  * 외부에 제공할 Block 삭제 제공 API

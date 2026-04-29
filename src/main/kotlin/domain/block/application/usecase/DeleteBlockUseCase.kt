@@ -1,8 +1,8 @@
-package com.peekr.domain.block.application.usecase
+package com.turnin.domain.block.application.usecase
 
-import com.peekr.common.model.id.BlockId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.block.domain.repository.BlockRepository
+import com.turnin.common.model.id.BlockId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.block.domain.repository.BlockRepository
 
 /**
  * 차단 해제

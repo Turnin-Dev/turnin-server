@@ -1,13 +1,13 @@
-package com.peekr.domain.auth.application.usecase
+package com.turnin.domain.auth.application.usecase
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.auth.domain.model.AuthUser
+import com.turnin.domain.auth.domain.repository.AuthRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.time.Instant

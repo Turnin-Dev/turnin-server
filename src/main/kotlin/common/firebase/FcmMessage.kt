@@ -1,6 +1,6 @@
-package com.peekr.common.firebase
+package com.turnin.common.firebase
 
-import com.peekr.common.model.NotificationType
+import com.turnin.common.model.NotificationType
 
 /**
  * FCM 메시지 규격

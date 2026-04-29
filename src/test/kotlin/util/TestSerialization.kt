@@ -1,4 +1,4 @@
-package com.peekr.util
+package com.turnin.util
 
 import kotlinx.serialization.json.Json
 

@@ -1,12 +1,12 @@
-package com.peekr.domain.discover.util
+package com.turnin.domain.discover.util
 
-import com.peekr.common.db.schema.Keywords
-import com.peekr.common.db.schema.UserKeywords
-import com.peekr.common.db.schema.Users
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.domain.discover.util.TestVectorFixture.toPgVectorString
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.db.schema.Keywords
+import com.turnin.common.db.schema.UserKeywords
+import com.turnin.common.db.schema.Users
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.domain.discover.util.TestVectorFixture.toPgVectorString
+import com.turnin.util.db.TestDatabaseFactory
 import java.time.Instant
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.batchInsert

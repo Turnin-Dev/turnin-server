@@ -1,11 +1,11 @@
-package com.peekr.domain.discover.domain.model
+package com.turnin.domain.discover.domain.model
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
 
 /**
  * 유사한 키워드를 공유하고 있는 사용자 정보 일부와 키워드 정보 일부를 담고 있다.

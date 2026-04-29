@@ -1,11 +1,11 @@
-package com.peekr.domain.feed.domain.model
+package com.turnin.domain.feed.domain.model
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.domain.model.Description
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.userKeyword.domain.model.Description
 
 /**
  * 피드 모델 클래스

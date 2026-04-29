@@ -1,8 +1,8 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
-import com.peekr.common.db.DatabaseUtils.timestamptz
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.toOffsetDateTime
+import com.turnin.common.db.DatabaseUtils.timestamptz
+import com.turnin.common.util.TurninDateTime
+import com.turnin.common.util.toOffsetDateTime
 import io.ktor.util.logging.KtorSimpleLogger
 import org.jetbrains.exposed.dao.EntityChangeType
 import org.jetbrains.exposed.dao.EntityHook
@@ -70,7 +70,7 @@ fun <T : BaseLongIdTable> T.updateWithTimestamp(
     body(it)
     // 이미 명시적으로 updated_at이 세팅된 경우 덮어쓰지 않음
     if (updatedAt !in it.firstDataSet.map { col -> col.first }) {
-        it[updatedAt] = PeekrDateTime.now().toOffsetDateTime()
+        it[updatedAt] = TurninDateTime.now().toOffsetDateTime()
     }
 }
 
@@ -86,7 +86,7 @@ fun <T : BaseLongIdTable> T.updateWithTimestamp(
  *     it[provider] = SocialLoginProvider.KAKAO
  *     it[providerId] = "provider_id"
  *     it[name] = "변경된이름"
- *     it[createdAt] = PeekrDateTime.now().toOffsetDateTime() // INSERT 시 직접 세팅
+ *     it[createdAt] = TurninDateTime.now().toOffsetDateTime() // INSERT 시 직접 세팅
  * }
  * ```
  */
@@ -102,7 +102,7 @@ fun <T : BaseLongIdTable> T.upsertWithTimestamp(
 ) {
     body(it)
     // INSERT/UPDATE 모두 현재 시각으로 갱신
-    it[updatedAt] = PeekrDateTime.now().toOffsetDateTime()
+    it[updatedAt] = TurninDateTime.now().toOffsetDateTime()
 }
 
 // ------------------------------ BaseEntity ------------------------------
@@ -162,7 +162,7 @@ abstract class BaseEntityClass<E : BaseEntity>(table: BaseLongIdTable) : LongEnt
                 try {
                     val entity = action.toEntity(this)
                     if (entity != null) {
-                        entity.updatedAt = PeekrDateTime.now().toOffsetDateTime()
+                        entity.updatedAt = TurninDateTime.now().toOffsetDateTime()
                     } else {
                         LOGGER.warn(
                             "Failed to update updatedAt: " +

@@ -1,4 +1,4 @@
-package com.peekr.common.util.pagination.cursor
+package com.turnin.common.util.pagination.cursor
 
 import kotlinx.serialization.Serializable
 

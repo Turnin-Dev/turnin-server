@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.domain.model
+package com.turnin.domain.friend.domain.model
 
 /**
  * 친구 요청 컨텍스트

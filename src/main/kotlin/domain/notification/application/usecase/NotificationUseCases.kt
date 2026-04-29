@@ -1,4 +1,4 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
 data class NotificationUseCases(
     /**

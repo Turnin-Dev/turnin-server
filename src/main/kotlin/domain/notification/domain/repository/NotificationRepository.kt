@@ -1,9 +1,9 @@
-package com.peekr.domain.notification.domain.repository
+package com.turnin.domain.notification.domain.repository
 
-import com.peekr.common.model.id.NotificationId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.model.Notification
-import com.peekr.domain.notification.domain.model.NotificationCommand
+import com.turnin.common.model.id.NotificationId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.model.Notification
+import com.turnin.domain.notification.domain.model.NotificationCommand
 
 /** Notification 리포지토리 */
 interface NotificationRepository {

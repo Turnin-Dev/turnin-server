@@ -1,6 +1,6 @@
-package com.peekr.common.jwt
+package com.turnin.common.jwt
 
-import com.peekr.common.validator.PeekrValidator.validation
+import com.turnin.common.validator.TurninValidator.validation
 
 object JWTValidator {
     fun validate(token: String) {

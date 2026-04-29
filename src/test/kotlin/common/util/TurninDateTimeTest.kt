@@ -1,6 +1,6 @@
-package com.peekr.common.util
+package com.turnin.common.util
 
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.util.db.TestDatabaseFactory
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Collections
@@ -13,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.junit.Before
 
-class PeekrDateTimeTest {
+class TurninDateTimeTest {
     @Before
     fun setup() {
         TestDatabaseFactory.init()
@@ -21,15 +21,15 @@ class PeekrDateTimeTest {
 
     @Test
     fun `timestamp가 CurrentTimeStamp 타입을 반환해야 한다`() {
-        val result = PeekrDateTime.timestamp
+        val result = TurninDateTime.timestamp
         assertEquals(CurrentTimestamp, result)
     }
 
     @Test
     fun `1초 뒤에 호출하면 서로 다른 값이 반환되어야 한다`() = runBlocking {
-        val first = PeekrDateTime.now()
+        val first = TurninDateTime.now()
         delay(1100L)
-        val second = PeekrDateTime.now()
+        val second = TurninDateTime.now()
 
         assertNotEquals(first, second, "서로 값이 달라야 한다.")
         assertTrue(second.isAfter(first.minus(2, ChronoUnit.SECONDS)))
@@ -46,7 +46,7 @@ class PeekrDateTimeTest {
         repeat(threadCount) { i ->
             val thread = Thread {
                 try {
-                    val result = PeekrDateTime.now()
+                    val result = TurninDateTime.now()
                     results.add(result)
                     println("Thread $i: $result")
                 } catch (e: Exception) {
@@ -71,7 +71,7 @@ class PeekrDateTimeTest {
 
     @Test
     fun `Instant에서 변환된 OffsetDateTime을 다시 Instant화 시켜도 항상 같아야 한다`() {
-        val instant = PeekrDateTime.now()
+        val instant = TurninDateTime.now()
         val offsetDateTime = instant.toOffsetDateTime()
         val instant2 = offsetDateTime.toInstant()
 

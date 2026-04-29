@@ -1,4 +1,4 @@
-package com.peekr.domain.discover.domain.model
+package com.turnin.domain.discover.domain.model
 
 /**
  * 탐색 컨텍스트 모델

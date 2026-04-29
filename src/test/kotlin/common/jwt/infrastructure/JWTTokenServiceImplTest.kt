@@ -1,12 +1,12 @@
-package com.peekr.common.jwt.infrastructure
+package com.turnin.common.jwt.infrastructure
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions.JWTVerificationException
-import com.peekr.common.jwt.JWTTestDoubles
-import com.peekr.common.jwt.domain.model.JWTTokenType
-import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.util.config.AppConfig
+import com.turnin.common.jwt.JWTTestDoubles
+import com.turnin.common.jwt.domain.model.JWTTokenType
+import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.util.config.AppConfig
 import io.mockk.every
 import io.mockk.mockk
 import java.time.Instant

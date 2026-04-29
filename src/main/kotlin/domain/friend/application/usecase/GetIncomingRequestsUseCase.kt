@@ -1,13 +1,13 @@
-package com.peekr.domain.friend.application.usecase
+package com.turnin.domain.friend.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.pagination.offset.PaginationParams
-import com.peekr.common.util.pagination.offset.PagingData
-import com.peekr.domain.friend.application.dto.IncomingRequestInfoDto
-import com.peekr.domain.friend.application.dto.IncomingRequestPagingDataDto
-import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.exception.FriendException
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.pagination.offset.PaginationParams
+import com.turnin.common.util.pagination.offset.PagingData
+import com.turnin.domain.friend.application.dto.IncomingRequestInfoDto
+import com.turnin.domain.friend.application.dto.IncomingRequestPagingDataDto
+import com.turnin.domain.friend.domain.repository.FriendRepository
+import com.turnin.domain.friend.exception.FriendException
 
 /**
  * 나에게 들어온 친구 요청 목록 페이지네이션 조회

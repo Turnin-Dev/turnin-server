@@ -1,4 +1,4 @@
-package com.peekr.domain.keyword.application.usecase
+package com.turnin.domain.keyword.application.usecase
 
 data class KeywordUseCases(
     val get: GetKeywordUseCase,

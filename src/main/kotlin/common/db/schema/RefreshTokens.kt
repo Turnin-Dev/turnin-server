@@ -1,6 +1,6 @@
-package com.peekr.common.db.schema
+package com.turnin.common.db.schema
 
-import com.peekr.common.db.DatabaseUtils.timestamptz
+import com.turnin.common.db.DatabaseUtils.timestamptz
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 

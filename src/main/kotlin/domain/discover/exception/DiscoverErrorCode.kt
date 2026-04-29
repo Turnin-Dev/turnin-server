@@ -1,6 +1,6 @@
-package com.peekr.domain.discover.exception
+package com.turnin.domain.discover.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 /**
  * 키워드 그래프 커스텀 에러 코드

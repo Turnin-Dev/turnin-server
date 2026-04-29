@@ -1,11 +1,11 @@
-package com.peekr.domain.userKeyword.presentation.route
+package com.turnin.domain.userKeyword.presentation.route
 
-import com.peekr.common.plugin.AuthenticatedRoute
-import com.peekr.common.route.Api
-import com.peekr.common.validator.inputValidationAndReturn
-import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
-import com.peekr.domain.userKeyword.presentation.dto.UserKeywordDetailResponse
-import com.peekr.domain.userKeyword.presentation.dto.toResponse
+import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.route.Api
+import com.turnin.common.validator.inputValidationAndReturn
+import com.turnin.domain.userKeyword.application.usecase.UserKeywordUseCases
+import com.turnin.domain.userKeyword.presentation.dto.UserKeywordDetailResponse
+import com.turnin.domain.userKeyword.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route

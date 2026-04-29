@@ -1,8 +1,8 @@
-package com.peekr.domain.account.presentation
+package com.turnin.domain.account.presentation
 
-import com.peekr.common.plugin.AuthenticatedRoute
-import com.peekr.common.route.Api
-import com.peekr.domain.account.application.AccountUseCases
+import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.route.Api
+import com.turnin.domain.account.application.AccountUseCases
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.route

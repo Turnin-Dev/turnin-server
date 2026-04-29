@@ -1,8 +1,8 @@
-package com.peekr.domain.report.application.usecase
+package com.turnin.domain.report.application.usecase
 
-import com.peekr.common.model.id.ReportReasonId
-import com.peekr.domain.report.domain.model.ReportReason
-import com.peekr.domain.report.domain.repository.ReportRepository
+import com.turnin.common.model.id.ReportReasonId
+import com.turnin.domain.report.domain.model.ReportReason
+import com.turnin.domain.report.domain.repository.ReportRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test

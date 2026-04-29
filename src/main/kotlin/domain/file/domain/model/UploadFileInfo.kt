@@ -1,4 +1,4 @@
-package com.peekr.domain.file.domain.model
+package com.turnin.domain.file.domain.model
 
 /**
  * 사전 정의된 URL과 함께 클라이언트가 필요한 정보

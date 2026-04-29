@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.application.dto
+package com.turnin.domain.friend.application.dto
 
 /**
  * 친구 정보 DTO

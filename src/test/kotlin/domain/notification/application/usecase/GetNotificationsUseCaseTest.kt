@@ -1,8 +1,8 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.repository.NotificationRepository
-import com.peekr.domain.notification.notificationFixture
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.repository.NotificationRepository
+import com.turnin.domain.notification.notificationFixture
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest

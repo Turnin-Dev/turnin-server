@@ -1,8 +1,8 @@
-package com.peekr.domain.file.application.usecase
+package com.turnin.domain.file.application.usecase
 
-import com.peekr.domain.file.application.dto.UploadFileInfoDto
-import com.peekr.domain.file.application.dto.toDto
-import com.peekr.domain.file.domain.service.FileService
+import com.turnin.domain.file.application.dto.UploadFileInfoDto
+import com.turnin.domain.file.application.dto.toDto
+import com.turnin.domain.file.domain.service.FileService
 
 /**
  * 파일 업데이트 URL 가져오기

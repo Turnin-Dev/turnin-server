@@ -1,11 +1,11 @@
-package com.peekr.common.db.schema
+package com.turnin.common.db.schema
 
-import com.peekr.common.db.BaseEntity
-import com.peekr.common.db.BaseEntityClass
-import com.peekr.common.db.BaseLongIdTable
-import com.peekr.common.db.DatabaseUtils.customPostgresEnum
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
+import com.turnin.common.db.BaseEntity
+import com.turnin.common.db.BaseEntityClass
+import com.turnin.common.db.BaseLongIdTable
+import com.turnin.common.db.DatabaseUtils.customPostgresEnum
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.javatime.timestamp
 

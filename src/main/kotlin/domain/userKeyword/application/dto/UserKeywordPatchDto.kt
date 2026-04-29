@@ -1,9 +1,9 @@
-package com.peekr.domain.userKeyword.application.dto
+package com.turnin.domain.userKeyword.application.dto
 
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.domain.model.Description
-import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.userKeyword.domain.model.Description
+import com.turnin.domain.userKeyword.domain.model.UserKeywordPatch
 
 /**
  * 사용자 키워드 수정 DTO

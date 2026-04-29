@@ -1,7 +1,7 @@
-package com.peekr.domain.friend.application.provider
+package com.turnin.domain.friend.application.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.repository.FriendRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.repository.FriendRepository
 
 /**
  * 외부에 제공할 Friend 삭제 제공 API

@@ -1,8 +1,8 @@
-package com.peekr.domain.user.domain.model
+package com.turnin.domain.user.domain.model
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
 
 /**
  * UserPatch

@@ -1,4 +1,4 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
 /** 공통적으로 사용하는 DB 에러 메시지 */
 object DatabaseErrorMessage {

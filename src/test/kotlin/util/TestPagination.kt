@@ -1,7 +1,7 @@
-package com.peekr.util
+package com.turnin.util
 
-import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.util.TestClientFactory.createTestClient
+import com.turnin.common.jwt.domain.model.JWTToken
+import com.turnin.util.TestClientFactory.createTestClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText

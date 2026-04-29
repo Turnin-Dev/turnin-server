@@ -1,6 +1,6 @@
-package com.peekr.domain.file.exception
+package com.turnin.domain.file.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class FileErrorCode(
     code: String,

@@ -1,11 +1,11 @@
-package com.peekr.domain.auth.infrastructure.mapper
+package com.turnin.domain.auth.infrastructure.mapper
 
-import com.peekr.common.db.schema.Users
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.auth.domain.model.AuthUser
+import com.turnin.common.db.schema.Users
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.auth.domain.model.AuthUser
 import org.jetbrains.exposed.sql.ResultRow
 
 object AuthMapper {

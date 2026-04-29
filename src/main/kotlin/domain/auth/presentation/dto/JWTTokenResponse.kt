@@ -1,6 +1,6 @@
-package com.peekr.domain.auth.presentation.dto
+package com.turnin.domain.auth.presentation.dto
 
-import com.peekr.common.jwt.application.dto.JWTTokenDto
+import com.turnin.common.jwt.application.dto.JWTTokenDto
 import kotlinx.serialization.Serializable
 
 /** JWT 토큰 응답 바디 */

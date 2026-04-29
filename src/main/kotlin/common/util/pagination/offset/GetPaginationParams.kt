@@ -1,6 +1,6 @@
-package com.peekr.common.util.pagination.offset
+package com.turnin.common.util.pagination.offset
 
-import com.peekr.common.validator.inputValidationAndReturn
+import com.turnin.common.validator.inputValidationAndReturn
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.routing.RoutingContext
 

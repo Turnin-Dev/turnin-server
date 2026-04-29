@@ -1,6 +1,6 @@
-package com.peekr.domain.userKeyword.application.dto
+package com.turnin.domain.userKeyword.application.dto
 
-import com.peekr.domain.userKeyword.domain.model.UserKeyword
+import com.turnin.domain.userKeyword.domain.model.UserKeyword
 
 /**
  * 사용자별 키워드 DTO

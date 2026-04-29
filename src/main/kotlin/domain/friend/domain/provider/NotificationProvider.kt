@@ -1,6 +1,6 @@
-package com.peekr.domain.friend.domain.provider
+package com.turnin.domain.friend.domain.provider
 
-import com.peekr.domain.friend.domain.model.FriendNotificationCommand
+import com.turnin.domain.friend.domain.model.FriendNotificationCommand
 
 /**
  * 외부에서 제공받은 알림 API

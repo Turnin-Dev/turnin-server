@@ -1,25 +1,25 @@
-package com.peekr.domain.auth.application.usecase
+package com.turnin.domain.auth.application.usecase
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.jwt.application.dto.toDto
-import com.peekr.common.jwt.domain.model.JWTClaimName
-import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.common.jwt.domain.model.JWTTokenPayload
-import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.log.LogAction
-import com.peekr.common.util.log.LogTag
-import com.peekr.common.util.log.LogType
-import com.peekr.domain.auth.application.dto.LoginDto
-import com.peekr.domain.auth.application.dto.LoginResultDto
-import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.domain.repository.AuthRepository
-import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
-import com.peekr.domain.auth.exception.AuthException
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.jwt.application.dto.toDto
+import com.turnin.common.jwt.domain.model.JWTClaimName
+import com.turnin.common.jwt.domain.model.JWTToken
+import com.turnin.common.jwt.domain.model.JWTTokenPayload
+import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
+import com.turnin.domain.auth.application.dto.LoginDto
+import com.turnin.domain.auth.application.dto.LoginResultDto
+import com.turnin.domain.auth.domain.model.AuthUser
+import com.turnin.domain.auth.domain.repository.AuthRepository
+import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
+import com.turnin.domain.auth.exception.AuthException
 
 /**
  * 로그인 Usecase

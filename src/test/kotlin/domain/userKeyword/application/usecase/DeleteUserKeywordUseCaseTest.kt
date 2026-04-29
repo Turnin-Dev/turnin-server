@@ -1,9 +1,9 @@
-package com.peekr.domain.userKeyword.application.usecase
+package com.turnin.domain.userKeyword.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.domain.provider.ReportProvider
-import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.userKeyword.domain.provider.ReportProvider
+import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

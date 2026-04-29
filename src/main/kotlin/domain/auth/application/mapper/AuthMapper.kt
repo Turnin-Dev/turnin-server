@@ -1,12 +1,12 @@
-package com.peekr.domain.auth.application.mapper
+package com.turnin.domain.auth.application.mapper
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.domain.auth.application.dto.FindUserResultDto
-import com.peekr.domain.auth.application.dto.RegisterDto
-import com.peekr.domain.auth.domain.model.FindUserResult
-import com.peekr.domain.auth.domain.model.Register
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.domain.auth.application.dto.FindUserResultDto
+import com.turnin.domain.auth.application.dto.RegisterDto
+import com.turnin.domain.auth.domain.model.FindUserResult
+import com.turnin.domain.auth.domain.model.Register
 
 object AuthMapper {
     fun RegisterDto.toDomain(): Register = Register(

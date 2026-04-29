@@ -1,15 +1,15 @@
-package com.peekr.domain.keyword.infrastructure.repository.impl
+package com.turnin.domain.keyword.infrastructure.repository.impl
 
-import com.peekr.common.db.schema.KeywordEntity
-import com.peekr.common.db.schema.Keywords
-import com.peekr.common.db.schema.Users
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.keyword.domain.model.Keyword
-import com.peekr.domain.keyword.domain.repository.KeywordRepository
-import com.peekr.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
+import com.turnin.common.db.schema.KeywordEntity
+import com.turnin.common.db.schema.Keywords
+import com.turnin.common.db.schema.Users
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.keyword.domain.model.Keyword
+import com.turnin.domain.keyword.domain.repository.KeywordRepository
+import com.turnin.domain.keyword.infrastructure.mapper.KeywordMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 

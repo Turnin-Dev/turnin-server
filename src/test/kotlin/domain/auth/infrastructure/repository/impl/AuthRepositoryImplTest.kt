@@ -1,15 +1,15 @@
-package com.peekr.domain.auth.infrastructure.repository.impl
+package com.turnin.domain.auth.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseException
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.domain.auth.domain.model.Register
-import com.peekr.util.db.TestDatabaseFactory
-import com.peekr.util.db.setUserInactiveForTest
+import com.turnin.common.db.DatabaseException
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.TurninDateTime
+import com.turnin.domain.auth.domain.model.Register
+import com.turnin.util.db.TestDatabaseFactory
+import com.turnin.util.db.setUserInactiveForTest
 import junit.framework.TestCase.assertFalse
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -132,9 +132,9 @@ class AuthRepositoryImplTest {
         val userId = savedUser.userId
 
         // when
-        val before = PeekrDateTime.now()
+        val before = TurninDateTime.now()
         repository.updateLastLoginAt(userId)
-        val after = PeekrDateTime.now()
+        val after = TurninDateTime.now()
 
         // then
         val updatedUser = repository.findUserByUserId(userId)
@@ -150,8 +150,8 @@ class AuthRepositoryImplTest {
 
         // when
         repository.updateLastLoginAt(userId)
-        val before = PeekrDateTime.now().plusSeconds(1)
-        val after = PeekrDateTime.now().plusSeconds(2)
+        val before = TurninDateTime.now().plusSeconds(1)
+        val after = TurninDateTime.now().plusSeconds(2)
 
         // then
         val updatedUser = repository.findUserByUserId(userId)

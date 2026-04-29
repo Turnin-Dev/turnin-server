@@ -1,12 +1,12 @@
-package com.peekr.domain.notification
+package com.turnin.domain.notification
 
-import com.peekr.common.model.NotificationType
-import com.peekr.common.model.id.FcmTokenId
-import com.peekr.common.model.id.NotificationId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.model.FcmToken
-import com.peekr.domain.notification.domain.model.Notification
-import com.peekr.domain.notification.domain.model.NotificationCommand
+import com.turnin.common.model.NotificationType
+import com.turnin.common.model.id.FcmTokenId
+import com.turnin.common.model.id.NotificationId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.model.FcmToken
+import com.turnin.domain.notification.domain.model.Notification
+import com.turnin.domain.notification.domain.model.NotificationCommand
 
 /** Notification 생성 유틸 */
 fun notificationFixture(

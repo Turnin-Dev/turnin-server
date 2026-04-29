@@ -1,6 +1,6 @@
-package com.peekr.domain.userKeyword.exception
+package com.turnin.domain.userKeyword.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 /**
  * 사용자 키워드 커스텀 에러 코드

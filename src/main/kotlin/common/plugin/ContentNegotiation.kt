@@ -1,4 +1,4 @@
-package com.peekr.common.plugin
+package com.turnin.common.plugin
 
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application

@@ -1,15 +1,15 @@
-package com.peekr.domain.feed.application.usecase
+package com.turnin.domain.feed.application.usecase
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.feed.application.dto.FeedCursor
-import com.peekr.domain.feed.application.dto.toDto
-import com.peekr.domain.feed.domain.model.Feed
-import com.peekr.domain.feed.domain.repository.FeedRepository
-import com.peekr.domain.userKeyword.domain.model.Description
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.feed.application.dto.FeedCursor
+import com.turnin.domain.feed.application.dto.toDto
+import com.turnin.domain.feed.domain.model.Feed
+import com.turnin.domain.feed.domain.repository.FeedRepository
+import com.turnin.domain.userKeyword.domain.model.Description
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

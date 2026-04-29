@@ -1,4 +1,4 @@
-package com.peekr.domain.userKeyword.domain.model
+package com.turnin.domain.userKeyword.domain.model
 
 /**
  * 사용자별 키워드 설명

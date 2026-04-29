@@ -1,14 +1,14 @@
-package com.peekr.domain.discover.presentation.route
+package com.turnin.domain.discover.presentation.route
 
-import com.peekr.common.plugin.AuthenticatedRoute
-import com.peekr.common.route.Api
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.common.util.pagination.cursor.getCursorPaginationParams
-import com.peekr.common.util.pagination.cursor.toResponse
-import com.peekr.common.validator.inputValidationAndReturn
-import com.peekr.domain.discover.application.usecase.DiscoverUseCases
-import com.peekr.domain.discover.presentation.dto.DiscoverContextResponse
-import com.peekr.domain.discover.presentation.dto.toResponse
+import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.route.Api
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.common.util.pagination.cursor.getCursorPaginationParams
+import com.turnin.common.util.pagination.cursor.toResponse
+import com.turnin.common.validator.inputValidationAndReturn
+import com.turnin.domain.discover.application.usecase.DiscoverUseCases
+import com.turnin.domain.discover.presentation.dto.DiscoverContextResponse
+import com.turnin.domain.discover.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.route

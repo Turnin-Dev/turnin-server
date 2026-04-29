@@ -1,7 +1,7 @@
-package com.peekr.domain.notification.presentation.dto
+package com.turnin.domain.notification.presentation.dto
 
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.domain.notification.application.dto.NotificationDto
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.domain.notification.application.dto.NotificationDto
 import kotlinx.serialization.Serializable
 
 /**

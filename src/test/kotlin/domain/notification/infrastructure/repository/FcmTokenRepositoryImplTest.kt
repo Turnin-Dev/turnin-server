@@ -1,10 +1,10 @@
-package com.peekr.domain.notification.infrastructure.repository
+package com.turnin.domain.notification.infrastructure.repository
 
-import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.id.UserId
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.id.UserId
+import com.turnin.util.db.TestDatabaseFactory
 import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.After

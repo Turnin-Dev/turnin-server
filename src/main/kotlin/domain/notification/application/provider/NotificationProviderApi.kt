@@ -1,13 +1,13 @@
-package com.peekr.domain.notification.application.provider
+package com.turnin.domain.notification.application.provider
 
-import com.peekr.common.firebase.FcmDataKey
-import com.peekr.common.firebase.FcmMessage
-import com.peekr.common.firebase.FcmService
-import com.peekr.common.model.NotificationType
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.application.usecase.SendNotificationUseCase
-import com.peekr.domain.notification.domain.model.NotificationCommand
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.common.firebase.FcmDataKey
+import com.turnin.common.firebase.FcmMessage
+import com.turnin.common.firebase.FcmService
+import com.turnin.common.model.NotificationType
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.application.usecase.SendNotificationUseCase
+import com.turnin.domain.notification.domain.model.NotificationCommand
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
 
 /**
  * 외부에 제공할 알림 API

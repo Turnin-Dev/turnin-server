@@ -1,22 +1,22 @@
-package com.peekr.domain.auth.infrastructure.repository.impl
+package com.turnin.domain.auth.infrastructure.repository.impl
 
-import com.peekr.common.db.DatabaseUtils.eqEnum
-import com.peekr.common.db.extension.filterActiveUser
-import com.peekr.common.db.schema.UserEntity
-import com.peekr.common.db.schema.Users
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.Role
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.masking
-import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.domain.model.Register
-import com.peekr.domain.auth.domain.model.toAuthUser
-import com.peekr.domain.auth.domain.repository.AuthRepository
-import com.peekr.domain.auth.infrastructure.mapper.AuthMapper
+import com.turnin.common.db.DatabaseUtils.eqEnum
+import com.turnin.common.db.extension.filterActiveUser
+import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.db.schema.Users
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.TurninDateTime
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.masking
+import com.turnin.domain.auth.domain.model.AuthUser
+import com.turnin.domain.auth.domain.model.Register
+import com.turnin.domain.auth.domain.model.toAuthUser
+import com.turnin.domain.auth.domain.repository.AuthRepository
+import com.turnin.domain.auth.infrastructure.mapper.AuthMapper
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.selectAll
@@ -55,7 +55,7 @@ class AuthRepositoryImpl : AuthRepository {
     override suspend fun save(register: Register): AuthUser = suspendTransaction {
         val role = Role.USER
         val isActive = true
-        val lastLoginAt = PeekrDateTime.now()
+        val lastLoginAt = TurninDateTime.now()
 
         val savedUserEntity = UserEntity.new {
             this.role = role
@@ -79,7 +79,7 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun updateLastLoginAt(userId: UserId) = suspendTransaction<Unit> {
         UserEntity.findByIdAndUpdate(userId.value) {
-            it.lastLoginAt = PeekrDateTime.now()
+            it.lastLoginAt = TurninDateTime.now()
         } ?: LOGGER.warn("updateLastLoginAt: user not found. userId=${userId.value.masking()}")
     }
 }

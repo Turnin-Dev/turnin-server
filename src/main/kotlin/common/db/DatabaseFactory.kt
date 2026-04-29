@@ -1,7 +1,7 @@
-package com.peekr.common.db
+package com.turnin.common.db
 
-import com.peekr.common.util.config.RunEnvironment
-import com.peekr.common.util.log.AppLoggerFactory
+import com.turnin.common.util.config.RunEnvironment
+import com.turnin.common.util.log.AppLoggerFactory
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource

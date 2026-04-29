@@ -1,7 +1,7 @@
-package com.peekr.domain.notification.application.dto
+package com.turnin.domain.notification.application.dto
 
-import com.peekr.common.model.NotificationType
-import com.peekr.domain.notification.domain.model.Notification
+import com.turnin.common.model.NotificationType
+import com.turnin.domain.notification.domain.model.Notification
 
 /**
  * 알림 DTO

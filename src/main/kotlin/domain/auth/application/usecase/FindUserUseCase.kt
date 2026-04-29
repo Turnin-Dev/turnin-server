@@ -1,12 +1,12 @@
-package com.peekr.domain.auth.application.usecase
+package com.turnin.domain.auth.application.usecase
 
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.masking
-import com.peekr.domain.auth.application.dto.FindUserResultDto
-import com.peekr.domain.auth.application.mapper.AuthMapper.toDto
-import com.peekr.domain.auth.domain.model.FindUserResult
-import com.peekr.domain.auth.domain.repository.AuthRepository
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.masking
+import com.turnin.domain.auth.application.dto.FindUserResultDto
+import com.turnin.domain.auth.application.mapper.AuthMapper.toDto
+import com.turnin.domain.auth.domain.model.FindUserResult
+import com.turnin.domain.auth.domain.repository.AuthRepository
 
 /**
  * 로그인을 수행하기 전에 이미 가입되어 있는 사용자인지 찾는다.

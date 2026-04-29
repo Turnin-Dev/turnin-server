@@ -1,17 +1,17 @@
-package com.peekr.domain.auth.di
+package com.turnin.domain.auth.di
 
-import com.peekr.domain.auth.application.provider.AuthDeletionSupportApi
-import com.peekr.domain.auth.application.provider.AuthProviderApi
-import com.peekr.domain.auth.application.usecase.AuthUseCases
-import com.peekr.domain.auth.application.usecase.ExistsDisplayIdUseCase
-import com.peekr.domain.auth.application.usecase.FindUserUseCase
-import com.peekr.domain.auth.application.usecase.LoginUseCase
-import com.peekr.domain.auth.application.usecase.RefreshTokenUseCase
-import com.peekr.domain.auth.application.usecase.RegisterUseCase
-import com.peekr.domain.auth.domain.repository.AuthRepository
-import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
-import com.peekr.domain.auth.infrastructure.repository.impl.AuthRepositoryImpl
-import com.peekr.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
+import com.turnin.domain.auth.application.provider.AuthDeletionSupportApi
+import com.turnin.domain.auth.application.provider.AuthProviderApi
+import com.turnin.domain.auth.application.usecase.AuthUseCases
+import com.turnin.domain.auth.application.usecase.ExistsDisplayIdUseCase
+import com.turnin.domain.auth.application.usecase.FindUserUseCase
+import com.turnin.domain.auth.application.usecase.LoginUseCase
+import com.turnin.domain.auth.application.usecase.RefreshTokenUseCase
+import com.turnin.domain.auth.application.usecase.RegisterUseCase
+import com.turnin.domain.auth.domain.repository.AuthRepository
+import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
+import com.turnin.domain.auth.infrastructure.repository.impl.AuthRepositoryImpl
+import com.turnin.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
 import org.koin.dsl.module
 
 val authModule = module {

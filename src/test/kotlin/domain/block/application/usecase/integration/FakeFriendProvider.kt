@@ -1,9 +1,9 @@
-package com.peekr.domain.block.application.usecase.integration
+package com.turnin.domain.block.application.usecase.integration
 
-import com.peekr.common.db.schema.Friends
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.block.domain.provider.FriendProvider
+import com.turnin.common.db.schema.Friends
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.block.domain.provider.FriendProvider
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere

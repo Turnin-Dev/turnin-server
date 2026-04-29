@@ -1,4 +1,4 @@
-package com.peekr.common.plugin
+package com.turnin.common.plugin
 
 import io.github.smiley4.ktoropenapi.OpenApi
 import io.github.smiley4.ktoropenapi.config.OutputFormat
@@ -12,8 +12,8 @@ fun Application.configureAPIDocuments() {
 
         // configure basic information about the api
         info {
-            title = "Peekr API"
-            description = "Peekr API with Swagger-UI"
+            title = "Turnin API"
+            description = "Turnin API with Swagger-UI"
         }
         // configure the servers from where the api is being served
         server {

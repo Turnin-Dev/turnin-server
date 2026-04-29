@@ -1,7 +1,7 @@
-package com.peekr.common.validator
+package com.turnin.common.validator
 
 /**
- * [PeekrValidator]에서 사용하는 예외 타입
+ * [TurninValidator]에서 사용하는 예외 타입
  *
  * @param message 유효성 검사 실패/에러 메시지
  */

@@ -1,14 +1,14 @@
-package com.peekr.domain.userKeyword.application.usecase.integration
+package com.turnin.domain.userKeyword.application.usecase.integration
 
-import com.peekr.common.db.schema.KeywordEntity
-import com.peekr.common.db.schema.Keywords
-import com.peekr.common.db.schema.Users
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.userKeyword.domain.model.ExternalKeyword
-import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
+import com.turnin.common.db.schema.KeywordEntity
+import com.turnin.common.db.schema.Keywords
+import com.turnin.common.db.schema.Users
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.userKeyword.domain.model.ExternalKeyword
+import com.turnin.domain.userKeyword.domain.provider.KeywordProvider
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.selectAll
 

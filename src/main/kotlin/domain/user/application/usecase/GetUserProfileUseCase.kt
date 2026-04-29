@@ -1,11 +1,11 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.FriendStatus
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.application.dto.UserProfileDto
-import com.peekr.domain.user.application.dto.toDto
-import com.peekr.domain.user.domain.provider.FriendProvider
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.FriendStatus
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.application.dto.UserProfileDto
+import com.turnin.domain.user.application.dto.toDto
+import com.turnin.domain.user.domain.provider.FriendProvider
+import com.turnin.domain.user.domain.repository.UserRepository
 
 /**
  * 사용자 ID로 사용자 프로필 조회

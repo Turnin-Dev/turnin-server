@@ -1,6 +1,6 @@
-package com.peekr.domain.block.domain.model
+package com.turnin.domain.block.domain.model
 
-import com.peekr.common.model.id.BlockId
+import com.turnin.common.model.id.BlockId
 
 /**
  * 차단 엔티티 모델

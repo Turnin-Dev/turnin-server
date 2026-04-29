@@ -1,6 +1,6 @@
-package com.peekr.domain.auth.domain.repository
+package com.turnin.domain.auth.domain.repository
 
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.id.UserId
 
 interface RefreshTokenRepository {
     /**

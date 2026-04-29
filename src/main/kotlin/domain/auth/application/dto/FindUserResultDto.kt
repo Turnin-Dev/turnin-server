@@ -1,4 +1,4 @@
-package com.peekr.domain.auth.application.dto
+package com.turnin.domain.auth.application.dto
 
 /**
  * 사용자 존재 확인 결과 DTO

@@ -1,6 +1,6 @@
-package com.peekr.domain.report.application.dto
+package com.turnin.domain.report.application.dto
 
-import com.peekr.domain.report.domain.model.ReportReason
+import com.turnin.domain.report.domain.model.ReportReason
 
 /**
  * 신고 사유 DTO

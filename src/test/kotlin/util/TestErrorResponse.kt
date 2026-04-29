@@ -1,4 +1,4 @@
-package com.peekr.util
+package com.turnin.util
 
 data class TestErrorResponse(
     val code: Int,

@@ -1,10 +1,10 @@
-package com.peekr.domain.user.domain.repository
+package com.turnin.domain.user.domain.repository
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.domain.model.User
-import com.peekr.domain.user.domain.model.UserPatch
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.domain.model.User
+import com.turnin.domain.user.domain.model.UserPatch
 
 interface UserRepository {
     /**

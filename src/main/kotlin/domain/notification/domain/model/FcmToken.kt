@@ -1,7 +1,7 @@
-package com.peekr.domain.notification.domain.model
+package com.turnin.domain.notification.domain.model
 
-import com.peekr.common.model.id.FcmTokenId
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.id.FcmTokenId
+import com.turnin.common.model.id.UserId
 
 /**
  * 사용자 FCM 토큰 모델

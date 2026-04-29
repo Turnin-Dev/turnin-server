@@ -1,14 +1,14 @@
-package com.peekr.domain.notification.infrastructure.repository
+package com.turnin.domain.notification.infrastructure.repository
 
-import com.peekr.common.db.schema.UserFcmTokenEntity
-import com.peekr.common.db.schema.UserFcmTokens
-import com.peekr.common.db.schema.Users
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.db.updateWithTimestamp
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.notification.domain.model.FcmToken
-import com.peekr.domain.notification.domain.repository.FcmTokenRepository
-import com.peekr.domain.notification.infrastructure.mapper.NotificationMapper.toDomain
+import com.turnin.common.db.schema.UserFcmTokenEntity
+import com.turnin.common.db.schema.UserFcmTokens
+import com.turnin.common.db.schema.Users
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.db.updateWithTimestamp
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.notification.domain.model.FcmToken
+import com.turnin.domain.notification.domain.repository.FcmTokenRepository
+import com.turnin.domain.notification.infrastructure.mapper.NotificationMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and

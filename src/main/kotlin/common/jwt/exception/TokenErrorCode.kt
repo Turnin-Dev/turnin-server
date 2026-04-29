@@ -1,6 +1,6 @@
-package com.peekr.common.jwt.exception
+package com.turnin.common.jwt.exception
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class TokenErrorCode(
     raw: String,

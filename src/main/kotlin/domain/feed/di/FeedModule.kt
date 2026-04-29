@@ -1,9 +1,9 @@
-package com.peekr.domain.feed.di
+package com.turnin.domain.feed.di
 
-import com.peekr.domain.feed.application.usecase.FeedUseCases
-import com.peekr.domain.feed.application.usecase.GetFeedsUseCase
-import com.peekr.domain.feed.domain.repository.FeedRepository
-import com.peekr.domain.feed.infrastructure.repository.FeedRepositoryImpl
+import com.turnin.domain.feed.application.usecase.FeedUseCases
+import com.turnin.domain.feed.application.usecase.GetFeedsUseCase
+import com.turnin.domain.feed.domain.repository.FeedRepository
+import com.turnin.domain.feed.infrastructure.repository.FeedRepositoryImpl
 import org.koin.dsl.module
 
 val feedModule = module {

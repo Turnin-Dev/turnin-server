@@ -1,16 +1,16 @@
-package com.peekr.domain.file.di
+package com.turnin.domain.file.di
 
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.domain.file.application.provider.FileDeletionSupportApi
-import com.peekr.domain.file.application.provider.FileProviderApi
-import com.peekr.domain.file.application.usecase.DeleteFileUseCase
-import com.peekr.domain.file.application.usecase.FileUseCases
-import com.peekr.domain.file.application.usecase.GetFileUpdateUrlUseCase
-import com.peekr.domain.file.application.usecase.GetFileUploadUrlUseCase
-import com.peekr.domain.file.domain.service.FileService
-import com.peekr.domain.file.infrastructure.service.impl.CloudflareR2Service
-import com.peekr.domain.file.infrastructure.service.impl.FileServiceImpl
-import com.peekr.domain.file.infrastructure.service.impl.S3PresignerFactory
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.domain.file.application.provider.FileDeletionSupportApi
+import com.turnin.domain.file.application.provider.FileProviderApi
+import com.turnin.domain.file.application.usecase.DeleteFileUseCase
+import com.turnin.domain.file.application.usecase.FileUseCases
+import com.turnin.domain.file.application.usecase.GetFileUpdateUrlUseCase
+import com.turnin.domain.file.application.usecase.GetFileUploadUrlUseCase
+import com.turnin.domain.file.domain.service.FileService
+import com.turnin.domain.file.infrastructure.service.impl.CloudflareR2Service
+import com.turnin.domain.file.infrastructure.service.impl.FileServiceImpl
+import com.turnin.domain.file.infrastructure.service.impl.S3PresignerFactory
 import org.koin.dsl.module
 import org.koin.dsl.onClose
 

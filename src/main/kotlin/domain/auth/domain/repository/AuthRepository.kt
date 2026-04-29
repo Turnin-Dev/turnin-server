@@ -1,10 +1,10 @@
-package com.peekr.domain.auth.domain.repository
+package com.turnin.domain.auth.domain.repository
 
-import com.peekr.common.model.SocialLoginProvider
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.auth.domain.model.AuthUser
-import com.peekr.domain.auth.domain.model.Register
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.auth.domain.model.AuthUser
+import com.turnin.domain.auth.domain.model.Register
 
 interface AuthRepository {
     /**
@@ -47,7 +47,7 @@ interface AuthRepository {
      *
      * - 활성화된 사용자: `role: Role.User`, `isActive: true`
      *
-     * @exception com.peekr.common.db.DatabaseException.DuplicatedDataException - 이미 존재하는 사용자 저장 시 예외 발생
+     * @exception com.turnin.common.db.DatabaseException.DuplicatedDataException - 이미 존재하는 사용자 저장 시 예외 발생
      */
     suspend fun save(register: Register): AuthUser
 

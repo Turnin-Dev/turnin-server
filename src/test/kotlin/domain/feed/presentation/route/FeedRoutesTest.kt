@@ -1,15 +1,15 @@
-package com.peekr.domain.feed.presentation.route
+package com.turnin.domain.feed.presentation.route
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.route.Api
-import com.peekr.common.util.pagination.cursor.CursorPage
-import com.peekr.common.util.pagination.cursor.toResponse
-import com.peekr.domain.feed.application.dto.FeedCursor
-import com.peekr.domain.feed.application.dto.FeedDto
-import com.peekr.domain.feed.application.usecase.FeedUseCases
-import com.peekr.domain.feed.presentation.dto.toResponse
-import com.peekr.util.testGetEndpoint
-import com.peekr.util.testPlugin
+import com.turnin.common.model.id.UserId
+import com.turnin.common.route.Api
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.common.util.pagination.cursor.toResponse
+import com.turnin.domain.feed.application.dto.FeedCursor
+import com.turnin.domain.feed.application.dto.FeedDto
+import com.turnin.domain.feed.application.usecase.FeedUseCases
+import com.turnin.domain.feed.presentation.dto.toResponse
+import com.turnin.util.testGetEndpoint
+import com.turnin.util.testPlugin
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery

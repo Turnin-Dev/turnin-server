@@ -1,14 +1,14 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.log.LogAction
-import com.peekr.common.util.log.LogTag
-import com.peekr.common.util.log.LogType
-import com.peekr.domain.user.application.dto.UserPatchDto
-import com.peekr.domain.user.application.dto.toDomain
-import com.peekr.domain.user.domain.provider.FileProvider
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
+import com.turnin.domain.user.application.dto.UserPatchDto
+import com.turnin.domain.user.application.dto.toDomain
+import com.turnin.domain.user.domain.provider.FileProvider
+import com.turnin.domain.user.domain.repository.UserRepository
 import kotlin.coroutines.cancellation.CancellationException
 
 /**

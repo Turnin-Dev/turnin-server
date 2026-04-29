@@ -1,6 +1,6 @@
-package com.peekr.domain.friend.application.dto
+package com.turnin.domain.friend.application.dto
 
-import com.peekr.common.util.pagination.offset.PagingData
+import com.turnin.common.util.pagination.offset.PagingData
 
 /**
  * 페이지네이션용 친구 목록 DTO

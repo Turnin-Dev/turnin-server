@@ -1,4 +1,4 @@
-package com.peekr.common.util.log
+package com.turnin.common.util.log
 
 object LogSanitizer {
     fun sanitize(value: String?): String =

@@ -1,11 +1,11 @@
-package com.peekr.domain.notification.application.usecase
+package com.turnin.domain.notification.application.usecase
 
-import com.peekr.common.firebase.FcmService
-import com.peekr.common.model.NotificationType
-import com.peekr.domain.notification.application.dto.toDto
-import com.peekr.domain.notification.domain.model.NotificationCommand
-import com.peekr.domain.notification.domain.repository.NotificationRepository
-import com.peekr.domain.notification.notificationFixture
+import com.turnin.common.firebase.FcmService
+import com.turnin.common.model.NotificationType
+import com.turnin.domain.notification.application.dto.toDto
+import com.turnin.domain.notification.domain.model.NotificationCommand
+import com.turnin.domain.notification.domain.repository.NotificationRepository
+import com.turnin.domain.notification.notificationFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

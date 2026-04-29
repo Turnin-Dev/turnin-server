@@ -1,4 +1,4 @@
-package com.peekr.common.jwt.infrastructure
+package com.turnin.common.jwt.infrastructure
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
@@ -8,13 +8,13 @@ import com.auth0.jwt.exceptions.JWTDecodeException
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.peekr.common.jwt.domain.model.JWTToken
-import com.peekr.common.jwt.domain.model.JWTTokenPayload
-import com.peekr.common.jwt.domain.model.JWTTokenType
-import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.jwt.exception.TokenException
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.common.util.config.AppConfig
+import com.turnin.common.jwt.domain.model.JWTToken
+import com.turnin.common.jwt.domain.model.JWTTokenPayload
+import com.turnin.common.jwt.domain.model.JWTTokenType
+import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.util.TurninDateTime
+import com.turnin.common.util.config.AppConfig
 import java.util.UUID
 
 class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
@@ -82,7 +82,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         expiresIn: Long,
     ): String {
         val checksum = UUID.randomUUID().toString()
-        val issuedAt = PeekrDateTime.now()
+        val issuedAt = TurninDateTime.now()
         val expiresAt = issuedAt.plusMillis(expiresIn)
 
         return JWT
@@ -102,7 +102,7 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
         expiresIn: Long,
     ): String {
         val checksum = UUID.randomUUID().toString()
-        val issuedAt = PeekrDateTime.now()
+        val issuedAt = TurninDateTime.now()
         val expiresAt = issuedAt.plusMillis(expiresIn)
 
         return JWT

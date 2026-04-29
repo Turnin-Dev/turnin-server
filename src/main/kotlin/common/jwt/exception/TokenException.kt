@@ -1,8 +1,8 @@
-package com.peekr.common.jwt.exception
+package com.turnin.common.jwt.exception
 
-import com.peekr.common.exception.ApiErrorCode
-import com.peekr.common.exception.ApiException
-import com.peekr.common.util.log.LogLevel
+import com.turnin.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiException
+import com.turnin.common.util.log.LogLevel
 import io.ktor.http.HttpStatusCode
 
 /**

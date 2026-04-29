@@ -1,12 +1,12 @@
-package com.peekr.domain.userKeyword.domain.repository
+package com.turnin.domain.userKeyword.domain.repository
 
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.domain.model.Description
-import com.peekr.domain.userKeyword.domain.model.UserKeyword
-import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
-import com.peekr.domain.userKeyword.domain.model.UserKeywordPatch
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.userKeyword.domain.model.Description
+import com.turnin.domain.userKeyword.domain.model.UserKeyword
+import com.turnin.domain.userKeyword.domain.model.UserKeywordDetail
+import com.turnin.domain.userKeyword.domain.model.UserKeywordPatch
 
 interface UserKeywordRepository {
     /**

@@ -1,8 +1,8 @@
-package com.peekr.domain.friend.domain.model
+package com.turnin.domain.friend.domain.model
 
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.common.model.id.FriendId
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.common.model.id.FriendId
+import com.turnin.common.model.id.UserId
 
 /**
  * 친구 엔티티 모델

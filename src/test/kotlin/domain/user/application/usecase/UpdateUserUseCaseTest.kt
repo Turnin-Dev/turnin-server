@@ -1,13 +1,13 @@
-package com.peekr.domain.user.application.usecase
+package com.turnin.domain.user.application.usecase
 
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.user.application.dto.UserPatchDto
-import com.peekr.domain.user.domain.model.UserPatch
-import com.peekr.domain.user.domain.provider.FileProvider
-import com.peekr.domain.user.domain.repository.UserRepository
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.user.application.dto.UserPatchDto
+import com.turnin.domain.user.domain.model.UserPatch
+import com.turnin.domain.user.domain.provider.FileProvider
+import com.turnin.domain.user.domain.repository.UserRepository
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every

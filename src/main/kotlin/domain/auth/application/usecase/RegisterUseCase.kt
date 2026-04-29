@@ -1,24 +1,24 @@
-package com.peekr.domain.auth.application.usecase
+package com.turnin.domain.auth.application.usecase
 
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.jwt.application.dto.toDto
-import com.peekr.common.jwt.domain.model.JWTClaimName
-import com.peekr.common.jwt.domain.model.JWTTokenPayload
-import com.peekr.common.jwt.domain.service.JWTTokenService
-import com.peekr.common.util.log.AppLoggerFactory
-import com.peekr.common.util.log.LogAction
-import com.peekr.common.util.log.LogTag
-import com.peekr.common.util.log.LogType
-import com.peekr.common.util.masking
-import com.peekr.domain.auth.application.dto.RegisterDto
-import com.peekr.domain.auth.application.dto.RegisterResultDto
-import com.peekr.domain.auth.application.mapper.AuthMapper.toDomain
-import com.peekr.domain.auth.domain.model.Register
-import com.peekr.domain.auth.domain.model.RegisterResult
-import com.peekr.domain.auth.domain.repository.AuthRepository
-import com.peekr.domain.auth.domain.repository.RefreshTokenRepository
-import com.peekr.domain.auth.exception.AuthException
-import com.peekr.domain.auth.exception.AuthException.DuplicateUserException
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.jwt.application.dto.toDto
+import com.turnin.common.jwt.domain.model.JWTClaimName
+import com.turnin.common.jwt.domain.model.JWTTokenPayload
+import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
+import com.turnin.common.util.masking
+import com.turnin.domain.auth.application.dto.RegisterDto
+import com.turnin.domain.auth.application.dto.RegisterResultDto
+import com.turnin.domain.auth.application.mapper.AuthMapper.toDomain
+import com.turnin.domain.auth.domain.model.Register
+import com.turnin.domain.auth.domain.model.RegisterResult
+import com.turnin.domain.auth.domain.repository.AuthRepository
+import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
+import com.turnin.domain.auth.exception.AuthException
+import com.turnin.domain.auth.exception.AuthException.DuplicateUserException
 
 class RegisterUseCase(
     private val authRepository: AuthRepository,

@@ -1,4 +1,4 @@
-package com.peekr.domain.friend.domain.message
+package com.turnin.domain.friend.domain.message
 
 /**
  * 친구 알림 메시지

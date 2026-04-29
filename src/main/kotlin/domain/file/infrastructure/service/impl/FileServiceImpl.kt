@@ -1,8 +1,8 @@
-package com.peekr.domain.file.infrastructure.service.impl
+package com.turnin.domain.file.infrastructure.service.impl
 
-import com.peekr.domain.file.domain.model.UploadFileInfo
-import com.peekr.domain.file.domain.service.FileService
-import com.peekr.domain.file.exception.FileException
+import com.turnin.domain.file.domain.model.UploadFileInfo
+import com.turnin.domain.file.domain.service.FileService
+import com.turnin.domain.file.exception.FileException
 import java.net.URI
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception

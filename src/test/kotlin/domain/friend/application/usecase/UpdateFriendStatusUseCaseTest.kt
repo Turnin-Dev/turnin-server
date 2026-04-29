@@ -1,15 +1,15 @@
-package com.peekr.domain.friend.application.usecase
+package com.turnin.domain.friend.application.usecase
 
-import com.peekr.common.model.FriendRequestStatus
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.friend.domain.model.FriendRequestContext
-import com.peekr.domain.friend.domain.model.UserInfo
-import com.peekr.domain.friend.domain.provider.NotificationProvider
-import com.peekr.domain.friend.domain.repository.FriendRepository
-import com.peekr.domain.friend.exception.FriendException
-import com.peekr.util.db.TestDatabaseFactory
+import com.turnin.common.model.FriendRequestStatus
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.model.FriendRequestContext
+import com.turnin.domain.friend.domain.model.UserInfo
+import com.turnin.domain.friend.domain.provider.NotificationProvider
+import com.turnin.domain.friend.domain.repository.FriendRepository
+import com.turnin.domain.friend.exception.FriendException
+import com.turnin.util.db.TestDatabaseFactory
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.coEvery

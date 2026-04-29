@@ -1,7 +1,7 @@
-package com.peekr.common.db.extension
+package com.turnin.common.db.extension
 
-import com.peekr.common.db.schema.Blocks
-import com.peekr.common.model.id.UserId
+import com.turnin.common.db.schema.Blocks
+import com.turnin.common.model.id.UserId
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.or

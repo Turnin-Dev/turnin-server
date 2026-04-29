@@ -1,28 +1,28 @@
-package com.peekr
+package com.turnin
 
-import com.peekr.ApplicationUtils.initDatabase
-import com.peekr.ApplicationUtils.printSection
-import com.peekr.ApplicationUtils.printServerSettings
-import com.peekr.ApplicationUtils.printTimeZone
-import com.peekr.common.di.configureKoin
-import com.peekr.common.exception.configureExceptionHandler
-import com.peekr.common.firebase.FirebaseAdmin
-import com.peekr.common.jwt.configureJwtSecurity
-import com.peekr.common.plugin.configureAPIDocuments
-import com.peekr.common.plugin.configureCallLogging
-import com.peekr.common.plugin.configureContentNegotiation
-import com.peekr.common.plugin.configureCors
-import com.peekr.common.plugin.configureResources
-import com.peekr.common.plugin.configureRouting
-import com.peekr.common.util.AppDispatchers
-import com.peekr.common.util.application.applicationCleanup
-import com.peekr.common.util.getTimeZoneInfo
+import com.turnin.ApplicationUtils.initDatabase
+import com.turnin.ApplicationUtils.printSection
+import com.turnin.ApplicationUtils.printServerSettings
+import com.turnin.ApplicationUtils.printTimeZone
+import com.turnin.common.di.configureKoin
+import com.turnin.common.exception.configureExceptionHandler
+import com.turnin.common.firebase.FirebaseAdmin
+import com.turnin.common.jwt.configureJwtSecurity
+import com.turnin.common.plugin.configureAPIDocuments
+import com.turnin.common.plugin.configureCallLogging
+import com.turnin.common.plugin.configureContentNegotiation
+import com.turnin.common.plugin.configureCors
+import com.turnin.common.plugin.configureResources
+import com.turnin.common.plugin.configureRouting
+import com.turnin.common.util.application.applicationCleanup
+import com.turnin.common.util.config.AppConfig
+import com.turnin.common.util.getTimeZoneInfo
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.netty.EngineMain
 import java.util.TimeZone
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import org.koin.ktor.ext.inject
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -42,10 +42,9 @@ fun Application.module() {
     configureKoin()
 
     // ------------------------------ Initialize ------------------------------
+    val appConfig: AppConfig by inject()
     initDatabase()
-    runBlocking(AppDispatchers.ioDispatcher) {
-        FirebaseAdmin.initialize()
-    }
+    FirebaseAdmin.initialize(appConfig)
 
     // ------------------------------ Plugins ------------------------------
     configureResources()

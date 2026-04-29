@@ -1,7 +1,7 @@
-package com.peekr.common.ml
+package com.turnin.common.ml
 
-import com.peekr.common.util.config.AppConfig
-import com.peekr.common.util.log.AppLoggerFactory
+import com.turnin.common.util.config.AppConfig
+import com.turnin.common.util.log.AppLoggerFactory
 import org.koin.dsl.module
 import org.koin.dsl.onClose
 

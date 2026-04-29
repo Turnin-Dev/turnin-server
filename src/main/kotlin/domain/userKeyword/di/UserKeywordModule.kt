@@ -1,24 +1,24 @@
-package com.peekr.domain.userKeyword.di
+package com.turnin.domain.userKeyword.di
 
-import com.peekr.common.di.ApplicationScopeQualifier
-import com.peekr.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
-import com.peekr.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
-import com.peekr.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
-import com.peekr.domain.userKeyword.application.usecase.GetDetailUseCase
-import com.peekr.domain.userKeyword.application.usecase.GetDetailsUseCase
-import com.peekr.domain.userKeyword.application.usecase.GetUserKeywordsUseCase
-import com.peekr.domain.userKeyword.application.usecase.UpdateUserKeywordUseCase
-import com.peekr.domain.userKeyword.application.usecase.UserKeywordUseCases
-import com.peekr.domain.userKeyword.domain.provider.FriendProvider
-import com.peekr.domain.userKeyword.domain.provider.KeywordProvider
-import com.peekr.domain.userKeyword.domain.provider.NotificationProvider
-import com.peekr.domain.userKeyword.domain.provider.ReportProvider
-import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
-import com.peekr.domain.userKeyword.infrastructure.provider.FriendProviderImpl
-import com.peekr.domain.userKeyword.infrastructure.provider.KeywordProviderImpl
-import com.peekr.domain.userKeyword.infrastructure.provider.NotificationProviderImpl
-import com.peekr.domain.userKeyword.infrastructure.provider.ReportProviderImpl
-import com.peekr.domain.userKeyword.infrastructure.repository.impl.UserKeywordRepositoryImpl
+import com.turnin.common.di.ApplicationScopeQualifier
+import com.turnin.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
+import com.turnin.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
+import com.turnin.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
+import com.turnin.domain.userKeyword.application.usecase.GetDetailUseCase
+import com.turnin.domain.userKeyword.application.usecase.GetDetailsUseCase
+import com.turnin.domain.userKeyword.application.usecase.GetUserKeywordsUseCase
+import com.turnin.domain.userKeyword.application.usecase.UpdateUserKeywordUseCase
+import com.turnin.domain.userKeyword.application.usecase.UserKeywordUseCases
+import com.turnin.domain.userKeyword.domain.provider.FriendProvider
+import com.turnin.domain.userKeyword.domain.provider.KeywordProvider
+import com.turnin.domain.userKeyword.domain.provider.NotificationProvider
+import com.turnin.domain.userKeyword.domain.provider.ReportProvider
+import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.turnin.domain.userKeyword.infrastructure.provider.FriendProviderImpl
+import com.turnin.domain.userKeyword.infrastructure.provider.KeywordProviderImpl
+import com.turnin.domain.userKeyword.infrastructure.provider.NotificationProviderImpl
+import com.turnin.domain.userKeyword.infrastructure.provider.ReportProviderImpl
+import com.turnin.domain.userKeyword.infrastructure.repository.impl.UserKeywordRepositoryImpl
 import org.koin.dsl.module
 
 val userKeywordModule = module {

@@ -1,6 +1,6 @@
-package com.peekr.common.ml
+package com.turnin.common.ml
 
-import com.peekr.common.exception.ApiErrorCode
+import com.turnin.common.exception.ApiErrorCode
 
 sealed class EmbeddingServiceErrorCode(
     code: String,

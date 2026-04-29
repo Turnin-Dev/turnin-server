@@ -1,7 +1,7 @@
-package com.peekr.domain.userKeyword.domain.provider
+package com.turnin.domain.userKeyword.domain.provider
 
-import com.peekr.common.model.id.UserId
-import com.peekr.domain.userKeyword.domain.model.UserKeywordFriendFcmContext
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.userKeyword.domain.model.UserKeywordFriendFcmContext
 
 /**
  * 외부에서 제공되는 친구 API

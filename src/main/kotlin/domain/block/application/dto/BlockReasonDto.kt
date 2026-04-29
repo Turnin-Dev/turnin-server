@@ -1,6 +1,6 @@
-package com.peekr.domain.block.application.dto
+package com.turnin.domain.block.application.dto
 
-import com.peekr.domain.block.domain.model.BlockReason
+import com.turnin.domain.block.domain.model.BlockReason
 
 /**
  * 차단 사유 DTO

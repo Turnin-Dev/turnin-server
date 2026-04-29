@@ -1,15 +1,15 @@
-package com.peekr.domain.userKeyword.application.usecase
+package com.turnin.domain.userKeyword.application.usecase
 
-import com.peekr.common.model.KeywordName
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.KeywordId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.model.id.UserKeywordId
-import com.peekr.domain.userKeyword.application.dto.toDto
-import com.peekr.domain.userKeyword.domain.model.Description
-import com.peekr.domain.userKeyword.domain.model.UserInfo
-import com.peekr.domain.userKeyword.domain.model.UserKeywordDetail
-import com.peekr.domain.userKeyword.domain.repository.UserKeywordRepository
+import com.turnin.common.model.KeywordName
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.KeywordId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.userKeyword.application.dto.toDto
+import com.turnin.domain.userKeyword.domain.model.Description
+import com.turnin.domain.userKeyword.domain.model.UserInfo
+import com.turnin.domain.userKeyword.domain.model.UserKeywordDetail
+import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.Test

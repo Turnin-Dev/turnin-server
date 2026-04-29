@@ -1,6 +1,6 @@
-package com.peekr.domain.block.domain.provider
+package com.turnin.domain.block.domain.provider
 
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.id.UserId
 
 interface FriendProvider {
     /**

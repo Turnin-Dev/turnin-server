@@ -1,19 +1,19 @@
-package com.peekr.domain.user.infrastructure.repository.impl
+package com.turnin.domain.user.infrastructure.repository.impl
 
-import com.peekr.common.db.extension.existsUser
-import com.peekr.common.db.extension.filterActiveUser
-import com.peekr.common.db.schema.Blocks
-import com.peekr.common.db.schema.Users
-import com.peekr.common.db.suspendTransaction
-import com.peekr.common.db.updateWithTimestamp
-import com.peekr.common.model.Introduce
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
-import com.peekr.common.util.PeekrDateTime
-import com.peekr.domain.user.domain.model.User
-import com.peekr.domain.user.domain.model.UserPatch
-import com.peekr.domain.user.domain.repository.UserRepository
-import com.peekr.domain.user.infrastructure.mapper.UserMapper.toDomain
+import com.turnin.common.db.extension.existsUser
+import com.turnin.common.db.extension.filterActiveUser
+import com.turnin.common.db.schema.Blocks
+import com.turnin.common.db.schema.Users
+import com.turnin.common.db.suspendTransaction
+import com.turnin.common.db.updateWithTimestamp
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.util.TurninDateTime
+import com.turnin.domain.user.domain.model.User
+import com.turnin.domain.user.domain.model.UserPatch
+import com.turnin.domain.user.domain.repository.UserRepository
+import com.turnin.domain.user.infrastructure.mapper.UserMapper.toDomain
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.intLiteral
@@ -114,7 +114,7 @@ class UserRepositoryImpl : UserRepository {
         userId: UserId,
         providerId: String,
     ): Boolean = suspendTransaction {
-        val now = PeekrDateTime.now().epochSecond
+        val now = TurninDateTime.now().epochSecond
         Users.updateWithTimestamp({ Users.id eq userId.value }) {
             it[Users.providerId] = "DELETED_${now}_$providerId"
         } > 0

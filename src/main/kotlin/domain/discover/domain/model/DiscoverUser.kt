@@ -1,8 +1,8 @@
-package com.peekr.domain.discover.domain.model
+package com.turnin.domain.discover.domain.model
 
-import com.peekr.common.model.UserName
-import com.peekr.common.model.id.DisplayId
-import com.peekr.common.model.id.UserId
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
 
 /**
  * 탐색용 사용자 모델

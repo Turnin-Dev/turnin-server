@@ -1,4 +1,4 @@
-package com.peekr.common.validator
+package com.turnin.common.validator
 
 /**
  * presentation 계층에 존재하는 Routes 에서의 입력 유효성 검사를 하고 해당 값을 반환한다.
