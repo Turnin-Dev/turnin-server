@@ -18,6 +18,7 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -31,8 +32,10 @@ import org.junit.jupiter.api.assertThrows
 class UpdateFriendRequestStatusUseCaseTest {
     private val friendRepository: FriendRepository = mockk()
     private val notificationProvider: NotificationProvider = mockk()
-    private val applicationScope = TestScope()
-    private val usecase = UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider, applicationScope)
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testApplicationScope = TestScope(testDispatcher)
+    private val usecase =
+        UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider, testApplicationScope, testDispatcher)
 
     @Before
     fun setUp() {
@@ -72,7 +75,7 @@ class UpdateFriendRequestStatusUseCaseTest {
         usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
 
         // then
-        applicationScope.advanceUntilIdle()
+        testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
     }
 
@@ -82,7 +85,7 @@ class UpdateFriendRequestStatusUseCaseTest {
         usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.REJECTED)
 
         // then
-        applicationScope.advanceUntilIdle()
+        testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
@@ -98,7 +101,7 @@ class UpdateFriendRequestStatusUseCaseTest {
 
         // then
         assertTrue(result)
-        applicationScope.advanceUntilIdle()
+        testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
     }
 
@@ -126,7 +129,7 @@ class UpdateFriendRequestStatusUseCaseTest {
 
         // then: 사용자 확인 단계에서 실패하므로 수정 로직이나 알림이 실행되지 않아야 함
         coVerify(exactly = 0) { friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any()) }
-        applicationScope.advanceUntilIdle()
+        testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
@@ -142,7 +145,7 @@ class UpdateFriendRequestStatusUseCaseTest {
 
         // then
         assertFalse(result)
-        applicationScope.advanceUntilIdle()
+        testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
@@ -159,7 +162,7 @@ class UpdateFriendRequestStatusUseCaseTest {
         }
 
         // then: 트랜잭션이 실패한 상태이므로 알림 로직에 진입하면 안 됨
-        applicationScope.advanceUntilIdle()
+        testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
