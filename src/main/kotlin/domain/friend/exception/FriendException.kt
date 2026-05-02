@@ -42,4 +42,11 @@ sealed class FriendException(
             status = HttpStatusCode.NotFound,
             cause = cause,
         )
+
+    class UnsupportedRequestStatusException(cause: Throwable? = null) :
+        FriendException(
+            code = FriendErrorCode.UnsupportedRequestStatus,
+            status = HttpStatusCode.BadRequest,
+            cause = cause,
+        )
 }

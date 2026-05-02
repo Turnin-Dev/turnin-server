@@ -204,6 +204,9 @@ private fun RouteConfig.updateFriendStatusDocs() {
             description = "친구 데이터에서 수정 대상을 찾지 못하는 경우\n" +
                 "(상대방이 요청을 취소하는 경우나 차단된 사용자인 경우 등)"
         }
+        code(HttpStatusCode.Conflict) {
+            description = "이미 친구 상태인 경우"
+        }
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 실제 요청을 한 사용자 ID가 같지 않은 경우"
         }

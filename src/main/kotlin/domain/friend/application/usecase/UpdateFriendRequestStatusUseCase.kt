@@ -45,6 +45,9 @@ class UpdateFriendRequestStatusUseCase(
         val updaterIdVO = UserId(updaterId)
         val requesterIdVO = UserId(requesterId)
 
+        // +) 현재 지원하는 상태 수정은 수락(ACCEPTED) 뿐이다.
+        if (requestStatus != FriendRequestStatus.ACCEPTED) throw FriendException.UnsupportedRequestStatusException()
+
         // 1) 스스로 친구 관계가 될 수 없다.
         if (updaterId == requesterId) throw FriendException.SelfRequestException()
 

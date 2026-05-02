@@ -20,6 +20,9 @@ sealed class FriendErrorCode(
 
     data object FriendRequestNotFound :
         FriendErrorCode(F005, "존재하지 않는 친구 요청입니다.")
+
+    data object UnsupportedRequestStatus :
+        FriendErrorCode(F006, "지원하지 않는 요청 상태 값입니다.")
 }
 
 private const val F001 = "F001"
@@ -27,3 +30,4 @@ private const val F002 = "F002"
 private const val F003 = "F003"
 private const val F004 = "F004"
 private const val F005 = "F005"
+private const val F006 = "F006"

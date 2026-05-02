@@ -225,6 +225,13 @@ class UpdateFriendRequestStatusUseCaseTest {
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
+    @Test
+    fun `ACCEPTED 외 상태로 수정 시도 시 예외가 발생한다`() = runTest {
+        assertThrows<FriendException.UnsupportedRequestStatusException> {
+            usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.REJECTED)
+        }
+    }
+
     companion object {
         private val TestUpdaterId = UserId(1L) // 수락하는 사람 (원래 수신자)
         private val TestRequesterId = UserId(2L) // 원래 요청을 보낸 사람
