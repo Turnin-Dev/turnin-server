@@ -28,4 +28,25 @@ sealed class FriendException(
             status = HttpStatusCode.Conflict,
             cause = cause,
         )
+
+    class AlreadyFriendException(cause: Throwable? = null) :
+        FriendException(
+            code = FriendErrorCode.AlreadyFriend,
+            status = HttpStatusCode.Conflict,
+            cause = cause,
+        )
+
+    class FriendRequestNotFoundException(cause: Throwable? = null) :
+        FriendException(
+            code = FriendErrorCode.FriendRequestNotFound,
+            status = HttpStatusCode.NotFound,
+            cause = cause,
+        )
+
+    class UnsupportedRequestStatusException(cause: Throwable? = null) :
+        FriendException(
+            code = FriendErrorCode.UnsupportedRequestStatus,
+            status = HttpStatusCode.BadRequest,
+            cause = cause,
+        )
 }

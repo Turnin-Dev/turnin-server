@@ -6,7 +6,6 @@ import com.turnin.common.util.pagination.offset.getPaginationParams
 import com.turnin.common.validator.inputValidationAndReturn
 import com.turnin.domain.friend.application.usecase.FriendUseCases
 import com.turnin.domain.friend.presentation.dto.AddFriendRequest
-import com.turnin.domain.friend.presentation.dto.FriendResponse
 import com.turnin.domain.friend.presentation.dto.FriendsResponse
 import com.turnin.domain.friend.presentation.dto.IncomingRequestsResponse
 import com.turnin.domain.friend.presentation.dto.UpdateFriendStatusRequest
@@ -52,17 +51,14 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
                 return@post
             }
 
-            val friendDto = usecase.add(
+            usecase.add(
                 requesterId = addFriendRequest.requesterId,
                 receiverId = addFriendRequest.receiverId,
             )
-            call.respond(
-                status = HttpStatusCode.Created,
-                message = friendDto.toResponse(),
-            )
+
+            call.respond(HttpStatusCode.Created)
         }
 
-        // TODO: 친구 기능은 이미 취소된 즉, 이미 데이터 지워진 상태에서 쿼리될 확률이 높다. -> 대처 필요
         patch(route.STATUS, { updateFriendStatusDocs() }) {
             val userId = extractUserIdWithToken()
             val updateFriendStatusRequest = call.receive<UpdateFriendStatusRequest>()
@@ -73,16 +69,13 @@ fun AuthenticatedRoute.friendRoutes(route: Api.V1.Friend, usecase: FriendUseCase
                 return@patch
             }
 
-            val result = usecase.updateStatus(
-                requesterId = updateFriendStatusRequest.requesterId,
-                receiverId = updateFriendStatusRequest.receiverId,
+            usecase.updateStatus(
+                updaterId = updateFriendStatusRequest.requesterId,
+                requesterId = updateFriendStatusRequest.receiverId,
                 requestStatus = updateFriendStatusRequest.requestStatus,
             )
-            if (result) {
-                call.respond(HttpStatusCode.OK)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+
+            call.respond(HttpStatusCode.OK)
         }
 
         delete({ deleteFriendDocs() }) {
@@ -178,12 +171,7 @@ private fun RouteConfig.addFriendDocs() {
     }
     response {
         code(HttpStatusCode.Created) {
-            description = "친구 응답 바디"
-            body<FriendResponse> {
-                example("FriendResponse") {
-                    value = FriendResponse.sample
-                }
-            }
+            description = "친구 추가 성공한 경우"
         }
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 실제 요청을 한 사용자 ID가 같지 않은 경우"
@@ -214,7 +202,10 @@ private fun RouteConfig.updateFriendStatusDocs() {
         }
         code(HttpStatusCode.NotFound) {
             description = "친구 데이터에서 수정 대상을 찾지 못하는 경우\n" +
-                "(높은 확률로 이미 처리된 요청.)"
+                "(상대방이 요청을 취소하는 경우나 차단된 사용자인 경우 등)"
+        }
+        code(HttpStatusCode.Conflict) {
+            description = "이미 친구 상태인 경우"
         }
         code(HttpStatusCode.Forbidden) {
             description = "요청자 ID와 실제 요청을 한 사용자 ID가 같지 않은 경우"

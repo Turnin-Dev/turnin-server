@@ -12,6 +12,7 @@ import com.turnin.domain.friend.application.usecase.GetFriendsUseCase
 import com.turnin.domain.friend.application.usecase.UpdateFriendRequestStatusUseCase
 import com.turnin.domain.friend.domain.provider.NotificationProvider
 import com.turnin.domain.friend.domain.repository.FriendRepository
+import com.turnin.domain.friend.exception.FriendException
 import com.turnin.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import com.turnin.util.db.TestDatabaseFactory
 import io.mockk.Runs
@@ -26,6 +27,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.assertThrows
 
 /**
  * 여러 유스케이스들을 활용한 시나리오 테스트 (통합 테스트)
@@ -59,13 +61,10 @@ class FriendUseCaseIntegrationTest {
 
         // when
         // 1. 사용자 A가 사용자 B에게 친구 추가 요청
-        val friendDto = addFriendUseCase(userA.value, userB.value)
-        assertTrue(friendDto.requesterId == userA.value)
-        assertTrue(friendDto.receiverId == userB.value)
+        addFriendUseCase(userA.value, userB.value)
 
         // 2. 사용자 B가 친구 요청 수락
-        val result = updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
-        assertTrue(result)
+        updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
 
         // then: 사용자 B 친구 목록 조회
         val userBFriends = getFriendsUseCase(userB.value, PaginationParams(1, 10))
@@ -81,9 +80,7 @@ class FriendUseCaseIntegrationTest {
 
         // when
         // 1. 사용자 A가 사용자 B에게 친구 추가 요청
-        val friendDto = addFriendUseCase(userA.value, userB.value)
-        assertTrue(friendDto.requesterId == userA.value)
-        assertTrue(friendDto.receiverId == userB.value)
+        addFriendUseCase(userA.value, userB.value)
 
         // 2. 사용자 B가 친구 요청 거절
         val result = deleteFriendUseCase(userB.value, userA.value)
@@ -104,11 +101,8 @@ class FriendUseCaseIntegrationTest {
 
         // when
         // 1. 사용자 A가 사용자 B에게 친구 추가 요청 후 수락
-        val friendDto = addFriendUseCase(userA.value, userB.value)
-        assertTrue(friendDto.requesterId == userA.value)
-        assertTrue(friendDto.receiverId == userB.value)
-        val updateResult = updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
-        assertTrue(updateResult)
+        addFriendUseCase(userA.value, userB.value)
+        updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
 
         // 2. 서로 친구 인지 확인
         val userAFriends = getFriendsUseCase(userA.value, PaginationParams(1, 10))
@@ -135,9 +129,7 @@ class FriendUseCaseIntegrationTest {
 
         // when
         // 1. 사용자 A가 사용자 B에게 친구 추가 요청
-        val friendDto = addFriendUseCase(userA.value, userB.value)
-        assertTrue(friendDto.requesterId == userA.value)
-        assertTrue(friendDto.receiverId == userB.value)
+        addFriendUseCase(userA.value, userB.value)
 
         // 2. 사용자 A가 친구 요청을 취소하고 사용자 B가 요청을 거절한다.
         val deleteResult1 = deleteFriendUseCase(userA.value, userB.value)
@@ -156,17 +148,38 @@ class FriendUseCaseIntegrationTest {
 
         // when
         // 1. 사용자 A가 사용자 B에게 친구 추가 요청
-        val friendDto = addFriendUseCase(userA.value, userB.value)
-        assertTrue(friendDto.requesterId == userA.value)
-        assertTrue(friendDto.receiverId == userB.value)
+        addFriendUseCase(userA.value, userB.value)
 
-        // 2. 사용자 A가 친구 요청을 취소하고 사용자 B가 요청을 수락한다.
-        val deleteResult1 = deleteFriendUseCase(userA.value, userB.value)
-        val updateResult = updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
+        // 2. 사용자 A가 친구 요청을 취소한다.
+        val deleteResult = deleteFriendUseCase(userA.value, userB.value)
+        assertTrue(deleteResult)
 
-        // then: 사용자 B는 false를 반환 받는다
-        assertTrue(deleteResult1)
-        assertFalse(updateResult)
+        // then: 사용자 B가 이미 취소된 요청을 수락하면 예외가 발생한다.
+        assertThrows<FriendException.FriendRequestNotFoundException> {
+            updateFriendRequestStatusUseCase(userB.value, userA.value, FriendRequestStatus.ACCEPTED)
+        }
+    }
+
+    @Test
+    fun `(역방향 친구 요청 테스트) 사용자 A가 사용자 B에게 친구 요청을 한 상태에서 사용자 B가 사용자 A에게 친구 요청을 하면 자동으로 친구 수락 처리된다`() = runTest {
+        // given: 사용자 A, B 생성
+        val userA = insertUserAndReturnId("a")
+        val userB = insertUserAndReturnId("b")
+
+        // when
+        // 1. 사용자 A가 사용자 B에게 친구 요청
+        addFriendUseCase(userA.value, userB.value)
+
+        // 2. 사용자 B가 사용자 A에게 친구 요청 (역방향 → 자동 수락)
+        addFriendUseCase(userB.value, userA.value)
+
+        // then: 두 사용자 모두 친구 목록에 상대방이 포함돼야 한다
+        val userAFriends = getFriendsUseCase(userA.value, PaginationParams(1, 10))
+        val userBFriends = getFriendsUseCase(userB.value, PaginationParams(1, 10))
+        assertTrue(userAFriends.friends.isNotEmpty())
+        assertTrue(userBFriends.friends.isNotEmpty())
+        assertTrue(userAFriends.friends.first().userId == userB.value)
+        assertTrue(userBFriends.friends.first().userId == userA.value)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

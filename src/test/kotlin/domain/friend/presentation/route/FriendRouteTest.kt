@@ -42,14 +42,14 @@ class FriendRouteTest {
     fun setUp() {
         coEvery {
             usecase.add(TestRequesterId.value, TestReceiverId.value)
-        } returns TestFriendDto
+        } returns Unit
         coEvery {
             usecase.updateStatus(
-                requesterId = TestRequesterId.value,
-                receiverId = TestReceiverId.value,
+                updaterId = TestRequesterId.value,
+                requesterId = TestReceiverId.value,
                 requestStatus = FriendRequestStatus.ACCEPTED,
             )
-        } returns true
+        } returns Unit
         coEvery {
             usecase.delete(TestRequesterId.value, TestReceiverId.value)
         } returns true
@@ -425,13 +425,6 @@ class FriendRouteTest {
             },
             tokenSubject = TestUserId.value.toString(),
             expectedStatus = HttpStatusCode.Created,
-            responseValidator = {
-                containsAll(
-                    TestFriendDto.requesterId.toString(),
-                    TestFriendDto.receiverId.toString(),
-                    TestFriendDto.requestStatus.toString(),
-                )
-            },
         )
     }
 
@@ -578,26 +571,6 @@ class FriendRouteTest {
             },
             tokenSubject = null,
             expectedStatus = HttpStatusCode.Unauthorized,
-        )
-    }
-
-    @Test
-    fun `친구 상태 수정 - 수정 실패 시 수정할 데이터가 없다는 것으로 간주하고 NotFound를 반환한다`() = testApplication {
-        coEvery {
-            usecase.updateStatus(TestRequesterId.value, TestReceiverId.value, FriendRequestStatus.ACCEPTED)
-        } returns false
-
-        testPatchEndpoint(
-            endpoint = "${route.ROUTE}${route.STATUS}",
-            queryParameters = null,
-            requestBody = TestUpdateFriendRequestStatusRequest,
-            testPlugin = {
-                testPlugin(
-                    authRouting = { friendRoutes(route, usecase) },
-                )
-            },
-            tokenSubject = TestUserId.value.toString(),
-            expectedStatus = HttpStatusCode.NotFound,
         )
     }
 

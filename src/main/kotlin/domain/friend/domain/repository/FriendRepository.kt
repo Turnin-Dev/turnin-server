@@ -101,15 +101,15 @@ interface FriendRepository {
     /**
      * 친구 요청 상태 수정
      *
-     * @param userId1 사용자 ID (수정 요청 주체)
-     * @param userId2 사용자 ID (수정 대상 친구)
+     * @param updaterId 상태를 수정할 사용자 ID (원래 수신자)
+     * @param requesterId 원래 요청을 보낸 사용자 ID
      * @param requestStatus 친구 요청 상태
      *
      * @return 성공 시 `true`, 실패 시 `false` 반환
      */
     suspend fun updateFriendRequestStatus(
-        userId1: UserId,
-        userId2: UserId,
+        updaterId: UserId,
+        requesterId: UserId,
         requestStatus: FriendRequestStatus,
     ): Boolean
 

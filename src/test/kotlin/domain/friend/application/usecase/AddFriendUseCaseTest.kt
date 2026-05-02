@@ -1,11 +1,12 @@
 package com.turnin.domain.friend.application.usecase
 
-import com.turnin.common.db.DatabaseException
 import com.turnin.common.model.FriendRequestStatus
+import com.turnin.common.model.NotificationType
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.FriendId
 import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.model.ExistingRelation
 import com.turnin.domain.friend.domain.model.Friend
 import com.turnin.domain.friend.domain.model.FriendRequestContext
 import com.turnin.domain.friend.domain.model.UserInfo
@@ -24,7 +25,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
@@ -64,16 +64,18 @@ class AddFriendUseCaseTest {
         } returns TestFriend
 
         // when
-        val friendDto = usecase(
+        usecase(
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
         )
 
         // then
-        assertEquals(TestRequesterId.value, friendDto.requesterId)
-        assertEquals(TestReceiverId.value, friendDto.receiverId)
         applicationScope.advanceUntilIdle()
-        coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
+        coVerify(exactly = 1) {
+            notificationProvider.sendNotification(
+                match { it.notiType == NotificationType.FRIEND_REQUEST },
+            )
+        }
     }
 
     @Test
@@ -108,17 +110,121 @@ class AddFriendUseCaseTest {
     }
 
     @Test
-    fun `이미 친구 요청을 했거나 친구 상태인 경우 예외가 발생한다`() = runTest {
+    fun `이미 친구 상태인 경우 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            friendRepository.createFriend(TestRequesterId, TestReceiverId)
-        } throws DatabaseException.DuplicatedDataException(Throwable())
+            friendRepository.getFriendRequestContext(TestRequesterId, TestReceiverId)
+        } returns TestFriendRequestContext.copy(
+            existingRelation = ExistingRelation(
+                status = FriendRequestStatus.ACCEPTED,
+                isReverse = false,
+            ),
+        )
+
+        // when, then
+        assertThrows<FriendException.AlreadyFriendException> {
+            usecase(
+                requesterId = TestRequesterId.value,
+                receiverId = TestReceiverId.value,
+            )
+        }
+
+        // then: 예외 발생 시 알림은 전송되지 않아야 함
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
+    }
+
+    @Test
+    fun `동일 방향 중복 요청인 경우 예외가 발생한다`() = runTest {
+        // given
+        coEvery {
+            friendRepository.getFriendRequestContext(TestRequesterId, TestReceiverId)
+        } returns TestFriendRequestContext.copy(
+            existingRelation = ExistingRelation(
+                status = FriendRequestStatus.PENDING,
+                isReverse = false,
+            ),
+        )
 
         // when, then
         assertThrows<FriendException.AlreadyFriendRequestException> {
             usecase(
                 requesterId = TestRequesterId.value,
                 receiverId = TestReceiverId.value,
+            )
+        }
+
+        // then: 예외 발생 시 알림은 전송되지 않아야 함
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
+    }
+
+    @Test
+    fun `역방향 요청이 존재하는 경우 자동 수락 처리된다`() = runTest {
+        // given: 수신자가 이미 요청자에게 친구 요청을 보낸 상태 (역방향)
+        coEvery {
+            friendRepository.getFriendRequestContext(TestRequesterId, TestReceiverId)
+        } returns TestFriendRequestContext.copy(
+            existingRelation = ExistingRelation(
+                status = FriendRequestStatus.PENDING,
+                isReverse = true,
+            ),
+        )
+        coEvery {
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestRequesterId,
+                requesterId = TestReceiverId,
+                requestStatus = FriendRequestStatus.ACCEPTED,
+            )
+        } returns true
+
+        // when
+        usecase(
+            requesterId = TestRequesterId.value,
+            receiverId = TestReceiverId.value,
+        )
+
+        // then: 자동 수락이므로 createFriend는 호출되지 않아야 함
+        coVerify(exactly = 0) { friendRepository.createFriend(TestRequesterId, TestReceiverId) }
+        coVerify(exactly = 1) {
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestRequesterId,
+                requesterId = TestReceiverId,
+                requestStatus = FriendRequestStatus.ACCEPTED,
+            )
+        }
+    }
+
+    @Test
+    fun `역방향 요청 자동 수락 시 수락 알림이 전송된다`() = runTest {
+        // given
+        coEvery {
+            friendRepository.getFriendRequestContext(TestRequesterId, TestReceiverId)
+        } returns TestFriendRequestContext.copy(
+            existingRelation = ExistingRelation(
+                status = FriendRequestStatus.PENDING,
+                isReverse = true,
+            ),
+        )
+        coEvery {
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestRequesterId,
+                requesterId = TestReceiverId,
+                requestStatus = FriendRequestStatus.ACCEPTED,
+            )
+        } returns true
+
+        // when
+        usecase(
+            requesterId = TestRequesterId.value,
+            receiverId = TestReceiverId.value,
+        )
+
+        // then: 요청 알림이 아닌 수락 알림이 전송돼야 함
+        applicationScope.advanceUntilIdle()
+        coVerify(exactly = 1) {
+            notificationProvider.sendNotification(
+                match { it.notiType == NotificationType.FRIEND_ACCEPT },
             )
         }
     }
@@ -150,15 +256,12 @@ class AddFriendUseCaseTest {
         } throws Exception("알림 전송 실패")
 
         // when
-        val friendDto = usecase(
+        usecase(
             requesterId = TestRequesterId.value,
             receiverId = TestReceiverId.value,
         )
 
-        // then
-        assertEquals(TestRequesterId.value, friendDto.requesterId)
-        assertEquals(TestReceiverId.value, friendDto.receiverId)
-        // 알림 전송 시도는 이루어졌음을 확인
+        // then: 알림 전송 시도는 이루어졌음을 확인
         applicationScope.advanceUntilIdle()
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
     }
@@ -200,6 +303,7 @@ class AddFriendUseCaseTest {
                 profileImageUrl = null,
             ),
             isBlocked = false,
+            existingRelation = null,
         )
         private val TestFriend = Friend(
             id = FriendId(1L),
