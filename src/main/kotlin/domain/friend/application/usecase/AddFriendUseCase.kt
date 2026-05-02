@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 
 /**
  * 친구 추가(요청)
+ *
+ * @see invoke
  */
 class AddFriendUseCase(
     private val friendRepository: FriendRepository,

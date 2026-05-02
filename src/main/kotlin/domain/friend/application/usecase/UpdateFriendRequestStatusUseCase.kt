@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 
 /**
  * 친구 상태 수정
+ *
+ * @see invoke
  */
 class UpdateFriendRequestStatusUseCase(
     private val friendRepository: FriendRepository,
