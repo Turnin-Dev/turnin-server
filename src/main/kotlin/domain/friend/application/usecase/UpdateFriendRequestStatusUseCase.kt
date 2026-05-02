@@ -53,7 +53,7 @@ class UpdateFriendRequestStatusUseCase(
         // 1) 스스로 친구 관계가 될 수 없다.
         if (updaterId == requesterId) throw FriendException.SelfRequestException()
 
-        val requesterName = suspendTransaction {
+        val updaterName = suspendTransaction {
             // 2) 수정 주체자/요청자 정보 조회 + 차단 관계 + 기존 친구 관계 확인
             val context = friendRepository.getFriendRequestContext(updaterIdVO, requesterIdVO)
                 ?: throw FriendException.UserNotFoundException()
@@ -101,7 +101,7 @@ class UpdateFriendRequestStatusUseCase(
                         userId = requesterIdVO,
                         notiType = NotificationType.FRIEND_ACCEPT,
                         title = FriendNotificationMessage.FriendAccept.TITLE,
-                        message = FriendNotificationMessage.FriendAccept.message(requesterName),
+                        message = FriendNotificationMessage.FriendAccept.message(updaterName),
                         refId = updaterId,
                         refType = RefType.USER,
                     ),
