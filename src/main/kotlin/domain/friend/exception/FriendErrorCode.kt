@@ -14,8 +14,16 @@ sealed class FriendErrorCode(
 
     data object AlreadyFriendRequest :
         FriendErrorCode(F003, "이미 친구 요청을 한 상태입니다.")
+
+    data object AlreadyFriend :
+        FriendErrorCode(F004, "이미 친구 상태입니다.")
+
+    data object FriendRequestNotFound :
+        FriendErrorCode(F005, "존재하지 않는 친구 요청입니다.")
 }
 
 private const val F001 = "F001"
 private const val F002 = "F002"
 private const val F003 = "F003"
+private const val F004 = "F004"
+private const val F005 = "F005"

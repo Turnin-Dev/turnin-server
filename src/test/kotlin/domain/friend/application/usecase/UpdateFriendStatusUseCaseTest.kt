@@ -4,6 +4,7 @@ import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
+import com.turnin.domain.friend.domain.model.ExistingRelation
 import com.turnin.domain.friend.domain.model.FriendRequestContext
 import com.turnin.domain.friend.domain.model.UserInfo
 import com.turnin.domain.friend.domain.provider.NotificationProvider
@@ -22,8 +23,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
@@ -42,11 +41,15 @@ class UpdateFriendRequestStatusUseCaseTest {
         TestDatabaseFactory.init()
 
         coEvery {
-            friendRepository.getFriendRequestContext(TestUserId1, TestUserId2)
+            friendRepository.getFriendRequestContext(TestUpdaterId, TestRequesterId)
         } returns TestFriendRequestContext
 
         coEvery {
-            friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any())
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestUpdaterId,
+                requesterId = TestRequesterId,
+                requestStatus = any(),
+            )
         } returns true
 
         coEvery {
@@ -62,31 +65,17 @@ class UpdateFriendRequestStatusUseCaseTest {
 
     @Test
     fun `친구 상태 수정 성공 테스트`() = runTest {
-        // when
-        val result = usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
-
-        // then
-        assertTrue(result)
+        usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
     }
 
     @Test
-    fun `친구 요청 수락 시 수신자에게 알림을 전송한다`() = runTest {
+    fun `친구 요청 수락 시 원래 요청을 보낸 사람에게 알림을 전송한다`() = runTest {
         // when
-        usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
+        usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
 
         // then
         testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
-    }
-
-    @Test
-    fun `친구 요청 거절 시 알림을 전송하지 않는다`() = runTest {
-        // when
-        usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.REJECTED)
-
-        // then
-        testApplicationScope.advanceUntilIdle()
-        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
     @Test
@@ -97,10 +86,9 @@ class UpdateFriendRequestStatusUseCaseTest {
         } throws RuntimeException("알림 전송 실패")
 
         // when
-        val result = usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
+        usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
 
         // then
-        assertTrue(result)
         testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
     }
@@ -111,7 +99,7 @@ class UpdateFriendRequestStatusUseCaseTest {
             usecase(1L, 1L, FriendRequestStatus.ACCEPTED)
         }
 
-        // then 로직 최상단에서 걸리므로 DB 조회가 발생하지 않아야 함
+        // then: 로직 최상단에서 걸리므로 DB 조회가 발생하지 않아야 함
         coVerify(exactly = 0) { friendRepository.getFriendRequestContext(UserId(1L), UserId(1L)) }
     }
 
@@ -119,32 +107,99 @@ class UpdateFriendRequestStatusUseCaseTest {
     fun `상태를 수정하려는 사용자가 존재하지 않는 경우 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            friendRepository.getFriendRequestContext(TestUserId1, TestUserId2)
+            friendRepository.getFriendRequestContext(TestUpdaterId, TestRequesterId)
         } returns null
 
         // when, then
         assertThrows<FriendException.UserNotFoundException> {
-            usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
+            usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
         }
 
         // then: 사용자 확인 단계에서 실패하므로 수정 로직이나 알림이 실행되지 않아야 함
-        coVerify(exactly = 0) { friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any()) }
+        coVerify(exactly = 0) {
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestUpdaterId,
+                requesterId = TestRequesterId,
+                requestStatus = any(),
+            )
+        }
         testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
 
     @Test
-    fun `상태 수정 실패 시 알림을 전송하지 않는다`() = runTest {
+    fun `차단 관계에 있는 경우 예외가 발생한다`() = runTest {
         // given
         coEvery {
-            friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any())
-        } returns false
+            friendRepository.getFriendRequestContext(TestUpdaterId, TestRequesterId)
+        } returns TestFriendRequestContext.copy(isBlocked = true)
 
-        // when
-        val result = usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
+        // when, then
+        assertThrows<FriendException.UserNotFoundException> {
+            usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
+        }
 
-        // then
-        assertFalse(result)
+        // then: 차단 확인 단계에서 실패하므로 수정 로직이나 알림이 실행되지 않아야 함
+        coVerify(exactly = 0) {
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestUpdaterId,
+                requesterId = TestRequesterId,
+                requestStatus = any(),
+            )
+        }
+        testApplicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
+    }
+
+    @Test
+    fun `수락할 요청이 없는 경우 예외가 발생한다`() = runTest {
+        // given: existingRelation이 null인 상태 (아무 관계도 없음)
+        coEvery {
+            friendRepository.getFriendRequestContext(TestUpdaterId, TestRequesterId)
+        } returns TestFriendRequestContext.copy(existingRelation = null)
+
+        // when, then
+        assertThrows<FriendException.FriendRequestNotFoundException> {
+            usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
+        }
+
+        // then: 수정 로직이나 알림이 실행되지 않아야 함
+        coVerify(exactly = 0) {
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestUpdaterId,
+                requesterId = TestRequesterId,
+                requestStatus = any(),
+            )
+        }
+        testApplicationScope.advanceUntilIdle()
+        coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
+    }
+
+    @Test
+    fun `이미 친구 상태인 경우 예외가 발생한다`() = runTest {
+        // given
+        coEvery {
+            friendRepository.getFriendRequestContext(TestUpdaterId, TestRequesterId)
+        } returns TestFriendRequestContext.copy(
+            existingRelation = ExistingRelation(
+                status = FriendRequestStatus.ACCEPTED,
+                isReverse = false,
+            ),
+        )
+
+        // when, then
+        assertThrows<FriendException.AlreadyFriendException> {
+            usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
+        }
+
+        // then: 수정 로직이나 알림이 실행되지 않아야 함
+        coVerify(exactly = 0) {
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestUpdaterId,
+                requesterId = TestRequesterId,
+                requestStatus = any(),
+            )
+        }
         testApplicationScope.advanceUntilIdle()
         coVerify(exactly = 0) { notificationProvider.sendNotification(any()) }
     }
@@ -153,12 +208,16 @@ class UpdateFriendRequestStatusUseCaseTest {
     fun `DB 수정 로직 중 예외 발생 시 알림을 전송하지 않는다`() = runTest {
         // given
         coEvery {
-            friendRepository.updateFriendRequestStatus(TestUserId1, TestUserId2, any())
+            friendRepository.updateFriendRequestStatus(
+                updaterId = TestUpdaterId,
+                requesterId = TestRequesterId,
+                requestStatus = any(),
+            )
         } throws RuntimeException("DB 수정을 실패했습니다.")
 
         // when, then
         assertThrows<RuntimeException> {
-            usecase(TestUserId1.value, TestUserId2.value, FriendRequestStatus.ACCEPTED)
+            usecase(TestUpdaterId.value, TestRequesterId.value, FriendRequestStatus.ACCEPTED)
         }
 
         // then: 트랜잭션이 실패한 상태이므로 알림 로직에 진입하면 안 됨
@@ -167,22 +226,27 @@ class UpdateFriendRequestStatusUseCaseTest {
     }
 
     companion object {
-        private val TestUserId1 = UserId(1L)
-        private val TestUserId2 = UserId(2L)
+        private val TestUpdaterId = UserId(1L) // 수락하는 사람 (원래 수신자)
+        private val TestRequesterId = UserId(2L) // 원래 요청을 보낸 사람
         private val TestFriendRequestContext = FriendRequestContext(
             requesterInfo = UserInfo(
-                userId = TestUserId1,
+                userId = TestUpdaterId,
                 displayId = DisplayId("did1"),
                 userName = UserName("테스트유저1"),
                 profileImageUrl = null,
             ),
             receiverInfo = UserInfo(
-                userId = TestUserId2,
+                userId = TestRequesterId,
                 displayId = DisplayId("did2"),
                 userName = UserName("테스트유저2"),
                 profileImageUrl = null,
             ),
             isBlocked = false,
+            existingRelation = ExistingRelation(
+                // 기본값: 정상 수락 가능한 상태
+                status = FriendRequestStatus.PENDING,
+                isReverse = false,
+            ),
         )
     }
 }

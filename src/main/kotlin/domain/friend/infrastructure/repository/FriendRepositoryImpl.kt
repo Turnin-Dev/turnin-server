@@ -15,6 +15,7 @@ import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.toOffsetDateTime
+import com.turnin.domain.friend.domain.model.ExistingRelation
 import com.turnin.domain.friend.domain.model.Friend
 import com.turnin.domain.friend.domain.model.FriendFcmContext
 import com.turnin.domain.friend.domain.model.FriendRequestContext
@@ -170,6 +171,21 @@ class FriendRepositoryImpl : FriendRepository {
             row.getOrNull(Blocks.id) != null
         }
 
+        // 기존 친구 관계 양방향 조회 (추가)
+        val existingRelationRow = Friends
+            .select(Friends.requesterId, Friends.status)
+            .where(
+                ((Friends.requesterId eq requesterId.value) and (Friends.receiverId eq receiverId.value)) or
+                    ((Friends.requesterId eq receiverId.value) and (Friends.receiverId eq requesterId.value)),
+            ).singleOrNull()
+
+        val existingRelation = existingRelationRow?.let {
+            ExistingRelation(
+                status = it[Friends.status],
+                isReverse = it[Friends.requesterId].value == receiverId.value,
+            )
+        }
+
         FriendRequestContext(
             requesterInfo = UserInfo(
                 userId = UserId(requesterRow[Users.id].value),
@@ -184,6 +200,7 @@ class FriendRepositoryImpl : FriendRepository {
                 profileImageUrl = receiverRow[Users.profileImageUrl],
             ),
             isBlocked = isBlocked,
+            existingRelation = existingRelation,
         )
     }
 
@@ -250,13 +267,15 @@ class FriendRepositoryImpl : FriendRepository {
     }
 
     override suspend fun updateFriendRequestStatus(
-        userId1: UserId,
-        userId2: UserId,
+        updaterId: UserId,
+        requesterId: UserId,
         requestStatus: FriendRequestStatus,
     ): Boolean = suspendTransaction {
+        // updaterId → requesterId 방향의 PENDING row만 수정
         val updateCondition = Op.build {
-            ((Friends.requesterId eq userId1.value) and (Friends.receiverId eq userId2.value)) or
-                ((Friends.requesterId eq userId2.value) and (Friends.receiverId eq userId1.value))
+            (Friends.requesterId eq requesterId.value) and
+                (Friends.receiverId eq updaterId.value) and
+                (Friends.status eqEnum FriendRequestStatus.PENDING)
         }
         Friends.updateWithTimestamp({ updateCondition }) {
             it[this.status] = requestStatus

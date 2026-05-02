@@ -146,8 +146,8 @@ class FriendRepositoryImplTest {
 
         // when: 친구 요청을 수락한다.
         repository.updateFriendRequestStatus(
-            testUserId,
             userId,
+            testUserId,
             FriendRequestStatus.ACCEPTED,
         )
 
@@ -175,7 +175,8 @@ class FriendRepositoryImplTest {
         // given
         val userId1 = insertUserAndReturnId("a")
         val userId2 = insertUserAndReturnId("b")
-        val expectedFriend = repository.createFriend(userId1, userId2)
+        repository.createFriend(userId1, userId2)
+        val expectedFriend = repository.findByIds(userId1, userId2)
 
         // when
         val actualFriend = repository.findByIds(userId1, userId2)
@@ -206,7 +207,8 @@ class FriendRepositoryImplTest {
         val userId2 = insertUserAndReturnId("b")
 
         // when: user1이 user2에게 친구 요청
-        val friend = repository.createFriend(userId1, userId2)
+        repository.createFriend(userId1, userId2)
+        val friend = repository.findByIds(userId1, userId2)!!
         val nowInSeconds = Instant.now().epochSecond
 
         // then
@@ -243,12 +245,12 @@ class FriendRepositoryImplTest {
         // given
         val userId1 = insertUserAndReturnId("a")
         val userId2 = insertUserAndReturnId("b")
-        val expectedFriend = repository.createFriend(userId1, userId2)
+        repository.createFriend(userId1, userId2) // 반환값 제거
+        val expectedFriend = repository.findByIds(userId1, userId2)!! // 별도 조회로 변경
         val originalUpdatedAt = TestDatabaseFactory.dbQuery {
             FriendEntity
-                .findById(
-                    expectedFriend.id.value,
-                )?.updatedAt
+                .findById(expectedFriend.id.value)
+                ?.updatedAt
         }
 
         // when, then: PENDING(초기 값), ACCEPTED 순서대로 검증
@@ -263,7 +265,11 @@ class FriendRepositoryImplTest {
         assertEquals(FriendRequestStatus.PENDING, friend[Friends.status])
 
         // 2. ACCEPTED
-        repository.updateFriendRequestStatus(userId2, userId1, FriendRequestStatus.ACCEPTED)
+        repository.updateFriendRequestStatus(
+            updaterId = userId2,
+            requesterId = userId1,
+            requestStatus = FriendRequestStatus.ACCEPTED,
+        )
         val friend2 = TestDatabaseFactory.dbQuery {
             Friends
                 .selectAll()
@@ -285,8 +291,12 @@ class FriendRepositoryImplTest {
         // given
         val userId1 = insertUserAndReturnId("a")
 
-        // when
-        val result = repository.updateFriendRequestStatus(userId1, UserId(10L), FriendRequestStatus.ACCEPTED)
+        // when: 수락하는 사람 -> 존재하지 않는 원래 요청자
+        val result = repository.updateFriendRequestStatus(
+            updaterId = userId1,
+            requesterId = UserId(10L),
+            requestStatus = FriendRequestStatus.ACCEPTED,
+        )
 
         // then
         assertFalse(result)
@@ -422,6 +432,7 @@ class FriendRepositoryImplTest {
         assertEquals(requesterId, context.requesterInfo.userId)
         assertEquals(receiverId, context.receiverInfo.userId)
         assertFalse(context.isBlocked)
+        assertNull(context.existingRelation) // 아무 관계도 없는 상태
     }
 
     @Test
@@ -475,6 +486,7 @@ class FriendRepositoryImplTest {
         // then
         assertNotNull(context)
         assertTrue(context.isBlocked)
+        assertNull(context.existingRelation)
     }
 
     @Test
@@ -490,6 +502,62 @@ class FriendRepositoryImplTest {
         // then
         assertNotNull(context)
         assertTrue(context.isBlocked)
+        assertNull(context.existingRelation)
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 정방향 PENDING 요청이 있는 경우 existingRelation을 반환한다`() = runTest {
+        // given: requesterId가 receiverId에게 친구 요청을 보낸 상태
+        val requesterId = insertUserAndReturnId("requester")
+        val receiverId = insertUserAndReturnId("receiver")
+        repository.createFriend(requesterId, receiverId)
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, receiverId)
+
+        // then
+        assertNotNull(context)
+        assertNotNull(context.existingRelation)
+        assertEquals(FriendRequestStatus.PENDING, context.existingRelation.status)
+        assertFalse(context.existingRelation.isReverse) // 정방향
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 역방향 PENDING 요청이 있는 경우 existingRelation을 반환한다`() = runTest {
+        // given: receiverId가 requesterId에게 친구 요청을 보낸 상태 (역방향)
+        val requesterId = insertUserAndReturnId("requester")
+        val receiverId = insertUserAndReturnId("receiver")
+        repository.createFriend(receiverId, requesterId)
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, receiverId)
+
+        // then
+        assertNotNull(context)
+        assertNotNull(context.existingRelation)
+        assertEquals(FriendRequestStatus.PENDING, context.existingRelation.status)
+        assertTrue(context.existingRelation.isReverse) // 역방향
+    }
+
+    @Test
+    fun `getFriendRequestContext 성공 테스트 - 이미 친구 상태인 경우 ACCEPTED existingRelation을 반환한다`() = runTest {
+        // given
+        val requesterId = insertUserAndReturnId("requester")
+        val receiverId = insertUserAndReturnId("receiver")
+        repository.createFriend(requesterId, receiverId)
+        repository.updateFriendRequestStatus(
+            updaterId = receiverId,
+            requesterId = requesterId,
+            requestStatus = FriendRequestStatus.ACCEPTED,
+        )
+
+        // when
+        val context = repository.getFriendRequestContext(requesterId, receiverId)
+
+        // then
+        assertNotNull(context)
+        assertNotNull(context.existingRelation)
+        assertEquals(FriendRequestStatus.ACCEPTED, context.existingRelation.status)
     }
 
     // ------------------------------ getFriendFcmContext ------------------------------
