@@ -35,16 +35,10 @@ out/
 ### VS Code ###
 .vscode/
 
-### dotenv & config ###
+### dotenv ###
 .env*
 **/src/main/resources/**/*.yaml
 **/src/main/resources/**/*.yml
-.conf
-**/src/main/resources/**/*.conf
-
-### db file ###
-**/src/main/resources/**/*.sql
-**/src/main/resources/**/*.psql
 
 # macOS
 .DS_Store

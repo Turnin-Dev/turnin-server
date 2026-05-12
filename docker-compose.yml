@@ -1,0 +1,41 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d  # Nginx 설정 파일
+      - ./nginx/ssl:/etc/nginx/ssl        # SSL 인증서
+      - ./certbot/www:/var/www/certbot    # certbot 인증용 webroot
+    depends_on:
+      - ktor
+    restart: always
+    mem_limit: 100m
+
+  ktor:
+    image: turnindev/turnin-api:latest
+    container_name: ktor
+    expose:
+      - "8081"
+    restart: always
+    mem_limit: 900m           # JVM 힙(512m) + Metaspace(128m) + 오버헤드(~100m) + 여유
+    mem_reservation: 400m     # 최소 보장 메모리
+    env_file:
+      - .env.prod
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError -javaagent:/app/agents/opentelemetry-javaagent.jar
+    volumes:
+      - ./secrets:/app/secrets
+      - ./ml:/app/ml
+      - ./agents:/app/agents
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./nginx/ssl:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    # 12시간마다 인증서 갱신 체크 (만료 30일 이내일 때만 실제 갱신)
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done;'"

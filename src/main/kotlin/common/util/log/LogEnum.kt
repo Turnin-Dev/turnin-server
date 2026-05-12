@@ -7,6 +7,9 @@ enum class LogLevel {
     DEBUG,
 }
 
+/**
+ * 로그 태그이자 MDC의 키가 된다.
+ */
 enum class LogTag(val key: String) {
     /** 로그 유형 */
     LOG_TYPE("log_type"),
