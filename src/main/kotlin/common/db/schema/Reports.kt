@@ -5,6 +5,7 @@ import com.turnin.common.db.BaseEntityClass
 import com.turnin.common.db.BaseLongIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
+import org.jetbrains.exposed.sql.or
 
 /** 신고 엔티티 클래스 (Exposed DSL 방식) */
 object Reports : BaseLongIdTable("report") {
@@ -22,6 +23,9 @@ object Reports : BaseLongIdTable("report") {
         // 한 사람이 한 대상에 대해 한 번만 신고 가능하도록 제약
         uniqueIndex("uq_report_reporter_user", reporterId, reportedId)
         uniqueIndex("uq_report_reporter_keyword", reporterId, reportedUserKeywordId)
+        check("chk_report_target_present") {
+            reportedId.isNotNull() or reportedUserKeywordId.isNotNull()
+        }
     }
 }
 

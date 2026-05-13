@@ -135,9 +135,11 @@ CREATE TABLE report (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    -- 한 사람이 한 대상에 대해 한 번만 신고가능하도록 제약
+    -- 한 사람이 한 대상에 대해 한 번만 신고가능하도록 제약, 신고 대상은 하나라도 있어야 한다.
+    CONSTRAINT chk_report_target_present
+        CHECK (reported_id IS NOT NULL OR reported_user_keyword_id IS NOT NULL),
     CONSTRAINT uq_report_reporter_user UNIQUE (reporter_id, reported_id),
-    CONSTRAINT uq_report_reporter_keyword UNIQUE (reporter_id, reported_user_keyword_id),
+    CONSTRAINT uq_report_reporter_keyword UNIQUE (reporter_id, reported_user_keyword_id)
 );
 
 -- 차단 사유 테이블 (룩업 테이블)
@@ -157,7 +159,8 @@ CREATE TABLE block (
     custom_reason TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_block_pair UNIQUE (blocker_id, blocked_id)
+    CONSTRAINT uq_block_pair UNIQUE (blocker_id, blocked_id),
+    CONSTRAINT chk_block_not_self CHECK (blocker_id <> blocked_id)
 );
 
 -- 리프레시 토큰

@@ -47,7 +47,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: turnindev/turnin-api:latest
+          tags: |
+            turdindev/turnin-api:latest
+            turdindev/turnin-api:${{ github.run_number }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -61,8 +63,23 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          fingerprint: ${{ secrets.SSH_HOST_FINGERPRINT }}
           script: |
             cd ~/turnin
             docker compose pull ktor
             docker compose up -d --no-deps --force-recreate ktor            
             docker image prune -f
+            
+            # healthy 될 때까지 대기 (최대 60초)
+            timeout 60 bash -c '
+              until [ "$(docker inspect --format={{.State.Health.Status}} $(docker compose ps -q ktor))" = "healthy" ]; do
+                sleep 3
+              done
+            ' || (echo "Deploy failed" && docker compose logs --tail=50 ktor && exit 1)
+            
+            # 이미지 정리 (최근 3개 유지)
+            docker images turdindev/turnin-api --format "{{.Tag}}" \
+              | grep -v latest \
+              | sort -n \          # 숫자 정렬
+              | tail -n +4 \       # 최근 3개 제외
+              | xargs -r -I {} docker rmi turdindev/turnin-api:{}

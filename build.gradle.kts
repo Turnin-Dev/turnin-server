@@ -91,19 +91,6 @@ tasks.register<JavaExec>("runDev") {
     }
 }
 
-tasks.register<JavaExec>("runDevWithOTel") {
-    group = "application"
-    description = "Run the application in development mode"
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("io.ktor.server.netty.EngineMain")
-    systemProperty("config.resource", "application-dev.conf")
-    systemProperty("io.ktor.development", "true")
-    systemProperty("logback.configurationFile", "logback-prod.xml")
-    envDev.forEach { (key, value) ->
-        environment(key, value)
-    }
-}
-
 tasks.register<JavaExec>("runProd") {
     group = "application"
     description = "Run the application in production mode"
