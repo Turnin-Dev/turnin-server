@@ -64,7 +64,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           fingerprint: ${{ secrets.SSH_HOST_FINGERPRINT }}
+          envs: DOCKERHUB_USERNAME,DOCKERHUB_TOKEN
           script: |
+            # Docker Login
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            
+            # Docker
             cd ~/turnin
             docker compose pull ktor
             docker compose up -d --no-deps --force-recreate ktor            
@@ -83,3 +88,6 @@ jobs:
               | sort -n \          # 숫자 정렬
               | tail -n +4 \       # 최근 3개 제외
               | xargs -r -I {} docker rmi turdindev/turnin-api:{}
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
