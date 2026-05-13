@@ -26,11 +26,7 @@ jobs:
         with:
           cache-read-only: false
 
-      # 4. ktlint 검사
-      - name: ktlint check
-        run: ./gradlew ktlintCheck
-
-      # 5. 빌드 + 테스트
+      # 4. 빌드 + 테스트 + ktlintCheck
       - name: Build & Test
         run: |
           set -e

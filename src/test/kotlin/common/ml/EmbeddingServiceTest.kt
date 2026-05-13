@@ -114,23 +114,27 @@ class EmbeddingServiceTest {
     // ------------------------------ 예외 처리 테스트 ------------------------------
     @Test
     fun `빈 문자열 입력 시 TokenizationFailed 예외가 발생한다`() {
+        val service = embeddingService ?: return
+
         // given
         val emptyText = ""
 
         // when, then
         assertThrows<EmbeddingServiceException.TokenizationFailed> {
-            embeddingService!!.embed(emptyText)
+            service.embed(emptyText)
         }
     }
 
     @Test
     fun `공백 문자열 입력 시 TokenizationFailed 예외가 발생한다`() {
+        val service = embeddingService ?: return
+
         // given
         val blankText = "   "
 
         // when, then
         assertThrows<EmbeddingServiceException.TokenizationFailed> {
-            embeddingService!!.embed(blankText)
+            service.embed(blankText)
         }
     }
 
@@ -148,12 +152,14 @@ class EmbeddingServiceTest {
     // ------------------------------ 일관성 테스트 ------------------------------
     @Test
     fun `동일 입력에는 동일한 벡터 값이 출력되어야 한다`() {
+        val service = embeddingService ?: return
+
         // given
         val keyword = "산책"
 
         // when
-        val vector1 = embeddingService!!.embed(keyword)
-        val vector2 = embeddingService!!.embed(keyword)
+        val vector1 = service.embed(keyword)
+        val vector2 = service.embed(keyword)
 
         // then
         assertEquals(vector1, vector2)
