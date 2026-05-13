@@ -18,10 +18,8 @@ import com.turnin.common.util.application.applicationCleanup
 import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.getTimeZoneInfo
 import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.netty.EngineMain
 import java.util.TimeZone
-import kotlinx.coroutines.delay
 import org.koin.ktor.ext.inject
 
 fun main(args: Array<String>) {
@@ -29,12 +27,6 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    // TODO: 개발 단계에서만 활성화
-    intercept(ApplicationCallPipeline.Call) {
-        delay(2000L)
-        proceed()
-    }
-
     // ------------------------------ Setting ------------------------------
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 

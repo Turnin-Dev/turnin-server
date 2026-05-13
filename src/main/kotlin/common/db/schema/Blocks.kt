@@ -15,6 +15,7 @@ object Blocks : BaseLongIdTable("block") {
 
     init {
         uniqueIndex("uq_block_pair", blockerId, blockedId)
+        check("chk_block_not_self") { blockerId neq blockedId }
     }
 }
 

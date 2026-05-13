@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
@@ -14,6 +16,12 @@ application {
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
+ktor {
+    fatJar {
+        archiveFileName.set("turnin-api.jar")
+    }
 }
 
 repositories {
@@ -38,10 +46,22 @@ ktlint {
     }
 }
 
+tasks.named<ShadowJar>("shadowJar") {
+    exclude("firebase-service-account.json")
+    exclude("model_int8.onnx")
+    exclude("tokenizer.json")
+    exclude("tokenizer_config.json")
+}
+
 tasks.withType<JavaExec> {
     val configFile = System.getProperty("config.file")
     if (configFile != null) {
         systemProperty("config.file", configFile)
+    }
+    // 로컬에 에이전트 파일 있을 때만 적용
+    val agentFile = rootProject.file("opentelemetry-javaagent.jar")
+    if (agentFile.exists()) {
+        jvmArgs("-javaagent:${agentFile.absolutePath}")
     }
 }
 
@@ -71,19 +91,6 @@ tasks.register<JavaExec>("runDev") {
     }
 }
 
-tasks.register<JavaExec>("runDevWithOTel") {
-    group = "application"
-    description = "Run the application in development mode"
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("io.ktor.server.netty.EngineMain")
-    systemProperty("config.resource", "application-dev.conf")
-    systemProperty("io.ktor.development", "true")
-    systemProperty("logback.configurationFile", "logback-prod.xml")
-    envDev.forEach { (key, value) ->
-        environment(key, value)
-    }
-}
-
 tasks.register<JavaExec>("runProd") {
     group = "application"
     description = "Run the application in production mode"
@@ -94,11 +101,6 @@ tasks.register<JavaExec>("runProd") {
     systemProperty("logback.configurationFile", "logback-prod.xml")
     envProd.forEach { (key, value) -> environment(key, value) }
 }
-
-// tasks.test {
-//    systemProperty("config.file", "application-test.conf")
-//    useJUnitPlatform()
-// }
 
 dependencies {
     implementation(libs.ktor.server.core)
