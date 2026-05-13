@@ -7,6 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.measureTimedValue
 import org.junit.AfterClass
+import org.junit.Assume.assumeTrue
 import org.junit.BeforeClass
 import org.junit.jupiter.api.assertThrows
 
@@ -31,6 +32,8 @@ class EmbeddingServiceTest {
         @JvmStatic
         @BeforeClass
         fun setUp() {
+            assumeTrue(File(ModelPath).exists() && File(TokenizerPath).exists())
+
             embeddingService = EmbeddingService(
                 modelPath = ModelPath,
                 tokenizerPath = TokenizerPath,
