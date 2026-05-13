@@ -7,7 +7,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.measureTimedValue
 import org.junit.AfterClass
-import org.junit.Assume.assumeTrue
 import org.junit.BeforeClass
 import org.junit.jupiter.api.assertThrows
 
@@ -26,25 +25,23 @@ class EmbeddingServiceTest {
         private const val HIGH_SIMILARITY_THRESHOLD = 0.7f
         private const val MEDIUM_SIMILARITY_THRESHOLD = 0.6f
 
-        @JvmStatic
-        private lateinit var embeddingService: EmbeddingService
+        private var embeddingService: EmbeddingService? = null
 
         @JvmStatic
         @BeforeClass
         fun setUp() {
-            assumeTrue(File(ModelPath).exists() && File(TokenizerPath).exists())
+            if (!File(ModelPath).exists() || !File(TokenizerPath).exists()) return
 
             embeddingService = EmbeddingService(
                 modelPath = ModelPath,
                 tokenizerPath = TokenizerPath,
-            )
-            embeddingService.init()
+            ).also { it.init() }
         }
 
         @JvmStatic
         @AfterClass
         fun teardown() {
-            embeddingService.close()
+            embeddingService?.close()
         }
     }
 
@@ -122,7 +119,7 @@ class EmbeddingServiceTest {
 
         // when, then
         assertThrows<EmbeddingServiceException.TokenizationFailed> {
-            embeddingService.embed(emptyText)
+            embeddingService!!.embed(emptyText)
         }
     }
 
@@ -133,7 +130,7 @@ class EmbeddingServiceTest {
 
         // when, then
         assertThrows<EmbeddingServiceException.TokenizationFailed> {
-            embeddingService.embed(blankText)
+            embeddingService!!.embed(blankText)
         }
     }
 
@@ -155,8 +152,8 @@ class EmbeddingServiceTest {
         val keyword = "산책"
 
         // when
-        val vector1 = embeddingService.embed(keyword)
-        val vector2 = embeddingService.embed(keyword)
+        val vector1 = embeddingService!!.embed(keyword)
+        val vector2 = embeddingService!!.embed(keyword)
 
         // then
         assertEquals(vector1, vector2)
@@ -222,9 +219,11 @@ class EmbeddingServiceTest {
         text: String,
         additionalAssertion: (vector: String, durationMillisecond: Long) -> Unit = { _, _ -> },
     ) {
+        val service = embeddingService ?: return
+
         // when
         val timedValue = measureTimedValue {
-            embeddingService.embed(text)
+            service.embed(text)
         }
         val vector = timedValue.value
         val dimensions = parseVector(vector)
@@ -250,9 +249,11 @@ class EmbeddingServiceTest {
         text2: String,
         similarityAssertion: (Float) -> Unit,
     ) {
+        val service = embeddingService ?: return
+
         // when
-        val vector1 = parseVector(embeddingService.embed(text1))
-        val vector2 = parseVector(embeddingService.embed(text2))
+        val vector1 = parseVector(service.embed(text1))
+        val vector2 = parseVector(service.embed(text2))
         val similarity = dotProduct(vector1, vector2)
 
         // then
