@@ -110,7 +110,6 @@ dependencies {
     implementation(libs.h2)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
-    implementation(libs.ktor.server.config.yaml)
 
     // Test
     testImplementation(libs.ktor.server.test.host)

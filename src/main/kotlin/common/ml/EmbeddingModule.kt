@@ -9,11 +9,11 @@ val embeddingModule = module {
     single {
         val appConfig = get<AppConfig>()
         val modelPath = appConfig.getOrDefault(
-            "ktor.model.modelPath",
+            "ktor.ml.modelPath",
             "src/main/resources/ml/model_int8.onnx",
         )
         val tokenizerPath = appConfig.getOrDefault(
-            "ktor.model.tokenizerPath",
+            "ktor.ml.tokenizerPath",
             "src/main/resources/ml/tokenizer.json",
         )
 
