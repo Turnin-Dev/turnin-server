@@ -1,0 +1,33 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # 2. JDK 설정
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. Gradle 설정 (의존성 + 빌드 캐시 자동 관리)
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      # 4. 빌드 + 테스트 + ktlintCheck
+      - name: Build & Test
+        run: |
+          set -e
+          ./gradlew clean build --no-daemon

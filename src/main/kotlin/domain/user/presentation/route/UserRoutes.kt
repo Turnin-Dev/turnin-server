@@ -1,0 +1,255 @@
+package com.turnin.domain.user.presentation.route
+
+import com.turnin.common.exception.ErrorResponse
+import com.turnin.common.exception.toErrorResponse
+import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.route.Api
+import com.turnin.common.validator.inputValidationAndReturn
+import com.turnin.domain.user.application.usecase.UserUseCases
+import com.turnin.domain.user.exception.UserErrorCode
+import com.turnin.domain.user.presentation.dto.FcmTokenRequest
+import com.turnin.domain.user.presentation.dto.IntroducePatchRequest
+import com.turnin.domain.user.presentation.dto.MyProfileResponse
+import com.turnin.domain.user.presentation.dto.UserPatchRequest
+import com.turnin.domain.user.presentation.dto.UserProfileResponse
+import com.turnin.domain.user.presentation.dto.UserResponse
+import com.turnin.domain.user.presentation.dto.toDto
+import com.turnin.domain.user.presentation.dto.toResponse
+import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.get
+import io.github.smiley4.ktoropenapi.patch
+import io.github.smiley4.ktoropenapi.put
+import io.github.smiley4.ktoropenapi.route
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+
+// ------------------------------ Route ------------------------------
+fun AuthenticatedRoute.userRoutes(route: Api.V1.User, usecase: UserUseCases) {
+    route(route.ROUTE, {
+        tags = setOf(route.TAG)
+        description = "User API"
+    }) {
+        get({ getUserByIdDocs() }) {
+            val userId = extractUserIdWithToken()
+            val user = usecase.get(userId, userId)
+            if (user != null) {
+                call.respond(user.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        get(route.myProfile(), { getMyProfileDocs() }) {
+            val userId = extractUserIdWithToken()
+            val user = usecase.getMyProfile(userId)
+            if (user != null) {
+                call.respond(user.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        get(route.profile("{userId}"), { getUserProfileDocs() }) {
+            val myUserId = extractUserIdWithToken()
+            val userId = call.pathParameters["userId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 ID")
+            val userProfileDto = usecase.getUserProfile(myUserId = myUserId.value, userId = userId)
+            if (userProfileDto != null) {
+                call.respond(userProfileDto.toResponse())
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        put({ updateUserDocs() }) {
+            val userPatchRequest = call.receive<UserPatchRequest>()
+            val userId = extractUserIdWithToken()
+            verifyAuthUserId(userId)
+            val result = usecase.update(userId, userPatchRequest.toDto())
+            if (result) {
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.UserPatchFailed.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        patch(route.INTRODUCE, { patchIntroduceDocs() }) {
+            val introducePatchRequest = call.receive<IntroducePatchRequest>()
+            val userId = extractUserIdWithToken()
+            verifyAuthUserId(userId)
+            val result = usecase.updateIntroduce(userId, introducePatchRequest.introduce)
+            if (result) {
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    UserErrorCode.IntroducePatchFailed.toErrorResponse(HttpStatusCode.NotFound),
+                )
+            }
+        }
+
+        patch(route.LOGOUT, { logoutDocs() }) {
+            val userId = extractUserIdWithToken()
+            val token = call.receive<FcmTokenRequest>()
+            usecase.logout(userId.value, token.token)
+            call.respond(HttpStatusCode.OK)
+        }
+    }
+}
+
+// ------------------------------ Route Docs ------------------------------
+private fun RouteConfig.getUserByIdDocs() {
+    deprecated = true
+    summary = "사용자 조회"
+    description = "사용자 ID로 사용자를 조회한다."
+    response {
+        code(HttpStatusCode.OK) {
+            body<UserResponse> {
+                description = "사용자 정보"
+                example("UserResponse") {
+                    value = UserResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자가 존재하지 않는 경우"
+                example("UserResponse") {
+                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getMyProfileDocs() {
+    summary = "나의 프로필 조회"
+    description = "나의 사용자 ID로 프로필을 조회한다."
+    response {
+        code(HttpStatusCode.OK) {
+            body<MyProfileResponse> {
+                description = "나의 프로필"
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자가 존재하지 않는 경우"
+                example("UserNotFound") {
+                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.getUserProfileDocs() {
+    summary = "사용자 프로필 조회"
+    description = "사용자 ID로 사용자 프로필을 조회한다."
+    request {
+        pathParameter<Long>("userId") {
+            description = "사용자 ID"
+            example("Example") {
+                value = 1L
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<UserProfileResponse> {
+                description = "사용자 프로필"
+            }
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자가 존재하지 않는 경우, 차단 관계에 있는 사용자인 경우"
+                example("UserNotFound") {
+                    value = UserErrorCode.UserNotFound.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.updateUserDocs() {
+    summary = "사용자 정보 수정"
+    description = "사용자 정보를 수정한다."
+    request {
+        body<UserPatchRequest> {
+            description = "사용자 정보 수정 요청 바디"
+            example("Example") {
+                value = UserPatchRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.NoContent) {
+            description = "사용자 정보 수정 성공 시"
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "사용자 정보가 수정되지 않았을 때"
+                example("UserPatchFailed") {
+                    value = UserErrorCode.UserPatchFailed.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.patchIntroduceDocs() {
+    summary = "사용자 소개글 수정"
+    description = "사용자 소개글을 수정한다."
+    request {
+        body<IntroducePatchRequest> {
+            description = "사용자 소개글 수정 요청 바디"
+            example("Example") {
+                value = IntroducePatchRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.NoContent) {
+            description = "사용자 소개글 수정 성공 시"
+        }
+        code(HttpStatusCode.NotFound) {
+            body<ErrorResponse> {
+                description = "소개글이 수정되지 않았을 때"
+                example("IntroducePatchFailed") {
+                    value = UserErrorCode.IntroducePatchFailed.toErrorResponse(HttpStatusCode.NotFound)
+                }
+            }
+        }
+    }
+}
+
+private fun RouteConfig.logoutDocs() {
+    summary = "로그아웃"
+    description = "로그아웃을 수행한다."
+    request {
+        body<FcmTokenRequest> {
+            description = "FCM 토큰 요청 바디"
+            example("FcmTokenRequest") {
+                value = FcmTokenRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            description = "로그아웃 성공 시"
+        }
+    }
+}

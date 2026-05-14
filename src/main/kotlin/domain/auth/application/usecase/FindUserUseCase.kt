@@ -1,0 +1,33 @@
+package com.turnin.domain.auth.application.usecase
+
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.masking
+import com.turnin.domain.auth.application.dto.FindUserResultDto
+import com.turnin.domain.auth.application.mapper.AuthMapper.toDto
+import com.turnin.domain.auth.domain.model.FindUserResult
+import com.turnin.domain.auth.domain.repository.AuthRepository
+
+/**
+ * 로그인을 수행하기 전에 이미 가입되어 있는 사용자인지 찾는다.
+ */
+class FindUserUseCase(private val authRepository: AuthRepository) {
+    /**
+     * 로그인을 수행하기 전에 [provider]와 [providerId]로 이미 가입되어 있는 사용자인지 찾는다.
+     *
+     * @param provider 소셜 로그인 제공자
+     * @param providerId 소셜 로그인 제공자에서 제공한 ID
+     *
+     * @return [FindUserResultDto] 가입 여부(`exists`)
+     */
+    suspend operator fun invoke(
+        provider: SocialLoginProvider,
+        providerId: String,
+    ): FindUserResultDto {
+        LOGGER.debug("findUser called, provider: $provider, providerId: ${providerId.masking()}")
+        val result = authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
+        return FindUserResult(result != null).toDto()
+    }
+}
+
+private val LOGGER = AppLoggerFactory.createLogger("FindUserUseCase")

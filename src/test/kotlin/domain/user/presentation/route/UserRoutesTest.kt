@@ -1,0 +1,603 @@
+package com.turnin.domain.user.presentation.route
+
+import com.turnin.common.exception.ApiException
+import com.turnin.common.exception.common.CommonErrorCode
+import com.turnin.common.model.FriendStatus
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.route.Api
+import com.turnin.domain.user.UserTestDoubles.MockUserDto
+import com.turnin.domain.user.application.dto.MyProfileDto
+import com.turnin.domain.user.application.dto.UserPatchDto
+import com.turnin.domain.user.application.dto.UserProfileDto
+import com.turnin.domain.user.application.usecase.UserUseCases
+import com.turnin.domain.user.presentation.dto.FcmTokenRequest
+import com.turnin.domain.user.presentation.dto.IntroducePatchRequest
+import com.turnin.domain.user.presentation.dto.UserPatchRequest
+import com.turnin.util.testGetEndpoint
+import com.turnin.util.testPatchEndpoint
+import com.turnin.util.testPlugin
+import com.turnin.util.testPutEndpoint
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.testApplication
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.just
+import io.mockk.mockk
+import org.junit.Test
+
+class UserRoutesTest {
+    private val route = Api.V1.User
+    private val userUseCases = mockk<UserUseCases>()
+
+    @Test
+    fun `사용자 조회 GET 요청 성공 테스트`() = testApplication {
+        coEvery { userUseCases.get(TestMyUserId, TestMyUserId) } returns MockUserDto
+
+        testGetEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                containsAll(
+                    MockUserDto.userName.value,
+                    MockUserDto.displayId.value,
+                    MockUserDto.role.name,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `사용자 조회 GET 요청 실패 테스트 -잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+        coEvery { userUseCases.get(TestMyUserId, TestMyUserId) } returns MockUserDto
+
+        testGetEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = INVALID_USER_ID,
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `사용자 조회 GET 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+        coEvery { userUseCases.get(TestMyUserId, TestMyUserId) } returns null
+
+        testGetEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.NotFound,
+            responseValidator = {
+                contains(HttpStatusCode.NotFound.value.toString())
+            },
+        )
+    }
+
+    @Test
+    fun `나의 프로필 조회 GET 요청 성공 테스트`() = testApplication {
+        coEvery { userUseCases.getMyProfile(TestMyUserId) } returns TestMyProfileDto
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.myProfile()}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                containsAll(
+                    TestMyProfileDto.displayId.value,
+                    TestMyProfileDto.displayId.value,
+                    TestMyProfileDto.friendsCount.toString(),
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `나의 프로필 조회 GET 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+        coEvery { userUseCases.getMyProfile(TestMyUserId) } returns TestMyProfileDto
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.myProfile()}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = INVALID_USER_ID,
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `나의 프로필 조회 GET 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+        coEvery { userUseCases.getMyProfile(TestMyUserId) } returns null
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.myProfile()}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.NotFound,
+        )
+    }
+
+    @Test
+    fun `나의 프로필 조회 GET 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        coEvery { userUseCases.getMyProfile(TestMyUserId) } returns null
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.myProfile()}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `나의 프로필 조회 GET 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        val expectedApiException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery { userUseCases.getMyProfile(TestMyUserId) } throws expectedApiException
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.myProfile()}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `사용자 프로필 조회 GET 요청 성공 테스트`() = testApplication {
+        coEvery {
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
+        } returns TestUserProfileDto
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                containsAll(
+                    TestUserProfileDto.displayId.value,
+                    TestUserProfileDto.userName.value,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `사용자 프로필 조회 GET 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+        coEvery {
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
+        } returns TestUserProfileDto
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = INVALID_USER_ID,
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `사용자 프로필 조회 GET 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+        coEvery {
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
+        } returns null
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.NotFound,
+        )
+    }
+
+    @Test
+    fun `사용자 프로필 조회 GET 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        coEvery {
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
+        } returns TestUserProfileDto
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `사용자 프로필 조회 GET 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        val expectedApiException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery {
+            userUseCases.getUserProfile(TestMyUserId.value, TestUserId.value)
+        } throws expectedApiException
+
+        testGetEndpoint(
+            endpoint = "${route.ROUTE}${route.profile(TestUserId.value.toString())}",
+            queryParameters = null,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `사용자 수정 PUT 요청 성공 테스트`() = testApplication {
+        coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns true
+
+        testPutEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestUserPatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.NoContent,
+        )
+    }
+
+    @Test
+    fun `사용자 수정 PUT 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+        coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns true
+
+        testPutEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestUserPatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = INVALID_USER_ID,
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `사용자 수정 PUT 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+        coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns false
+
+        testPutEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestUserPatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.NotFound,
+        )
+    }
+
+    @Test
+    fun `사용자 수정 PUT 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        coEvery { userUseCases.update(TestMyUserId, TestUserPatchDto) } returns false
+
+        testPutEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestUserPatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `사용자 수정 PUT 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        // given
+        val expectedApiException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery {
+            userUseCases.update(TestMyUserId, TestUserPatchDto)
+        } throws expectedApiException
+
+        testPutEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = null,
+            requestBody = TestUserPatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 성공 테스트`() = testApplication {
+        coEvery { userUseCases.updateIntroduce(TestMyUserId, TEST_INTRODUCE) } returns true
+
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.INTRODUCE}",
+            queryParameters = null,
+            requestBody = TestIntroducePatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.NoContent,
+        )
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 잘못된 형식의 사용자 ID인 경우 BadRequest를 반환한다`() = testApplication {
+        coEvery { userUseCases.updateIntroduce(TestMyUserId, TEST_INTRODUCE) } returns true
+
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.INTRODUCE}",
+            queryParameters = null,
+            requestBody = TestIntroducePatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = INVALID_USER_ID,
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 사용자가 존재하지 않는 경우 NotFound를 반환한다`() = testApplication {
+        coEvery { userUseCases.updateIntroduce(TestMyUserId, TEST_INTRODUCE) } returns false
+
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.INTRODUCE}",
+            queryParameters = null,
+            requestBody = TestIntroducePatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.NotFound,
+        )
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        coEvery { userUseCases.updateIntroduce(TestMyUserId, TEST_INTRODUCE) } returns true
+
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.INTRODUCE}",
+            queryParameters = null,
+            requestBody = TestIntroducePatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `사용자 소개글 수정 PATCH 요청 실패 테스트 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        // given
+        val expectedApiException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery {
+            userUseCases.updateIntroduce(TestMyUserId, TEST_INTRODUCE)
+        } throws expectedApiException
+
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.INTRODUCE}",
+            queryParameters = null,
+            requestBody = TestIntroducePatchRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = expectedApiException.status,
+            responseValidator = {
+                containsAll(
+                    expectedApiException.errorCode.code,
+                    expectedApiException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `로그아웃 요청 성공 테스트`() = testApplication {
+        // given
+        coEvery { userUseCases.logout(TestMyUserId.value, any()) } just Runs
+
+        // when, then
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.LOGOUT}",
+            requestBody = FcmTokenRequest("fcm-token"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = TestMyUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+        )
+    }
+
+    @Test
+    fun `로그아웃 요청 실패 테스트 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        // given
+        coEvery { userUseCases.logout(TestMyUserId.value, any()) } just Runs
+
+        // when, then
+        testPatchEndpoint(
+            endpoint = "${route.ROUTE}${route.LOGOUT}",
+            requestBody = FcmTokenRequest("fcm-token"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { userRoutes(route, userUseCases) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    companion object {
+        private val TestMyUserId = UserId(1L)
+        private val TestUserId = UserId(2L)
+        private val TestDisplayId = DisplayId("did")
+        private const val INVALID_USER_ID = "asd"
+        private val TestUserPatchDto = UserPatchDto(
+            userName = "name",
+            displayId = "did",
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
+            introduce = "introduce",
+        )
+        private val TestUserPatchRequest = UserPatchRequest(
+            name = "name",
+            displayId = "did",
+            oldProfileImageUrl = null,
+            newProfileImageUrl = null,
+            introduce = "introduce",
+        )
+        private val TestMyProfileDto = MyProfileDto(
+            userId = TestMyUserId.value,
+            displayId = DisplayId("id"),
+            userName = UserName("name"),
+            profileImageUrl = null,
+            introduce = Introduce(TEST_INTRODUCE),
+            isActive = true,
+            lastLoginAt = 1000,
+            friendsCount = 2,
+        )
+        private const val TEST_INTRODUCE = "test introduce"
+        private val TestIntroducePatchRequest = IntroducePatchRequest(
+            introduce = TEST_INTRODUCE,
+        )
+        private val TestUserProfileDto = UserProfileDto(
+            userId = TestUserId.value,
+            displayId = TestDisplayId,
+            userName = UserName("honggd"),
+            profileImageUrl = "https://www.example.com/image.jpg",
+            introduce = Introduce("hello world!"),
+            isActive = true,
+            lastLoginAt = 1697875200L,
+            friendsCount = 51L,
+            friendStatus = FriendStatus.NOTHING,
+            isBlocked = false,
+        )
+    }
+}

@@ -1,23 +1,36 @@
-
 [versions]
 exposed-version = "0.61.0"
 h2-version = "2.3.232"
 kotlin-version = "2.1.10"
 ktor-version = "3.1.2"
-logback-version = "1.5.13"
-postgresql-version = "42.7.2"
-exposed-orm-version = "0.41.1"
+logback-version = "1.5.25"
+postgresql-version = "42.7.11"
 hikariCP-version = "5.0.1"
 dotenv-version = "6.4.0"
 jwt-version = "4.2.1"
+ktlint-version = "12.2.0"
+koin-version = "4.0.3"
+flyway-version = "11.8.2"
+koin-ksp-version = "2.0.1-RC1"
+ksp = "2.1.10-1.0.30"
+mockk-version = "1.14.2"
+swagger-codegen-version = "1.0.56"
+smiley-openapi-version = "5.0.2"
+aws-s3 = "2.32.26"
+onnx-runtime = "1.23.2"
+huggingface-tokenizers = "0.36.0"
+test-container-pg = "1.21.4"
+firebase-admin = "9.8.0"
+# opentelemetry-logback-appender는 모든 버전이 -alpha suffix를 사용.
+# stable 버전이 존재하지 않으며, OpenTelemetry Java 공식 릴리즈 정책.
+# 참고: https://github.com/open-telemetry/opentelemetry-java-instrumentation
+opentelemetry-logback-appender = "2.26.1-alpha"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
-ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor-version" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor-version" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-version" }
-exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
-exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-version" }
 h2 = { module = "com.h2database:h2", version.ref = "h2-version" }
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor-version" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor-version" }
@@ -25,12 +38,16 @@ logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "lo
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor-version" }
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor-version" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-version" }
+# Status Pages
+ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor-version" }
+ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor-version" }
 # PostgreSQL JDBC Driver
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql-version" }
-# Exposed ORM
-exposed-orm-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-orm-version" }
-exposed-orm-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed-orm-version" }
-exposed-orm-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-orm-version" }
+# Exposed
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed-version" }
+exposed-datatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed-version" }
 # HikariCP (Connection Pool)
 hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikariCP-version" }
 # dot env
@@ -38,8 +55,46 @@ dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv-v
 # JWT
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor-version" }
 jwt = { module = "com.auth0:java-jwt", version.ref = "jwt-version" }
+# Open API
+ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
+ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor-version" }
+ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor-version" }
+swagger-codegen-generator = { module = "io.swagger.codegen.v3:swagger-codegen-generators", version.ref = "swagger-codegen-version" }
+smiley4-swagger-ui = { module = "io.github.smiley4:ktor-swagger-ui", version.ref = "smiley-openapi-version" }
+smiley4-openapi = { module = "io.github.smiley4:ktor-openapi", version.ref = "smiley-openapi-version" }
+# Logging
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor-version" }
+# DI
+koin = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-version" }
+koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-version" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-ksp-version" }
+koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-ksp-version" }
+# Flyway
+flyway-core = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-version" }
+# Mockk
+mockk = { module = "io.mockk:mockk", version.ref = "mockk-version" }
+# Client (for test)
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-version" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-version" }
+# CORS
+ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor-version" }
+# AWS S3
+amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-s3" }
+# ONNX, Tokenizers
+onnx-runtime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnx-runtime" }
+huggingface-tokenizers = { module = "ai.djl.huggingface:tokenizers", version.ref = "huggingface-tokenizers" }
+# PostgreSQL Test Container
+test-container-postgresql = { module = "org.testcontainers:postgresql", version.ref = "test-container-pg" }
+# Firebase
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+# OpenTelemetry
+opentelemetry-logback-appender = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0", version.ref = "opentelemetry-logback-appender" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
+# Ktlint
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-version" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

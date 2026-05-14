@@ -1,0 +1,228 @@
+package com.turnin.domain.auth.application.usecase
+
+import com.auth0.jwt.JWT
+import com.turnin.common.jwt.JWTTestDoubles
+import com.turnin.common.jwt.domain.model.JWTToken
+import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.model.Introduce
+import com.turnin.common.model.Role
+import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.UserName
+import com.turnin.common.model.id.DisplayId
+import com.turnin.common.model.id.UserId
+import com.turnin.domain.auth.domain.model.AuthUser
+import com.turnin.domain.auth.domain.repository.AuthRepository
+import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
+import io.mockk.coEvery
+import io.mockk.mockk
+import java.time.Instant
+import kotlin.test.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.jupiter.api.assertThrows
+
+class RefreshTokenUseCaseTest {
+    private val jwtTokenService = mockk<JWTTokenService>()
+    private val authRepository = mockk<AuthRepository>()
+    private val refreshTokenRepository = mockk<RefreshTokenRepository>()
+    private val usecase = RefreshTokenUseCase(authRepository, refreshTokenRepository, jwtTokenService)
+
+    @Before
+    fun setUp() {
+        coEvery {
+            jwtTokenService.verify(any(), any())
+        } returns JWTTestDoubles.getMockJWTToken(TEST_SUBJECT).let {
+            JWT.decode(it.refreshToken) // DecodedJWT 반환
+        }
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } returns TEST_SUBJECT
+        coEvery {
+            jwtTokenService.generate(any())
+        } returns TestJWTToken
+        coEvery {
+            authRepository.findUserByUserId(TestUserId)
+        } returns TestAuthUser
+        coEvery {
+            refreshTokenRepository.findUserIdByRefreshToken(any())
+        } returns TestUserId
+        coEvery {
+            refreshTokenRepository.save(TestUserId, any())
+        } returns true
+    }
+
+    @Test
+    fun `리프레쉬 토큰 갱신 성공 테스트`() = runTest {
+        // given
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+
+        // when
+        val jwtTokenDto = usecase(token.refreshToken)
+
+        // then
+        assertNotNull(jwtTokenDto)
+        assert(jwtTokenDto.accessToken == TestJWTToken.accessToken)
+        assert(jwtTokenDto.refreshToken == TestJWTToken.refreshToken)
+    }
+
+    @Test
+    fun `토큰에서 Subject(사용자 ID) 추출에 실패하면 null을 반환한다`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } returns null
+
+        // when
+        val jwtTokenDto = usecase("aaa.bbb.ccc")
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `리프레쉬 토큰 갱신 과정에서 토큰 생성에 실패하면 null을 반환한다`() = runTest {
+        // given
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery { jwtTokenService.generate(any()) } throws TokenException.CannotCreateToken()
+
+        // when
+        val jwtTokenDto = usecase(token.refreshToken)
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `리프레쉬 토큰 저장 실패 시 null을 반환한다`() = runTest {
+        // given
+        val token = JWTTestDoubles.getMockJWTToken(TestUserId.value.toString())
+        coEvery {
+            refreshTokenRepository.save(TestUserId, any())
+        } returns false
+
+        // when
+        val jwtTokenDto = usecase(token.refreshToken)
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `만료된 토큰으로 갱신 시도 시 null을 반환한다 - verify에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.verify(any(), any())
+        } throws TokenException.TokenExpiredException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getExpiredRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `만료된 토큰으로 갱신 시도 시 null을 반환한다 - extractSubjectWithToken에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } throws TokenException.TokenExpiredException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getExpiredRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `변조된 토큰으로 갱신 시도 시 null을 반환한다 - verify에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.verify(any(), any())
+        } throws TokenException.VerificationFailedException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getTamperedRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `변조된 토큰으로 갱신 시도 시 null을 반환한다 - extractSubjectWithToken에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } throws TokenException.VerificationFailedException()
+
+        // when
+        val jwtTokenDto = usecase(JWTTestDoubles.getTamperedRefreshToken())
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `잘못된 형식의 토큰으로 갱신 시도 시 null을 반환한다 - verify에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.verify(any(), any())
+        } throws TokenException.CannotDecodedException()
+
+        // when
+        val jwtTokenDto = usecase("invalid.token")
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `잘못된 형식의 토큰으로 갱신 시도 시 null을 반환한다 - extractSubjectWithToken에서 예외가 발생하는 경우`() = runTest {
+        // given
+        coEvery {
+            jwtTokenService.extractSubjectWithToken(any(), any())
+        } throws TokenException.CannotDecodedException()
+
+        // when
+        val jwtTokenDto = usecase("invalid.token")
+
+        // then
+        assertNull(jwtTokenDto)
+    }
+
+    @Test
+    fun `토큰 생성 중 예상치 못한 예외는 전파된다`() = runTest {
+        // given
+        coEvery { jwtTokenService.generate(any()) } throws RuntimeException("unexpected")
+
+        // when, then
+        assertThrows<RuntimeException> {
+            usecase(JWTTestDoubles.getMockJWTToken(TestUserId.value.toString()).refreshToken)
+        }
+    }
+
+    companion object {
+        private const val TEST_SUBJECT = "1"
+        private val TestUserId = UserId(TEST_SUBJECT.toLong())
+        private val TestJWTToken = JWTToken(
+            accessToken = "aaa.bbb.ccc",
+            refreshToken = "ddd.eee.fff",
+        )
+        val TestAuthUser = AuthUser(
+            userId = TestUserId,
+            role = Role.USER,
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "providerIDDDDD",
+            displayId = DisplayId("hong_gd_123"),
+            userName = UserName("honggd"),
+            profileImageUrl = "http://example.com/profile.jpg",
+            introduce = Introduce("Hello!"),
+            isActive = true,
+            lastLoginAt = Instant.now(),
+        )
+    }
+}

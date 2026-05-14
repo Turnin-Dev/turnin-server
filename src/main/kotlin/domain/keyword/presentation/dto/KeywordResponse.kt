@@ -1,0 +1,40 @@
+package com.turnin.domain.keyword.presentation.dto
+
+import com.turnin.domain.keyword.application.dto.KeywordDto
+import kotlinx.serialization.Serializable
+
+/**
+ * 키워드 응답바디
+ *
+ * @property id 키워드 ID
+ * @property keyword 키워드명
+ * @property createdBy 키워드 최초등록자 ID
+ * @property createdAt 키워드 등록 일자
+ * @property updatedAt 키워드 수정 일자
+ */
+@Serializable
+data class KeywordResponse(
+    val id: Long,
+    val keyword: String,
+    val createdBy: Long?,
+    val createdAt: Long,
+    val updatedAt: Long,
+) {
+    companion object {
+        val sample = KeywordResponse(
+            id = 1,
+            keyword = "sample",
+            createdBy = 1,
+            createdAt = 1697875200L,
+            updatedAt = 1697875200L,
+        )
+    }
+}
+
+fun KeywordDto.toResponse(): KeywordResponse = KeywordResponse(
+    id = id.value,
+    keyword = name,
+    createdBy = createdBy?.value,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+)

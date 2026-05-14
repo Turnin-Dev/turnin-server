@@ -36,4 +36,18 @@ out/
 .vscode/
 
 ### dotenv ###
-.env
+.env*
+**/src/main/resources/**/*.yaml
+**/src/main/resources/**/*.yml
+
+# macOS
+.DS_Store
+**/src/.DS_Store
+**/src/main/.DS_Store
+**/src/main/resources/.DS_Store
+
+# ML Models
+**/src/main/resources/ml/**
+
+### JSON (include firebase key) ###
+**/src/main/resources/**/*.json
