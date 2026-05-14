@@ -48,8 +48,8 @@ jobs:
           context: .
           push: true
           tags: |
-            turdindev/turnin-api:latest
-            turdindev/turnin-api:${{ github.run_number }}
+            turnindev/turnin-api:latest
+            turnindev/turnin-api:${{ github.run_number }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -83,11 +83,11 @@ jobs:
             ' || (echo "Deploy failed" && docker compose logs --tail=50 ktor && exit 1)
             
             # 이미지 정리 (최근 3개 유지)
-            docker images turdindev/turnin-api --format "{{.Tag}}" \
+            docker images turnindev/turnin-api --format "{{.Tag}}" \
               | grep -v latest \
               | sort -n \          # 숫자 정렬
               | tail -n +4 \       # 최근 3개 제외
-              | xargs -r -I {} docker rmi turdindev/turnin-api:{}
+              | xargs -r -I {} docker rmi turnindev/turnin-api:{}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
