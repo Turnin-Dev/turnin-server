@@ -13,13 +13,6 @@ create type social_login_provider as ENUM ('GOOGLE', 'APPLE', 'KAKAO');
 -- 역할
 create type user_role as ENUM('USER', 'ADMIN');
 
--- 키워드 카테고리
-CREATE TYPE keyword_category AS ENUM (
-    'FOOD', 'FASHION', 'BEAUTY', 'TRAVEL', 'FITNESS', 'DAILY',
-    'ROMANCE', 'CAREER', 'TECH', 'ART', 'ENTERTAINMENT',
-    'SELF_DEVELOPMENT', 'EMOTION'
-);
-
 -- ✅ 테이블 ------------------------------------------------------------
 
 -- 사용자 테이블
@@ -89,8 +82,6 @@ CREATE TABLE keyword (
     id BIGSERIAL PRIMARY KEY,
     keyword VARCHAR(100) NOT null UNIQUE,
     embedding vector(768) NOT NULL,
-    category keyword_category,
-    category_similarity DOUBLE PRECISION,
     created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -168,7 +159,8 @@ CREATE TABLE block (
     custom_reason TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_block_pair UNIQUE (blocker_id, blocked_id)
+    CONSTRAINT uq_block_pair UNIQUE (blocker_id, blocked_id),
+    CONSTRAINT chk_block_not_self CHECK (blocker_id <> blocked_id)
 );
 
 -- 리프레시 토큰
@@ -197,9 +189,11 @@ CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_user_id_keyword_id ON user_keyword (user_id, keyword_id);
 CREATE INDEX IF NOT EXISTS idx_user_keyword_combo_keyword ON user_keyword (keyword_id, user_id);
 
--- 키워드 카테고리 유사도 인덱스
-CREATE INDEX idx_keyword_category_similarity
-    ON keyword (category, category_similarity DESC);
+-- 키워드 임베딩을 위한 인덱스
+CREATE INDEX idx_keyword_embedding_hnsw
+ON keyword
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 12, ef_construction = 48);
 
 -- FCM 알림 인덱스
 CREATE INDEX idx_fcm_token_user_id ON user_fcm_token (user_id);
