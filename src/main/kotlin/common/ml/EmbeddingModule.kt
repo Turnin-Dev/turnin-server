@@ -1,5 +1,6 @@
 package com.turnin.common.ml
 
+import com.turnin.common.ml.keywordCategory.KeywordCategoryClassifier
 import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.log.AppLoggerFactory
 import org.koin.dsl.module
@@ -29,6 +30,13 @@ val embeddingModule = module {
         } catch (e: Exception) {
             LOGGER.error(e, "Failed to close embedding service")
         }
+    }
+
+    // EmbeddingService가 먼저 초기화된 후 실행되어야 한다.
+    single {
+        KeywordCategoryClassifier(
+            embeddingService = get(),
+        ).apply { init() }
     }
 }
 
