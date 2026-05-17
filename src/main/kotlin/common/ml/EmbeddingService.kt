@@ -76,7 +76,7 @@ class EmbeddingService(
      * @throws EmbeddingServiceException.TokenizationFailed 토큰화 실패시 예외가 발생한다.
      * @throws EmbeddingServiceException.InferenceException 임베딩 과정에서 실패시 예외가 발생한다.
      */
-    fun embed(text: String): String {
+    private fun runInference(text: String): FloatArray {
         check(initialized) { "EmbeddingService is not initialized." }
 
         val encoding = try {
@@ -133,11 +133,8 @@ class EmbeddingService(
                 // 1) 평균 내기
                 val sentenceEmbedding = meanPooling(outputs[0], attentionMask)
 
-                // 2) 길이 1로 맞추기 (정규화)
-                val normalizedSentenceEmbedding = normalize(sentenceEmbedding)
-
-                // 3) 문자열 변환
-                normalizedSentenceEmbedding.joinToString(prefix = "[", postfix = "]", separator = ",")
+                // 2) 길이 1로 맞추고(정규화) 반환
+                normalize(sentenceEmbedding)
             }
         } catch (e: Exception) {
             LOGGER.error("embedding inference failed: $text, cause: ${e.message}")
@@ -145,6 +142,38 @@ class EmbeddingService(
         } finally {
             closeables.forEach { it.close() }
         }
+    }
+
+    /**
+     * 입력받은 텍스트를 ONNX 모델을 통해 추론하여 문자열 형태의 임베딩 벡터를 추출한다.
+     *
+     * **[kotlinx.coroutines.Dispatchers.Default]에서 실행하는 것을 권장한다.**
+     *
+     * @param text 벡터를 생성할 텍스트
+     * @return [String] 타입의 임베딩
+     *
+     * @throws EmbeddingServiceException.TokenizationFailed 토큰화 실패시 예외가 발생한다.
+     * @throws EmbeddingServiceException.InferenceException 임베딩 과정에서 실패시 예외가 발생한다.
+     */
+    fun embed(text: String): String {
+        check(initialized) { "EmbeddingService is not initialized." }
+        return runInference(text).joinToString(prefix = "[", postfix = "]", separator = ",")
+    }
+
+    /**
+     * 입력받은 텍스트를 ONNX 모델을 통해 추론하여 [FloatArray] 타입의 임베딩 벡터를 추출한다.
+     *
+     * **[kotlinx.coroutines.Dispatchers.Default]에서 실행하는 것을 권장한다.**
+     *
+     * @param text 벡터를 생성할 텍스트
+     * @return [FloatArray] 타입의 임베딩
+     *
+     * @throws EmbeddingServiceException.TokenizationFailed 토큰화 실패시 예외가 발생한다.
+     * @throws EmbeddingServiceException.InferenceException 임베딩 과정에서 실패시 예외가 발생한다.
+     */
+    internal fun embedAsVector(text: String): FloatArray {
+        check(initialized) { "EmbeddingService is not initialized." }
+        return runInference(text)
     }
 
     /**
