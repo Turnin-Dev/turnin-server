@@ -1,6 +1,9 @@
 package com.turnin.common.plugin
 
 import com.turnin.common.route.Api
+import com.turnin.common.util.config.AppConfig
+import com.turnin.common.util.config.RunEnvironment
+import com.turnin.common.util.config.RunEnvironment.Companion.toRunEnvironment
 import com.turnin.common.util.healthRoutes
 import com.turnin.domain.account.application.AccountUseCases
 import com.turnin.domain.account.presentation.accountRoutes
@@ -33,9 +36,14 @@ import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.server.application.Application
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.routing
+import kotlin.getValue
+import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
+    val appConfig = get<AppConfig>()
+    val environment = appConfig.getOrDefault("ktor.environment", "")
+
     val accountUseCases by inject<AccountUseCases>()
     val authUseCases by inject<AuthUseCases>()
     val userUseCases by inject<UserUseCases>()
@@ -50,7 +58,7 @@ fun Application.configureRouting() {
     val notificationUseCases by inject<NotificationUseCases>()
 
     routing {
-        customRoutingOption()
+        customRoutingOption(environment.toRunEnvironment())
 
         // Add Turnin routes
         route(Api.ROUTE, { description = "Turnin API" }) {
@@ -78,11 +86,13 @@ fun Application.configureRouting() {
     }
 }
 
-private fun Route.customRoutingOption() {
-    route("api.json") {
-        openApi()
-    }
-    route("swagger") {
-        swaggerUI("/api.json")
+private fun Route.customRoutingOption(runEnvironment: RunEnvironment) {
+    if (runEnvironment != RunEnvironment.Prod) {
+        route("api.json") {
+            openApi()
+        }
+        route("swagger") {
+            swaggerUI("/api.json")
+        }
     }
 }

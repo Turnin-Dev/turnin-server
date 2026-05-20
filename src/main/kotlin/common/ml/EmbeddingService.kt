@@ -207,7 +207,7 @@ class EmbeddingService(
         return result
     }
 
-    private fun normalize(vector: FloatArray): FloatArray {
+    internal fun normalize(vector: FloatArray): FloatArray {
         var sum = 0.0f
         for (v in vector) sum += v * v
         val length = sqrt(sum.toDouble()).toFloat()

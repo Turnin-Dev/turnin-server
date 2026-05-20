@@ -27,45 +27,7 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
     companion object {
         const val THRESHOLD = 0.5f
 
-        val CATEGORY_POOL = listOf(
-            CategoryPool(KeywordCategory.FOOD, listOf("음식", "맛집", "요리", "카페", "레스토랑", "식당", "먹거리", "brunch", "foodie")),
-            CategoryPool(
-                KeywordCategory.FASHION,
-                listOf("패션", "옷", "스타일", "코디", "데일리룩", "옷차림", "트렌드", "OOTD", "fashion", "style"),
-            ),
-            CategoryPool(
-                KeywordCategory.BEAUTY,
-                listOf("뷰티", "메이크업", "화장", "스킨케어", "미용", "뷰티루틴", "beauty", "makeup", "skincare"),
-            ),
-            CategoryPool(
-                KeywordCategory.TRAVEL,
-                listOf("여행", "국내여행", "해외여행", "관광", "숙박", "호텔", "tour", "travel", "hotel"),
-            ),
-            CategoryPool(
-                KeywordCategory.FITNESS,
-                listOf("운동", "스포츠", "헬스", "피트니스", "구기종목", "야외활동", "홈트", "fitness", "sports"),
-            ),
-            CategoryPool(KeywordCategory.DAILY, listOf("일상", "브이로그", "하루", "소소한", "일상기록", "vlog", "daily")),
-            CategoryPool(
-                KeywordCategory.ROMANCE,
-                listOf("연애", "썸", "짝사랑", "사랑", "이별", "데이트", "romance", "relationship"),
-            ),
-            CategoryPool(KeywordCategory.CAREER, listOf("직장", "커리어", "취업", "이직", "업무", "회사생활", "career", "work")),
-            CategoryPool(KeywordCategory.TECH, listOf("기술", "IT", "개발", "프로그래밍", "소프트웨어", "디지털", "tech", "software")),
-            CategoryPool(KeywordCategory.ART, listOf("예술", "창작", "그림", "사진", "음악", "디자인", "영상제작", "art", "creative")),
-            CategoryPool(
-                KeywordCategory.ENTERTAINMENT,
-                listOf("엔터테인먼트", "드라마", "영화", "아이돌", "콘서트", "유튜브", "게임", "entertainment"),
-            ),
-            CategoryPool(
-                KeywordCategory.SELF_DEVELOPMENT,
-                listOf("자기계발", "독서", "명상", "습관", "성장", "공부", "동기부여", "self-improvement"),
-            ),
-            CategoryPool(
-                KeywordCategory.EMOTION,
-                listOf("감정", "힐링", "기분", "심리", "불안", "우울", "외로움", "행복", "분노", "공허함", "설렘", "emotion", "feeling"),
-            ),
-        )
+        val CATEGORY_POOL = KeywordCategory.entries.map { CategoryPool(it) }
     }
 
     /**
@@ -76,7 +38,7 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
      */
     data class CategoryPool(
         val category: KeywordCategory,
-        val keywords: List<String>,
+        val keywords: List<String> = category.anchorKeywords,
     )
 
     // 서버 시작 시 계산된 카테고리 평균 벡터 목록
@@ -96,7 +58,8 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
         categoryVectors = CATEGORY_POOL.map { pool ->
             val vectors = pool.keywords.map { embeddingService.embedAsVector(it) }
             val avgVector = meanVectors(vectors)
-            pool.category to avgVector
+            val normalizedVector = embeddingService.normalize(avgVector)
+            pool.category to normalizedVector
         }
         initialized = true
         LOGGER.info("KeywordCategoryClassifier initialized with ${categoryVectors.size} categories")
@@ -112,7 +75,8 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
     fun classify(keyword: String): CategoryClassificationResult? {
         check(initialized) { "KeywordCategoryClassifier is not initialized." }
 
-        val kwVector = embeddingService.embedAsVector(keyword)
+        val preprocessed = preprocessKeyword(keyword)
+        val kwVector = embeddingService.embedAsVector(preprocessed)
 
         val (category, similarity) = categoryVectors
             .map { (cat, vector) -> cat to cosineSimilarity(kwVector, vector) }
@@ -141,6 +105,14 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
         }
         for (i in 0 until dim) result[i] /= vectors.size.toFloat()
         return result
+    }
+
+    // 전처리
+    private fun preprocessKeyword(keyword: String): String {
+        // 뒤 숫자 제거
+        val trimmed = keyword.trimEnd { it.isDigit() }.trim()
+        // 전처리 후 빈 문자열이 되면 원본 반환
+        return trimmed.ifEmpty { keyword }
     }
 }
 
