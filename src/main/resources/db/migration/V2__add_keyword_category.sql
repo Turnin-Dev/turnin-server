@@ -27,9 +27,8 @@ ALTER TABLE keyword
     ADD COLUMN category keyword_category,
     ADD COLUMN category_similarity DOUBLE PRECISION;
 
--- 탐색 쿼리 핵심 인덱스
-CREATE INDEX idx_keyword_category_similarity
-    ON keyword (category, category_similarity DESC);
+-- 키워드 카테고리 인덱스
+CREATE INDEX idx_keyword_category ON keyword (category);
 
 -- HNSW 인덱스 제거 (카테고리 방식으로 대체)
-DROP INDEX idx_keyword_embedding_hnsw;
+DROP INDEX IF EXISTS idx_keyword_embedding_hnsw;
