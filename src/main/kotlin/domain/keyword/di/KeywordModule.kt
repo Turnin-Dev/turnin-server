@@ -17,7 +17,7 @@ val keywordModule = module {
 
     // UseCases
     single { GetKeywordUseCase(get()) }
-    single { CreateKeywordUseCase(get(), get()) }
+    single { CreateKeywordUseCase(get(), get(), get()) }
     single { GetKeywordByNameUseCase(get()) }
     single { KeywordUseCases(get(), get(), get()) }
 

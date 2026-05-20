@@ -1,5 +1,6 @@
 package com.turnin.domain.keyword.application.usecase
 
+import com.turnin.common.ml.keywordCategory.KeywordCategoryClassifier
 import com.turnin.common.model.KeywordName
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.keyword.application.dto.KeywordDto
@@ -18,9 +19,16 @@ import kotlinx.coroutines.withContext
 class CreateKeywordUseCase(
     private val keywordRepository: KeywordRepository,
     private val embeddingServiceProvider: EmbeddingServiceProvider,
+    private val keywordCategoryClassifier: KeywordCategoryClassifier,
 ) {
     /**
-     * 키워드를 생성한다.
+     * 키워드를 생성하고 해당 키워드의 카테고리를 분류한다.
+     *
+     * 최종적으로 키워드, 임베딩(키워드), 카테고리, 유사도를 저장한다.
+     *
+     * 추후 미분류 키워드에 대한 폴백 전략이 필요하다.
+     *
+     * (미분류 키워드끼리만 벡터 연산 등)
      *
      * @param keywordName 키워드명
      * @param createdBy 키워드 최초등록자 ID
@@ -34,13 +42,20 @@ class CreateKeywordUseCase(
         createdBy: UserId,
     ): KeywordDto {
         val keywordNameVO = KeywordName(keywordName)
-        val embeddedKeyword = withContext(Dispatchers.Default) {
-            embeddingServiceProvider.embed(keywordName)
+
+        // 임베딩 + 카테고리 분류를 같은 스레드풀에서 수행
+        val (embeddedKeyword, classificationResult) = withContext(Dispatchers.Default) {
+            val embedded = embeddingServiceProvider.embed(keywordName)
+            val classification = keywordCategoryClassifier.classify(keywordName)
+            embedded to classification
         }
+
         return keywordRepository
             .create(
                 keywordName = keywordNameVO,
                 embeddedKeyword = embeddedKeyword,
+                category = classificationResult?.category,
+                categorySimilarity = classificationResult?.similarity,
                 createdBy = createdBy,
             ).toDto()
     }

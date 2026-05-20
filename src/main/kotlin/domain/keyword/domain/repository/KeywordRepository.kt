@@ -1,5 +1,6 @@
 package com.turnin.domain.keyword.domain.repository
 
+import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.KeywordName
 import com.turnin.common.model.id.KeywordId
 import com.turnin.common.model.id.UserId
@@ -36,6 +37,8 @@ interface KeywordRepository {
      *
      * @param keywordName 키워드명
      * @param embeddedKeyword 임베드된 키워드
+     * @param category 키워드 카테고리 (미분류시 null)
+     * @param categorySimilarity 키워드 - 카테고리 유사도 (미분류시 null)
      * @param createdBy 키워드 최초 등록자
      *
      * @return 생성된 [Keyword] 키워드를 반환한다.
@@ -43,6 +46,8 @@ interface KeywordRepository {
     suspend fun create(
         keywordName: KeywordName,
         embeddedKeyword: String,
+        category: KeywordCategory?,
+        categorySimilarity: Float?,
         createdBy: UserId,
     ): Keyword
 }
