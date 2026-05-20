@@ -168,14 +168,6 @@ class KeywordRepositoryImplTest {
         assertNull(keyword)
     }
 
-    private suspend fun createTestKeyword(userId: UserId) = repository.create(
-        TestKeywordName,
-        TEST_EMBEDDED_KEYWORD,
-        TestCategory,
-        TEST_CATEGORY_SIMILARITY,
-        userId,
-    )
-
     private suspend fun insertUserAndReturnId(): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
