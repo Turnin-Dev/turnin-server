@@ -50,7 +50,6 @@ data class FeedResponse(
             },
             nextCursor = FeedCursor(
                 score = 50.0,
-                createdAt = 1000L,
                 userKeywordId = 2L,
             ),
         )

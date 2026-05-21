@@ -42,7 +42,6 @@ class FeedRoutesTest {
             endpoint = route.ROUTE,
             queryParameters = mapOf(
                 "cursorScore" to "",
-                "cursorCreatedAt" to "",
                 "cursorUserKeywordId" to "",
                 "size" to "$pageSize",
             ),
@@ -69,7 +68,6 @@ class FeedRoutesTest {
             items = feedDtoList,
             nextCursor = FeedCursor(
                 score = feedDtoList.last().score,
-                createdAt = feedDtoList.last().createdAt,
                 userKeywordId = feedDtoList.last().userKeywordId,
             ),
         )
@@ -86,7 +84,6 @@ class FeedRoutesTest {
             endpoint = route.ROUTE,
             queryParameters = mapOf(
                 "cursorScore" to "",
-                "cursorCreatedAt" to "",
                 "cursorUserKeywordId" to "",
                 "size" to "$pageSize",
             ),
@@ -113,7 +110,6 @@ class FeedRoutesTest {
             items = feedDtoList,
             nextCursor = FeedCursor(
                 score = feedDtoList.last().score,
-                createdAt = feedDtoList.last().createdAt,
                 userKeywordId = feedDtoList.last().userKeywordId,
             ),
         )
@@ -121,7 +117,7 @@ class FeedRoutesTest {
         coEvery {
             usecase.getFeeds(
                 TestUserId.value,
-                FeedCursor(40.0, 1000L, 10L),
+                FeedCursor(40.0, 10L),
                 pageSize,
             )
         } returns cursorPage
@@ -132,7 +128,6 @@ class FeedRoutesTest {
             endpoint = route.ROUTE,
             queryParameters = mapOf(
                 "cursorScore" to "40.0",
-                "cursorCreatedAt" to "1000",
                 "cursorUserKeywordId" to "10",
                 "size" to "$pageSize",
             ),
