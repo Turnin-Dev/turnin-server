@@ -7,6 +7,7 @@ import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -23,6 +24,7 @@ class KeywordCategoryClassifierTest {
         classifier = KeywordCategoryClassifier(embeddingService)
 
         every { embeddingService.normalize(any()) } answers { firstArg() }
+        every { embeddingService.vectorToString(any()) } returns "mocked_vector"
     }
 
     // -------------------------------------------------------------------------
@@ -69,7 +71,7 @@ class KeywordCategoryClassifierTest {
     // -------------------------------------------------------------------------
 
     @Test
-    fun `유사도가 THRESHOLD 이상이면 CategoryClassificationResult를 반환한다`() {
+    fun `유사도가 THRESHOLD 이상이면 category와 similarity가 존재한다`() {
         every { embeddingService.embedAsVector(any()) } returns vectorA
         classifier.init()
 
@@ -77,12 +79,13 @@ class KeywordCategoryClassifierTest {
 
         val result = classifier.classify("키워드")
 
-        assertNotNull(result)
-        assert(result.similarity >= KeywordCategoryClassifier.THRESHOLD)
+        assertNotNull(result.category)
+        assertNotNull(result.similarity)
+        assertTrue(result.similarity >= KeywordCategoryClassifier.THRESHOLD)
     }
 
     @Test
-    fun `유사도가 THRESHOLD 미만이면 null을 반환한다`() {
+    fun `유사도가 THRESHOLD 미만이면 category와 similarity가 null이다`() {
         every { embeddingService.embedAsVector(any()) } returns vectorA
         classifier.init()
 
@@ -90,21 +93,33 @@ class KeywordCategoryClassifierTest {
 
         val result = classifier.classify("키워드")
 
-        assertNull(result)
+        assertNull(result.category)
+        assertNull(result.similarity)
     }
 
     @Test
-    fun `유사도가 정확히 THRESHOLD와 같으면 결과를 반환한다`() {
+    fun `유사도가 THRESHOLD 미만이어도 preprocessedKeywordVector는 항상 존재한다`() {
         every { embeddingService.embedAsVector(any()) } returns vectorA
         classifier.init()
 
-        // vectorA(1,0,0,0)와 내적 = 0.5f = THRESHOLD
+        every { embeddingService.embedAsVector("키워드") } returns vectorB
+
+        val result = classifier.classify("키워드")
+
+        assertNotNull(result.preprocessedKeywordVector)
+    }
+
+    @Test
+    fun `유사도가 정확히 THRESHOLD와 같으면 category와 similarity가 존재한다`() {
+        every { embeddingService.embedAsVector(any()) } returns vectorA
+        classifier.init()
+
         val thresholdVector = floatArrayOf(0.5f, 0f, 0f, 0f)
         every { embeddingService.embedAsVector("경계키워드") } returns thresholdVector
 
         val result = classifier.classify("경계키워드")
 
-        assertNotNull(result)
+        assertNotNull(result.category)
         assertEquals(KeywordCategoryClassifier.THRESHOLD, result.similarity)
     }
 
@@ -117,7 +132,6 @@ class KeywordCategoryClassifierTest {
 
         val result = classifier.classify("키워드")
 
-        assertNotNull(result)
         assertEquals(1.0f, result.similarity)
     }
 
@@ -164,5 +178,45 @@ class KeywordCategoryClassifierTest {
         classifier.classify("key2word3")
 
         verify { embeddingService.embedAsVector("key2word") }
+    }
+
+    @Test
+    fun `특수문자가 제거된 키워드로 임베딩이 호출된다`() {
+        every { embeddingService.embedAsVector(any()) } returns vectorA
+        classifier.init()
+
+        classifier.classify("#독서")
+
+        verify { embeddingService.embedAsVector("독서") }
+    }
+
+    @Test
+    fun `대문자가 소문자로 변환된 키워드로 임베딩이 호출된다`() {
+        every { embeddingService.embedAsVector(any()) } returns vectorA
+        classifier.init()
+
+        classifier.classify("iPhone")
+
+        verify { embeddingService.embedAsVector("iphone") }
+    }
+
+    @Test
+    fun `특수문자와 숫자가 모두 포함된 키워드는 특수문자 제거 후 뒤 숫자도 제거된다`() {
+        every { embeddingService.embedAsVector(any()) } returns vectorA
+        classifier.init()
+
+        classifier.classify("#아이폰16")
+
+        verify { embeddingService.embedAsVector("아이폰") }
+    }
+
+    @Test
+    fun `앞뒤 공백이 제거된 키워드로 임베딩이 호출된다`() {
+        every { embeddingService.embedAsVector(any()) } returns vectorA
+        classifier.init()
+
+        classifier.classify("  독서  ")
+
+        verify { embeddingService.embedAsVector("독서") }
     }
 }

@@ -9,7 +9,6 @@ import com.turnin.common.model.id.KeywordId
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.keyword.application.dto.toDto
 import com.turnin.domain.keyword.domain.model.Keyword
-import com.turnin.domain.keyword.domain.provider.EmbeddingServiceProvider
 import com.turnin.domain.keyword.domain.repository.KeywordRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.assertThrows
 
 class CreateKeywordUseCaseTest {
     private val keywordRepository = mockk<KeywordRepository>()
-    private val embeddingServiceProvider = mockk<EmbeddingServiceProvider>()
     private val keywordCategoryClassifier = mockk<KeywordCategoryClassifier>()
     private lateinit var usecase: CreateKeywordUseCase
 
@@ -31,7 +29,6 @@ class CreateKeywordUseCaseTest {
     fun setUp() {
         usecase = CreateKeywordUseCase(
             keywordRepository,
-            embeddingServiceProvider,
             keywordCategoryClassifier,
         )
     }
@@ -42,8 +39,8 @@ class CreateKeywordUseCaseTest {
         val classificationResult = CategoryClassificationResult(
             category = KeywordCategory.FOOD,
             similarity = 0.8f,
+            preprocessedKeywordVector = TEST_EMBEDDED_KEYWORD,
         )
-        coEvery { embeddingServiceProvider.embed(any()) } returns TEST_EMBEDDED_KEYWORD
         every { keywordCategoryClassifier.classify(any()) } returns classificationResult
         coEvery {
             keywordRepository.create(
@@ -60,15 +57,16 @@ class CreateKeywordUseCaseTest {
 
         // then
         assertEquals(TestKeyword.toDto(), keyword)
-        coVerify(exactly = 1) { embeddingServiceProvider.embed(any()) }
         coVerify(exactly = 1) { keywordCategoryClassifier.classify(any()) }
     }
 
     @Test
     fun `성공적으로 키워드를 생성한다 - 카테고리 미분류`() = runTest {
         // given
-        coEvery { embeddingServiceProvider.embed(any()) } returns TEST_EMBEDDED_KEYWORD
-        every { keywordCategoryClassifier.classify(any()) } returns null // 미분류
+        // 미분류
+        every {
+            keywordCategoryClassifier.classify(any())
+        } returns CategoryClassificationResult(null, null, TEST_EMBEDDED_KEYWORD)
         coEvery {
             keywordRepository.create(
                 TestKeywordName,
@@ -84,7 +82,6 @@ class CreateKeywordUseCaseTest {
 
         // then
         assertEquals(TestKeywordUnclassified.toDto(), keyword)
-        coVerify(exactly = 1) { embeddingServiceProvider.embed(any()) }
         coVerify(exactly = 1) { keywordCategoryClassifier.classify(any()) }
     }
 
@@ -97,7 +94,6 @@ class CreateKeywordUseCaseTest {
         assertThrows<KeywordNameValidationException> {
             usecase(invalidKeywordName, TestUserId)
         }
-        coVerify(exactly = 0) { embeddingServiceProvider.embed(any()) }
         coVerify(exactly = 0) { keywordCategoryClassifier.classify(any()) }
     }
 

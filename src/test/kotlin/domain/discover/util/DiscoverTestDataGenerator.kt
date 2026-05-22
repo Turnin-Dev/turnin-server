@@ -23,7 +23,7 @@ object DiscoverTestDataGenerator {
      * 사용자ID 및 키워드ID는 1부터 순서대로 개수만큼 부여된다.
      *
      * @param userCount 생성할 사용자 수
-     * @param keywordsWithCategories 생성할 키워드 개수만큼 (키워드 명, 벡터 값) 입력
+     * @param keywordsWithCategories 생성할 키워드 개수만큼 (키워드 명, 카테고리) 입력
      * @param userKeywordRelation 사용자 키워드 관계 지정 (사용자 ID to 키워드 ID)
      */
     suspend fun setupKeywordRelations(

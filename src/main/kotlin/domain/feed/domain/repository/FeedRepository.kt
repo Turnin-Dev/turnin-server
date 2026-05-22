@@ -64,7 +64,7 @@ interface FeedRepository {
      * @param cursorScore 이전 페이지 마지막 항목의 점수 (초기 조회 시 null)
      * @param cursorUkId 이전 페이지 마지막 항목의 user_keyword ID (초기 조회 시 null)
      * @param limit 조회할 항목 개수
-     * @param similarPoolLimit 카테고리 일치 글 최대 수집 개수 (기본값: 20)
+     * @param similarPoolLimit 카테고리 일치 글 최대 수집 개수 (기본값: 500)
      * @param fallbackPoolLimit 폴백 풀 최대 수집 개수 (기본값: 100)
      *
      * @return 추천 피드 항목 리스트

@@ -9,10 +9,12 @@ import kotlin.collections.maxByOrNull
  *
  * @property category 키워드 카테고리
  * @property similarity 키워드 <-> 카테고리 유사도
+ * @property preprocessedKeywordVector 전처리된 키워드 벡터
  */
 data class CategoryClassificationResult(
-    val category: KeywordCategory,
-    val similarity: Float,
+    val category: KeywordCategory?,
+    val similarity: Float?,
+    val preprocessedKeywordVector: String,
 )
 
 /**
@@ -67,27 +69,27 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
 
     /**
      * 키워드를 분류하여 카테고리와 유사도를 반환한다.
+     *
      * 유사도가 THRESHOLD 미만이면 `null`을 반환한다. (미분류)
      *
      * @param keyword 분류할 키워드
      * @return [CategoryClassificationResult] or `null`(미분류)
      */
-    fun classify(keyword: String): CategoryClassificationResult? {
+    fun classify(keyword: String): CategoryClassificationResult {
         check(initialized) { "KeywordCategoryClassifier is not initialized." }
 
         val preprocessed = preprocessKeyword(keyword)
         val kwVector = embeddingService.embedAsVector(preprocessed)
+        val kwVectorString = embeddingService.vectorToString(kwVector)
 
+        // 미분류 케이스(takeIf)에서는 category, similarity 가 null
         val (category, similarity) = categoryVectors
             .map { (cat, vector) -> cat to cosineSimilarity(kwVector, vector) }
             .maxByOrNull { it.second }
-            ?: return null
+            ?.takeIf { it.second >= THRESHOLD }
+            ?: return CategoryClassificationResult(null, null, kwVectorString)
 
-        return if (similarity >= THRESHOLD) {
-            CategoryClassificationResult(category, similarity)
-        } else {
-            null // 미분류
-        }
+        return CategoryClassificationResult(category, similarity, kwVectorString)
     }
 
     // 정규화된 벡터끼리의 내적 = 코사인 유사도
@@ -109,8 +111,12 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
 
     // 전처리
     private fun preprocessKeyword(keyword: String): String {
-        // 뒤 숫자 제거
-        val trimmed = keyword.trimEnd { it.isDigit() }.trim()
+        // 특수문자 제거, 소문자로 통합, 뒤 숫자 제거
+        val trimmed = keyword
+            .trim()
+            .replace(Regex("""[^\w가-힣\s]"""), "")
+            .lowercase()
+            .trimEnd { it.isDigit() }
         // 전처리 후 빈 문자열이 되면 원본 반환
         return trimmed.ifEmpty { keyword }
     }

@@ -5,7 +5,6 @@ import com.turnin.common.model.KeywordName
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.keyword.application.dto.KeywordDto
 import com.turnin.domain.keyword.application.dto.toDto
-import com.turnin.domain.keyword.domain.provider.EmbeddingServiceProvider
 import com.turnin.domain.keyword.domain.repository.KeywordRepository
 import com.turnin.domain.keyword.exception.KeywordException
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +17,6 @@ import kotlinx.coroutines.withContext
  */
 class CreateKeywordUseCase(
     private val keywordRepository: KeywordRepository,
-    private val embeddingServiceProvider: EmbeddingServiceProvider,
     private val keywordCategoryClassifier: KeywordCategoryClassifier,
 ) {
     /**
@@ -44,18 +42,16 @@ class CreateKeywordUseCase(
         val keywordNameVO = KeywordName(keywordName)
 
         // 임베딩 + 카테고리 분류를 같은 스레드풀에서 수행
-        val (embeddedKeyword, classificationResult) = withContext(Dispatchers.Default) {
-            val embedded = embeddingServiceProvider.embed(keywordName)
-            val classification = keywordCategoryClassifier.classify(keywordName)
-            embedded to classification
+        val classificationResult = withContext(Dispatchers.Default) {
+            keywordCategoryClassifier.classify(keywordName)
         }
 
         return keywordRepository
             .create(
                 keywordName = keywordNameVO,
-                embeddedKeyword = embeddedKeyword,
-                category = classificationResult?.category,
-                categorySimilarity = classificationResult?.similarity,
+                embeddedKeyword = classificationResult.preprocessedKeywordVector,
+                category = classificationResult.category,
+                categorySimilarity = classificationResult.similarity,
                 createdBy = createdBy,
             ).toDto()
     }

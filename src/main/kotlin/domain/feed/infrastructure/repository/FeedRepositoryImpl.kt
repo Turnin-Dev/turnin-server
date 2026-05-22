@@ -118,6 +118,7 @@ class FeedRepositoryImpl : FeedRepository {
             FROM user_keyword uk
             WHERE uk.user_id IN (SELECT id FROM friends)
               AND uk.is_active = true
+              AND NOT EXISTS (SELECT 1 FROM blocked_users b WHERE b.user_id = uk.user_id)
         ),
         similar_pool AS (
             SELECT

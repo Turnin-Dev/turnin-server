@@ -157,7 +157,7 @@ class EmbeddingService(
      */
     fun embed(text: String): String {
         check(initialized) { "EmbeddingService is not initialized." }
-        return runInference(text).joinToString(prefix = "[", postfix = "]", separator = ",")
+        return vectorToString(runInference(text))
     }
 
     /**
@@ -175,6 +175,9 @@ class EmbeddingService(
         check(initialized) { "EmbeddingService is not initialized." }
         return runInference(text)
     }
+
+    fun vectorToString(vector: FloatArray): String =
+        vector.joinToString(prefix = "[", postfix = "]", separator = ",")
 
     /**
      * 토큰별 벡터들을 평균내어 문장 전체의 의미를 대표하는 하나의 벡터를 만든다.
