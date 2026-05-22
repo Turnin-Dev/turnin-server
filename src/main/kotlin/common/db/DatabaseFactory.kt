@@ -54,25 +54,44 @@ object DatabaseFactory {
         )
 
     private fun migrate(env: RunEnvironment, dataSource: DataSource) {
-        val flywayBuilder = Flyway
+        // 공통 기본 설정 구성
+        val config = Flyway
             .configure()
             .dataSource(dataSource)
-            .locations("classpath:db/migration") // 필요 시 명시
-            .baselineOnMigrate(true) // 기존 DB에 적용 시 필요
+            .schemas("public")
+            .locations("classpath:db/migration")
 
+        // 환경별 동적 설정 분기
         val flyway = when (env) {
             RunEnvironment.Dev -> {
-//                flywayBuilder.cleanDisabled(false).load().also { it.clean() }
+                // 로컬/개발 환경에서 필요 시 clean 기능을 켤 수 있도록 유연성 부여
+                // (현재는 주석 처리된 clean 로직에 맞춰 false로 안전장치만 해제하거나 true 유지 가능)
+                // flywayBuilder.cleanDisabled(false).load().also { it.clean() }
                 LOGGER.warn("Dev 환경에서도 Flyway.clean()을 수행하지 않으므로 모든 스키마가 유지됩니다.")
-                flywayBuilder.cleanDisabled(true).load()
+                config.cleanDisabled(true).load()
             }
 
             RunEnvironment.Prod -> {
-                flywayBuilder.cleanDisabled(true).load()
+                // 운영 환경이므로 clean 금지
+                config.cleanDisabled(true).load()
             }
         }
 
-        flyway.migrate()
+        // 마이그레이션 수행
+        try {
+            val result = flyway.migrate()
+            if (result.migrationsExecuted > 0) {
+                LOGGER.info(
+                    "Flyway 마이그레이션 성공: ${result.migrationsExecuted}개의 파일이 적용되었습니다." +
+                        "(버전: ${result.targetSchemaVersion})",
+                )
+            } else {
+                LOGGER.info("Flyway 마이그레이션 체크 완료: 적용할 새로운 파일이 없습니다.")
+            }
+        } catch (e: Exception) {
+            LOGGER.error(e, "Flyway 마이그레이션 수행 중 에러가 발생했습니다.")
+            throw e // 서버 구동 중단
+        }
     }
 }
 
