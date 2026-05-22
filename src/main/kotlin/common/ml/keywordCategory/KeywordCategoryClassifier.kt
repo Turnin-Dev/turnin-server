@@ -68,12 +68,14 @@ class KeywordCategoryClassifier(private val embeddingService: EmbeddingService) 
     }
 
     /**
-     * 키워드를 분류하여 카테고리와 유사도를 반환한다.
+     * 키워드를 전처리하고 전처리된 키워드를 임베딩한 후 카테고리 분류 작업을 수행한다.
      *
-     * 유사도가 THRESHOLD 미만이면 `null`을 반환한다. (미분류)
+     * 모든 작업을 수행한 후 카테고리 분류 결과([CategoryClassificationResult])를 반환한다.
+     *
+     * 유사도가 THRESHOLD 미만이면 `category`와 `similarity`가 `null`로 반환된다. (미분류 케이스)
      *
      * @param keyword 분류할 키워드
-     * @return [CategoryClassificationResult] or `null`(미분류)
+     * @return [CategoryClassificationResult] - 미분류 시 `category`, `similarity`는 `null`
      */
     fun classify(keyword: String): CategoryClassificationResult {
         check(initialized) { "KeywordCategoryClassifier is not initialized." }
