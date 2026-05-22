@@ -19,11 +19,11 @@ class EmbeddingServiceTest {
         private val ModelPath = File("src/main/resources/ml/model_int8.onnx").absolutePath
         private val TokenizerPath = File("src/main/resources/ml/tokenizer.json").absolutePath
 
-        // ko-sbert-sts 모델의 벡터 차원
+        // 임베딩 모델의 벡터 차원
         private const val VECTOR_DIMENSION = 768
 
-        private const val HIGH_SIMILARITY_THRESHOLD = 0.7f
-        private const val MEDIUM_SIMILARITY_THRESHOLD = 0.6f
+        private const val HIGH_SIMILARITY_THRESHOLD = 0.5f
+        private const val MEDIUM_SIMILARITY_THRESHOLD = 0.4f
 
         private var embeddingService: EmbeddingService? = null
 
