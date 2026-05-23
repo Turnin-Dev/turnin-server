@@ -3,6 +3,7 @@ package com.turnin.domain.discover.util
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
+import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.domain.discover.util.TestVectorFixture.toPgVectorString
@@ -22,12 +23,12 @@ object DiscoverTestDataGenerator {
      * 사용자ID 및 키워드ID는 1부터 순서대로 개수만큼 부여된다.
      *
      * @param userCount 생성할 사용자 수
-     * @param keywordsWithVectors 생성할 키워드 개수만큼 (키워드 명, 벡터 값) 입력
+     * @param keywordsWithCategories 생성할 키워드 개수만큼 (키워드 명, 카테고리) 입력
      * @param userKeywordRelation 사용자 키워드 관계 지정 (사용자 ID to 키워드 ID)
      */
     suspend fun setupKeywordRelations(
         userCount: Int,
-        keywordsWithVectors: List<Pair<String, FloatArray>>,
+        keywordsWithCategories: List<Pair<String, KeywordCategory?>>,
         userKeywordRelation: Map<Long, List<Long>>,
     ) {
         // 1. 사용자 생성
@@ -45,18 +46,19 @@ object DiscoverTestDataGenerator {
             }
         }
 
-        // 2. 키워드 생성
+        // 2. 키워드 생성 (embedding은 더미값, category로 분류)
         TestDatabaseFactory.dbQuery {
-            keywordsWithVectors.map { (name, vec) ->
+            keywordsWithCategories.map { (name, category) ->
                 Keywords.insertAndGetId {
                     it[keyword] = name
-                    it[embedding] = vec.toPgVectorString()
+                    it[embedding] = FloatArray(768) { 0f }.toPgVectorString() // 더미값
+                    it[Keywords.category] = category
                     it[createdBy] = EntityID(1L, Users)
                 }
             }
         }
 
-        // 3. 관계 생성 (수정된 로직)
+        // 3. 관계 생성
         val ukRelation = userKeywordRelation.flatMap { (userId, keywordIds) ->
             keywordIds.map { userId to it }
         }

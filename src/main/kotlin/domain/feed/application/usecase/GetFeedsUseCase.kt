@@ -44,14 +44,13 @@ class GetFeedsUseCase(private val feedRepository: FeedRepository) {
         val feedsWithOneExtra = if (isFallback) {
             feedRepository.getFallbackFeeds(
                 userId = userIdVO,
-                cursorCreatedAt = cursor.createdAt,
+                cursorUkId = cursorUkIdVO,
                 limit = pageSize + 1,
             )
         } else {
             feedRepository.getFeeds(
                 userId = userIdVO,
                 cursorScore = cursor?.score,
-                cursorCreatedAt = cursor?.createdAt,
                 cursorUkId = cursorUkIdVO,
                 limit = pageSize + 1,
             )

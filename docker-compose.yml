@@ -32,10 +32,10 @@ services:
       - ./agents:/app/agents
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/api/health" ]
-      interval: 10s
-      timeout: 5s
+      interval: 1m
+      timeout: 10s
       retries: 3
-      start_period: 30s  # 앱 뜨는 시간 여유
+      start_period: 45s
 
   certbot:
     image: certbot/certbot

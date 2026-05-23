@@ -46,6 +46,5 @@ fun Feed.toDto(): FeedDto =
 fun FeedDto.toCursor(): FeedCursor =
     FeedCursor(
         score = score,
-        createdAt = createdAt,
         userKeywordId = userKeywordId,
     )

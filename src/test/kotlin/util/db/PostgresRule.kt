@@ -9,6 +9,7 @@ import com.turnin.common.db.schema.Notifications
 import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
+import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
@@ -73,6 +74,7 @@ private object TestDBContainerFactory {
                     "user_role" to Role.entries.map { it.name },
                     "social_login_provider" to SocialLoginProvider.entries.map { it.name },
                     "friend_status" to FriendRequestStatus.entries.map { it.name },
+                    "keyword_category" to KeywordCategory.entries.map { it.name },
                 )
 
                 enums.forEach { (typeName, values) ->

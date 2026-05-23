@@ -5,7 +5,6 @@ import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
 import com.turnin.common.db.suspendTransaction
 import com.turnin.common.model.KeywordName
-import com.turnin.common.model.KeywordSimilarityValues
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.KeywordId
@@ -13,7 +12,6 @@ import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.discover.domain.model.SharedUserKeyword
 import com.turnin.domain.discover.domain.repository.DiscoverRepository
-import org.jetbrains.exposed.sql.DoubleColumnType
 import org.jetbrains.exposed.sql.IColumnType
 import org.jetbrains.exposed.sql.IntegerColumnType
 import org.jetbrains.exposed.sql.LongColumnType
@@ -31,12 +29,11 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         val sql = findUserIdsWithSimilarKeywordsNativeSQL(cursor != null)
 
         val params = buildList {
-            add(LongColumnType() to targetUserId.value) // my_keywords: uk.user_id = ?
-            add(DoubleColumnType() to KeywordSimilarityValues.HIGH_THRESHOLD) // similar_ids: similarity >= ?
-            add(LongColumnType() to targetUserId.value) // matched_users: uk_other.user_id != ?
-            add(LongColumnType() to targetUserId.value) // matched_users: block.blocker_id = ?
-            add(LongColumnType() to targetUserId.value) // matched_users: block.blocked_id = ?
-            cursor?.let { add(LongColumnType() to it) } // user_id < ?
+            add(LongColumnType() to targetUserId.value) // my_categories: user_id = ?
+            add(LongColumnType() to targetUserId.value) // candidate_users: user_id != ?
+            add(LongColumnType() to targetUserId.value) // blocked_users: blocker_id = ?
+            add(LongColumnType() to targetUserId.value) // blocked_users: blocked_id = ?
+            cursor?.let { add(LongColumnType() to it) } // cu.user_id < ?
             add(IntegerColumnType() to pageSize) // LIMIT ?
         }
 
@@ -100,47 +97,39 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         } ?: emptyList()
 
     private fun findUserIdsWithSimilarKeywordsNativeSQL(hasCursor: Boolean): String {
-        val cursorCondition = if (hasCursor) "AND user_id < ?" else ""
+        val cursorCondition = if (hasCursor) "AND cu.user_id < ?" else ""
         return """
-            WITH my_keywords AS MATERIALIZED (
-                SELECT uk.keyword_id, k.embedding
-                FROM user_keyword uk
-                JOIN keyword k ON uk.keyword_id = k.id
-                WHERE uk.user_id = ?
-                  AND uk.is_active = true
-                ORDER BY uk.created_at DESC
-                LIMIT 5
+            WITH my_categories AS MATERIALIZED (
+                SELECT DISTINCT k.category
+                FROM (
+                    SELECT keyword_id
+                    FROM user_keyword
+                    WHERE user_id = ?
+                      AND is_active = true
+                    ORDER BY created_at DESC
+                    LIMIT 5
+                ) my_uk
+                JOIN keyword k ON k.id = my_uk.keyword_id
+                WHERE k.category IS NOT NULL
             ),
-            similar_ids AS MATERIALIZED (
-                SELECT DISTINCT k_other.id
-                FROM my_keywords
-                CROSS JOIN LATERAL (
-                    SELECT id, (1 - (embedding <=> my_keywords.embedding)) AS similarity
-                    FROM keyword
-                    ORDER BY embedding <=> my_keywords.embedding
-                    LIMIT 100
-                ) k_other
-                WHERE k_other.similarity >= ?
+            candidate_users AS MATERIALIZED (
+                SELECT DISTINCT uk.user_id
+                FROM my_categories mc
+                JOIN keyword k ON k.category = mc.category
+                JOIN user_keyword uk ON uk.keyword_id = k.id
+                WHERE uk.is_active = true
+                  AND uk.user_id != ?
             ),
-            matched_users AS MATERIALIZED (
-                SELECT DISTINCT uk_other.user_id
-                FROM similar_ids
-                JOIN user_keyword uk_other ON uk_other.keyword_id = similar_ids.id
-                WHERE uk_other.is_active = true
-                  AND uk_other.user_id != ?
-                  AND NOT EXISTS (
-                      SELECT 1 FROM block
-                      WHERE block.blocker_id = ? AND block.blocked_id = uk_other.user_id
-                      UNION ALL
-                      SELECT 1 FROM block
-                      WHERE block.blocked_id = ? AND block.blocker_id = uk_other.user_id
-                  )
+            blocked_users AS MATERIALIZED (
+                SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
+                UNION
+                SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
             )
-            SELECT user_id
-            FROM matched_users
-            WHERE (1=1)
+            SELECT cu.user_id
+            FROM candidate_users cu
+            WHERE cu.user_id NOT IN (SELECT user_id FROM blocked_users)
               $cursorCondition
-            ORDER BY user_id DESC
+            ORDER BY cu.user_id DESC
             LIMIT ?;
             """.trimIndent()
     }

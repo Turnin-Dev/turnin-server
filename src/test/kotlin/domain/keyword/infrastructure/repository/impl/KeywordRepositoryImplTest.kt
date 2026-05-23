@@ -1,6 +1,7 @@
 package com.turnin.domain.keyword.infrastructure.repository.impl
 
 import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.KeywordName
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
@@ -39,12 +40,35 @@ class KeywordRepositoryImplTest {
         val keyword = repository.create(
             TestKeywordName,
             TEST_EMBEDDED_KEYWORD,
+            TestCategory,
+            TEST_CATEGORY_SIMILARITY,
             userId,
         )
 
         // then
         assertEquals(TestKeywordName, keyword.name)
         assertEquals(userId, keyword.createdBy)
+        assertEquals(TestCategory, keyword.category)
+        assertEquals(TEST_CATEGORY_SIMILARITY.toDouble(), keyword.categorySimilarity)
+    }
+
+    @Test
+    fun `create 성공 테스트 - 미분류 키워드는 category와 categorySimilarity가 null이다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId()
+
+        // when
+        val keyword = repository.create(
+            TestKeywordName,
+            TEST_EMBEDDED_KEYWORD,
+            null,
+            null,
+            userId,
+        )
+
+        // then
+        assertNull(keyword.category)
+        assertNull(keyword.categorySimilarity)
     }
 
     @Test
@@ -54,6 +78,8 @@ class KeywordRepositoryImplTest {
         val savedKeyword = repository.create(
             TestKeywordName,
             TEST_EMBEDDED_KEYWORD,
+            null,
+            null,
             userId,
         )
 
@@ -86,6 +112,8 @@ class KeywordRepositoryImplTest {
             repository.create(
                 KeywordName(it.toString()),
                 TEST_EMBEDDED_KEYWORD,
+                null,
+                null,
                 userId,
             )
         }
@@ -114,6 +142,8 @@ class KeywordRepositoryImplTest {
         val savedKeyword = repository.create(
             TestKeywordName,
             TEST_EMBEDDED_KEYWORD,
+            null,
+            null,
             userId,
         )
 
@@ -156,5 +186,7 @@ class KeywordRepositoryImplTest {
     companion object {
         private val TestKeywordName = KeywordName("keyword")
         private const val TEST_EMBEDDED_KEYWORD = "[1,0,1]"
+        private val TestCategory = KeywordCategory.FOOD // 적절한 카테고리로 교체
+        private const val TEST_CATEGORY_SIMILARITY = 0.8f
     }
 }

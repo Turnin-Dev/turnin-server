@@ -8,6 +8,7 @@ import com.turnin.common.db.schema.UserEntity
 import com.turnin.common.db.schema.UserKeywordEntity
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
+import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.UserId
@@ -45,16 +46,13 @@ class FeedRepositoryImplTest {
         val stranger = createUser("stranger")
         val blocked = createUser("blocked")
 
-        val baseVector = TestVectorFixture.unitVector(1.0f)
-        val similarVector = TestVectorFixture.unitVector(0.9f) // 유사도 0.7 이상 -> similar_pool 포함
-
-        val myKeyword = createKeyword("myKeyword", baseVector.toPgVectorString(), me)
-        val similarKeyword = createKeyword("similarKeyword", similarVector.toPgVectorString(), me)
+        val myKeyword = createKeyword("myKeyword", category = KeywordCategory.TECH, createdBy = me)
+        val sameCategory = createKeyword("sameCateKeyword", category = KeywordCategory.TECH, createdBy = me)
 
         createUserKeyword(me, myKeyword, "내 취향 글")
-        createUserKeyword(friend, similarKeyword, "친구의 유사한 글") // friend_pool: 점수 최상위
-        createUserKeyword(stranger, similarKeyword, "남의 유사한 글") // similar_pool: 점수 중간
-        createUserKeyword(blocked, similarKeyword, "차단된 사용자의 글") // 차단 -> 조회 X
+        createUserKeyword(friend, sameCategory, "친구의 같은 카테고리 글") // friend_pool: 점수 최상위
+        createUserKeyword(stranger, sameCategory, "남의 같은 카테고리 글") // similar_pool: 점수 중간
+        createUserKeyword(blocked, sameCategory, "차단된 사용자의 글") // 차단 -> 조회 X
 
         createFriends(requesterId = me.id, receiverId = friend.id, status = FriendRequestStatus.ACCEPTED)
         createBlocks(blockerId = me.id, blockedId = blocked.id, reasonId = EntityID(1L, BlockReasons))
@@ -64,7 +62,6 @@ class FeedRepositoryImplTest {
         val feeds = repository.getFeeds(
             userId = myUserId,
             cursorScore = null,
-            cursorCreatedAt = null,
             cursorUkId = null,
             limit = 10,
         )
@@ -81,39 +78,34 @@ class FeedRepositoryImplTest {
         assertTrue(myUserId !in feeds.map { it.userId })
         assertTrue(UserId(blocked.id.value) !in feeds.map { it.userId })
 
-        // 순서 검증: 1등(친구, similar) -> 2등(남, similar)
+        // 순서 검증: 1등(친구, friend_pool) -> 2등(남, similar_pool)
         assertEquals(2, feeds.size)
         val firstFeed = feeds[0]
         val secondFeed = feeds[1]
 
-        // 1등: 친구 보너스(100) + 유사도 점수
+        // 1등: 친구 보너스(100) = 100
         assertEquals(friend.id.value, firstFeed.userId.value)
-        assertTrue(firstFeed.score >= 100.0)
+        assertEquals(100.0, firstFeed.score)
 
-        // 2등: 유사도 점수만
+        // 2등: 카테고리 유사도(0.5 * 50 = 25)만
         assertEquals(stranger.id.value, secondFeed.userId.value)
-        assertTrue(secondFeed.score < 100.0)
+        assertEquals(25.0, secondFeed.score)
         assertTrue(firstFeed.score > secondFeed.score)
     }
 
     @Test
     fun `friend_pool이 similar_pool보다 우선순위가 높다`() = runTest {
-        // given: 친구가 낮은 유사도, 타인이 높은 유사도를 가지는 경우
+        // given: 친구 글은 friend_pool(보너스 100), 타인 글은 similar_pool(보너스 없음)
         val me = createUser("me")
         val friend = createUser("friend")
         val stranger = createUser("stranger")
 
-        val baseVector = TestVectorFixture.unitVector(1.0f)
-        val highSimilarVector = TestVectorFixture.unitVector(0.99f) // 타인: 유사도 매우 높음
-        val lowSimilarVector = TestVectorFixture.unitVector(0.8f) // 친구: 유사도 낮음
-
-        val myKeyword = createKeyword("myKeyword", baseVector.toPgVectorString(), me)
-        val highKeyword = createKeyword("highKeyword", highSimilarVector.toPgVectorString(), me)
-        val lowKeyword = createKeyword("lowKeyword", lowSimilarVector.toPgVectorString(), me)
+        val myKeyword = createKeyword("myKeyword", category = KeywordCategory.TECH, createdBy = me)
+        val sameCategory = createKeyword("sameCateKeyword", category = KeywordCategory.TECH, createdBy = me)
 
         createUserKeyword(me, myKeyword, "내 글")
-        createUserKeyword(friend, lowKeyword, "친구 글 (유사도 낮음)")
-        createUserKeyword(stranger, highKeyword, "타인 글 (유사도 높음)")
+        createUserKeyword(friend, sameCategory, "친구 글")
+        createUserKeyword(stranger, sameCategory, "타인 글")
 
         createFriends(requesterId = me.id, receiverId = friend.id, status = FriendRequestStatus.ACCEPTED)
 
@@ -121,12 +113,11 @@ class FeedRepositoryImplTest {
         val feeds = repository.getFeeds(
             userId = UserId(me.id.value),
             cursorScore = null,
-            cursorCreatedAt = null,
             cursorUkId = null,
             limit = 10,
         )
 
-        // then: 친구 글이 더 낮은 유사도임에도 친구 보너스로 1등
+        // then: 친구 글이 friend 보너스(100)로 1등
         assertEquals(2, feeds.size)
         assertEquals(friend.id.value, feeds[0].userId.value)
         assertEquals(stranger.id.value, feeds[1].userId.value)
@@ -134,57 +125,107 @@ class FeedRepositoryImplTest {
     }
 
     @Test
-    fun `유사도 임계값 미만인 글은 similar_pool에서 제외된다`() = runTest {
+    fun `친구는 카테고리 무관하게 score가 100이다`() = runTest {
+        val me = createUser("me")
+        val friend = createUser("friend")
+        val myKeyword = createKeyword("myKeyword", category = KeywordCategory.TECH, createdBy = me)
+        val differentCategory = createKeyword("diffKeyword", category = KeywordCategory.FOOD, createdBy = me)
+
+        createUserKeyword(me, myKeyword, "내 글")
+        createUserKeyword(friend, differentCategory, "친구 글 (다른 카테고리)")
+        createFriends(requesterId = me.id, receiverId = friend.id, status = FriendRequestStatus.ACCEPTED)
+
+        val feeds = repository.getFeeds(
+            userId = UserId(me.id.value),
+            cursorScore = null,
+            cursorUkId = null,
+            limit = 10,
+        )
+
+        assertEquals(1, feeds.size)
+        assertEquals(100.0, feeds[0].score) // 카테고리 달라도 100
+    }
+
+    @Test
+    fun `카테고리가 없는 키워드는 similar_pool에서 제외되고 fallback_pool로 처리된다`() = runTest {
         // given
         val me = createUser("me")
         val stranger1 = createUser("stranger1")
         val stranger2 = createUser("stranger2")
 
-        val baseVector = TestVectorFixture.unitVector(1.0f)
-        val aboveThresholdVector = TestVectorFixture.unitVector(0.8f) // 임계값(0.7) 이상
-        val belowThresholdVector = TestVectorFixture.orthogonalVector() // 임계값(0.7) 미만
-
-        val myKeyword = createKeyword("myKeyword", baseVector.toPgVectorString(), me)
-        val aboveKeyword = createKeyword("aboveKeyword", aboveThresholdVector.toPgVectorString(), me)
-        val belowKeyword = createKeyword("belowKeyword", belowThresholdVector.toPgVectorString(), me)
+        // 내 키워드: 카테고리 있음
+        val myKeyword = createKeyword("myKeyword", category = KeywordCategory.TECH, createdBy = me)
+        // stranger1: 동일 카테고리 -> similar_pool (score = 0.5 * 50 = 25)
+        val sameCategoryKeyword = createKeyword("sameCateKeyword", category = KeywordCategory.TECH, createdBy = me)
+        // stranger2: 카테고리 없음 -> fallback_pool (score = 0)
+        val noCategoryKeyword = createKeyword("noCateKeyword", category = null, createdBy = me)
 
         createUserKeyword(me, myKeyword, "내 글")
-        createUserKeyword(stranger1, aboveKeyword, "임계값 이상 글") // similar_pool 포함
-        createUserKeyword(stranger2, belowKeyword, "임계값 미만 글") // similar_pool 제외, fallback_pool로
+        createUserKeyword(stranger1, sameCategoryKeyword, "같은 카테고리 글")
+        createUserKeyword(stranger2, noCategoryKeyword, "카테고리 없는 글")
 
         // when
         val feeds = repository.getFeeds(
             userId = UserId(me.id.value),
             cursorScore = null,
-            cursorCreatedAt = null,
             cursorUkId = null,
             limit = 10,
         )
 
-        // then: 임계값 미만 글은 fallback_pool(priority=3, score=0)으로 처리됨
-        val aboveFeed = feeds.find { it.userId == UserId(stranger1.id.value) }
-        val belowFeed = feeds.find { it.userId == UserId(stranger2.id.value) }
+        // then
+        val feed1 = feeds.find { it.userId == UserId(stranger1.id.value) }
+        val feed2 = feeds.find { it.userId == UserId(stranger2.id.value) }
 
-        assertNotNull(aboveFeed)
-        assertNotNull(belowFeed)
-        assertTrue(aboveFeed!!.score > belowFeed!!.score)
-        assertEquals(0.0, belowFeed.score)
+        assertNotNull(feed1)
+        assertNotNull(feed2)
+        assertEquals(25.0, feed1!!.score) // similar_pool: 0.5 * 50 = 25
+        assertEquals(0.0, feed2!!.score) // fallback_pool: score = 0
+        assertTrue(feed1.score > feed2.score)
+    }
+
+    @Test
+    fun `내 키워드에 카테고리가 없으면 similar_pool이 비어 fallback_pool만 반환된다`() = runTest {
+        // given: 내 키워드의 카테고리가 null → my_categories 비어있음
+        val me = createUser("me")
+        val stranger = createUser("stranger")
+
+        val myKeyword = createKeyword("myKeyword", category = null, createdBy = me)
+        val strangerKeyword = createKeyword("strangerKeyword", category = KeywordCategory.TECH, createdBy = me)
+
+        createUserKeyword(me, myKeyword, "내 글")
+        createUserKeyword(stranger, strangerKeyword, "타인 글")
+
+        // when
+        val feeds = repository.getFeeds(
+            userId = UserId(me.id.value),
+            cursorScore = null,
+            cursorUkId = null,
+            limit = 10,
+        )
+
+        // then: fallback_pool으로만 처리 → score = 0, similarity = 0
+        assertEquals(1, feeds.size)
+        assertEquals(stranger.id.value, feeds[0].userId.value)
+        assertEquals(0.0, feeds[0].score)
+        assertEquals(0.0, feeds[0].similarity)
     }
 
     @Test
     fun `피드 페이징 처리가 정상적으로 동작한다`() = runTest {
-        // given: 유사도 임계값(0.7) 이상인 타인 10명 생성
+        // given: 같은 카테고리의 타인 10명 생성
         val me = createUser("me")
-        val baseVector = TestVectorFixture.unitVector(1.0f)
-        val myKeyword = createKeyword("my", baseVector.toPgVectorString(), me)
+        val myKeyword = createKeyword("my", category = KeywordCategory.TECH, createdBy = me)
         createUserKeyword(me, myKeyword, "내 글")
 
         val users = (1..10).map { createUser("other$it") }
         users.forEachIndexed { index, user ->
-            val sim = 0.95f - (index * 0.02f) // 0.95 ~ 0.77 (모두 0.7 이상)
-            val vec = TestVectorFixture.unitVector(sim)
-            val kw = createKeyword("kw$index", vec.toPgVectorString(), user)
-            createUserKeyword(user, kw, "피드_$index")
+            val kw = createKeyword("kw_${user.name}", category = KeywordCategory.TECH, createdBy = me)
+            createUserKeyword(
+                user = user,
+                keyword = kw,
+                description = "피드_${user.name}",
+                createdAt = Instant.now().minusSeconds(index.toLong() + 1),
+            )
         }
 
         val myUserId = UserId(me.id.value)
@@ -193,20 +234,18 @@ class FeedRepositoryImplTest {
         val firstPage = repository.getFeeds(
             userId = myUserId,
             cursorScore = null,
-            cursorCreatedAt = null,
             cursorUkId = null,
             limit = 2,
         )
 
         // then: limit 개 조회
         assertEquals(2, firstPage.size)
-        val cursorItem = firstPage.last() // 마지막 항목이 커서
+        val cursorItem = firstPage.last()
 
         // when: 2페이지 조회
         val secondPage = repository.getFeeds(
             userId = myUserId,
             cursorScore = cursorItem.score,
-            cursorCreatedAt = cursorItem.createdAt,
             cursorUkId = cursorItem.userKeywordId,
             limit = 2,
         )
@@ -217,7 +256,7 @@ class FeedRepositoryImplTest {
             println("ID: ${it.userKeywordId.value}, 점수: ${it.score}, 작성자: ${it.userName}")
         }
 
-        // 2페이지 첫 항목은 커서보다 점수가 낮아야 함
+        // 2페이지 첫 항목은 커서보다 점수가 낮거나 같아야 함
         assertTrue(secondPage[0].score <= cursorItem.score)
         // 1페이지와 중복 없음
         val firstPageIds = firstPage.map { it.userKeywordId.value }.toSet()
@@ -229,11 +268,53 @@ class FeedRepositoryImplTest {
         val emptyPage = repository.getFeeds(
             userId = myUserId,
             cursorScore = -1.0,
-            cursorCreatedAt = 0L,
             cursorUkId = UserKeywordId(1000L),
             limit = 2,
         )
         assertTrue(emptyPage.isEmpty())
+    }
+
+    @Test
+    fun `같은 시간에 등록된 피드도 uk_id로 페이징이 정상 동작한다`() = runTest {
+        val me = createUser("me")
+        val myKeyword = createKeyword("my", category = KeywordCategory.TECH, createdBy = me)
+        createUserKeyword(me, myKeyword, "내 글")
+
+        val fixedTime = Instant.ofEpochSecond(Instant.now().epochSecond - 10)
+        val users = (1..10).map { createUser("other$it") }
+        users.forEach { user ->
+            val kw = createKeyword("kw_${user.name}", category = KeywordCategory.TECH, createdBy = me)
+            createUserKeyword(
+                user = user,
+                keyword = kw,
+                description = "피드_${user.name}",
+                createdAt = fixedTime,
+            )
+        }
+
+        val myUserId = UserId(me.id.value)
+
+        val firstPage = repository.getFeeds(
+            userId = myUserId,
+            cursorScore = null,
+            cursorUkId = null,
+            limit = 2,
+        )
+        assertEquals(2, firstPage.size)
+        val cursorItem = firstPage.last()
+
+        val secondPage = repository.getFeeds(
+            userId = myUserId,
+            cursorScore = cursorItem.score,
+            cursorUkId = cursorItem.userKeywordId,
+            limit = 2,
+        )
+
+        assertEquals(2, secondPage.size)
+        val firstPageIds = firstPage.map { it.userKeywordId.value }.toSet()
+        secondPage.forEach {
+            assertTrue(it.userKeywordId.value !in firstPageIds, "중복 데이터 발견: ${it.userKeywordId.value}")
+        }
     }
 
     @Test
@@ -245,17 +326,14 @@ class FeedRepositoryImplTest {
         val blocked = createUser("blocked")
         val inactiveUser = createUser("inactiveUser")
 
-        val baseVector = TestVectorFixture.unitVector(1.0f)
-        val similarVector = TestVectorFixture.unitVector(0.9f)
-
-        val myKeyword = createKeyword("myKeyword", baseVector.toPgVectorString(), me)
-        val similarKeyword = createKeyword("similarKeyword", similarVector.toPgVectorString(), me)
+        val myKeyword = createKeyword("myKeyword", category = KeywordCategory.TECH, createdBy = me)
+        val sameCategory = createKeyword("sameCateKeyword", category = KeywordCategory.TECH, createdBy = me)
 
         createUserKeyword(me, myKeyword, "내 취향 글")
-        createUserKeyword(friend, similarKeyword, "친구의 유사한 글")
-        createUserKeyword(stranger, similarKeyword, "남의 유사한 글")
-        createUserKeyword(blocked, similarKeyword, "차단된 사용자의 글")
-        createUserKeyword(inactiveUser, similarKeyword, "비활성화 사용자의 글")
+        createUserKeyword(friend, sameCategory, "친구의 글")
+        createUserKeyword(stranger, sameCategory, "남의 글")
+        createUserKeyword(blocked, sameCategory, "차단된 사용자의 글")
+        createUserKeyword(inactiveUser, sameCategory, "비활성화 사용자의 글")
 
         createFriends(requesterId = me.id, receiverId = friend.id, status = FriendRequestStatus.ACCEPTED)
         createBlocks(blockerId = me.id, blockedId = blocked.id, reasonId = EntityID(1L, BlockReasons))
@@ -270,7 +348,6 @@ class FeedRepositoryImplTest {
         val feeds = repository.getFeeds(
             userId = myUserId,
             cursorScore = null,
-            cursorCreatedAt = null,
             cursorUkId = null,
             limit = 10,
         )
@@ -287,17 +364,16 @@ class FeedRepositoryImplTest {
     // ==========================================================================================
 
     @Test
-    fun `폴백 피드를 최신순으로 조회한다`() = runTest {
+    fun `폴백 피드를 uk_id 기준 내림차순으로 조회한다`() = runTest {
         // given
         val me = createUser("me")
         val user1 = createUser("user1")
         val user2 = createUser("user2")
         val user3 = createUser("user3")
 
-        val vector = TestVectorFixture.unitVector(1.0f)
-        val keyword = createKeyword("keyword", vector.toPgVectorString(), me)
+        val keyword = createKeyword("keyword", category = KeywordCategory.TECH, createdBy = me)
 
-        // 순서대로 생성하여 created_at 차이 보장
+        // 순서대로 생성하여 uk_id 차이 보장
         val now = Instant.now()
         createUserKeyword(user3, keyword, "오래된 글", createdAt = now.minusSeconds(2))
         createUserKeyword(user2, keyword, "중간 글", createdAt = now.minusSeconds(1))
@@ -306,11 +382,11 @@ class FeedRepositoryImplTest {
         // when
         val feeds = repository.getFallbackFeeds(
             userId = UserId(me.id.value),
-            cursorCreatedAt = null,
+            cursorUkId = null,
             limit = 10,
         )
 
-        // then: 최신순 정렬 검증
+        // then: uk_id 내림차순 정렬 검증 (생성순 == id순이므로 최신 = 가장 큰 id)
         assertEquals(3, feeds.size)
         assertEquals(user1.id.value, feeds[0].userId.value)
         assertEquals(user2.id.value, feeds[1].userId.value)
@@ -330,8 +406,7 @@ class FeedRepositoryImplTest {
         val stranger = createUser("stranger")
         val blocked = createUser("blocked")
 
-        val vector = TestVectorFixture.unitVector(1.0f)
-        val keyword = createKeyword("keyword", vector.toPgVectorString(), me)
+        val keyword = createKeyword("keyword", category = KeywordCategory.TECH, createdBy = me)
 
         createUserKeyword(me, keyword, "내 글")
         createUserKeyword(stranger, keyword, "타인 글")
@@ -343,7 +418,7 @@ class FeedRepositoryImplTest {
         val myUserId = UserId(me.id.value)
         val feeds = repository.getFallbackFeeds(
             userId = myUserId,
-            cursorCreatedAt = null,
+            cursorUkId = null,
             limit = 10,
         )
 
@@ -358,8 +433,7 @@ class FeedRepositoryImplTest {
     fun `폴백 피드 페이징이 정상적으로 동작한다`() = runTest {
         // given: 타인 4명 생성 (1페이지 2개 + 2페이지 2개로 소진)
         val me = createUser("me")
-        val vector = TestVectorFixture.unitVector(1.0f)
-        val keyword = createKeyword("keyword", vector.toPgVectorString(), me)
+        val keyword = createKeyword("keyword", category = KeywordCategory.TECH, createdBy = me)
 
         val users = (1..4).map { createUser("user$it") }
         val now = Instant.now()
@@ -377,7 +451,7 @@ class FeedRepositoryImplTest {
         // when: 1페이지 (limit 2)
         val firstPage = repository.getFallbackFeeds(
             userId = myUserId,
-            cursorCreatedAt = null,
+            cursorUkId = null,
             limit = 2,
         )
 
@@ -388,15 +462,15 @@ class FeedRepositoryImplTest {
         // when: 2페이지
         val secondPage = repository.getFallbackFeeds(
             userId = myUserId,
-            cursorCreatedAt = cursorItem.createdAt,
+            cursorUkId = cursorItem.userKeywordId,
             limit = 2,
         )
 
         // then: 2페이지 검증
         assertEquals(2, secondPage.size)
-        // 2페이지 항목은 커서보다 오래된 글이어야 함
+        // 2페이지 항목은 커서보다 uk_id가 작아야 함
         secondPage.forEach {
-            assertTrue(it.createdAt < cursorItem.createdAt)
+            assertTrue(it.userKeywordId.value < cursorItem.userKeywordId.value)
         }
         // 1페이지와 중복 없음
         val firstPageIds = firstPage.map { it.userKeywordId.value }.toSet()
@@ -407,7 +481,7 @@ class FeedRepositoryImplTest {
         // when: 빈 페이지 검증 (4명 데이터 소진 후)
         val emptyPage = repository.getFallbackFeeds(
             userId = myUserId,
-            cursorCreatedAt = secondPage.last().createdAt,
+            cursorUkId = UserKeywordId(secondPage.last().userKeywordId.value),
             limit = 2,
         )
 
@@ -422,8 +496,7 @@ class FeedRepositoryImplTest {
         val activeUser = createUser("activeUser")
         val inactiveUser = createUser("inactiveUser")
 
-        val vector = TestVectorFixture.unitVector(1.0f)
-        val keyword = createKeyword("keyword", vector.toPgVectorString(), me)
+        val keyword = createKeyword("keyword", category = KeywordCategory.TECH, createdBy = me)
 
         createUserKeyword(activeUser, keyword, "활성 글")
         createUserKeyword(inactiveUser, keyword, "비활성 글")
@@ -435,7 +508,7 @@ class FeedRepositoryImplTest {
         // when
         val feeds = repository.getFallbackFeeds(
             userId = UserId(me.id.value),
-            cursorCreatedAt = null,
+            cursorUkId = null,
             limit = 10,
         )
 
@@ -461,12 +534,14 @@ class FeedRepositoryImplTest {
 
     private suspend fun createKeyword(
         keyword: String,
-        vector: String,
+        category: KeywordCategory?,
         createdBy: UserEntity,
     ): KeywordEntity = TestDatabaseFactory.dbQuery {
         KeywordEntity.new {
             this.keyword = keyword
-            this.embedding = vector
+            this.embedding = TestVectorFixture.orthogonalVector().toPgVectorString()
+            this.category = category
+            this.categorySimilarity = null
             this.createdBy = createdBy.id
         }
     }

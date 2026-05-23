@@ -31,7 +31,6 @@ class GetFeedsUseCaseTest {
         val expectedFirstPage = createFeed(pageSize + 1)
         val expectedCursor = FeedCursor(
             score = expectedFirstPage.take(pageSize).last().score,
-            createdAt = expectedFirstPage.take(pageSize).last().createdAt,
             userKeywordId = expectedFirstPage
                 .take(pageSize)
                 .last()
@@ -44,7 +43,6 @@ class GetFeedsUseCaseTest {
                 TestUserId,
                 null,
                 null,
-                null,
                 pageSize + 1,
             )
         } returns expectedFirstPage
@@ -52,7 +50,6 @@ class GetFeedsUseCaseTest {
             feedRepository.getFeeds(
                 TestUserId,
                 expectedCursor.score,
-                expectedCursor.createdAt,
                 UserKeywordId(expectedCursor.userKeywordId),
                 pageSize + 1,
             )
@@ -80,7 +77,6 @@ class GetFeedsUseCaseTest {
         val pageSize = 2
         val fallbackCursor = FeedCursor(
             score = 0.0,
-            createdAt = 1000L,
             userKeywordId = 1L,
         )
         val expectedFallbackPage = createFallbackFeed(pageSize + 1)
@@ -88,7 +84,7 @@ class GetFeedsUseCaseTest {
         coEvery {
             feedRepository.getFallbackFeeds(
                 TestUserId,
-                fallbackCursor.createdAt,
+                UserKeywordId(fallbackCursor.userKeywordId),
                 pageSize + 1,
             )
         } returns expectedFallbackPage
@@ -101,7 +97,11 @@ class GetFeedsUseCaseTest {
             feedRepository.getFeeds(TestUserId, any(), any(), any(), any())
         }
         coVerify(exactly = 1) {
-            feedRepository.getFallbackFeeds(TestUserId, fallbackCursor.createdAt, pageSize + 1)
+            feedRepository.getFallbackFeeds(
+                TestUserId,
+                UserKeywordId(fallbackCursor.userKeywordId),
+                pageSize + 1,
+            )
         }
         assertEquals(expectedFallbackPage.take(pageSize).map { it.toDto() }, result.items)
         assertNotNull(result.nextCursor)
@@ -114,7 +114,6 @@ class GetFeedsUseCaseTest {
         val pageSize = 2
         val fallbackCursor = FeedCursor(
             score = 0.0,
-            createdAt = 1000L,
             userKeywordId = 1L,
         )
         // pageSize보다 적은 데이터 -> 마지막 페이지
@@ -123,7 +122,7 @@ class GetFeedsUseCaseTest {
         coEvery {
             feedRepository.getFallbackFeeds(
                 TestUserId,
-                fallbackCursor.createdAt,
+                UserKeywordId(fallbackCursor.userKeywordId),
                 pageSize + 1,
             )
         } returns expectedFallbackPage
