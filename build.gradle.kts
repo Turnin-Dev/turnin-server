@@ -51,6 +51,9 @@ tasks.named<ShadowJar>("shadowJar") {
     exclude("model_int8.onnx")
     exclude("tokenizer.json")
     exclude("tokenizer_config.json")
+    mergeServiceFiles {
+        setPath("META-INF/services/org.flywaydb.core.extensibility.Plugin")
+    }
 }
 
 tasks.withType<JavaExec> {
@@ -63,6 +66,13 @@ tasks.withType<JavaExec> {
     if (agentFile.exists()) {
         jvmArgs("-javaagent:${agentFile.absolutePath}")
     }
+}
+
+tasks.withType<Test> {
+    // hot reload 비활성화
+    systemProperty("io.ktor.development", "false")
+    systemProperty("io.ktor.deployment.watch", "false")
+    systemProperty("config.resource", "application-test.conf")
 }
 
 fun loadDotenv(environment: String): Map<String, String> {

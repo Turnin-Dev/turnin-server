@@ -60,6 +60,7 @@ object DatabaseFactory {
             .dataSource(dataSource)
             .schemas("public")
             .locations("classpath:db/migration")
+            .validateMigrationNaming(true)
 
         // 환경별 동적 설정 분기
         val flyway = when (env) {

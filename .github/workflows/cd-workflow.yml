@@ -22,7 +22,7 @@ jobs:
 
       # 3. Gradle 설정 (의존성 + 빌드 캐시 자동 관리)
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: false
 
