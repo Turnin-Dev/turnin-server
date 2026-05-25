@@ -30,4 +30,4 @@ jobs:
       - name: Build & Test
         run: |
           set -e
-          ./gradlew clean build --no-daemon --info
+          ./gradlew build --no-daemon --info
