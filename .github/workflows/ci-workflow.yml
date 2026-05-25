@@ -19,7 +19,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
       # 3. Gradle 설정 (의존성 + 빌드 캐시 자동 관리)
       - name: Set up Gradle
