@@ -6,6 +6,7 @@ import com.turnin.common.db.schema.Blocks
 import com.turnin.common.db.schema.Friends
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.Notifications
+import com.turnin.common.db.schema.RefreshTokens
 import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
@@ -95,6 +96,7 @@ private object TestDBContainerFactory {
             // 테이블 생성
             SchemaUtils.create(
                 Users,
+                RefreshTokens,
                 Keywords,
                 UserKeywords,
                 Friends,
@@ -113,6 +115,7 @@ private object TestDBContainerFactory {
         transaction(database) {
             SchemaUtils.drop(
                 Users,
+                RefreshTokens,
                 Keywords,
                 UserKeywords,
                 Friends,
@@ -123,6 +126,7 @@ private object TestDBContainerFactory {
             )
             SchemaUtils.create(
                 Users,
+                RefreshTokens,
                 Keywords,
                 UserKeywords,
                 Friends,

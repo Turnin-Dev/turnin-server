@@ -65,6 +65,12 @@ tasks.withType<JavaExec> {
     }
 }
 
+tasks.withType<Test> {
+    // hot reload 비활성화
+    systemProperty("io.ktor.development", "false")
+    systemProperty("config.resource", "application-test.conf")
+}
+
 fun loadDotenv(environment: String): Map<String, String> {
     val dotenvFile = rootProject.file(".env.$environment")
     if (!dotenvFile.exists()) return emptyMap()
