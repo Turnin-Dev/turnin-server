@@ -68,6 +68,7 @@ tasks.withType<JavaExec> {
 tasks.withType<Test> {
     // hot reload 비활성화
     systemProperty("io.ktor.development", "false")
+    systemProperty("io.ktor.deployment.watch", "false")
     systemProperty("config.resource", "application-test.conf")
 }
 
