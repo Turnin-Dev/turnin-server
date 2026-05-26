@@ -51,6 +51,9 @@ tasks.named<ShadowJar>("shadowJar") {
     exclude("model_int8.onnx")
     exclude("tokenizer.json")
     exclude("tokenizer_config.json")
+    mergeServiceFiles {
+        setPath("META-INF/services/org.flywaydb.core.extensibility.Plugin")
+    }
 }
 
 tasks.withType<JavaExec> {
