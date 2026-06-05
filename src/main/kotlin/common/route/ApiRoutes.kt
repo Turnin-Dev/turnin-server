@@ -107,6 +107,12 @@ object Api {
 
             fun read(pathParam: String): String = "{$pathParam}/$READ"
         }
+
+        object Announcement {
+            const val ROUTE = "/announcement"
+            const val TAG = "Announcement"
+            const val READ = "/read"
+        }
     }
 
     /** PathParameter를 사용해 키 값 이름이 포함된 경로를 반환한다. */
