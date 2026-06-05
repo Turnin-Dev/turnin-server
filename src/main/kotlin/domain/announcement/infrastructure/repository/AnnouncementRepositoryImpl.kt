@@ -55,7 +55,7 @@ class AnnouncementRepositoryImpl : AnnouncementRepository {
 
     override suspend fun createAnnouncement(
         detail: AnnouncementDetail,
-    ): AnnouncementEntity = suspendTransaction {
+    ): Unit = suspendTransaction {
         AnnouncementEntity.new {
             this.title = detail.title
             this.content = detail.content

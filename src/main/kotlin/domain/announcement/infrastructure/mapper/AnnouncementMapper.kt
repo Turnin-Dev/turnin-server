@@ -17,6 +17,6 @@ object AnnouncementMapper {
             targetAudience = this[Announcements.targetAudience],
             expiresAt = this[Announcements.expiresAt]?.toEpochSecond(),
             createdAt = this[Announcements.createdAt].toEpochSecond(),
-            isRead = this[isRead] ?: false,
+            isRead = this[isRead],
         )
 }

@@ -1,6 +1,5 @@
 package com.turnin.domain.announcement.domain.repository
 
-import com.turnin.common.db.schema.AnnouncementEntity
 import com.turnin.common.model.AnnouncementAudience
 import com.turnin.common.model.AnnouncementStatus
 import com.turnin.common.model.id.AnnouncementId
@@ -30,7 +29,7 @@ interface AnnouncementRepository {
      *
      * @param detail 공지 상세정보
      */
-    suspend fun createAnnouncement(detail: AnnouncementDetail): AnnouncementEntity
+    suspend fun createAnnouncement(detail: AnnouncementDetail)
 
     /**
      * 공지 읽음 처리
