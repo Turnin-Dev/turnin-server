@@ -90,8 +90,11 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
             .withAudience(audience)
             .withIssuer(issuer)
             .withSubject(payload.userId)
-            .withClaim(payload.claimName.name, payload.claim)
-            .withJWTId(checksum)
+            .apply {
+                payload.claims.forEach { (claimName, value) ->
+                    withClaim(claimName.name, value)
+                }
+            }.withJWTId(checksum)
             .withIssuedAt(issuedAt)
             .withExpiresAt(expiresAt)
             .sign(algorithm)

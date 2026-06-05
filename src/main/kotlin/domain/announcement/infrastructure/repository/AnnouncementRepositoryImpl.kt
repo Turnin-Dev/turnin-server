@@ -28,7 +28,7 @@ import org.jetbrains.exposed.sql.or
 class AnnouncementRepositoryImpl : AnnouncementRepository {
     override suspend fun getAnnouncements(
         userId: UserId,
-        userRole: AnnouncementAudience,
+        audiences: List<AnnouncementAudience>,
     ): List<Announcement> = suspendTransaction {
         val isRead = AnnouncementReads.readAt.isNotNull()
 
@@ -44,7 +44,7 @@ class AnnouncementRepositoryImpl : AnnouncementRepository {
             ).select(Announcements.columns + isRead)
             .where {
                 (Announcements.status eq AnnouncementStatus.ACTIVE) and
-                    (Announcements.targetAudience inList listOf(AnnouncementAudience.ALL, userRole)) and
+                    (Announcements.targetAudience inList audiences) and
                     (
                         (Announcements.expiresAt eq null) or
                             (Announcements.expiresAt greater TurninDateTime.now().toOffsetDateTime())

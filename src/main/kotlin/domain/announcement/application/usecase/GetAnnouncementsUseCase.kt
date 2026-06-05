@@ -1,6 +1,7 @@
 package com.turnin.domain.announcement.application.usecase
 
 import com.turnin.common.model.AnnouncementAudience
+import com.turnin.common.model.Role
 import com.turnin.common.model.id.UserId
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.domain.announcement.application.dto.AnnouncementDto
@@ -21,10 +22,11 @@ class GetAnnouncementsUseCase(private val announcementRepository: AnnouncementRe
      */
     suspend operator fun invoke(
         userId: UserId,
-        userRole: AnnouncementAudience,
+        userRole: Role,
     ): List<AnnouncementDto> {
         LOGGER.debug("getAnnouncements called, userId: ${userId.value}")
-        return announcementRepository.getAnnouncements(userId, userRole).map { it.toDto() }
+        val audiences = AnnouncementAudience.from(userRole)
+        return announcementRepository.getAnnouncements(userId, audiences).map { it.toDto() }
     }
 }
 

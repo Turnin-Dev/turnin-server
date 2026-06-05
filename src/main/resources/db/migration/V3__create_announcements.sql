@@ -1,5 +1,5 @@
-CREATE TYPE announcement_audience AS ENUM ('all', 'premium', 'admin');
-CREATE TYPE announcement_status AS ENUM ('active', 'inactive');
+CREATE TYPE announcement_audience AS ENUM ('ALL', 'PREMIUM', 'ADMIN');
+CREATE TYPE announcement_status AS ENUM ('ACTIVE', 'INACTIVE');
 
 CREATE TABLE announcement (
     id              BIGSERIAL PRIMARY KEY,

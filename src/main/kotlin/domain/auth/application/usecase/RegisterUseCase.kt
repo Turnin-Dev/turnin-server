@@ -83,8 +83,10 @@ class RegisterUseCase(
 
         val payload = JWTTokenPayload(
             userId = savedAuthUser.userId.value.toString(),
-            claimName = JWTClaimName.DISPLAY_ID,
-            claim = savedAuthUser.displayId.value,
+            claims = mapOf(
+                JWTClaimName.DISPLAY_ID to savedAuthUser.displayId.value,
+                JWTClaimName.ROLE to savedAuthUser.role.name,
+            ),
         )
         val jwtToken = jwtTokenService.generate(payload)
 

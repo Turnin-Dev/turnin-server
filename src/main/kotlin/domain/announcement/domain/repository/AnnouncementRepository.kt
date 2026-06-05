@@ -17,11 +17,11 @@ interface AnnouncementRepository {
      * 만료된 공지([expires_at] 기준)는 제외된다.
      *
      * @param userId 조회 요청 사용자 ID
-     * @param userRole 사용자 역할 (수신 대상 필터링)
+     * @param audiences 수신 대상 목록 (수신 대상 필터링)
      */
     suspend fun getAnnouncements(
         userId: UserId,
-        userRole: AnnouncementAudience,
+        audiences: List<AnnouncementAudience>,
     ): List<Announcement>
 
     /**

@@ -7,6 +7,7 @@ import com.turnin.common.jwt.domain.model.JWTToken
 import com.turnin.common.jwt.domain.model.JWTTokenPayload
 import com.turnin.common.jwt.domain.service.JWTTokenService
 import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
@@ -85,6 +86,7 @@ class LoginUseCase(
         val jwtToken = generateJWTToken(
             userId = authUser.userId,
             displayId = authUser.displayId,
+            role = authUser.role,
         )
 
         // 3) 마지막 로그인 일자 업데이트
@@ -119,11 +121,14 @@ class LoginUseCase(
     private fun generateJWTToken(
         userId: UserId,
         displayId: DisplayId,
+        role: Role,
     ): JWTToken {
         val payload = JWTTokenPayload(
             userId = userId.value.toString(),
-            claimName = JWTClaimName.DISPLAY_ID,
-            claim = displayId.value,
+            claims = mapOf(
+                JWTClaimName.DISPLAY_ID to displayId.value,
+                JWTClaimName.ROLE to role.name,
+            ),
         )
         return jwtTokenService.generate(payload)
     }

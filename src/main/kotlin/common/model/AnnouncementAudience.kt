@@ -5,6 +5,13 @@ package com.turnin.common.model
  */
 enum class AnnouncementAudience {
     ALL,
-    PREMIUM,
     ADMIN,
+    ;
+
+    companion object {
+        fun from(role: Role): List<AnnouncementAudience> = when (role) {
+            Role.USER -> listOf(ALL)
+            Role.ADMIN -> listOf(ALL, ADMIN)
+        }
+    }
 }
