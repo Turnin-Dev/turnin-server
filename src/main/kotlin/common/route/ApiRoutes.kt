@@ -18,6 +18,16 @@ object Api {
         const val DETAIL = "/detail"
     }
 
+    object Admin {
+        const val ROUTE = "/admin"
+
+        object Announcement {
+            const val ROUTE = "/announcement"
+            const val TAG = "Announcement"
+            const val STATUS = "/status"
+        }
+    }
+
     object V1 {
         const val ROUTE = "/v1"
 

@@ -1,13 +1,18 @@
 package com.turnin.domain.announcement.presentation.route
 
+import com.turnin.common.model.id.AnnouncementId
 import com.turnin.common.plugin.AuthenticatedRoute
 import com.turnin.common.route.Api
+import com.turnin.common.validator.inputValidationAndReturn
 import com.turnin.domain.announcement.application.usecase.AnnouncementUseCases
+import com.turnin.domain.announcement.presentation.dto.AnnouncementResponse
+import com.turnin.domain.announcement.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.response.respond
 
 fun AuthenticatedRoute.announcementRoutes(route: Api.V1.Announcement, usecase: AnnouncementUseCases) {
     route(route.ROUTE, {
@@ -15,19 +20,19 @@ fun AuthenticatedRoute.announcementRoutes(route: Api.V1.Announcement, usecase: A
         description = "Announcement API"
     }) {
         get({ getAnnouncementsDocs() }) {
-//            val userId = extractUserIdWithToken()
-//            val userRole = extractUserRoleWithToken()
-//            val announcements = usecase.getAnnouncements(userId.value, userRole)
-//            call.respond(HttpStatusCode.OK, announcements.toResponse())
+            val userId = extractUserIdWithToken()
+            val userRole = extractUserRoleWithToken()
+            val announcements = usecase.getAnnouncements(userId, userRole)
+            call.respond(HttpStatusCode.OK, announcements.map { it.toResponse() })
         }
 
         post(route.READ, { markAnnouncementAsReadDocs() }) {
-//            val announcementId = call.parameters["id"]
-//                ?.toLongOrNull()
-//                .inputValidationAndReturn("공지 ID")
-//            val userId = extractUserIdWithToken()
-//            usecase.markAsRead(AnnouncementId(announcementId), userId.value)
-//            call.respond(HttpStatusCode.OK)
+            val announcementId = call.parameters["id"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("공지 ID")
+            val userId = extractUserIdWithToken()
+            usecase.markAsRead(AnnouncementId(announcementId), userId)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }
@@ -38,11 +43,11 @@ private fun RouteConfig.getAnnouncementsDocs() {
     response {
         code(HttpStatusCode.OK) {
             description = "공지 목록"
-//            body<List<AnnouncementResponse>> {
-//                example("AnnouncementResponse") {
-//                    value = AnnouncementResponse.sampleList
-//                }
-//            }
+            body<List<AnnouncementResponse>> {
+                example("AnnouncementResponse") {
+                    value = AnnouncementResponse.sample
+                }
+            }
         }
     }
 }
@@ -58,6 +63,9 @@ private fun RouteConfig.markAnnouncementAsReadDocs() {
     response {
         code(HttpStatusCode.OK) {
             description = "읽음 처리 성공 시"
+        }
+        code(HttpStatusCode.NotFound) {
+            description = "공지가 존재하지 않는 경우"
         }
     }
 }

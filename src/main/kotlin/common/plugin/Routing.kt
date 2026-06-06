@@ -7,6 +7,10 @@ import com.turnin.common.util.config.RunEnvironment.Companion.toRunEnvironment
 import com.turnin.common.util.healthRoutes
 import com.turnin.domain.account.application.AccountUseCases
 import com.turnin.domain.account.presentation.accountRoutes
+import com.turnin.domain.announcement.application.usecase.AnnouncementAdminUseCases
+import com.turnin.domain.announcement.application.usecase.AnnouncementUseCases
+import com.turnin.domain.announcement.presentation.route.announcementAdminRoutes
+import com.turnin.domain.announcement.presentation.route.announcementRoutes
 import com.turnin.domain.auth.application.usecase.AuthUseCases
 import com.turnin.domain.auth.presentation.route.authRoutes
 import com.turnin.domain.block.application.usecase.BlockUseCases
@@ -56,17 +60,22 @@ fun Application.configureRouting() {
     val feedUseCases by inject<FeedUseCases>()
     val blockUseCases by inject<BlockUseCases>()
     val notificationUseCases by inject<NotificationUseCases>()
+    val announcementUseCases by inject<AnnouncementUseCases>()
+    val announcementAdminUseCases by inject<AnnouncementAdminUseCases>()
 
     routing {
         customRoutingOption(environment.toRunEnvironment())
 
         // Add Turnin routes
         route(Api.ROUTE, { description = "Turnin API" }) {
+            // 헬스 체크 라우트
             healthRoutes(route = Api.Health)
+
+            // 일반 사용자 라우트
             route(Api.V1.ROUTE, { description = "Turnin API V1" }) {
                 authRoutes(route = Api.V1.Auth, usecase = authUseCases)
                 fileRoutes(route = Api.V1.File, usecase = fileUseCases)
-                authenticatedRoute {
+                authenticatedUserRoute {
                     accountRoutes(route = Api.V1.Account, usecase = accountUseCases)
                     userRoutes(route = Api.V1.User, usecase = userUseCases)
                     keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
@@ -77,10 +86,16 @@ fun Application.configureRouting() {
                     feedRoutes(route = Api.V1.Feed, usecase = feedUseCases)
                     blockRoutes(route = Api.V1.Block, usecase = blockUseCases)
                     notificationRoutes(route = Api.V1.Notification, usecase = notificationUseCases)
+                    announcementRoutes(route = Api.V1.Announcement, usecase = announcementUseCases)
 
                     // 도메인과 API 명세서에 표시되는 위치가 다른 라우트
                     externalUserKeywordRoutes(route = Api.V1.User, usecase = userKeywordUseCases)
                 }
+            }
+
+            // 관리자 라우트
+            authenticatedAdminRoute {
+                announcementAdminRoutes(route = Api.Admin.Announcement, usecase = announcementAdminUseCases)
             }
         }
     }
