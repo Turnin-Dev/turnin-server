@@ -21,6 +21,7 @@ import com.turnin.domain.auth.domain.model.AuthUser
 import com.turnin.domain.auth.domain.repository.AuthRepository
 import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
 import com.turnin.domain.auth.exception.AuthException
+import org.koin.core.annotation.Named
 
 /**
  * 로그인 Usecase
@@ -30,7 +31,7 @@ import com.turnin.domain.auth.exception.AuthException
 class LoginUseCase(
     private val authRepository: AuthRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val jwtTokenService: JWTTokenService,
+    @Named("user") private val jwtTokenService: JWTTokenService,
 ) {
     /**
      * 소셜로그인

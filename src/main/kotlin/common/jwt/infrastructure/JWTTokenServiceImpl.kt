@@ -17,7 +17,10 @@ import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.config.AppConfig
 import java.util.UUID
 
-class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
+class JWTTokenServiceImpl(
+    private val appConfig: AppConfig,
+    private val secretKey: String,
+) : JWTTokenService {
     override val realm by lazy {
         appConfig.getOrDefault("ktor.security.jwt.realm", "jwt-realm")
     }
@@ -36,10 +39,6 @@ class JWTTokenServiceImpl(private val appConfig: AppConfig) : JWTTokenService {
 
     private val refreshTokenExpiresIn by lazy {
         appConfig.get("ktor.security.jwt.refreshTokenExpiresIn")?.toLong() ?: 0L
-    }
-
-    private val secretKey by lazy {
-        appConfig.getOrDefault("ktor.security.jwt.secret", "jwt-secret")
     }
 
     private val algorithm = Algorithm.HMAC256(secretKey)

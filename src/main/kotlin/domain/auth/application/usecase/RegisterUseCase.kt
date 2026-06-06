@@ -19,11 +19,12 @@ import com.turnin.domain.auth.domain.repository.AuthRepository
 import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
 import com.turnin.domain.auth.exception.AuthException
 import com.turnin.domain.auth.exception.AuthException.DuplicateUserException
+import org.koin.core.annotation.Named
 
 class RegisterUseCase(
     private val authRepository: AuthRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val jwtTokenService: JWTTokenService,
+    @Named("user") private val jwtTokenService: JWTTokenService,
 ) {
     /**
      * 회원가입

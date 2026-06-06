@@ -4,8 +4,11 @@ import com.turnin.common.exception.configureExceptionHandler
 import com.turnin.common.jwt.JWTTestDoubles
 import com.turnin.common.jwt.domain.model.JWTClaimName
 import com.turnin.common.jwt.exception.TokenException
+import com.turnin.common.model.Role
+import com.turnin.common.plugin.AuthRole
 import com.turnin.common.plugin.AuthenticatedRoute
-import com.turnin.common.plugin.authenticatedRoute
+import com.turnin.common.plugin.authenticatedAdminRoute
+import com.turnin.common.plugin.authenticatedUserRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -29,6 +32,7 @@ import org.koin.ktor.plugin.Koin
  * @param routingApplicationScope 라우터 (Application 범위)
  */
 fun ApplicationTestBuilder.testPlugin(
+    role: AuthRole = AuthRole.USER,
     module: Module? = null,
     plugin: Application.() -> Unit = {},
     routing: Routing.() -> Unit = {},
@@ -48,8 +52,18 @@ fun ApplicationTestBuilder.testPlugin(
         routing {
             routing()
             authRouting?.let {
-                authenticatedRoute {
-                    it()
+                when (role) {
+                    AuthRole.USER -> {
+                        authenticatedUserRoute {
+                            it()
+                        }
+                    }
+
+                    AuthRole.ADMIN -> {
+                        authenticatedAdminRoute {
+                            it()
+                        }
+                    }
                 }
             }
         }
@@ -63,13 +77,31 @@ private fun Application.testJwtSecurity() {
     val testAudience = JWTTestDoubles.AUDIENCE
 
     authentication {
-        jwt {
+        jwt(AuthRole.USER.providerName) {
             verifier(testVerifier)
             realm = testRealm
             validate { credential ->
                 val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
                 val hasAudience = credential.payload.audience.contains(testAudience)
                 if (displayIdClaim?.isNotEmpty() == true && hasAudience) {
+                    JWTPrincipal(credential.payload)
+                } else {
+                    null
+                }
+            }
+            challenge { e1, e2 ->
+                throw TokenException.InvalidTokenException()
+            }
+        }
+
+        jwt(AuthRole.ADMIN.providerName) {
+            verifier(testVerifier)
+            realm = testRealm
+            validate { credential ->
+                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
+                val hasAudience = credential.payload.audience.contains(testAudience)
+                val role = credential.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
+                if (displayIdClaim?.isNotEmpty() == true && hasAudience && role == Role.ADMIN.name) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null
