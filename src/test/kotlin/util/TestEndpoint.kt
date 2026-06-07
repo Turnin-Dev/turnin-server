@@ -1,6 +1,7 @@
 package com.turnin.util
 
 import com.turnin.common.jwt.JWTTestDoubles
+import com.turnin.common.plugin.AuthRole
 import com.turnin.util.TestClientFactory.createTestClient
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
@@ -72,6 +73,7 @@ class ResponseValidator(
  * @param responseValidator 응답 바디 검증
  */
 private suspend fun ApplicationTestBuilder.testEndpoint(
+    role: AuthRole = AuthRole.USER,
     method: HttpMethod,
     endpoint: String,
     queryParameters: Map<String, String>?,
@@ -86,7 +88,7 @@ private suspend fun ApplicationTestBuilder.testEndpoint(
     // given
     val client = createTestClient()
     val token = tokenSubject?.let {
-        JWTTestDoubles.getMockJWTToken(it)
+        JWTTestDoubles.getMockJWTToken(it, role)
     }
     testPlugin()
 
@@ -138,6 +140,7 @@ private suspend fun ApplicationTestBuilder.testEndpoint(
  * @param responseValidator 응답 바디 검증
  */
 suspend fun ApplicationTestBuilder.testGetEndpoint(
+    role: AuthRole = AuthRole.USER,
     endpoint: String,
     queryParameters: Map<String, String>? = null,
     requestBuilder: (HttpRequestBuilder.() -> Unit)? = null,
@@ -147,6 +150,7 @@ suspend fun ApplicationTestBuilder.testGetEndpoint(
     additionalAssertions: (() -> Unit)? = null,
     responseValidator: ResponseValidator.() -> Unit = {},
 ) = testEndpoint(
+    role = role,
     method = HttpMethod.Get,
     endpoint = endpoint,
     queryParameters = queryParameters,
@@ -172,6 +176,7 @@ suspend fun ApplicationTestBuilder.testGetEndpoint(
  * @param responseValidator 응답 바디 검증
  */
 suspend fun ApplicationTestBuilder.testPostEndpoint(
+    role: AuthRole = AuthRole.USER,
     endpoint: String,
     queryParameters: Map<String, String>? = null,
     requestBody: Any? = null,
@@ -182,6 +187,7 @@ suspend fun ApplicationTestBuilder.testPostEndpoint(
     additionalAssertions: (() -> Unit)? = null,
     responseValidator: ResponseValidator.() -> Unit = {},
 ) = testEndpoint(
+    role = role,
     method = HttpMethod.Post,
     endpoint = endpoint,
     queryParameters = queryParameters,
@@ -208,6 +214,7 @@ suspend fun ApplicationTestBuilder.testPostEndpoint(
  * @param responseValidator 응답 바디 검증
  */
 suspend fun ApplicationTestBuilder.testPatchEndpoint(
+    role: AuthRole = AuthRole.USER,
     endpoint: String,
     queryParameters: Map<String, String>? = null,
     requestBody: Any? = null,
@@ -218,6 +225,7 @@ suspend fun ApplicationTestBuilder.testPatchEndpoint(
     additionalAssertions: (() -> Unit)? = null,
     responseValidator: ResponseValidator.() -> Unit = {},
 ) = testEndpoint(
+    role = role,
     method = HttpMethod.Patch,
     endpoint = endpoint,
     queryParameters = queryParameters,
@@ -244,6 +252,7 @@ suspend fun ApplicationTestBuilder.testPatchEndpoint(
  * @param responseValidator 응답 바디 검증
  */
 suspend fun ApplicationTestBuilder.testPutEndpoint(
+    role: AuthRole = AuthRole.USER,
     endpoint: String,
     queryParameters: Map<String, String>? = null,
     requestBody: Any? = null,
@@ -254,6 +263,7 @@ suspend fun ApplicationTestBuilder.testPutEndpoint(
     additionalAssertions: (() -> Unit)? = null,
     responseValidator: ResponseValidator.() -> Unit = {},
 ) = testEndpoint(
+    role = role,
     method = HttpMethod.Put,
     endpoint = endpoint,
     queryParameters = queryParameters,
@@ -280,6 +290,7 @@ suspend fun ApplicationTestBuilder.testPutEndpoint(
  * @param responseValidator 응답 바디 검증
  */
 suspend fun ApplicationTestBuilder.testDeleteEndpoint(
+    role: AuthRole = AuthRole.USER,
     endpoint: String,
     queryParameters: Map<String, String>? = null,
     requestBody: Any? = null,
@@ -290,6 +301,7 @@ suspend fun ApplicationTestBuilder.testDeleteEndpoint(
     additionalAssertions: (() -> Unit)? = null,
     responseValidator: ResponseValidator.() -> Unit = {},
 ) = testEndpoint(
+    role = role,
     method = HttpMethod.Delete,
     endpoint = endpoint,
     queryParameters = queryParameters,

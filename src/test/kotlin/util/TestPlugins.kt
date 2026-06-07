@@ -83,7 +83,12 @@ private fun Application.testJwtSecurity() {
             validate { credential ->
                 val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
                 val hasAudience = credential.payload.audience.contains(testAudience)
-                if (displayIdClaim?.isNotEmpty() == true && hasAudience) {
+                val role = credential.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
+                if (
+                    displayIdClaim?.isNotEmpty() == true &&
+                    role != null &&
+                    hasAudience
+                ) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null
@@ -101,7 +106,11 @@ private fun Application.testJwtSecurity() {
                 val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
                 val hasAudience = credential.payload.audience.contains(testAudience)
                 val role = credential.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
-                if (displayIdClaim?.isNotEmpty() == true && hasAudience && role == Role.ADMIN.name) {
+                if (
+                    displayIdClaim?.isNotEmpty() == true &&
+                    role == Role.ADMIN.name &&
+                    hasAudience
+                ) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

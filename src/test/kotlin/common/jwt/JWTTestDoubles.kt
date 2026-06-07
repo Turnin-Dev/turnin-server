@@ -36,7 +36,7 @@ internal object JWTTestDoubles {
         userId = subject,
         claims = mapOf(
             JWTClaimName.DISPLAY_ID to "DISPLAY_ID123",
-            JWTClaimName.ROLE to role.providerName,
+            JWTClaimName.ROLE to role.name,
         ),
     )
 
@@ -44,8 +44,11 @@ internal object JWTTestDoubles {
         payload: JWTTokenPayload = getJWTTokenPayload(),
     ): JWTToken = generateTestToken(payload)
 
-    fun getMockJWTToken(subject: String): JWTToken =
-        generateTestToken(getJWTTokenPayload(subject))
+    fun getMockJWTToken(
+        subject: String,
+        role: AuthRole = AuthRole.USER,
+    ): JWTToken =
+        generateTestToken(getJWTTokenPayload(subject, role))
 
     fun getExpiredRefreshToken(subject: String = "user123"): String {
         val now = Instant.now()

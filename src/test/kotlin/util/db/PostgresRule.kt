@@ -1,6 +1,8 @@
 package com.turnin.util.db
 
 import com.turnin.common.db.DatabaseException
+import com.turnin.common.db.schema.AnnouncementReads
+import com.turnin.common.db.schema.Announcements
 import com.turnin.common.db.schema.BlockReasons
 import com.turnin.common.db.schema.Blocks
 import com.turnin.common.db.schema.Friends
@@ -11,6 +13,8 @@ import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
 import com.turnin.common.ml.keywordCategory.KeywordCategory
+import com.turnin.common.model.AnnouncementAudience
+import com.turnin.common.model.AnnouncementStatus
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
@@ -76,6 +80,8 @@ private object TestDBContainerFactory {
                     "social_login_provider" to SocialLoginProvider.entries.map { it.name },
                     "friend_status" to FriendRequestStatus.entries.map { it.name },
                     "keyword_category" to KeywordCategory.entries.map { it.name },
+                    "announcement_audience" to AnnouncementAudience.entries.map { it.name },
+                    "announcement_status" to AnnouncementStatus.entries.map { it.name },
                 )
 
                 enums.forEach { (typeName, values) ->
@@ -104,6 +110,8 @@ private object TestDBContainerFactory {
                 BlockReasons,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
 
             // 초기 데이터 준비
@@ -123,6 +131,8 @@ private object TestDBContainerFactory {
                 BlockReasons,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
             SchemaUtils.create(
                 Users,
@@ -134,6 +144,8 @@ private object TestDBContainerFactory {
                 BlockReasons,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
 
             // 초기 데이터 준비
