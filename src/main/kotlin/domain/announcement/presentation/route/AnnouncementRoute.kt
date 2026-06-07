@@ -3,6 +3,7 @@ package com.turnin.domain.announcement.presentation.route
 import com.turnin.common.model.id.AnnouncementId
 import com.turnin.common.plugin.AuthenticatedRoute
 import com.turnin.common.route.Api
+import com.turnin.common.route.Api.byPathParam
 import com.turnin.common.validator.inputValidationAndReturn
 import com.turnin.domain.announcement.application.usecase.AnnouncementUseCases
 import com.turnin.domain.announcement.presentation.dto.AnnouncementResponse
@@ -26,8 +27,8 @@ fun AuthenticatedRoute.announcementRoutes(route: Api.V1.Announcement, usecase: A
             call.respond(HttpStatusCode.OK, announcements.map { it.toResponse() })
         }
 
-        post(route.READ, { markAnnouncementAsReadDocs() }) {
-            val announcementId = call.parameters["id"]
+        post(route.READ.byPathParam("announcementId"), { markAnnouncementAsReadDocs() }) {
+            val announcementId = call.parameters["announcementId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("공지 ID")
             val userId = extractUserIdWithToken()

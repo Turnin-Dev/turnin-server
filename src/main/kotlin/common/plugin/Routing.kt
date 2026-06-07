@@ -93,9 +93,11 @@ fun Application.configureRouting() {
                 }
             }
 
-            // 관리자 라우트
-            authenticatedAdminRoute {
-                announcementAdminRoutes(route = Api.Admin.Announcement, usecase = announcementAdminUseCases)
+            route(Api.Admin.ROUTE, { description = "Admin API" }) {
+                // 관리자 라우트
+                authenticatedAdminRoute {
+                    announcementAdminRoutes(route = Api.Admin.Announcement, usecase = announcementAdminUseCases)
+                }
             }
         }
     }
@@ -103,11 +105,12 @@ fun Application.configureRouting() {
 
 private fun Route.customRoutingOption(runEnvironment: RunEnvironment) {
     if (runEnvironment != RunEnvironment.Prod) {
-        route("api.json") {
-            openApi()
-        }
-        route("swagger") {
-            swaggerUI("/api.json")
-        }
+        // 일반 API 문서
+        route("api.json") { openApi() }
+        route("swagger") { swaggerUI("/api.json") }
+
+        // 관리자 API 문서
+        route("admin-api.json") { openApi("admin") }
+        route("swagger/admin") { swaggerUI("/admin-api.json") }
     }
 }

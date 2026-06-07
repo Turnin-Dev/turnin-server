@@ -1,12 +1,12 @@
-CREATE TYPE announcement_audience AS ENUM ('ALL', 'PREMIUM', 'ADMIN');
+CREATE TYPE announcement_audience AS ENUM ('ALL', 'ADMIN');
 CREATE TYPE announcement_status AS ENUM ('ACTIVE', 'INACTIVE');
 
 CREATE TABLE announcement (
     id              BIGSERIAL PRIMARY KEY,
     title           VARCHAR(100)          NOT NULL,
     content         TEXT                  NOT NULL,
-    target_audience announcement_audience NOT NULL DEFAULT 'all',
-    status          announcement_status   NOT NULL DEFAULT 'inactive',
+    target_audience announcement_audience NOT NULL DEFAULT 'ALL',
+    status          announcement_status   NOT NULL DEFAULT 'INACTIVE',
     expires_at      TIMESTAMPTZ,
     created_at      TIMESTAMPTZ           NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ           NOT NULL DEFAULT now()

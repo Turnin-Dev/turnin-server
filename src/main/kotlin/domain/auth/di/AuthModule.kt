@@ -12,6 +12,7 @@ import com.turnin.domain.auth.domain.repository.AuthRepository
 import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
 import com.turnin.domain.auth.infrastructure.repository.impl.AuthRepositoryImpl
 import com.turnin.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val authModule = module {
@@ -24,9 +25,9 @@ val authModule = module {
     single { AuthDeletionSupportApi(get()) }
 
     // UseCase
-    single { LoginUseCase(get(), get(), get()) }
-    single { RegisterUseCase(get(), get(), get()) }
-    single { RefreshTokenUseCase(get(), get(), get()) }
+    single { LoginUseCase(get(), get(), get(named("user"))) }
+    single { RegisterUseCase(get(), get(), get(named("user"))) }
+    single { RefreshTokenUseCase(get(), get(), get(named("user"))) }
     single { ExistsDisplayIdUseCase(get()) }
     single { FindUserUseCase(get()) }
     single {

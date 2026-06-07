@@ -3,6 +3,7 @@ package com.turnin.domain.announcement.presentation.route
 import com.turnin.common.model.id.AnnouncementId
 import com.turnin.common.plugin.AuthenticatedRoute
 import com.turnin.common.route.Api
+import com.turnin.common.route.Api.byPathParam
 import com.turnin.common.validator.inputValidationAndReturn
 import com.turnin.domain.announcement.application.usecase.AnnouncementAdminUseCases
 import com.turnin.domain.announcement.presentation.dto.CreateAnnouncementRequest
@@ -20,6 +21,7 @@ fun AuthenticatedRoute.announcementAdminRoutes(route: Api.Admin.Announcement, us
     route(route.ROUTE, {
         tags = setOf(route.TAG)
         description = "Announcement Admin API"
+        specName = "admin"
     }) {
         post({ createAnnouncementDocs() }) {
             val request = call.receive<CreateAnnouncementRequest>()
@@ -27,8 +29,8 @@ fun AuthenticatedRoute.announcementAdminRoutes(route: Api.Admin.Announcement, us
             call.respond(HttpStatusCode.Created)
         }
 
-        patch(route.STATUS, { updateAnnouncementStatusDocs() }) {
-            val announcementId = call.parameters["id"]
+        patch(route.STATUS.byPathParam("announcementId"), { updateAnnouncementStatusDocs() }) {
+            val announcementId = call.parameters["announcementId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("공지 ID")
             val request = call.receive<UpdateAnnouncementStatusRequest>()
@@ -36,8 +38,8 @@ fun AuthenticatedRoute.announcementAdminRoutes(route: Api.Admin.Announcement, us
             call.respond(HttpStatusCode.OK)
         }
 
-        delete({ deleteAnnouncementDocs() }) {
-            val announcementId = call.parameters["id"]
+        delete("".byPathParam("announcementId"), { deleteAnnouncementDocs() }) {
+            val announcementId = call.parameters["announcementId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("공지 ID")
             usecase.delete(AnnouncementId(announcementId))

@@ -5,6 +5,7 @@ import com.turnin.common.firebase.firebaseModule
 import com.turnin.common.jwt.di.jwtModule
 import com.turnin.common.ml.embeddingModule
 import com.turnin.domain.account.di.accountModule
+import com.turnin.domain.announcement.di.announcementModule
 import com.turnin.domain.auth.di.authModule
 import com.turnin.domain.block.di.blockModule
 import com.turnin.domain.discover.di.discoverModule
@@ -42,6 +43,7 @@ fun Application.configureKoin() {
             blockModule,
             accountModule,
             notificationModule,
+            announcementModule,
             // 3rd service
             embeddingModule,
             firebaseModule,

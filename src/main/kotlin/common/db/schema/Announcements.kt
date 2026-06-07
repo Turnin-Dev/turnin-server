@@ -17,7 +17,7 @@ object Announcements : BaseLongIdTable("announcement") {
         .default(AnnouncementAudience.ALL)
     val status = customPostgresEnum<AnnouncementStatus>("status", "announcement_status")
         .default(AnnouncementStatus.INACTIVE)
-    val expiresAt = timestamptz("expires_at").nullable()
+    val expiresAt = timestamptz("expires_at", setDefault = false).nullable()
 
     init {
         index("idx_announcement_status_expires", false, status, expiresAt)
