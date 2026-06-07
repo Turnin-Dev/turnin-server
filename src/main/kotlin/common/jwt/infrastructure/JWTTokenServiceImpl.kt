@@ -91,7 +91,7 @@ class JWTTokenServiceImpl(
             .withSubject(payload.userId)
             .apply {
                 payload.claims.forEach { (claimName, value) ->
-                    withClaim(claimName.name, value)
+                    withClaim(claimName.key, value)
                 }
             }.withJWTId(checksum)
             .withIssuedAt(issuedAt)

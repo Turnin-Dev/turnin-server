@@ -82,7 +82,7 @@ class JWTTokenServiceImplTest {
         assertEquals(payload.userId, decodedRefreshToken.subject)
         assertEquals(
             payload.claims[JWTClaimName.DISPLAY_ID],
-            decodedAccessToken.getClaim(JWTClaimName.DISPLAY_ID.name).asString(),
+            decodedAccessToken.getClaim(JWTClaimName.DISPLAY_ID.key).asString(),
         )
     }
 
@@ -296,7 +296,7 @@ class JWTTokenServiceImplTest {
         assertEquals(payload.userId, result!!.subject)
         assertEquals(
             payload.claims[JWTClaimName.DISPLAY_ID],
-            result.getClaim(JWTClaimName.DISPLAY_ID.name).asString(),
+            result.getClaim(JWTClaimName.DISPLAY_ID.key).asString(),
         )
     }
 

@@ -81,9 +81,9 @@ private fun Application.testJwtSecurity() {
             verifier(testVerifier)
             realm = testRealm
             validate { credential ->
-                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
+                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.key)?.asString()
                 val hasAudience = credential.payload.audience.contains(testAudience)
-                val role = credential.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
+                val role = credential.payload.getClaim(JWTClaimName.ROLE.key)?.asString()
                 if (
                     displayIdClaim?.isNotEmpty() == true &&
                     role != null &&
@@ -103,9 +103,9 @@ private fun Application.testJwtSecurity() {
             verifier(testVerifier)
             realm = testRealm
             validate { credential ->
-                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
+                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.key)?.asString()
                 val hasAudience = credential.payload.audience.contains(testAudience)
-                val role = credential.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
+                val role = credential.payload.getClaim(JWTClaimName.ROLE.key)?.asString()
                 if (
                     displayIdClaim?.isNotEmpty() == true &&
                     role == Role.ADMIN.name &&

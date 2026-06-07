@@ -27,8 +27,8 @@ fun Application.configureJwtSecurity() {
             verifier(userVerifier)
             realm = userJwtService.realm
             validate { credential ->
-                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
-                val roleClaim = credential.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
+                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.key)?.asString()
+                val roleClaim = credential.payload.getClaim(JWTClaimName.ROLE.key)?.asString()
                 val jwtId = credential.payload.id
                 if (
                     displayIdClaim?.isNotEmpty() == true &&
@@ -49,8 +49,8 @@ fun Application.configureJwtSecurity() {
             verifier(adminVerifier)
             realm = adminJwtService.realm
             validate { credential ->
-                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.name)?.asString()
-                val roleClaim = credential.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
+                val displayIdClaim = credential.payload.getClaim(JWTClaimName.DISPLAY_ID.key)?.asString()
+                val roleClaim = credential.payload.getClaim(JWTClaimName.ROLE.key)?.asString()
                 val jwtId = credential.payload.id
                 if (
                     displayIdClaim?.isNotEmpty() == true &&

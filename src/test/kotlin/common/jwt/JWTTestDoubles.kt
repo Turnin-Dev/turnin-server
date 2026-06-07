@@ -106,7 +106,7 @@ private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
         .withSubject(payload.userId)
         .apply {
             payload.claims.forEach { (claimName, value) ->
-                withClaim(claimName.name, value)
+                withClaim(claimName.key, value)
             }
         }.withIssuedAt(Date.from(now))
         .withExpiresAt(Date.from(now.plusMillis(ACCESS_TOKEN_EXPIRES_IN)))

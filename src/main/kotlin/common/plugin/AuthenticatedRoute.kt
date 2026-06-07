@@ -97,7 +97,7 @@ class AuthenticatedRoute(private val route: Route) : Route by route {
      */
     fun RoutingContext.extractUserRoleWithToken(): Role {
         val principal = call.principal<JWTPrincipal>() ?: throw TokenException.InvalidTokenException()
-        val role = principal.payload.getClaim(JWTClaimName.ROLE.name)?.asString()
+        val role = principal.payload.getClaim(JWTClaimName.ROLE.key)?.asString()
             ?: throw TokenException.InvalidTokenException()
         return try {
             Role.valueOf(role)
