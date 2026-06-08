@@ -10,6 +10,7 @@ import com.turnin.common.jwt.JWTTestDoubles.REFRESH_TOKEN_EXPIRES_IN
 import com.turnin.common.jwt.domain.model.JWTClaimName
 import com.turnin.common.jwt.domain.model.JWTToken
 import com.turnin.common.jwt.domain.model.JWTTokenPayload
+import com.turnin.common.plugin.AuthRole
 import java.time.Instant
 import java.util.Date
 
@@ -27,26 +28,27 @@ internal object JWTTestDoubles {
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
         .build()
-    val MockRefreshTokenVerifier = JWT
-        .require(MockAlgorithm)
-        .build()
 
     fun getJWTTokenPayload(
         subject: String = "user123",
-        claimName: JWTClaimName = JWTClaimName.DISPLAY_ID,
-        claim: String = "DISPLAY_ID123",
+        role: AuthRole = AuthRole.USER,
     ): JWTTokenPayload = JWTTokenPayload(
         userId = subject,
-        claimName = claimName,
-        claim = claim,
+        claims = mapOf(
+            JWTClaimName.DISPLAY_ID to "DISPLAY_ID123",
+            JWTClaimName.ROLE to role.name,
+        ),
     )
 
     fun getMockJWTToken(
         payload: JWTTokenPayload = getJWTTokenPayload(),
     ): JWTToken = generateTestToken(payload)
 
-    fun getMockJWTToken(subject: String): JWTToken =
-        generateTestToken(getJWTTokenPayload(subject))
+    fun getMockJWTToken(
+        subject: String,
+        role: AuthRole = AuthRole.USER,
+    ): JWTToken =
+        generateTestToken(getJWTTokenPayload(subject, role))
 
     fun getExpiredRefreshToken(subject: String = "user123"): String {
         val now = Instant.now()
@@ -102,8 +104,11 @@ private fun generateTestToken(payload: JWTTokenPayload): JWTToken {
         .withAudience(AUDIENCE)
         .withIssuer(ISSUER)
         .withSubject(payload.userId)
-        .withClaim(payload.claimName.name, payload.claim)
-        .withIssuedAt(Date.from(now))
+        .apply {
+            payload.claims.forEach { (claimName, value) ->
+                withClaim(claimName.key, value)
+            }
+        }.withIssuedAt(Date.from(now))
         .withExpiresAt(Date.from(now.plusMillis(ACCESS_TOKEN_EXPIRES_IN)))
         .sign(MockAlgorithm)
     val refreshToken = JWT

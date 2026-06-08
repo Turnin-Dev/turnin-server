@@ -1,5 +1,7 @@
 package com.turnin.domain.auth.domain.repository
 
+import com.turnin.common.db.DatabaseException.DuplicatedDataException
+import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
@@ -47,9 +49,14 @@ interface AuthRepository {
      *
      * - 활성화된 사용자: `role: Role.User`, `isActive: true`
      *
-     * @exception com.turnin.common.db.DatabaseException.DuplicatedDataException - 이미 존재하는 사용자 저장 시 예외 발생
+     * @param register 회원가입 모델
+     * @param role 사용자 역할
+     * @exception DuplicatedDataException - 이미 존재하는 사용자 저장 시 예외 발생
      */
-    suspend fun save(register: Register): AuthUser
+    suspend fun save(
+        register: Register,
+        role: Role,
+    ): AuthUser
 
     /**
      * 사용자의 마지막 로그인 시점을 업데이트 한다.

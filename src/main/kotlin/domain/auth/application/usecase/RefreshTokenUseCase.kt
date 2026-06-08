@@ -132,8 +132,10 @@ class RefreshTokenUseCase(
         // 3) 액세스 토큰 재발급
         val payload = JWTTokenPayload(
             userId = authUser.userId.value.toString(),
-            claimName = JWTClaimName.DISPLAY_ID,
-            claim = authUser.displayId.value,
+            claims = mapOf(
+                JWTClaimName.DISPLAY_ID to authUser.displayId.value,
+                JWTClaimName.ROLE to authUser.role.name,
+            ),
         )
 
         return try {

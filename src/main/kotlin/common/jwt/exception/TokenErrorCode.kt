@@ -19,7 +19,7 @@ sealed class TokenErrorCode(
         TokenErrorCode(raw = T004, description = "토큰을 디코딩 할 수 없습니다.")
 
     data object UnauthorizedUser :
-        TokenErrorCode(raw = T005, description = "본인만 조회 가능합니다.")
+        TokenErrorCode(raw = T005, description = "인가되지 않은 사용자입니다.")
 
     data object TokenExpired :
         TokenErrorCode(raw = T006, description = "토큰이 만료되었습니다.")

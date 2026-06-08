@@ -77,11 +77,21 @@ object DatabaseUtils {
      * [timestampWithTimeZone] 간소화 버전
      *
      * `Postgres`일 때만 `timestampWithTimeZone`사용하고 이 외에는 대체 타입 사용
+     *
+     * @param name 필드명
+     * @param setDefault 기본값 여부
      */
-    fun Table.timestamptz(name: String): Column<OffsetDateTime> = if (currentDialect is PostgreSQLDialect) {
-        timestampWithTimeZone(name).defaultExpression(timestampExpression)
+    fun Table.timestamptz(
+        name: String,
+        setDefault: Boolean = true,
+    ): Column<OffsetDateTime> = if (currentDialect is PostgreSQLDialect) {
+        timestampWithTimeZone(name).apply {
+            if (setDefault) defaultExpression(timestampExpression)
+        }
     } else {
-        registerColumn(name, JavaOffsetDateTimeColumnType()).defaultExpression(timestampExpression)
+        registerColumn(name, JavaOffsetDateTimeColumnType()).apply {
+            if (setDefault) defaultExpression(timestampExpression)
+        }
     }
 
     /**

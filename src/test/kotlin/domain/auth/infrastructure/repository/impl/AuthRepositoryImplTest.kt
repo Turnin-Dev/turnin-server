@@ -2,6 +2,7 @@ package com.turnin.domain.auth.infrastructure.repository.impl
 
 import com.turnin.common.db.DatabaseException
 import com.turnin.common.model.Introduce
+import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
@@ -36,7 +37,7 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `save & findByProviderAndProviderId 성공 테스트`() = runTest {
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         assertTrue(savedUser.userId.value > 0L)
 
         val foundUser = repository.findAuthUserByProviderAndProviderId(
@@ -51,7 +52,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findByProviderAndProviderId 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 사용자 생성 후 비활성화
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         assertTrue(savedUser.userId.value > 0L)
         setUserInactiveForTest(savedUser.userId)
 
@@ -77,12 +78,12 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `save 실패 테스트 - 중복된 providerId 저장 시도`() = runTest {
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
 
         assertTrue(savedUser.userId.value > 0L)
 
         val exception = assertFailsWith<DatabaseException.DuplicatedDataException> {
-            repository.save(TestRegister) // 동일한 providerId 삽입 시도
+            repository.save(TestRegister, Role.USER) // 동일한 providerId 삽입 시도
         }
 
         println("발생한 예외: ${exception.message}")
@@ -91,7 +92,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findUserByUserId 성공 테스트`() = runTest {
         // given
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         assertTrue(savedUser.userId.value > 0L)
 
         // when
@@ -105,7 +106,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `findUserByUserId 성공 테스트 - 비활성화 사용자는 조회되지 않는다`() = runTest {
         // given: 사용자 생성 후 비활성화
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         assertTrue(savedUser.userId.value > 0L)
         setUserInactiveForTest(savedUser.userId)
 
@@ -128,7 +129,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `updateLastLoginAt 성공 테스트`() = runTest {
         // given
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         val userId = savedUser.userId
 
         // when
@@ -145,7 +146,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `updateLastLoginAt 실패 테스트 - 2초 뒤에 시간과 비교`() = runTest {
         // given
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         val userId = savedUser.userId
 
         // when
@@ -162,7 +163,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `existsByDisplayId 성공 테스트`() = runTest {
         // given
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         val displayId = savedUser.displayId
 
         // when
@@ -175,7 +176,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `existsByDisplayId 성공 테스트 - 비활성화 사용자도 조회 가능하다`() = runTest {
         // given: 사용자 생성 후 비활성화
-        val savedUser = repository.save(TestRegister)
+        val savedUser = repository.save(TestRegister, Role.USER)
         val displayId = savedUser.displayId
         setUserInactiveForTest(savedUser.userId)
 

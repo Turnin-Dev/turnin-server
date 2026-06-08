@@ -86,7 +86,7 @@ class LoginUseCaseTransactionTest {
             }
         }
 
-        jwtTokenService = JWTTokenServiceImpl(appConfigManager)
+        jwtTokenService = JWTTokenServiceImpl(appConfigManager, SECRET)
         usecase = LoginUseCase(authRepository, refreshTokenRepository, jwtTokenService)
     }
 

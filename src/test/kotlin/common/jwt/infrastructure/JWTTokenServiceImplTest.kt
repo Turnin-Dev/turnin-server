@@ -3,6 +3,7 @@ package com.turnin.common.jwt.infrastructure
 import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.turnin.common.jwt.JWTTestDoubles
+import com.turnin.common.jwt.domain.model.JWTClaimName
 import com.turnin.common.jwt.domain.model.JWTTokenType
 import com.turnin.common.jwt.domain.service.JWTTokenService
 import com.turnin.common.jwt.exception.TokenException
@@ -53,7 +54,7 @@ class JWTTokenServiceImplTest {
             }
         }
 
-        jwtTokenService = JWTTokenServiceImpl(appConfigManager)
+        jwtTokenService = JWTTokenServiceImpl(appConfigManager, JWTTestDoubles.SECRET)
     }
 
     // ==================== generate ====================
@@ -76,10 +77,13 @@ class JWTTokenServiceImplTest {
         val decodedRefreshToken = JWT.decode(token.refreshToken)
 
         assertEquals(payload.userId, decodedAccessToken.subject)
-        assertEquals(payload.claim, decodedAccessToken.getClaim(payload.claimName.name).asString())
         assertEquals(JWTTestDoubles.ISSUER, decodedAccessToken.issuer)
         assert(JWTTestDoubles.AUDIENCE in decodedAccessToken.audience)
         assertEquals(payload.userId, decodedRefreshToken.subject)
+        assertEquals(
+            payload.claims[JWTClaimName.DISPLAY_ID],
+            decodedAccessToken.getClaim(JWTClaimName.DISPLAY_ID.key).asString(),
+        )
     }
 
     @Test
@@ -290,7 +294,10 @@ class JWTTokenServiceImplTest {
         // then
         assertNotNull(result)
         assertEquals(payload.userId, result!!.subject)
-        assertEquals(payload.claim, result.getClaim(payload.claimName.name).asString())
+        assertEquals(
+            payload.claims[JWTClaimName.DISPLAY_ID],
+            result.getClaim(JWTClaimName.DISPLAY_ID.key).asString(),
+        )
     }
 
     @Test

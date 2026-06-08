@@ -1,6 +1,8 @@
 package com.turnin.util.db
 
 import com.turnin.common.db.DatabaseException
+import com.turnin.common.db.schema.AnnouncementReads
+import com.turnin.common.db.schema.Announcements
 import com.turnin.common.db.schema.BlockReasons
 import com.turnin.common.db.schema.Blocks
 import com.turnin.common.db.schema.Friends
@@ -13,6 +15,8 @@ import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
 import com.turnin.common.ml.keywordCategory.KeywordCategory
+import com.turnin.common.model.AnnouncementAudience
+import com.turnin.common.model.AnnouncementStatus
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.Role
@@ -45,6 +49,8 @@ object TestDatabaseFactory {
                 "friend_status" to FriendRequestStatus.entries.map { it.name },
                 "noti_type" to NotificationType.entries.map { it.name },
                 "keyword_category" to KeywordCategory.entries.map { it.name },
+                "announcement_audience" to AnnouncementAudience.entries.map { it.name },
+                "announcement_status" to AnnouncementStatus.entries.map { it.name },
             )
 
             enums.forEach { (typeName, values) ->
@@ -65,6 +71,8 @@ object TestDatabaseFactory {
                 Blocks,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
 
             initData()
@@ -85,6 +93,8 @@ object TestDatabaseFactory {
                 Blocks,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
 
             SchemaUtils.create(
@@ -99,6 +109,8 @@ object TestDatabaseFactory {
                 Blocks,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
 
             initData()
