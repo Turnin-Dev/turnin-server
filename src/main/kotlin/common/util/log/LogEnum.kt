@@ -32,8 +32,8 @@ enum class LogType(val value: String) {
 // 명명 규칙: [도메인]_[행위]_[상태] (일부 생략 가능)
 enum class LogAction(val value: String) {
     // 관리자 액션
-    ADMIN_AUTH_FAILURE("admin_auth_failure"),
-    ADMIN_AUTH_SUCCESS("admin_auth_success"),
+    ADMIN_AUTH_FAILURE("ADMIN_AUTH_FAILURE"),
+    ADMIN_AUTH_SUCCESS("ADMIN_AUTH_SUCCESS"),
 
     // 회원 액션
     REGISTER_ATTEMPT("REGISTER_ATTEMPT"),

@@ -12,7 +12,10 @@ val jwtModule = module {
 
         JWTTokenServiceImpl(
             appConfig = appConfig,
-            secretKey = appConfig.get("ktor.security.jwt.secret") ?: error("User JWT secret key is not configured"),
+            secretKey = appConfig
+                .get("ktor.security.jwt.secret")
+                ?.takeIf { it.isNotBlank() }
+                ?: error("User JWT secret key is not configured or blank"),
         )
     }
 
@@ -21,7 +24,10 @@ val jwtModule = module {
 
         JWTTokenServiceImpl(
             appConfig = appConfig,
-            secretKey = appConfig.get("ktor.admin.jwtSecretKey") ?: error("Admin JWT secret key is not configured"),
+            secretKey = appConfig
+                .get("ktor.admin.jwtSecretKey")
+                ?.takeIf { it.isNotBlank() }
+                ?: error("Admin JWT secret key is not configured or blank"),
         )
     }
 }
