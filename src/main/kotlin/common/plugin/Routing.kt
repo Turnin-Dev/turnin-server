@@ -11,7 +11,9 @@ import com.turnin.domain.announcement.application.usecase.AnnouncementAdminUseCa
 import com.turnin.domain.announcement.application.usecase.AnnouncementUseCases
 import com.turnin.domain.announcement.presentation.route.announcementAdminRoutes
 import com.turnin.domain.announcement.presentation.route.announcementRoutes
+import com.turnin.domain.auth.application.usecase.AuthAdminUseCases
 import com.turnin.domain.auth.application.usecase.AuthUseCases
+import com.turnin.domain.auth.presentation.route.authAdminRoutes
 import com.turnin.domain.auth.presentation.route.authRoutes
 import com.turnin.domain.block.application.usecase.BlockUseCases
 import com.turnin.domain.block.presentation.route.blockRoutes
@@ -50,6 +52,7 @@ fun Application.configureRouting() {
 
     val accountUseCases by inject<AccountUseCases>()
     val authUseCases by inject<AuthUseCases>()
+    val authAdminUseCases by inject<AuthAdminUseCases>()
     val userUseCases by inject<UserUseCases>()
     val fileUseCases by inject<FileUseCases>()
     val keywordUseCases by inject<KeywordUseCases>()
@@ -93,8 +96,9 @@ fun Application.configureRouting() {
                 }
             }
 
+            // 관리자 라우트
             route(Api.Admin.ROUTE, { description = "Admin API" }) {
-                // 관리자 라우트
+                authAdminRoutes(route = Api.Admin.Auth, usecase = authAdminUseCases)
                 authenticatedAdminRoute {
                     announcementAdminRoutes(route = Api.Admin.Announcement, usecase = announcementAdminUseCases)
                 }

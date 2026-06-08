@@ -26,6 +26,12 @@ object Api {
             const val TAG = "Announcement"
             const val STATUS = "/status"
         }
+
+        object Auth {
+            const val ROUTE = "/auth"
+            const val TAG = "Auth"
+            const val REGISTER = "/register"
+        }
     }
 
     object V1 {

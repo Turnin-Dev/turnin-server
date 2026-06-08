@@ -52,8 +52,10 @@ class AuthRepositoryImpl : AuthRepository {
             .not()
     }
 
-    override suspend fun save(register: Register): AuthUser = suspendTransaction {
-        val role = Role.USER
+    override suspend fun save(
+        register: Register,
+        role: Role,
+    ): AuthUser = suspendTransaction {
         val isActive = true
         val lastLoginAt = TurninDateTime.now()
 

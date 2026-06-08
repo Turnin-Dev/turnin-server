@@ -17,7 +17,7 @@ data class CreateAnnouncementRequest(
     val title: String,
     val content: String,
     val targetAudience: AnnouncementAudience,
-    val expiresAt: Long?,
+    val expiresAt: Long? = null,
 ) {
     fun toDto() = AnnouncementDetail(
         title = title,
@@ -31,7 +31,7 @@ data class CreateAnnouncementRequest(
             title = "공지 제목",
             content = "공지 내용",
             targetAudience = AnnouncementAudience.ALL,
-            expiresAt = null,
+            expiresAt = 1000,
         )
     }
 }

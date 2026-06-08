@@ -5,6 +5,7 @@ import com.turnin.common.jwt.application.dto.toDto
 import com.turnin.common.jwt.domain.model.JWTClaimName
 import com.turnin.common.jwt.domain.model.JWTTokenPayload
 import com.turnin.common.jwt.domain.service.JWTTokenService
+import com.turnin.common.model.Role
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.log.LogAction
 import com.turnin.common.util.log.LogTag
@@ -19,12 +20,12 @@ import com.turnin.domain.auth.domain.repository.AuthRepository
 import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
 import com.turnin.domain.auth.exception.AuthException
 import com.turnin.domain.auth.exception.AuthException.DuplicateUserException
-import org.koin.core.annotation.Named
 
 class RegisterUseCase(
     private val authRepository: AuthRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
-    @Named("user") private val jwtTokenService: JWTTokenService,
+    private val jwtTokenService: JWTTokenService,
+    private val role: Role,
 ) {
     /**
      * 회원가입
@@ -44,7 +45,7 @@ class RegisterUseCase(
 
         val (savedAuthUser, registerResultDto) = suspendTransaction {
             val authUser = registerDto.toDomain()
-            val registerResult = authRegister(authUser)
+            val registerResult = authRegister(authUser, role)
             val savedAuthUser = registerResult.authUser
             val jwtTokenDto = registerResult.jwtToken.toDto()
 
@@ -76,11 +77,15 @@ class RegisterUseCase(
      * 단, 회원가입은 기존 회원이 존재하지 않는다는 가정하에 진행된다.
      *
      * @param register 회원가입 정보 [Register]
+     * @param role 사용자 역할
      *
      * @throws DuplicateUserException 이미 동일한 provider/providerId로 가입된 사용자가 존재하는 경우
      */
-    private suspend fun authRegister(register: Register): RegisterResult {
-        val savedAuthUser = authRepository.save(register)
+    private suspend fun authRegister(
+        register: Register,
+        role: Role,
+    ): RegisterResult {
+        val savedAuthUser = authRepository.save(register, role)
 
         val payload = JWTTokenPayload(
             userId = savedAuthUser.userId.value.toString(),

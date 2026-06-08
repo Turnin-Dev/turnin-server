@@ -18,12 +18,11 @@ import com.turnin.common.util.log.LogTag
 import com.turnin.common.util.log.LogType
 import com.turnin.domain.auth.domain.repository.AuthRepository
 import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
-import org.koin.core.annotation.Named
 
 class RefreshTokenUseCase(
     private val authRepository: AuthRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
-    @Named("user") private val jwtTokenService: JWTTokenService,
+    private val jwtTokenService: JWTTokenService,
 ) {
     /**
      * 리프레쉬 토큰 갱신
