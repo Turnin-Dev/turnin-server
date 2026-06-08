@@ -28,7 +28,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-// TODO: 검토하기
 class AuthAdminRouteTest {
     private val route = Api.Admin.Auth
     private val usecase: AuthAdminUseCases = mockk()

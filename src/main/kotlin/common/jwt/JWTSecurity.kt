@@ -33,6 +33,7 @@ fun Application.configureJwtSecurity() {
                 if (
                     displayIdClaim?.isNotEmpty() == true &&
                     roleClaim?.isNotEmpty() == true &&
+                    roleClaim in Role.allowedUserProviderRoles &&
                     jwtId?.isNotEmpty() == true
                 ) {
                     JWTPrincipal(credential.payload)

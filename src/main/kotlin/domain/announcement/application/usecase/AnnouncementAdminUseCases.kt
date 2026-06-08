@@ -14,7 +14,7 @@ data class AnnouncementAdminUseCases(
      */
     val update: UpdateAnnouncementStatusUseCase,
     /**
-     * 알림 삭제
+     * 공지 삭제
      *
      * @see DeleteAnnouncementUseCase
      */

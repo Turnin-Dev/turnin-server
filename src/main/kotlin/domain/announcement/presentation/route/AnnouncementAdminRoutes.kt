@@ -70,7 +70,7 @@ private fun RouteConfig.updateAnnouncementStatusDocs() {
     summary = "공지 상태 변경"
     description = "공지 상태를 변경한다. (활성/비활성)"
     request {
-        pathParameter<Long>("id") {
+        pathParameter<Long>("announcementId") {
             description = "공지 ID"
         }
         body<UpdateAnnouncementStatusRequest> {
@@ -94,7 +94,7 @@ private fun RouteConfig.deleteAnnouncementDocs() {
     summary = "공지 삭제"
     description = "공지를 삭제한다."
     request {
-        pathParameter<Long>("id") {
+        pathParameter<Long>("announcementId") {
             description = "공지 ID"
         }
     }

@@ -12,7 +12,7 @@ val jwtModule = module {
 
         JWTTokenServiceImpl(
             appConfig = appConfig,
-            secretKey = appConfig.getOrDefault("ktor.security.jwt.secret", "jwt-secret"),
+            secretKey = appConfig.get("ktor.security.jwt.secret") ?: error("User JWT secret key is not configured"),
         )
     }
 

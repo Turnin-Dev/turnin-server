@@ -30,7 +30,7 @@ data class AdminRegisterRequest(
             providerId = "providerIDDDDD",
             displayId = "hong_gd_123",
             name = "honggd",
-            profileImageUrl = "http://example.com/!@#$%^&*/profile.jpg",
+            profileImageUrl = "http://example.com/profile.jpg",
             introduce = "Hello!",
             secretKey = "hello-world!",
         )

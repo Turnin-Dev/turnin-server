@@ -57,7 +57,7 @@ private fun RouteConfig.markAnnouncementAsReadDocs() {
     summary = "공지 읽음 처리"
     description = "공지를 읽음 처리한다. 이미 읽은 공지라면 무시한다."
     request {
-        pathParameter<Long>("id") {
+        pathParameter<Long>("announcementId") {
             description = "공지 ID"
         }
     }
