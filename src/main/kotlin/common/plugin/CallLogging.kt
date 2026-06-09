@@ -24,7 +24,7 @@ fun Application.configureCallLogging() {
             val status = call.response.status()
             val httpMethod = call.request.httpMethod.value
             val userAgent = call.request.headers["User-Agent"]
-            val path = call.request.path()
+            val path = maskPath(call.request.path())
             val queryParams =
                 call.request.queryParameters
                     .entries()
@@ -68,4 +68,26 @@ fun Application.configureCallLogging() {
             }
         }
     }
+}
+
+/**
+ * 경로 마스킹 규칙
+ * - Pair(정규식, 마스킹 변환 함수)
+ * - 새 경로 추가 시 여기에만 추가
+ */
+private val pathMaskingRules: List<Pair<Regex, (MatchResult) -> String>> = listOf(
+    // /api/v1/auth/exists/provider/{provider}/{providerId} → providerId 마스킹
+    Regex("/api/v1/auth/exists/provider/([^/]+)/[^/]+") to
+        { match -> "/api/v1/auth/exists/provider/${match.groupValues[1]}/***" },
+    // /api/v1/auth/exists/displayId/{displayId} → displayId 마스킹
+    Regex("/api/v1/auth/exists/displayId/[^/]+") to
+        { _ -> "/api/v1/auth/exists/displayId/***" },
+)
+
+private fun maskPath(path: String): String {
+    var masked = path
+    pathMaskingRules.forEach { (regex, transform) ->
+        masked = regex.replace(masked, transform)
+    }
+    return masked
 }
