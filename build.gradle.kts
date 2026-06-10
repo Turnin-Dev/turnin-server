@@ -191,4 +191,7 @@ dependencies {
 
     // OpenTelemetry
     implementation(libs.opentelemetry.logback.appender)
+
+    // Logstash Logback Encoder
+    implementation(libs.logstash.logback.encoder)
 }

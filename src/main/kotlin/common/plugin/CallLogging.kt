@@ -2,6 +2,8 @@ package com.turnin.common.plugin
 
 import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.log.LogSanitizer
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.clientIp
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.calllogging.CallLogging
@@ -20,6 +22,7 @@ fun Application.configureCallLogging() {
     install(CallLogging) {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
+        mdc(LogTag.IP.key) { call -> call.clientIp() }
         format { call ->
             val status = call.response.status()
             val httpMethod = call.request.httpMethod.value
