@@ -14,10 +14,10 @@
 
     <!-- ======================== JSON 로컬 확인용 ======================== -->
     <appender name="FILE_NORMAL" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/normal/app-normal.log</file>
+        <file>./logs/normal/app-normal.log</file>
         <filter class="com.turnin.common.util.log.NormalLogFilter"/>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/logs/normal/app-normal-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>./logs/normal/app-normal-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>2</maxHistory>
         </rollingPolicy>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
@@ -26,10 +26,10 @@
     </appender>
 
     <appender name="FILE_PRIVACY" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/privacy/app-privacy.log</file>
+        <file>./logs/privacy/app-privacy.log</file>
         <filter class="com.turnin.common.util.log.PrivacyLogFilter"/>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/logs/privacy/app-privacy-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>./logs/privacy/app-privacy-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>2</maxHistory>
         </rollingPolicy>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>

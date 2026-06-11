@@ -20,7 +20,7 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 매일 자정 롤링 -->
-            <fileNamePattern>/logs/normal/app-normal-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/logs/normal/app-normal-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <!-- 로컬 7일치만 보관 -->
             <maxHistory>7</maxHistory>
         </rollingPolicy>
@@ -37,7 +37,7 @@
         <filter class="com.turnin.common.util.log.PrivacyLogFilter"/>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/logs/privacy/app-privacy-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/logs/privacy/app-privacy-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
 

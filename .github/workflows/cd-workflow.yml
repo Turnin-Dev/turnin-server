@@ -56,7 +56,37 @@ jobs:
     needs: build  # build job 완료 후 실행
 
     steps:
-      # 8. SSH로 서버 접속 → 자동 배포
+      # 1. 코드 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # 2. 배치 위험 구간 체크 (KST 00:55 ~ 01:05)
+      - name: Check deploy time (avoid batch window)
+        run: |
+          NOW=$(TZ="Asia/Seoul" date +"%H%M")
+          if [ "$NOW" -ge "0055" ] && [ "$NOW" -le "0105" ]; then
+            TARGET=$(TZ="Asia/Seoul" date -d "$(TZ="Asia/Seoul" date '+%Y-%m-%d') 01:06:00 KST" +%s)
+            CURRENT=$(date +%s)
+            WAIT=$((TARGET - CURRENT))
+            if [ "$WAIT" -gt "0" ]; then
+              echo "⚠️ 배치 위험 구간입니다. ${WAIT}초 대기합니다. (01:06 재개)"
+              sleep $WAIT
+              echo "✅ 대기 완료. 배포를 재개합니다."
+            fi
+          fi
+
+      # 3. docker-compose.yml 서버로 전송
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          fingerprint: ${{ secrets.SSH_HOST_FINGERPRINT }}
+          source: "docker-compose.yml"
+          target: "~/turnin/"
+
+      # 4. SSH로 서버 접속 → 자동 배포
       - name: Deploy to Lightsail
         uses: appleboy/ssh-action@v1.0.1
         with:

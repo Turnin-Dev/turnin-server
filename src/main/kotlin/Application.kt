@@ -4,6 +4,7 @@ import com.turnin.ApplicationUtils.initDatabase
 import com.turnin.ApplicationUtils.printSection
 import com.turnin.ApplicationUtils.printServerSettings
 import com.turnin.ApplicationUtils.printTimeZone
+import com.turnin.common.batch.configureBatch
 import com.turnin.common.di.configureKoin
 import com.turnin.common.exception.configureExceptionHandler
 import com.turnin.common.firebase.FirebaseAdmin
@@ -50,6 +51,9 @@ fun Application.module() {
 
     configureAPIDocuments()
     configureRouting()
+
+    // ------------------------------ Batch ------------------------------
+    configureBatch()
 
     // ------------------------------ Print ------------------------------
     val timeZoneInfo = getTimeZoneInfo()
