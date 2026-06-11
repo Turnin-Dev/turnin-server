@@ -69,6 +69,7 @@ class AuthRepositoryImpl : AuthRepository {
             this.introduce = register.introduce.value
             this.isActive = isActive
             this.lastLoginAt = lastLoginAt
+            this.deletedAt = null
         }
 
         register.toAuthUser(

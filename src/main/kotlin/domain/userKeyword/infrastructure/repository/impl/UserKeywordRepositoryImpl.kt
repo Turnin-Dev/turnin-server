@@ -198,6 +198,10 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         } > 0
     }
 
+    override suspend fun deleteByUserId(userId: UserId): Unit = suspendTransaction {
+        UserKeywords.deleteWhere { UserKeywords.userId eq userId.value }
+    }
+
     override suspend fun deactivate(
         ownerId: UserId,
         userKeywordId: UserKeywordId,

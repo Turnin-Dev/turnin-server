@@ -68,10 +68,10 @@ class LogBackupBatchTest {
         batch.run()
 
         verify(exactly = 1) {
-            r2Client.putObject(normalBucket, "logs/normal/app-normal-$dateStr.log", normalFile)
+            r2Client.putObject(normalBucket, "logs/normal/app-normal-$dateStr.log.gz", normalFile)
         }
         verify(exactly = 1) {
-            r2Client.putObject(privacyBucket, "logs/privacy/app-privacy-$dateStr.log", privacyFile)
+            r2Client.putObject(privacyBucket, "logs/privacy/app-privacy-$dateStr.log.gz", privacyFile)
         }
         assert(!normalFile.exists()) { "normalFile should be deleted" }
         assert(!privacyFile.exists()) { "privacyFile should be deleted" }
@@ -166,13 +166,13 @@ class LogBackupBatchTest {
 
         batch.run()
 
-        assertEquals("logs/normal/app-normal-$dateStr.log", keySlot.captured)
+        assertEquals("logs/normal/app-normal-$dateStr.log.gz", keySlot.captured)
     }
 
     // ================ 헬퍼 ================
 
     private fun createTempLogFile(dir: File, prefix: String): File =
-        File(dir, "$prefix-$dateStr.log").apply {
+        File(dir, "$prefix-$dateStr.log.gz").apply {
             writeText("dummy log content")
         }
 }

@@ -42,7 +42,7 @@ class LogBackupBatch(
             "LogBackupBatch running: date=$yesterday",
             mapOf(
                 LogTag.LOG_TYPE.key to LogType.NORMAL.value,
-                LogTag.ACTION.key to LogAction.LOG_BACKUP_START.value,
+                LogTag.ACTION.key to LogAction.LOG_BACKUP_BATCH_START.value,
             ),
         )
 
@@ -66,7 +66,7 @@ class LogBackupBatch(
                 "LogBackupBatch completed with failures",
                 mapOf(
                     LogTag.LOG_TYPE.key to LogType.NORMAL.value,
-                    LogTag.ACTION.key to LogAction.LOG_BACKUP_FAILURE.value,
+                    LogTag.ACTION.key to LogAction.LOG_BACKUP_BATCH_FAILURE.value,
                 ),
             )
         } else {
@@ -74,7 +74,7 @@ class LogBackupBatch(
                 "LogBackupBatch completed successfully",
                 mapOf(
                     LogTag.LOG_TYPE.key to LogType.NORMAL.value,
-                    LogTag.ACTION.key to LogAction.LOG_BACKUP_SUCCESS.value,
+                    LogTag.ACTION.key to LogAction.LOG_BACKUP_BATCH_SUCCESS.value,
                 ),
             )
         }

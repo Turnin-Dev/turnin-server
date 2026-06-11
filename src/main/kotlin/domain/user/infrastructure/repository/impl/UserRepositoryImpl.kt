@@ -14,7 +14,10 @@ import com.turnin.domain.user.domain.model.User
 import com.turnin.domain.user.domain.model.UserPatch
 import com.turnin.domain.user.domain.repository.UserRepository
 import com.turnin.domain.user.infrastructure.mapper.UserMapper.toDomain
+import java.time.Instant
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.notExists
@@ -129,6 +132,29 @@ class UserRepositoryImpl : UserRepository {
             it[name] = "탈퇴한 사용자"
             it[introduce] = ""
             it[profileImageUrl] = null
+
+            // 3. 탈퇴 시각 설정
+            it[deletedAt] = TurninDateTime.now()
         }
+    }
+
+    override suspend fun delete(userId: UserId): Unit = suspendTransaction {
+        Users.deleteWhere { Users.id eq userId.value }
+    }
+
+    override suspend fun findExpiredUsers(
+        expiredBefore: Instant,
+        limit: Int,
+        offset: Int,
+    ): List<Long> = suspendTransaction {
+        Users
+            .selectAll()
+            .where {
+                (Users.isActive eq false) and
+                    // deletedAt이 expiredBefore 이전인 사용자만 조회 (1년 경과 판별)
+                    (Users.deletedAt lessEq expiredBefore)
+            }.limit(limit)
+            .offset(offset.toLong())
+            .map { it[Users.id].value }
     }
 }

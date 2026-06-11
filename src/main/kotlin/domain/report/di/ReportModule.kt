@@ -1,5 +1,6 @@
 package com.turnin.domain.report.di
 
+import com.turnin.domain.report.application.provider.ReportDeletionSupportApi
 import com.turnin.domain.report.application.provider.ReportProviderApi
 import com.turnin.domain.report.application.usecase.CreateReportUseCase
 import com.turnin.domain.report.application.usecase.GetReportReasonsUseCase
@@ -14,6 +15,7 @@ val reportModule = module {
 
     // Provider
     single { ReportProviderApi(get()) }
+    single { ReportDeletionSupportApi(get()) }
 
     // Usecase
     single { GetReportReasonsUseCase(get()) }

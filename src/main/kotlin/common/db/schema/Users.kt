@@ -20,6 +20,7 @@ object Users : BaseLongIdTable("user") {
     val introduce = text("introduce")
     val isActive = bool("is_active").default(true)
     val lastLoginAt = timestamp("last_login_at")
+    val deletedAt = timestamp("deleted_at").nullable()
 
     init {
         uniqueIndex("uq_provider_user", provider, providerId)
@@ -39,4 +40,5 @@ class UserEntity(id: EntityID<Long>) : BaseEntity(id, Users) {
     var introduce by Users.introduce
     var isActive by Users.isActive
     var lastLoginAt by Users.lastLoginAt
+    var deletedAt by Users.deletedAt
 }

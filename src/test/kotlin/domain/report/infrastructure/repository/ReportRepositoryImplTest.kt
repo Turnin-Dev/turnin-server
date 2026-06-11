@@ -24,6 +24,8 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.selectAll
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -228,6 +230,59 @@ class ReportRepositoryImplTest {
 
         // then: 존재 여부 검증
         assertFalse(isExists)
+    }
+
+    @Test
+    fun `사용자의 모든 신고 관계 삭제 - 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val userKeywordId = insertUserKeywordAndReturnId(userId.value)
+        val reportReason = repository.createReportReason(
+            code = TEST_REPORT_REASON_CODE,
+            description = TEST_REPORT_REASON_DESCRIPTION,
+        )
+        TestDatabaseFactory.dbQuery {
+            Reports.insert {
+                it[reporterId] = EntityID(userId.value, Users)
+                it[reportedUserKeywordId] = EntityID(userKeywordId.value, UserKeywords)
+                it[reasonId] = EntityID(reportReason.id.value, ReportReasons)
+            }
+        }
+        assertTrue(repository.existsByUserKeywordId(userKeywordId))
+
+        // when
+        repository.deleteByUserId(userId)
+
+        // then
+        val count = TestDatabaseFactory.dbQuery {
+            Reports
+                .selectAll()
+                .where {
+                    (Reports.reporterId eq userId.value) or
+                        (Reports.reportedId eq userId.value)
+                }.count()
+        }
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun `사용자의 모든 신고 관계 삭제 - 사용자의 신고 내역이 없는 경우 정상 종료`() = runTest {
+        // given
+        val userId = UserId(1L)
+
+        // when
+        repository.deleteByUserId(userId)
+
+        // then
+        val count = TestDatabaseFactory.dbQuery {
+            Reports
+                .selectAll()
+                .where {
+                    (Reports.reporterId eq userId.value) or
+                        (Reports.reportedId eq userId.value)
+                }.count()
+        }
+        assertEquals(0, count)
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

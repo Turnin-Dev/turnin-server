@@ -300,6 +300,38 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
+    fun `deleteByUserId 성공 테스트`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        repository.create(
+            keywordId = keywordId,
+            userId = userId,
+            description = TestDescription,
+        )
+
+        // when
+        repository.deleteByUserId(userId)
+
+        // then
+        val count = repository.countByUserId(userId)
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun `deleteByUserId 성공 테스트 - 사용자 키워드가 존재하지 않는 경우 정상 종료`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+
+        // when
+        repository.deleteByUserId(userId)
+
+        // then
+        val count = repository.countByUserId(userId)
+        assertEquals(0, count)
+    }
+
+    @Test
     fun `findDescriptionById 성공 테스트`() = runTest {
         // given
         val userId = insertUserAndReturnId("1")

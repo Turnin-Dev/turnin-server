@@ -11,14 +11,27 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.ktor.ext.inject
 
+/**
+ * 배치 설정
+ */
 fun Application.configureBatch() {
     val logBackupBatch by inject<LogBackupBatch>()
+    val hardDeleteExpiredAccountsBatch by inject<HardDeleteExpiredAccountsBatch>()
 
     // 로그 백업: KST 01:00
     launch {
         delayUntilNextRun(kstHour = 1, kstMinute = 0)
         while (true) {
             logBackupBatch.run()
+            delay(24.hours)
+        }
+    }
+
+    // 만료 계정 삭제(Hard Delete): KST 02:00
+    launch {
+        delayUntilNextRun(kstHour = 2, kstMinute = 0)
+        while (true) {
+            hardDeleteExpiredAccountsBatch.run()
             delay(24.hours)
         }
     }
