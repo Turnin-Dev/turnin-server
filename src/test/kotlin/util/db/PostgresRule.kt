@@ -10,6 +10,7 @@ import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.Notifications
 import com.turnin.common.db.schema.RefreshTokens
 import com.turnin.common.db.schema.ReportReasons
+import com.turnin.common.db.schema.Reports
 import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
@@ -107,8 +108,10 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
                 Announcements,
@@ -128,8 +131,10 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
                 Announcements,
@@ -141,8 +146,10 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
                 Announcements,

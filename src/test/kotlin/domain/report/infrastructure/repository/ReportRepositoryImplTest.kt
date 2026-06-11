@@ -58,6 +58,12 @@ class ReportRepositoryImplTest {
     @Test
     fun `신고 사유 조회 성공 테스트`() = runTest {
         // given
+        // 기존에 있는 사유 개수 조회
+        val existsReasonsCount = TestDatabaseFactory
+            .dbQuery {
+                ReportReasons.selectAll().count()
+            }.toInt()
+
         val expectedCount = 5
         repeat(expectedCount) {
             repository.createReportReason(
@@ -70,16 +76,7 @@ class ReportRepositoryImplTest {
         val reportReasons = repository.getReportReasons()
 
         // then
-        assertEquals(expectedCount, reportReasons.size)
-    }
-
-    @Test
-    fun `신고 사유가 없는 경우 빈 리스트를 반환한다`() = runTest {
-        // when
-        val reportReasons = repository.getReportReasons()
-
-        // then
-        assertTrue(reportReasons.isEmpty())
+        assertEquals(expectedCount + existsReasonsCount, reportReasons.size)
     }
 
     @Test
