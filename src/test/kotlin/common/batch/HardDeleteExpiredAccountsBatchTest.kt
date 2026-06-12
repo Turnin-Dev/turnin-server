@@ -23,7 +23,7 @@ class HardDeleteExpiredAccountsBatchTest {
     fun `run - 만료 사용자가 없으면 유스케이스가 호출되지 않는다`() = runTest {
         // given
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(any(), any(), any())
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = null)
         } returns emptyList()
 
         // when
@@ -38,14 +38,10 @@ class HardDeleteExpiredAccountsBatchTest {
         // given: 만료 사용자 3명
         val expiredUserIds = listOf(1L, 2L, 3L)
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(any(), any(), offset = 0)
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = null)
         } returns expiredUserIds
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(
-                any(),
-                any(),
-                offset = HardDeleteExpiredAccountsBatch.CHUNK_SIZE,
-            )
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = 3L)
         } returns emptyList()
         coEvery { hardDeleteExpiredAccountsUseCase(any()) } just runs
 
@@ -63,20 +59,20 @@ class HardDeleteExpiredAccountsBatchTest {
         val firstChunk = (1L..chunkSize).toList()
         val secondChunk = listOf(chunkSize + 1L)
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(any(), any(), offset = 0)
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = null)
         } returns firstChunk
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(any(), any(), offset = chunkSize)
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = chunkSize.toLong())
         } returns secondChunk
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(any(), any(), offset = chunkSize * 2)
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = chunkSize + 1L)
         } returns emptyList()
         coEvery { hardDeleteExpiredAccountsUseCase(any()) } just runs
 
         // when
         batch.run()
 
-        // then: 3번 조회 (offset 0, chunkSize, chunkSize * 2)
+        // then: 3번 조회 (afterId null, chunkSize, chunkSize+1)
         coVerify(exactly = 3) { userDeletionSupportApi.findExpiredUsers(any(), any(), any()) }
         coVerify(exactly = chunkSize + 1) { hardDeleteExpiredAccountsUseCase(any()) }
     }
@@ -86,10 +82,10 @@ class HardDeleteExpiredAccountsBatchTest {
         // given: 만료 사용자 3명, 첫 번째 사용자 삭제 실패
         val expiredUserIds = listOf(1L, 2L, 3L)
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(any(), any(), offset = 0)
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = null)
         } returns expiredUserIds
         coEvery {
-            userDeletionSupportApi.findExpiredUsers(any(), any(), offset = 100)
+            userDeletionSupportApi.findExpiredUsers(any(), any(), afterId = 3L)
         } returns emptyList()
         coEvery { hardDeleteExpiredAccountsUseCase(1L) } throws RuntimeException("delete failed")
         coEvery { hardDeleteExpiredAccountsUseCase(2L) } just runs

@@ -1,7 +1,9 @@
 package com.turnin.common.util
 
 import java.time.Instant
+import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Date
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
@@ -13,6 +15,8 @@ import org.jetbrains.exposed.sql.javatime.CurrentTimestampBase
  * [Instant] 타입을 반환
  */
 object TurninDateTime {
+    val KST: ZoneId = ZoneId.of("Asia/Seoul")
+
     /**
      * DDL 용 DB의 CURRENT_TIMESTAMP 사용
      * ##### 사용 예시
@@ -34,3 +38,6 @@ fun Instant.toDate(): Date = Date.from(this)
 
 fun Instant.toOffsetDateTime(): OffsetDateTime =
     this.atOffset(ZoneOffset.UTC)
+
+fun Instant.toKstDate(): LocalDate =
+    this.atZone(TurninDateTime.KST).toLocalDate()

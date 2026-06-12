@@ -436,7 +436,7 @@ class UserRepositoryImplTest {
         assertNull(result)
     }
 
-    // =============== findExpiredUsers ===============
+// =============== findExpiredUsers ===============
 
     @Test
     fun `findExpiredUsers 성공 테스트`() = runTest {
@@ -458,7 +458,7 @@ class UserRepositoryImplTest {
         val result = repository.findExpiredUsers(
             expiredBefore = oneYearAgo,
             limit = 100,
-            offset = 0,
+            afterId = null,
         )
 
         // then: 만료 사용자 2명만 조회된다
@@ -476,7 +476,7 @@ class UserRepositoryImplTest {
         val result = repository.findExpiredUsers(
             expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
             limit = 100,
-            offset = 0,
+            afterId = null,
         )
 
         // then
@@ -484,24 +484,26 @@ class UserRepositoryImplTest {
     }
 
     @Test
-    fun `findExpiredUsers 성공 테스트 - limit, offset이 적용된다`() = runTest {
+    fun `findExpiredUsers 성공 테스트 - limit, afterId가 적용된다`() = runTest {
         // given: 만료 사용자 5명 생성
         val twoYearsAgo = TurninDateTime.now().minus(730.days.toJavaDuration())
-        repeat(5) {
-            val user = insertUser("${it + 1}")
-            setUserDeletedAtForTest(UserId(user.id.value), twoYearsAgo)
+        (1..5).forEach { i ->
+            insertUser("$i").also { user ->
+                setUserDeletedAtForTest(UserId(user.id.value), twoYearsAgo)
+            }
         }
 
         // when
         val firstChunk = repository.findExpiredUsers(
             expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
             limit = 2,
-            offset = 0,
+            afterId = null,
         )
+        // afterId -> 첫 번째 청크의 마지막 ID를 커서로 사용
         val secondChunk = repository.findExpiredUsers(
             expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
             limit = 2,
-            offset = 2,
+            afterId = firstChunk.last(),
         )
 
         // then
@@ -516,7 +518,7 @@ class UserRepositoryImplTest {
         val result = repository.findExpiredUsers(
             expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
             limit = 100,
-            offset = 0,
+            afterId = null,
         )
 
         // then

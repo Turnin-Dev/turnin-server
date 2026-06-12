@@ -15,6 +15,7 @@ import com.turnin.domain.user.domain.model.UserPatch
 import com.turnin.domain.user.domain.repository.UserRepository
 import com.turnin.domain.user.infrastructure.mapper.UserMapper.toDomain
 import java.time.Instant
+import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -145,16 +146,16 @@ class UserRepositoryImpl : UserRepository {
     override suspend fun findExpiredUsers(
         expiredBefore: Instant,
         limit: Int,
-        offset: Int,
+        afterId: Long?,
     ): List<Long> = suspendTransaction {
         Users
             .selectAll()
             .where {
                 (Users.isActive eq false) and
-                    // deletedAt이 expiredBefore 이전인 사용자만 조회 (1년 경과 판별)
-                    (Users.deletedAt lessEq expiredBefore)
-            }.limit(limit)
-            .offset(offset.toLong())
+                    (Users.deletedAt lessEq expiredBefore) and
+                    (afterId?.let { Users.id greater it } ?: Op.TRUE)
+            }.orderBy(Users.id)
+            .limit(limit)
             .map { it[Users.id].value }
     }
 }

@@ -79,12 +79,15 @@ fun Application.configureCallLogging() {
  * - 새 경로 추가 시 여기에만 추가
  */
 private val pathMaskingRules: List<Pair<Regex, (MatchResult) -> String>> = listOf(
-    // /api/v1/auth/exists/provider/{provider}/{providerId} → providerId 마스킹
-    Regex("/api/v1/auth/exists/provider/([^/]+)/[^/]+") to
-        { match -> "/api/v1/auth/exists/provider/${match.groupValues[1]}/***" },
-    // /api/v1/auth/exists/displayId/{displayId} → displayId 마스킹
-    Regex("/api/v1/auth/exists/displayId/[^/]+") to
-        { _ -> "/api/v1/auth/exists/displayId/***" },
+    // /auth/exists/provider/{provider}/{providerId} → providerId 마스킹
+    Regex("/auth/exists/provider/([^/]+)/[^/]+") to
+        { match -> "/auth/exists/provider/${match.groupValues[1]}/***" },
+    // /auth/exists/displayId/{displayId} → displayId 마스킹
+    Regex("/auth/exists/displayId/[^/]+") to
+        { _ -> "/auth/exists/displayId/***" },
+    // 숫자로 된 경로 파라미터 마스킹 (userId, notificationId, keywordId 등)
+    Regex("/[0-9]+") to
+        { _ -> "/***" },
 )
 
 private fun maskPath(path: String): String {

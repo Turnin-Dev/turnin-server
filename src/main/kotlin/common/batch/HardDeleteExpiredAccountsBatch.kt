@@ -32,12 +32,12 @@ class HardDeleteExpiredAccountsBatch(
         // 탈퇴 기준 시각: 현재 시각으로부터 1년 전
         val expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration())
 
-        var offset = 0
+        var afterId: Long? = null
         while (true) {
             val expiredUsers = userDeletionSupportApi.findExpiredUsers(
                 expiredBefore = expiredBefore,
                 limit = CHUNK_SIZE,
-                offset = offset,
+                afterId = afterId,
             )
 
             if (expiredUsers.isEmpty()) break
@@ -59,9 +59,8 @@ class HardDeleteExpiredAccountsBatch(
                         ),
                     )
                 }
+                afterId = userId
             }
-
-            offset += CHUNK_SIZE
         }
 
         LOGGER.info(

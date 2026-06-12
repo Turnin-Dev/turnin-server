@@ -1,5 +1,6 @@
 package com.turnin.common.batch
 
+import com.turnin.common.di.ApplicationScopeQualifier
 import com.turnin.common.util.log.AppLoggerFactory
 import io.ktor.server.application.Application
 import java.time.Clock
@@ -7,6 +8,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlin.time.Duration.Companion.hours
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.ktor.ext.inject
@@ -15,23 +17,30 @@ import org.koin.ktor.ext.inject
  * 배치 설정
  */
 fun Application.configureBatch() {
+    val applicationScope by inject<CoroutineScope>(ApplicationScopeQualifier)
     val logBackupBatch by inject<LogBackupBatch>()
     val hardDeleteExpiredAccountsBatch by inject<HardDeleteExpiredAccountsBatch>()
 
     // 로그 백업: KST 01:00
-    launch {
-        delayUntilNextRun(kstHour = 1, kstMinute = 0)
+    applicationScope.launch {
+        val logBackUpBatchName = "LogBackupBatch"
+        delayUntilNextRun(kstHour = 1, kstMinute = 0, batchName = logBackUpBatchName)
         while (true) {
-            logBackupBatch.run()
+            batchTryCatch(logBackUpBatchName) {
+                logBackupBatch.run()
+            }
             delay(24.hours)
         }
     }
 
     // 만료 계정 삭제(Hard Delete): KST 02:00
-    launch {
-        delayUntilNextRun(kstHour = 2, kstMinute = 0)
+    applicationScope.launch {
+        val accountDeletionBatchName = "AccountDeletionBatch"
+        delayUntilNextRun(kstHour = 2, kstMinute = 0, batchName = accountDeletionBatchName)
         while (true) {
-            hardDeleteExpiredAccountsBatch.run()
+            batchTryCatch(accountDeletionBatchName) {
+                hardDeleteExpiredAccountsBatch.run()
+            }
             delay(24.hours)
         }
     }
@@ -60,6 +69,7 @@ fun Application.configureBatch() {
 internal suspend fun delayUntilNextRun(
     kstHour: Int,
     kstMinute: Int = 0,
+    batchName: String,
     clock: Clock = Clock.system(ZoneId.of("Asia/Seoul")),
     delayFn: suspend (Long) -> Unit = { ms -> delay(ms) },
 ) {
@@ -69,8 +79,25 @@ internal suspend fun delayUntilNextRun(
         .atTime(kstHour, kstMinute)
         .let { if (it.isBefore(now)) it.plusDays(1) else it }
     val delayMillis = Duration.between(now, next).toMillis()
-    LOGGER.info("LogBackupBatch next run at: $next KST")
+    LOGGER.info("$batchName next run at: $next KST")
     delayFn(delayMillis)
+}
+
+/**
+ * 배치 전용 try-catch
+ *
+ * @param batchName 배치명
+ * @param block 배치 수행 블록
+ */
+private suspend inline fun batchTryCatch(
+    batchName: String,
+    block: suspend () -> Unit,
+) {
+    try {
+        block()
+    } catch (e: Exception) {
+        LOGGER.error(e, "Batch '$batchName' failed")
+    }
 }
 
 private val LOGGER = AppLoggerFactory.createLogger("BatchConfig")

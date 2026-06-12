@@ -142,16 +142,18 @@ interface UserRepository {
     /**
      * 탈퇴 후 [expiredBefore] 이전에 비활성화된 만료 사용자 ID 목록을 조회한다.
      *
-     * 배치 처리를 위해 [limit]와 [offset]으로 청크 단위 페이징을 지원한다.
+     * 배치 처리를 위해 [limit]와 커서 기반 페이지네이션을 지원한다.
+     * 삭제와 동시에 진행되는 배치 특성상 오프셋 방식은 레코드 누락이 발생할 수 있어
+     * [afterId]를 커서로 사용하는 방식으로 구현한다.
      *
      * @param expiredBefore 이 시각 이전에 탈퇴한 사용자를 만료로 판단 (보통 현재 시각 - 1년)
      * @param limit 한 번에 조회할 최대 사용자 수
-     * @param offset 조회 시작 오프셋
+     * @param afterId 이 ID 이후의 사용자만 조회 (커서). null이면 처음부터 조회
      * @return 만료된 사용자 ID 목록. 없으면 빈 리스트 반환
      */
     suspend fun findExpiredUsers(
         expiredBefore: Instant,
         limit: Int,
-        offset: Int,
+        afterId: Long? = null,
     ): List<Long>
 }

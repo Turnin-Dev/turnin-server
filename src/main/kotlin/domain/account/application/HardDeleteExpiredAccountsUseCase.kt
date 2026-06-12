@@ -1,5 +1,6 @@
 package com.turnin.domain.account.application
 
+import com.turnin.common.db.suspendTransaction
 import com.turnin.common.model.id.UserId
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.log.LogAction
@@ -34,12 +35,14 @@ class HardDeleteExpiredAccountsUseCase(
             ),
         )
 
-        // DeleteAccountUseCase에서 Soft Delete로 처리된 작업 외의 작업만 처리한다.
-        // AnnouncementRead(공지 읽음 여부) 테이블 같은 단순 매핑성 테이블은 CASCADE에 맡긴다.
-        val userIdVO = UserId(userId)
-        reportDeletionSupportApi.deleteByUserId(userIdVO)
-        userKeywordDeletionSupportApi.deleteByUserId(userIdVO)
-        userDeleteSupportApi.delete(userIdVO)
+        suspendTransaction {
+            // DeleteAccountUseCase에서 Soft Delete로 처리된 작업 외의 작업만 처리한다.
+            // AnnouncementRead(공지 읽음 여부) 테이블 같은 단순 매핑성 테이블은 CASCADE에 맡긴다.
+            val userIdVO = UserId(userId)
+            reportDeletionSupportApi.deleteByUserId(userIdVO)
+            userKeywordDeletionSupportApi.deleteByUserId(userIdVO)
+            userDeleteSupportApi.delete(userIdVO)
+        }
 
         LOGGER.info(
             message = "Account Hard Deletion successful: userId=$userId",

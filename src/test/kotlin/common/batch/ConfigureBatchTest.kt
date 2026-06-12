@@ -32,6 +32,7 @@ class DelayUntilNextRunTest {
         delayUntilNextRun(
             kstHour = 1,
             kstMinute = 0,
+            batchName = "TestBatch",
             clock = clock,
             delayFn = { capturedDelayMs = it },
         )
@@ -49,6 +50,7 @@ class DelayUntilNextRunTest {
         delayUntilNextRun(
             kstHour = 1,
             kstMinute = 0,
+            batchName = "TestBatch",
             clock = clock,
             delayFn = { capturedDelayMs = it },
         )
@@ -66,6 +68,7 @@ class DelayUntilNextRunTest {
         delayUntilNextRun(
             kstHour = 1,
             kstMinute = 0,
+            batchName = "TestBatch",
             clock = clock,
             delayFn = { capturedDelayMs = it },
         )
@@ -81,6 +84,7 @@ class DelayUntilNextRunTest {
         delayUntilNextRun(
             kstHour = 0,
             kstMinute = 0,
+            batchName = "TestBatch",
             clock = clock,
             delayFn = { capturedDelayMs = it },
         )
@@ -97,6 +101,7 @@ class DelayUntilNextRunTest {
         delayUntilNextRun(
             kstHour = 0,
             kstMinute = 0,
+            batchName = "TestBatch",
             clock = clock,
             delayFn = { capturedDelayMs = it },
         )
@@ -115,6 +120,7 @@ class DelayUntilNextRunTest {
         delayUntilNextRun(
             kstHour = 1,
             kstMinute = 0,
+            batchName = "TestBatch",
             clock = clock,
             delayFn = { callCount++ },
         )
@@ -132,6 +138,7 @@ class DelayUntilNextRunTest {
         delayUntilNextRun(
             kstHour = 1,
             kstMinute = 0,
+            batchName = "TestBatch",
             clock = clock,
             delayFn = { capturedDelayMs = it },
         )

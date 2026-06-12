@@ -1,11 +1,13 @@
 package com.turnin.common.batch
 
 import com.turnin.common.infrastructure.cloudflare.CloudflareR2Client
+import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.log.LogAction
 import com.turnin.common.util.log.LogTag
 import com.turnin.common.util.log.LogType
+import com.turnin.common.util.toKstDate
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -13,7 +15,8 @@ import java.time.format.DateTimeFormatter
 /**
  * 로그 백업 배치
  *
- * 전날 로그 파일을 R2에 업로드하고 로컬에서 삭제한다.
+ * 로컬에 남아있는 미백업 로그 파일을 R2에 업로드하고 로컬에서 삭제한다.
+ * 이전에 실패한 파일도 재시도한다. (오늘 날짜 파일 제외)
  *
  * 실패 시 로컬 파일을 삭제하지 않는다. (maxHistory=7 이내 재시도 가능)
  */
@@ -31,34 +34,35 @@ class LogBackupBatch(
     }
 
     /**
-     * 전날 로그 파일을 R2에 백업한다.
+     * 로컬에 남아있는 미백업 로그 파일을 R2에 백업한다.
      *
      * 일반 로그와 개인정보 로그를 각각 다른 버킷에 업로드하고
      * 업로드 성공한 파일만 로컬에서 삭제한다.
+     * 이전에 실패한 파일도 재시도한다. (오늘 날짜 파일 제외)
      */
     fun run() {
-        val yesterday = LocalDate.now().minusDays(1)
+        val today = TurninDateTime.now().toKstDate()
         LOGGER.info(
-            "LogBackupBatch running: date=$yesterday",
+            "LogBackupBatch running: date=$today",
             mapOf(
                 LogTag.LOG_TYPE.key to LogType.NORMAL.value,
                 LogTag.ACTION.key to LogAction.LOG_BACKUP_BATCH_START.value,
             ),
         )
 
-        val normalFailed = backupLog(
+        val normalFailed = backupLogs(
             dir = normalLogDir,
             prefix = "app-normal",
             bucketName = normalLogBucketName,
             r2Prefix = "logs/normal",
-            date = yesterday,
+            today = today,
         )
-        val privacyFailed = backupLog(
+        val privacyFailed = backupLogs(
             dir = privacyLogDir,
             prefix = "app-privacy",
             bucketName = privacyLogBucketName,
             r2Prefix = "logs/privacy",
-            date = yesterday,
+            today = today,
         )
 
         if (normalFailed || privacyFailed) {
@@ -81,43 +85,69 @@ class LogBackupBatch(
     }
 
     /**
-     * 단일 로그 파일을 R2에 업로드하고 로컬에서 삭제한다.
+     * 디렉토리 내 미백업 로그 파일을 전부 R2에 업로드한다.
+     *
+     * 오늘 날짜 파일은 아직 쓰는 중이므로 제외한다.
      *
      * @param dir 로컬 로그 디렉토리
      * @param prefix 로그 파일 접두사
      * @param bucketName 업로드할 R2 버킷명
      * @param r2Prefix R2 저장 경로 접두사
-     * @param date 백업할 날짜
-     * @return 실패 여부 (true = 실패)
+     * @param today 오늘 날짜 (제외 기준)
+     * @return 실패 여부 (true = 하나 이상 실패)
      */
-    private fun backupLog(
+    private fun backupLogs(
         dir: String,
         prefix: String,
         bucketName: String,
         r2Prefix: String,
-        date: LocalDate,
+        today: LocalDate,
     ): Boolean {
-        val fileName = "$prefix-${date.format(DateTimeFormatter.ISO_LOCAL_DATE)}.log.gz"
-        val file = File("$dir/$fileName")
+        val todayStr = today.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val files = File(dir).listFiles { f ->
+            f.name.startsWith(prefix) &&
+                f.name.endsWith(".log.gz") &&
+                !f.name.contains(todayStr)
+        } ?: emptyArray()
 
-        if (!file.exists()) {
-            LOGGER.warn("Log file not found, skipping: ${file.path}")
+        if (files.isEmpty()) {
+            LOGGER.info("No log files to backup in $dir")
             return false
         }
 
-        return try {
-            r2Client.putObject(
-                bucketName = bucketName,
-                key = "$r2Prefix/$fileName",
-                file = file,
-            )
-            file.delete()
-            LOGGER.info("Log backup success: ${file.path} → r2://$bucketName/$r2Prefix/$fileName")
+        return files.any { file -> backupLog(file, bucketName, r2Prefix) }
+    }
+
+    /**
+     * 단일 로그 파일을 R2에 업로드하고 로컬에서 삭제한다.
+     *
+     * @param file 업로드할 로그 파일
+     * @param bucketName 업로드할 R2 버킷명
+     * @param r2Prefix R2 저장 경로 접두사
+     * @return 실패 여부 (true = 실패)
+     */
+    private fun backupLog(
+        file: File,
+        bucketName: String,
+        r2Prefix: String,
+    ): Boolean = try {
+        r2Client.putObject(
+            bucketName = bucketName,
+            key = "$r2Prefix/${file.name}",
+            file = file,
+            contentType = "application/gzip",
+        )
+        val deleted = file.delete()
+        if (deleted) {
+            LOGGER.info("Log backup success: ${file.path} → r2://$bucketName/$r2Prefix/${file.name}")
             false
-        } catch (e: Exception) {
-            LOGGER.error(e, "Log backup failed: ${file.path}")
+        } else {
+            LOGGER.error("Failed to delete local log file after upload: ${file.path}")
             true
         }
+    } catch (e: Exception) {
+        LOGGER.error(e, "Log backup failed: ${file.path}")
+        true
     }
 }
 

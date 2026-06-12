@@ -11,5 +11,6 @@ fun ApplicationCall.clientIp(): String =
         ?: request.headers["X-Forwarded-For"]
             ?.split(",")
             ?.first()
-            ?.trim() // fallback 1
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() } // fallback 1
         ?: request.origin.remoteHost // fallback 2
