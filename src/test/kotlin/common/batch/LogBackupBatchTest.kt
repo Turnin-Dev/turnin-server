@@ -1,7 +1,9 @@
 package com.turnin.common.batch
 
 import com.turnin.common.infrastructure.cloudflare.CloudflareR2Client
+import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.config.AppConfig
+import com.turnin.common.util.toKstDate
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -9,7 +11,6 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import java.io.File
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -31,9 +32,10 @@ class LogBackupBatchTest {
 
     private val normalBucket = "normal-bucket"
     private val privacyBucket = "privacy-bucket"
-    private val yesterday = LocalDate.now().minusDays(1)
+    private val today = TurninDateTime.now().toKstDate()
+    private val yesterday = today.minusDays(1)
     private val dateStr = yesterday.format(DateTimeFormatter.ISO_LOCAL_DATE)
-    private val todayStr = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+    private val todayStr = today.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
     @Before
     fun setUp() {
@@ -211,7 +213,7 @@ class LogBackupBatchTest {
 
     @Test
     fun `run - 이전에 실패한 파일이 남아있으면 재시도한다`() {
-        val twoDaysAgoStr = LocalDate.now().minusDays(2).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val twoDaysAgoStr = today.minusDays(2).format(DateTimeFormatter.ISO_LOCAL_DATE)
         val oldFile = createTempLogFileWithDate(normalLogDir, "app-normal", twoDaysAgoStr)
         val yesterdayFile = createTempLogFile(normalLogDir, "app-normal")
 
@@ -227,7 +229,7 @@ class LogBackupBatchTest {
 
     @Test
     fun `run - 이전에 실패한 파일 재시도 중 실패하면 파일이 삭제되지 않는다`() {
-        val twoDaysAgoStr = LocalDate.now().minusDays(2).format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val twoDaysAgoStr = today.minusDays(2).format(DateTimeFormatter.ISO_LOCAL_DATE)
         val oldFile = createTempLogFileWithDate(normalLogDir, "app-normal", twoDaysAgoStr)
 
         every { r2Client.putObject(any(), any(), any(), any()) } throws RuntimeException("R2 upload error")

@@ -50,14 +50,14 @@ class LogBackupBatch(
             ),
         )
 
-        val normalFailed = backupLogs(
+        val normalSuccess = backupLogs(
             dir = normalLogDir,
             prefix = "app-normal",
             bucketName = normalLogBucketName,
             r2Prefix = "logs/normal",
             today = today,
         )
-        val privacyFailed = backupLogs(
+        val privacySuccess = backupLogs(
             dir = privacyLogDir,
             prefix = "app-privacy",
             bucketName = privacyLogBucketName,
@@ -65,20 +65,20 @@ class LogBackupBatch(
             today = today,
         )
 
-        if (normalFailed || privacyFailed) {
-            LOGGER.warn(
-                "LogBackupBatch completed with failures",
-                mapOf(
-                    LogTag.LOG_TYPE.key to LogType.NORMAL.value,
-                    LogTag.ACTION.key to LogAction.LOG_BACKUP_BATCH_FAILURE.value,
-                ),
-            )
-        } else {
+        if (normalSuccess && privacySuccess) {
             LOGGER.info(
                 "LogBackupBatch completed successfully",
                 mapOf(
                     LogTag.LOG_TYPE.key to LogType.NORMAL.value,
                     LogTag.ACTION.key to LogAction.LOG_BACKUP_BATCH_SUCCESS.value,
+                ),
+            )
+        } else {
+            LOGGER.warn(
+                "LogBackupBatch completed with failures",
+                mapOf(
+                    LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                    LogTag.ACTION.key to LogAction.LOG_BACKUP_BATCH_FAILURE.value,
                 ),
             )
         }
@@ -94,7 +94,7 @@ class LogBackupBatch(
      * @param bucketName 업로드할 R2 버킷명
      * @param r2Prefix R2 저장 경로 접두사
      * @param today 오늘 날짜 (제외 기준)
-     * @return 실패 여부 (true = 하나 이상 실패)
+     * @return 성공 여부 (true = 성공)
      */
     private fun backupLogs(
         dir: String,
@@ -104,18 +104,31 @@ class LogBackupBatch(
         today: LocalDate,
     ): Boolean {
         val todayStr = today.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        val files = File(dir).listFiles { f ->
-            f.name.startsWith(prefix) &&
-                f.name.endsWith(".log.gz") &&
-                !f.name.contains(todayStr)
-        } ?: emptyArray()
-
-        if (files.isEmpty()) {
-            LOGGER.info("No log files to backup in $dir")
+        val logDir = File(dir)
+        if (!logDir.exists() || !logDir.isDirectory) {
+            LOGGER.error("Invalid log backup directory: $dir")
             return false
         }
 
-        return files.any { file -> backupLog(file, bucketName, r2Prefix) }
+        val files = logDir.listFiles { f ->
+            f.name.startsWith(prefix) &&
+                f.name.endsWith(".log.gz") &&
+                !f.name.contains(todayStr)
+        } ?: run {
+            LOGGER.error("Failed to list log files in $dir")
+            return false
+        }
+
+        if (files.isEmpty()) {
+            LOGGER.info("No log files to backup in $dir")
+            return true
+        }
+
+        var success = true
+        files.forEach { file ->
+            success = backupLog(file, bucketName, r2Prefix) && success
+        }
+        return success
     }
 
     /**
@@ -124,7 +137,7 @@ class LogBackupBatch(
      * @param file 업로드할 로그 파일
      * @param bucketName 업로드할 R2 버킷명
      * @param r2Prefix R2 저장 경로 접두사
-     * @return 실패 여부 (true = 실패)
+     * @return 성공 여부 (true = 성공)
      */
     private fun backupLog(
         file: File,
@@ -140,14 +153,14 @@ class LogBackupBatch(
         val deleted = file.delete()
         if (deleted) {
             LOGGER.info("Log backup success: ${file.path} → r2://$bucketName/$r2Prefix/${file.name}")
-            false
+            true
         } else {
             LOGGER.error("Failed to delete local log file after upload: ${file.path}")
-            true
+            false
         }
     } catch (e: Exception) {
         LOGGER.error(e, "Log backup failed: ${file.path}")
-        true
+        false
     }
 }
 
