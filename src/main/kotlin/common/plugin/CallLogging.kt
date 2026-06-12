@@ -2,6 +2,8 @@ package com.turnin.common.plugin
 
 import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.log.LogSanitizer
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.clientIp
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.calllogging.CallLogging
@@ -20,11 +22,12 @@ fun Application.configureCallLogging() {
     install(CallLogging) {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
+        mdc(LogTag.IP.key) { call -> call.clientIp() }
         format { call ->
             val status = call.response.status()
             val httpMethod = call.request.httpMethod.value
             val userAgent = call.request.headers["User-Agent"]
-            val path = call.request.path()
+            val path = maskPath(call.request.path())
             val queryParams =
                 call.request.queryParameters
                     .entries()
@@ -68,4 +71,29 @@ fun Application.configureCallLogging() {
             }
         }
     }
+}
+
+/**
+ * 경로 마스킹 규칙
+ * - Pair(정규식, 마스킹 변환 함수)
+ * - 새 경로 추가 시 여기에만 추가
+ */
+private val pathMaskingRules: List<Pair<Regex, (MatchResult) -> String>> = listOf(
+    // /auth/exists/provider/{provider}/{providerId} → providerId 마스킹
+    Regex("/auth/exists/provider/([^/]+)/[^/]+") to
+        { match -> "/auth/exists/provider/${match.groupValues[1]}/***" },
+    // /auth/exists/displayId/{displayId} → displayId 마스킹
+    Regex("/auth/exists/displayId/[^/]+") to
+        { _ -> "/auth/exists/displayId/***" },
+    // 숫자로 된 경로 파라미터 마스킹 (userId, notificationId, keywordId 등)
+    Regex("/[0-9]+") to
+        { _ -> "/***" },
+)
+
+private fun maskPath(path: String): String {
+    var masked = path
+    pathMaskingRules.forEach { (regex, transform) ->
+        masked = regex.replace(masked, transform)
+    }
+    return masked
 }

@@ -135,5 +135,12 @@ object TestDatabaseFactory {
                 stmt[description] = "TEST_BLOCK_REASON_DESC_$it"
             }
         }
+
+        repeat(2) {
+            ReportReasons.insertIgnore { stmt ->
+                stmt[code] = "TEST_REPORT_REASON_$it"
+                stmt[description] = "TEST_REPORT_REASON_DESC_$it"
+            }
+        }
     }
 }

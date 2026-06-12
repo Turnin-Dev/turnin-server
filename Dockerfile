@@ -8,8 +8,8 @@ WORKDIR /app
 # CD에서 빌드된 JAR 복사
 COPY build/libs/turnin-api.jar app.jar
 
-RUN mkdir -p /app/secrets /app/ml /app/agents && \
-    chown -R appuser:appgroup /app
+RUN mkdir -p /app/secrets /app/ml /app/agents /logs/normal /logs/privacy && \
+    chown -R appuser:appgroup /app /logs
 
 USER appuser
 

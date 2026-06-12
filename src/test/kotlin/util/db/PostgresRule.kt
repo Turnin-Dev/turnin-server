@@ -9,6 +9,8 @@ import com.turnin.common.db.schema.Friends
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.Notifications
 import com.turnin.common.db.schema.RefreshTokens
+import com.turnin.common.db.schema.ReportReasons
+import com.turnin.common.db.schema.Reports
 import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
@@ -21,7 +23,7 @@ import com.turnin.common.model.SocialLoginProvider
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect
@@ -106,8 +108,10 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
                 Announcements,
@@ -127,8 +131,10 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
                 Announcements,
@@ -140,8 +146,10 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
                 Announcements,
@@ -161,9 +169,16 @@ private object TestDBContainerFactory {
     private fun initData() {
         // 초기 데이터 삽입
         repeat(2) {
-            BlockReasons.insert { stmt ->
+            BlockReasons.insertIgnore { stmt ->
                 stmt[code] = "TEST_BLOCK_REASON_$it"
                 stmt[description] = "TEST_BLOCK_REASON_DESC_$it"
+            }
+        }
+
+        repeat(2) {
+            ReportReasons.insertIgnore { stmt ->
+                stmt[code] = "TEST_REPORT_REASON_$it"
+                stmt[description] = "TEST_REPORT_REASON_DESC_$it"
             }
         }
     }

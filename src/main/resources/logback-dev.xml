@@ -1,12 +1,45 @@
 <configuration>
+    <!-- ======================== STDOUT ======================== -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- ======================== OTEL ======================== -->
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <captureCodeAttributes>false</captureCodeAttributes>
+        <captureExperimentalAttributes>false</captureExperimentalAttributes>
+    </appender>
+
+    <!-- ======================== JSON 로컬 확인용 ======================== -->
+    <appender name="FILE_NORMAL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/normal/app-normal.log</file>
+        <filter class="com.turnin.common.util.log.NormalLogFilter"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/normal/app-normal-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>2</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <excludeMdcKeyName>ip</excludeMdcKeyName>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_PRIVACY" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/privacy/app-privacy.log</file>
+        <filter class="com.turnin.common.util.log.PrivacyLogFilter"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/privacy/app-privacy-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>2</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="OTEL"/>
+        <appender-ref ref="FILE_NORMAL"/>
+        <appender-ref ref="FILE_PRIVACY"/>
     </root>
 
     <logger name="org.eclipse.jetty" level="INFO"/>

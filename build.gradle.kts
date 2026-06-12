@@ -173,6 +173,7 @@ dependencies {
     implementation(libs.koin.logger)
     implementation(libs.koin.annotations)
     ksp(libs.koin.ksp.compiler)
+    testImplementation(libs.koin.test)
 
     // Flyway
     implementation(libs.flyway.core)
@@ -191,4 +192,7 @@ dependencies {
 
     // OpenTelemetry
     implementation(libs.opentelemetry.logback.appender)
+
+    // Logstash Logback Encoder
+    implementation(libs.logstash.logback.encoder)
 }

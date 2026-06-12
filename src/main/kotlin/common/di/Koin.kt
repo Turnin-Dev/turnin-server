@@ -1,7 +1,9 @@
 package com.turnin.common.di
 
+import com.turnin.common.batch.batchModule
 import com.turnin.common.db.databaseModule
 import com.turnin.common.firebase.firebaseModule
+import com.turnin.common.infrastructure.di.infraModule
 import com.turnin.common.jwt.di.jwtModule
 import com.turnin.common.ml.embeddingModule
 import com.turnin.domain.account.di.accountModule
@@ -50,6 +52,8 @@ fun Application.configureKoin() {
             // Util
             coroutineModule,
             databaseModule,
+            infraModule,
+            batchModule,
         )
     }
 }

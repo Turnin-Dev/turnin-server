@@ -118,6 +118,13 @@ interface UserKeywordRepository {
     suspend fun delete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
 
     /**
+     * 사용자의 키워드를 전부 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun deleteByUserId(userId: UserId)
+
+    /**
      * 사용자 키워드를 비활성화한다.
      *
      * @param ownerId 사용자 ID

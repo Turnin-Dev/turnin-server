@@ -7,12 +7,16 @@ import com.turnin.common.db.schema.Reports
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
 import com.turnin.common.db.suspendTransaction
+import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.report.domain.model.ReportDetail
 import com.turnin.domain.report.domain.model.ReportReason
 import com.turnin.domain.report.domain.repository.ReportRepository
 import com.turnin.domain.report.infrastructure.mapper.ReportReasonMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 
 class ReportRepositoryImpl : ReportRepository {
@@ -55,6 +59,13 @@ class ReportRepositoryImpl : ReportRepository {
             }
             this.reasonId = EntityID(reportDetail.reasonId.value, ReportReasons)
             this.customReason = reportDetail.customReason
+        }
+    }
+
+    override suspend fun deleteByUserId(userId: UserId): Unit = suspendTransaction {
+        Reports.deleteWhere {
+            (Reports.reporterId eq userId.value) or
+                (Reports.reportedId eq userId.value)
         }
     }
 }
