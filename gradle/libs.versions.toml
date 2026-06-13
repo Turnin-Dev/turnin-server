@@ -25,6 +25,7 @@ firebase-admin = "9.8.0"
 # stable 버전이 존재하지 않으며, OpenTelemetry Java 공식 릴리즈 정책.
 # 참고: https://github.com/open-telemetry/opentelemetry-java-instrumentation
 opentelemetry-logback-appender = "2.26.1-alpha"
+logstash-logback-encoder = "8.0"
 
 [libraries]
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }
@@ -70,6 +71,7 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-version" 
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-version" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-ksp-version" }
 koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-ksp-version" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin-version" }
 # Flyway
 flyway-core = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway-version" }
 # Mockk
@@ -90,6 +92,8 @@ test-container-postgresql = { module = "org.testcontainers:postgresql", version.
 firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
 # OpenTelemetry
 opentelemetry-logback-appender = { module = "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0", version.ref = "opentelemetry-logback-appender" }
+# Logstash
+logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash-logback-encoder" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

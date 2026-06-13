@@ -7,7 +7,7 @@ import java.net.URI
 import software.amazon.awssdk.core.exception.SdkClientException
 import software.amazon.awssdk.services.s3.model.S3Exception
 
-class FileServiceImpl(private val r2Service: CloudflareR2Service) : FileService {
+class FileServiceImpl(private val r2Service: ImageR2Service) : FileService {
     override fun createPresignedUrlWithInfo(fileName: String, mimeType: String): UploadFileInfo {
         try {
             val presignedRequest = r2Service.createPresignedRequest(fileName, mimeType)

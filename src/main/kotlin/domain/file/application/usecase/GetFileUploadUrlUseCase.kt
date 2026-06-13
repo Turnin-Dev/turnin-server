@@ -2,6 +2,7 @@ package com.turnin.domain.file.application.usecase
 
 import com.turnin.domain.file.application.dto.UploadFileInfoDto
 import com.turnin.domain.file.application.dto.toDto
+import com.turnin.domain.file.domain.model.FileCategory
 import com.turnin.domain.file.domain.service.FileService
 
 /**
@@ -15,7 +16,14 @@ class GetFileUploadUrlUseCase(private val fileService: FileService) {
      *
      * @param fileName 업로드할 파일명
      * @param mimeType MIME 타입
+     * @param fileCategory 파일 카테고리 (기본 값은 프로필 사진)
      */
-    operator fun invoke(fileName: String, mimeType: String): UploadFileInfoDto =
-        fileService.createPresignedUrlWithInfo(fileName, mimeType).toDto()
+    operator fun invoke(
+        fileName: String,
+        mimeType: String,
+        fileCategory: FileCategory = FileCategory.PROFILE_IMAGE,
+    ): UploadFileInfoDto {
+        val fileFullName = "${fileCategory.prefix}/$fileName"
+        return fileService.createPresignedUrlWithInfo(fileFullName, mimeType).toDto()
+    }
 }

@@ -1,23 +1,29 @@
 package com.turnin.util.db
 
 import com.turnin.common.db.DatabaseException
+import com.turnin.common.db.schema.AnnouncementReads
+import com.turnin.common.db.schema.Announcements
 import com.turnin.common.db.schema.BlockReasons
 import com.turnin.common.db.schema.Blocks
 import com.turnin.common.db.schema.Friends
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.Notifications
 import com.turnin.common.db.schema.RefreshTokens
+import com.turnin.common.db.schema.ReportReasons
+import com.turnin.common.db.schema.Reports
 import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
 import com.turnin.common.ml.keywordCategory.KeywordCategory
+import com.turnin.common.model.AnnouncementAudience
+import com.turnin.common.model.AnnouncementStatus
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect
@@ -76,6 +82,8 @@ private object TestDBContainerFactory {
                     "social_login_provider" to SocialLoginProvider.entries.map { it.name },
                     "friend_status" to FriendRequestStatus.entries.map { it.name },
                     "keyword_category" to KeywordCategory.entries.map { it.name },
+                    "announcement_audience" to AnnouncementAudience.entries.map { it.name },
+                    "announcement_status" to AnnouncementStatus.entries.map { it.name },
                 )
 
                 enums.forEach { (typeName, values) ->
@@ -100,10 +108,14 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
 
             // 초기 데이터 준비
@@ -119,10 +131,14 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
             SchemaUtils.create(
                 Users,
@@ -130,10 +146,14 @@ private object TestDBContainerFactory {
                 Keywords,
                 UserKeywords,
                 Friends,
-                Blocks,
+                ReportReasons,
+                Reports,
                 BlockReasons,
+                Blocks,
                 UserFcmTokens,
                 Notifications,
+                Announcements,
+                AnnouncementReads,
             )
 
             // 초기 데이터 준비
@@ -149,9 +169,16 @@ private object TestDBContainerFactory {
     private fun initData() {
         // 초기 데이터 삽입
         repeat(2) {
-            BlockReasons.insert { stmt ->
+            BlockReasons.insertIgnore { stmt ->
                 stmt[code] = "TEST_BLOCK_REASON_$it"
                 stmt[description] = "TEST_BLOCK_REASON_DESC_$it"
+            }
+        }
+
+        repeat(2) {
+            ReportReasons.insertIgnore { stmt ->
+                stmt[code] = "TEST_REPORT_REASON_$it"
+                stmt[description] = "TEST_REPORT_REASON_DESC_$it"
             }
         }
     }

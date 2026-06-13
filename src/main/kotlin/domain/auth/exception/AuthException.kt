@@ -39,4 +39,11 @@ sealed class AuthException(
             status = HttpStatusCode.InternalServerError,
             cause = cause,
         )
+
+    class Unauthorized(cause: Throwable? = null) :
+        AuthException(
+            code = AuthErrorCode.Unauthorized,
+            status = HttpStatusCode.Unauthorized,
+            cause = cause,
+        )
 }

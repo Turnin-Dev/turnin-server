@@ -30,6 +30,8 @@ services:
       - ./secrets:/app/secrets
       - ./ml:/app/ml
       - ./agents:/app/agents
+      - ./logs/normal:/logs/normal
+      - ./logs/privacy:/logs/privacy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/api/health" ]
       interval: 1m

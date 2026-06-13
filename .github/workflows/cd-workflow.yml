@@ -11,18 +11,18 @@ jobs:
     steps:
       # 1. 코드 체크아웃
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       # 2. JDK 설정
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
       # 3. Gradle 설정 (의존성 + 빌드 캐시 자동 관리)
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3
         with:
           cache-read-only: false
 
@@ -32,18 +32,18 @@ jobs:
 
       # 5. Docker Buildx 설정
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
 
       # 6. Docker Hub 로그인
       - name: Login to Docker Hub
-        uses: docker/login-action@v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 7. Docker 이미지 빌드 & 푸시
       - name: Build & Push Docker image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7
         with:
           context: .
           push: true
@@ -56,9 +56,39 @@ jobs:
     needs: build  # build job 완료 후 실행
 
     steps:
-      # 8. SSH로 서버 접속 → 자동 배포
+      # 1. 코드 체크아웃
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      # 2. 배치 위험 구간 체크 (KST 00:55 ~ 01:05)
+      - name: Check deploy time (avoid batch window)
+        run: |
+          NOW=$(TZ="Asia/Seoul" date +"%H%M")
+          if [ "$NOW" -ge "0055" ] && [ "$NOW" -le "0105" ]; then
+            TARGET=$(TZ="Asia/Seoul" date -d "$(TZ="Asia/Seoul" date '+%Y-%m-%d') 01:06:00 KST" +%s)
+            CURRENT=$(date +%s)
+            WAIT=$((TARGET - CURRENT))
+            if [ "$WAIT" -gt "0" ]; then
+              echo "⚠️ 배치 위험 구간입니다. ${WAIT}초 대기합니다. (01:06 재개)"
+              sleep $WAIT
+              echo "✅ 대기 완료. 배포를 재개합니다."
+            fi
+          fi
+
+      # 3. docker-compose.yml 서버로 전송
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          fingerprint: ${{ secrets.SSH_HOST_FINGERPRINT }}
+          source: "docker-compose.yml"
+          target: "~/turnin/"
+
+      # 4. SSH로 서버 접속 → 자동 배포
       - name: Deploy to Lightsail
-        uses: appleboy/ssh-action@v1.0.1
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}

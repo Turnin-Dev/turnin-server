@@ -16,4 +16,12 @@ class UserKeywordDeletionSupportApi(private val userKeywordRepository: UserKeywo
      */
     suspend fun deactivateAll(userId: UserId) =
         userKeywordRepository.deactivateAll(userId)
+
+    /**
+     * 사용자의 키워드를 전부 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun deleteByUserId(userId: UserId) =
+        userKeywordRepository.deleteByUserId(userId)
 }

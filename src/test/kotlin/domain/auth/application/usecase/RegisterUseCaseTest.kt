@@ -30,7 +30,7 @@ class RegisterUseCaseTest {
     private val authRepository = mockk<AuthRepository>()
     private val refreshTokenRepository = mockk<RefreshTokenRepository>()
     private val jwtTokenService = mockk<JWTTokenService>()
-    private val usecase = RegisterUseCase(authRepository, refreshTokenRepository, jwtTokenService)
+    private val usecase = RegisterUseCase(authRepository, refreshTokenRepository, jwtTokenService, Role.USER)
 
     @Before
     fun setUp() {
@@ -40,7 +40,7 @@ class RegisterUseCaseTest {
             refreshTokenRepository.save(TestUserId, TestRegisterResult.jwtToken.refreshToken)
         } returns true
         coEvery {
-            authRepository.save(any())
+            authRepository.save(any(), any())
         } returns TestAuthUser
         coEvery {
             jwtTokenService.generate(any())

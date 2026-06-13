@@ -11,18 +11,18 @@ jobs:
     steps:
       # 1. 코드 체크아웃
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       # 2. JDK 설정
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
       # 3. Gradle 설정 (의존성 + 빌드 캐시 자동 관리)
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3
         with:
           cache-read-only: false
 

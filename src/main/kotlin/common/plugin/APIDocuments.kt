@@ -10,6 +10,7 @@ fun Application.configureAPIDocuments() {
     install(OpenApi) {
         outputFormat = OutputFormat.JSON
 
+        // 일반 API
         // configure basic information about the api
         info {
             title = "Turnin API"
@@ -23,6 +24,14 @@ fun Application.configureAPIDocuments() {
         server {
             url = "not yet"
             description = "Production Server"
+        }
+
+        // 관리자 API
+        spec("admin") {
+            info {
+                title = "Turnin Admin API"
+                description = "Turnin Admin API with Swagger-UI"
+            }
         }
     }
 }

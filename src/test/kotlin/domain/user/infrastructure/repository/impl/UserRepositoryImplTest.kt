@@ -10,6 +10,7 @@ import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
+import com.turnin.common.util.TurninDateTime
 import com.turnin.domain.user.domain.model.UserPatch
 import com.turnin.domain.user.domain.repository.UserRepository
 import com.turnin.domain.user.infrastructure.mapper.UserMapper.toDomain
@@ -21,8 +22,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
+import kotlin.time.toJavaDuration
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.update
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertNotNull
@@ -41,6 +45,8 @@ class UserRepositoryImplTest {
         TestDatabaseFactory.cleanUp()
     }
 
+    // =============== findById ===============
+
     @Test
     fun `findById 성공 테스트`() = runTest {
         // given
@@ -54,6 +60,8 @@ class UserRepositoryImplTest {
         assertNotNull(userResult)
         assertEquals(user, userResult)
     }
+
+    // =============== findActiveById ===============
 
     @Test
     fun `findActiveById 성공 테스트`() = runTest {
@@ -82,6 +90,8 @@ class UserRepositoryImplTest {
         // then: 사용자가 조회되지 않는다.
         assertNull(userResult)
     }
+
+    // =============== findVisibleById ===============
 
     @Test
     fun `findVisibleById 성공 테스트`() = runTest {
@@ -179,6 +189,8 @@ class UserRepositoryImplTest {
         assertNull(userEntity)
     }
 
+    // =============== findByIds ===============
+
     @Test
     fun `findByIds 성공 테스트`() = runTest {
         // given: 10명의 테스트 사용자를 생성
@@ -211,6 +223,8 @@ class UserRepositoryImplTest {
         // then: 사용자가 조회되지 않는다.
         assertEquals(0, users.size)
     }
+
+    // =============== findByDisplayId ===============
 
     @Test
     fun `findByDisplayId 성공 테스트`() = runTest {
@@ -251,6 +265,8 @@ class UserRepositoryImplTest {
         assertNull(userEntity)
     }
 
+    // =============== update ===============
+
     @Test
     fun `update 성공 테스트`() = runTest {
         // given
@@ -290,6 +306,8 @@ class UserRepositoryImplTest {
         assertFalse(result)
     }
 
+    // =============== updateIntroduce ===============
+
     @Test
     fun `updateIntroduce 성공 테스트`() = runTest {
         // given
@@ -318,6 +336,8 @@ class UserRepositoryImplTest {
         assertFalse(result)
     }
 
+    // =============== deactivate ===============
+
     @Test
     fun `deactivate 성공 테스트`() = runTest {
         // given: 사용자 생성
@@ -335,6 +355,7 @@ class UserRepositoryImplTest {
         assertEquals("", foundedUser.introduce)
         assertEquals("탈퇴한 사용자", foundedUser.name)
         assertNull(foundedUser.profileImageUrl)
+        assertNotNull(foundedUser.deletedAt)
     }
 
     @Test
@@ -360,6 +381,8 @@ class UserRepositoryImplTest {
         assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
     }
 
+    // =============== anonymizeProviderId ===============
+
     @Test
     fun `anonymizeProviderId 성공 테스트`() = runTest {
         // given: 사용자 생성
@@ -382,6 +405,124 @@ class UserRepositoryImplTest {
         assertTrue(foundedUser.providerId.endsWith("_$originalProviderId"))
         assertNotEquals(originalProviderId, foundedUser.providerId)
         assertTrue(updatedAt!!.isAfter(originalUpdatedAt))
+    }
+
+    // =============== delete ===============
+
+    @Test
+    fun `delete 성공 테스트`() = runTest {
+        // given
+        val userEntity = insertUser("1")
+        val userId = UserId(userEntity.id.value)
+
+        // when
+        repository.delete(userId)
+
+        // then
+        val result = repository.findById(userId)
+        assertNull(result)
+    }
+
+    @Test
+    fun `delete 성공 테스트 - 사용자가 존재하지 않는 경우 정상 종료`() = runTest {
+        // given
+        val userId = UserId(1L)
+
+        // when
+        repository.delete(userId)
+
+        // then
+        val result = repository.findById(userId)
+        assertNull(result)
+    }
+
+// =============== findExpiredUsers ===============
+
+    @Test
+    fun `findExpiredUsers 성공 테스트`() = runTest {
+        // given: 만료 사용자 2명, 미만료 사용자 1명 생성
+        val expiredUser1 = insertUser("1")
+        val expiredUser2 = insertUser("2")
+        val notExpiredUser = insertUser("3")
+
+        val oneYearAgo = TurninDateTime.now().minus(365.days.toJavaDuration())
+        val twoYearsAgo = TurninDateTime.now().minus(730.days.toJavaDuration())
+
+        // 만료 사용자: 2년 전 탈퇴
+        setUserDeletedAtForTest(UserId(expiredUser1.id.value), twoYearsAgo)
+        setUserDeletedAtForTest(UserId(expiredUser2.id.value), twoYearsAgo)
+        // 미만료 사용자: 현재 시각 탈퇴 (1년 미경과)
+        setUserDeletedAtForTest(UserId(notExpiredUser.id.value), TurninDateTime.now())
+
+        // when
+        val result = repository.findExpiredUsers(
+            expiredBefore = oneYearAgo,
+            limit = 100,
+            afterId = null,
+        )
+
+        // then: 만료 사용자 2명만 조회된다
+        assertEquals(2, result.size)
+        assertTrue(result.containsAll(listOf(expiredUser1.id.value, expiredUser2.id.value)))
+        assertFalse(result.contains(notExpiredUser.id.value))
+    }
+
+    @Test
+    fun `findExpiredUsers 성공 테스트 - 활성화 사용자는 조회되지 않는다`() = runTest {
+        // given: 활성화 사용자 생성 (deletedAt 없음)
+        val activeUser = insertUser("1")
+
+        // when
+        val result = repository.findExpiredUsers(
+            expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
+            limit = 100,
+            afterId = null,
+        )
+
+        // then
+        assertFalse(result.contains(activeUser.id.value))
+    }
+
+    @Test
+    fun `findExpiredUsers 성공 테스트 - limit, afterId가 적용된다`() = runTest {
+        // given: 만료 사용자 5명 생성
+        val twoYearsAgo = TurninDateTime.now().minus(730.days.toJavaDuration())
+        (1..5).forEach { i ->
+            insertUser("$i").also { user ->
+                setUserDeletedAtForTest(UserId(user.id.value), twoYearsAgo)
+            }
+        }
+
+        // when
+        val firstChunk = repository.findExpiredUsers(
+            expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
+            limit = 2,
+            afterId = null,
+        )
+        // afterId -> 첫 번째 청크의 마지막 ID를 커서로 사용
+        val secondChunk = repository.findExpiredUsers(
+            expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
+            limit = 2,
+            afterId = firstChunk.last(),
+        )
+
+        // then
+        assertEquals(2, firstChunk.size)
+        assertEquals(2, secondChunk.size)
+        assertTrue(firstChunk.intersect(secondChunk.toSet()).isEmpty()) // 중복 없음
+    }
+
+    @Test
+    fun `findExpiredUsers 성공 테스트 - 만료 사용자가 없는 경우 빈 리스트를 반환한다`() = runTest {
+        // when
+        val result = repository.findExpiredUsers(
+            expiredBefore = TurninDateTime.now().minus(365.days.toJavaDuration()),
+            limit = 100,
+            afterId = null,
+        )
+
+        // then
+        assertTrue(result.isEmpty())
     }
 
     private suspend fun insertUser(uniqueValue: String): UserEntity = TestDatabaseFactory.dbQuery {
@@ -412,6 +553,16 @@ class UserRepositoryImplTest {
 
     private suspend fun findByIdForTest(userId: Long): UserEntity? = TestDatabaseFactory.dbQuery {
         UserEntity.findById(userId)
+    }
+
+    private suspend fun setUserDeletedAtForTest(
+        userId: UserId,
+        deletedAt: Instant,
+    ): Unit = TestDatabaseFactory.dbQuery {
+        Users.update({ Users.id eq userId.value }) {
+            it[Users.isActive] = false
+            it[Users.deletedAt] = deletedAt
+        }
     }
 
     companion object {

@@ -28,6 +28,9 @@ sealed class AuthErrorCode(
 
     data object RefreshTokenSaveFailed :
         AuthErrorCode(A006, "토큰을 저장하는 도중 문제가 발생했습니다.")
+
+    data object Unauthorized :
+        AuthErrorCode(A007, "인가되지 않은 사용자입니다.")
 }
 
 private const val A001 = "A001"
@@ -36,3 +39,4 @@ private const val A003 = "A003"
 private const val A004 = "A004"
 private const val A005 = "A005"
 private const val A006 = "A006"
+private const val A007 = "A007"

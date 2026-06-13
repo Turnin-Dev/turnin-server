@@ -1,5 +1,6 @@
 package com.turnin.domain.report.domain.repository
 
+import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.report.domain.model.ReportDetail
 import com.turnin.domain.report.domain.model.ReportReason
@@ -36,4 +37,13 @@ interface ReportRepository {
      * @param reportDetail 신고 디테일 도메인 모델
      */
     suspend fun createReport(reportDetail: ReportDetail)
+
+    /**
+     * 신고 삭제
+     *
+     * 사용자의 모든 신고 관계를 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun deleteByUserId(userId: UserId)
 }

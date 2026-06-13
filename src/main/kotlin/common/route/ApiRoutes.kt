@@ -18,6 +18,22 @@ object Api {
         const val DETAIL = "/detail"
     }
 
+    object Admin {
+        const val ROUTE = "/admin"
+
+        object Announcement {
+            const val ROUTE = "/announcement"
+            const val TAG = "Announcement"
+            const val STATUS = "/status"
+        }
+
+        object Auth {
+            const val ROUTE = "/auth"
+            const val TAG = "Auth"
+            const val REGISTER = "/register"
+        }
+    }
+
     object V1 {
         const val ROUTE = "/v1"
 
@@ -106,6 +122,12 @@ object Api {
             const val READ = "read"
 
             fun read(pathParam: String): String = "{$pathParam}/$READ"
+        }
+
+        object Announcement {
+            const val ROUTE = "/announcement"
+            const val TAG = "Announcement"
+            const val READ = "/read"
         }
     }
 
