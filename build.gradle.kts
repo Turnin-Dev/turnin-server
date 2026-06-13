@@ -68,13 +68,6 @@ tasks.withType<JavaExec> {
     }
 }
 
-tasks.withType<Test> {
-    // hot reload 비활성화
-    systemProperty("io.ktor.development", "false")
-    systemProperty("io.ktor.deployment.watch", "false")
-    systemProperty("config.resource", "application-test.conf")
-}
-
 fun loadDotenv(environment: String): Map<String, String> {
     val dotenvFile = rootProject.file(".env.$environment")
     if (!dotenvFile.exists()) return emptyMap()
@@ -110,6 +103,41 @@ tasks.register<JavaExec>("runProd") {
     systemProperty("io.ktor.development", "false")
     systemProperty("logback.configurationFile", "logback-prod.xml")
     envProd.forEach { (key, value) -> environment(key, value) }
+}
+
+tasks.withType<Test> {
+    // hot reload 비활성화
+    systemProperty("io.ktor.development", "false")
+    systemProperty("io.ktor.deployment.watch", "false")
+    systemProperty("config.resource", "application-test.conf")
+}
+
+tasks.test {
+    // 순차 실행을 위해 제외
+    exclude("**/HardDeleteExpiredAccountsUseCaseIntegrationTest.class")
+    exclude("**/AccountDeletionIntegrationTest.class")
+
+    // 일반 테스트는 코어 수만큼 병렬 실행
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
+}
+
+val koinTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "특정 Koin 관련 테스트만 싱글 스레드로 순차 실행합니다."
+
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
+    // 위에서 제외한 2개 파일 포함
+    include("**/HardDeleteExpiredAccountsUseCaseIntegrationTest.class")
+    include("**/AccountDeletionIntegrationTest.class")
+
+    // 프로세스 개수를 1개로 고정하여 순차 실행 보장
+    maxParallelForks = 1
+}
+
+tasks.test {
+    finalizedBy(koinTest)
 }
 
 dependencies {
