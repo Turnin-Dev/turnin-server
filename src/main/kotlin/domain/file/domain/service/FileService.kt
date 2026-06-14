@@ -49,9 +49,9 @@ interface FileService {
      * 2. 업데이트 완료 확정 시 호출: 파일 업데이트 완료를 확정하기 위해 호출하며, 새 파일 업로드가 완료된 후에 수행한다.
      * (또한, 이 메서드를 호출하는 부분에서 `DB 경로 업데이트`와 `기존 파일 삭제`를 수행해야 한다.)
      *
-     * @param fileName 삭제할 파일명
+     * @param fileUrl 삭제할 파일 URL
      *
      * @throws FileException.R2DeleteFailed 파일을 삭제하는 과정에서 에러가 발생하면 예외가 발생한다.
      */
-    fun deleteFile(fileName: String)
+    fun deleteFile(fileUrl: String)
 }
