@@ -58,6 +58,13 @@ class FileServiceImpl(private val r2Service: ImageR2Service) : FileService {
         }
     }
 
+    /**
+     * 파일명 혹은 파일 URL을 파싱한다.
+     *
+     * 파라미터 형태가 파일명이라면 그대로 반환하고, URL 형태면 path를 제거하고 파일명 형태로 반환한다.
+     *
+     * @param fileNameOrUrl 파일명 혹은 파일 URL
+     */
     private fun parseFileName(fileNameOrUrl: String): String {
         val rawKey = fileNameOrUrl.removePrefix("/")
         val parsedPath = runCatching { URI(fileNameOrUrl).path }

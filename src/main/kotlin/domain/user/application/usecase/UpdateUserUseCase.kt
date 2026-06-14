@@ -5,6 +5,7 @@ import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.log.LogAction
 import com.turnin.common.util.log.LogTag
 import com.turnin.common.util.log.LogType
+import com.turnin.domain.file.domain.model.FileCategory
 import com.turnin.domain.user.application.dto.UserPatchDto
 import com.turnin.domain.user.application.dto.toDomain
 import com.turnin.domain.user.domain.provider.FileProvider
@@ -60,7 +61,7 @@ class UpdateUserUseCase(
                 patch.newProfileImageUrl != patch.oldProfileImageUrl
             ) {
                 try {
-                    fileProvider.deleteFile(patch.oldProfileImageUrl)
+                    fileProvider.deleteFile(patch.oldProfileImageUrl, FileCategory.PROFILE_IMAGE)
                     LOGGER.debug("Old profile image deleted")
                 } catch (e: Exception) {
                     if (e is CancellationException) throw e

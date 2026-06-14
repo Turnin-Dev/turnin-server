@@ -1,6 +1,7 @@
 package com.turnin.domain.file.application.provider
 
 import com.turnin.domain.file.application.usecase.DeleteFileUseCase
+import com.turnin.domain.file.domain.model.FileCategory
 
 /**
  * 외부에 제공할 File 삭제 제공 API
@@ -11,5 +12,8 @@ class FileDeletionSupportApi(private val deleteFileUseCase: DeleteFileUseCase) {
      *
      * @see DeleteFileUseCase
      */
-    fun deleteFile(fileName: String) = deleteFileUseCase(fileName)
+    fun deleteFile(
+        fileName: String,
+        fileCategory: FileCategory,
+    ) = deleteFileUseCase(fileName, fileCategory)
 }

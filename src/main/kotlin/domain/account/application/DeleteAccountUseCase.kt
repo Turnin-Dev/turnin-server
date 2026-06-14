@@ -10,6 +10,7 @@ import com.turnin.domain.account.exception.AccountException
 import com.turnin.domain.auth.application.provider.AuthDeletionSupportApi
 import com.turnin.domain.block.application.provider.BlockDeletionSupportApi
 import com.turnin.domain.file.application.provider.FileDeletionSupportApi
+import com.turnin.domain.file.domain.model.FileCategory
 import com.turnin.domain.friend.application.provider.FriendDeletionSupportApi
 import com.turnin.domain.notification.application.provider.NotificationDeletionSupportApi
 import com.turnin.domain.user.application.provider.UserDeletionSupportApi
@@ -80,7 +81,7 @@ class DeleteAccountUseCase(
         // 2. 파일 서버 정리 (스토리지 서버에 있는 사용자의 데이터를 모두 삭제)
         profileImageUrl?.let {
             try {
-                fileDeletionSupportApi.deleteFile(it)
+                fileDeletionSupportApi.deleteFile(it, FileCategory.PROFILE_IMAGE)
             } catch (e: Exception) {
                 LOGGER.warn(
                     message = "Failed to delete profile image during account deletion.",
