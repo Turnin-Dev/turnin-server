@@ -30,6 +30,7 @@ object Api {
         object Auth {
             const val ROUTE = "/auth"
             const val TAG = "Auth"
+            const val LOGIN = "/login"
             const val REGISTER = "/register"
         }
     }

@@ -6,10 +6,12 @@ import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.route.Api
+import com.turnin.domain.auth.application.dto.LoginResultDto
 import com.turnin.domain.auth.application.dto.RegisterResultDto
 import com.turnin.domain.auth.application.usecase.AuthAdminUseCases
 import com.turnin.domain.auth.exception.AuthErrorCode
 import com.turnin.domain.auth.exception.AuthException
+import com.turnin.domain.auth.presentation.dto.AdminLoginRequest
 import com.turnin.domain.auth.presentation.dto.AdminRegisterRequest
 import com.turnin.util.TestClientFactory.createTestClient
 import com.turnin.util.testPlugin
@@ -31,6 +33,106 @@ import org.junit.Test
 class AuthAdminRouteTest {
     private val route = Api.Admin.Auth
     private val usecase: AuthAdminUseCases = mockk()
+
+    // ------------------------------ 로그인 ------------------------------
+    @Test
+    fun `관리자 로그인 - 성공 테스트`() = testApplication {
+        coEvery { usecase.validateAdminSecretKey(any()) } just Runs
+        coEvery { usecase.login(any()) } returns MockLoginResultDto
+
+        val client = createTestClient()
+        testPlugin(routing = { authAdminRoutes(route, usecase) })
+
+        val response = client.post("${route.ROUTE}${route.LOGIN}") {
+            contentType(ContentType.Application.Json)
+            setBody(MockValidAdminLoginRequest)
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(response.bodyAsText().contains(MockLoginResultDto.jwtTokenDto.accessToken))
+    }
+
+    @Test
+    fun `관리자 로그인 - 잘못된 비밀키로 요청 시 실패한다`() = testApplication {
+        coEvery { usecase.validateAdminSecretKey(any()) } throws AuthException.Unauthorized()
+
+        val client = createTestClient()
+        testPlugin(routing = { authAdminRoutes(route, usecase) })
+
+        val response = client.post("${route.ROUTE}${route.LOGIN}") {
+            contentType(ContentType.Application.Json)
+            setBody(MockInvalidSecretKeyLoginRequest)
+        }
+
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun `관리자 로그인 - 로그인 정보가 일치하지 않는 경우 BadRequest를 반환한다`() = testApplication {
+        coEvery { usecase.validateAdminSecretKey(any()) } just Runs
+        coEvery { usecase.login(any()) } returns null
+
+        val client = createTestClient()
+        testPlugin(routing = { authAdminRoutes(route, usecase) })
+
+        val response = client.post("${route.ROUTE}${route.LOGIN}") {
+            contentType(ContentType.Application.Json)
+            setBody(MockValidAdminLoginRequest)
+        }
+        val responseBody = response.bodyAsText()
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(responseBody.contains(AuthErrorCode.LoginFailed.code))
+    }
+
+    @Test
+    fun `관리자 로그인 - 요청 바디 유효성 검사를 실패하는 경우 BadRequest를 반환한다`() = testApplication {
+        coEvery { usecase.validateAdminSecretKey(any()) } just Runs
+
+        val client = createTestClient()
+        testPlugin(routing = { authAdminRoutes(route, usecase) })
+
+        val response = client.post("${route.ROUTE}${route.LOGIN}") {
+            contentType(ContentType.Application.Json)
+            setBody(MockInvalidAdminLoginRequest)
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(response.bodyAsText().contains(CommonErrorCode.ValidationDefault.code))
+    }
+
+    @Test
+    fun `관리자 로그인 - 잘못된 형식의 요청 바디인 경우 BadRequest를 반환한다`() = testApplication {
+        val client = createTestClient()
+        testPlugin(routing = { authAdminRoutes(route, usecase) })
+
+        val response = client.post("${route.ROUTE}${route.LOGIN}") {
+            contentType(ContentType.Application.Json)
+            setBody("""{ "weirdField": "asd" }""")
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(response.bodyAsText().contains(CommonErrorCode.MalformedRequest.description))
+    }
+
+    @Test
+    fun `관리자 로그인 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        coEvery { usecase.validateAdminSecretKey(any()) } just Runs
+        coEvery { usecase.login(any()) } throws Exception("Something went wrong")
+
+        val client = createTestClient()
+        testPlugin(routing = { authAdminRoutes(route, usecase) })
+
+        val response = client.post("${route.ROUTE}${route.LOGIN}") {
+            contentType(ContentType.Application.Json)
+            setBody(MockValidAdminLoginRequest)
+        }
+
+        assertEquals(HttpStatusCode.InternalServerError, response.status)
+        assertTrue(response.bodyAsText().contains("${HttpStatusCode.InternalServerError.value}"))
+    }
+
+    // ------------------------------ 회원가입 ------------------------------
 
     @Test
     fun `관리자 회원가입 - 성공 테스트`() = testApplication {
@@ -156,6 +258,21 @@ class AuthAdminRouteTest {
         private val MockInvalidAdminRegisterRequest = MockValidAdminRegisterRequest.copy(
             displayId = "",
             name = "",
+        )
+        private val MockLoginResultDto = LoginResultDto(
+            userId = MockUserId,
+            jwtTokenDto = MockJWTTokenDto,
+        )
+        private val MockValidAdminLoginRequest = AdminLoginRequest(
+            secretKey = "valid-secret-key",
+            provider = SocialLoginProvider.GOOGLE,
+            providerId = "providerIDDDDD",
+        )
+        private val MockInvalidSecretKeyLoginRequest = MockValidAdminLoginRequest.copy(
+            secretKey = "invalid-secret-key",
+        )
+        private val MockInvalidAdminLoginRequest = MockValidAdminLoginRequest.copy(
+            providerId = "",
         )
     }
 }
