@@ -33,12 +33,13 @@ class LoginUseCase(
     /**
      * 소셜로그인
      *
+     * 로그인 실패 혹은 사용자를 가져올 수 없는 경우 예외가 발생한다.
+     *
      * @param loginDto [LoginDto]
      *
      * @return [LoginResultDto] 정상적으로 로그인이 진행된 경우
-     * (로그인 실패 혹은 사용자를 가져올 수 없는 경우 **`null`** 반환)
      */
-    suspend operator fun invoke(loginDto: LoginDto): LoginResultDto? {
+    suspend operator fun invoke(loginDto: LoginDto): LoginResultDto {
         LOGGER.info(
             message = "Login attempt: provider=${loginDto.provider}",
             tags = mapOf(

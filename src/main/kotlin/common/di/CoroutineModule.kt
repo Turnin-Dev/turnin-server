@@ -9,19 +9,34 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 
-val ApplicationScopeQualifier = qualifier("applicationScope")
+val DefaultApplicationScopeQualifier = qualifier("defaultApplicationScope")
+val IOApplicationScopeQualifier = qualifier("ioApplicationScope")
 
 val coroutineModule = module {
-    single<CoroutineScope>(ApplicationScopeQualifier) {
+    single<CoroutineScope>(DefaultApplicationScopeQualifier) {
         val logger = AppLoggerFactory.createLogger("ApplicationScope")
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            logger.error(throwable, "ApplicationScope에서 처리되지 않은 예외 발생")
+            logger.error(throwable, "DefaultApplicationScope에서 처리되지 않은 예외 발생")
         }
 
         CoroutineScope(
             SupervisorJob() +
                 AppDispatchers.defaultDispatcher +
-                CoroutineName("application-scope") +
+                CoroutineName("default-application-scope") +
+                exceptionHandler,
+        )
+    }
+
+    single<CoroutineScope>(IOApplicationScopeQualifier) {
+        val logger = AppLoggerFactory.createLogger("ApplicationScope")
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            logger.error(throwable, "IOApplicationScope에서 처리되지 않은 예외 발생")
+        }
+
+        CoroutineScope(
+            SupervisorJob() +
+                AppDispatchers.ioDispatcher +
+                CoroutineName("io-application-scope") +
                 exceptionHandler,
         )
     }

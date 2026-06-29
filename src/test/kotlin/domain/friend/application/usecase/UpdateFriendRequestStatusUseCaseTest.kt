@@ -34,7 +34,7 @@ class UpdateFriendRequestStatusUseCaseTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val testApplicationScope = TestScope(testDispatcher)
     private val usecase =
-        UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider, testApplicationScope, testDispatcher)
+        UpdateFriendRequestStatusUseCase(friendRepository, notificationProvider, testApplicationScope)
 
     @Before
     fun setUp() {

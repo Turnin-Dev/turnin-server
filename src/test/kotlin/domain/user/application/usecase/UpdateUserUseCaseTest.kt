@@ -4,7 +4,6 @@ import com.turnin.common.model.Introduce
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
-import com.turnin.domain.file.domain.model.FileCategory
 import com.turnin.domain.user.application.dto.UserPatchDto
 import com.turnin.domain.user.domain.model.UserPatch
 import com.turnin.domain.user.domain.provider.FileProvider
@@ -45,7 +44,7 @@ class UpdateUserUseCaseTest {
         coEvery {
             userRepository.update(TestUserId, any())
         } returns true
-        every { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) } just Runs
+        every { fileProvider.deleteFile(any()) } just Runs
         val userPatchDto = UserPatchDto(
             userName = "name",
             displayId = "did",
@@ -59,7 +58,7 @@ class UpdateUserUseCaseTest {
 
         // then
         assertTrue(result)
-        verify(exactly = 0) { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) }
+        verify(exactly = 0) { fileProvider.deleteFile(any()) }
     }
 
     @Test
@@ -68,7 +67,7 @@ class UpdateUserUseCaseTest {
         coEvery {
             userRepository.update(TestUserId, any())
         } returns true
-        every { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) } just Runs
+        every { fileProvider.deleteFile(any()) } just Runs
         val userPatchDto = UserPatchDto(
             userName = "name",
             displayId = "did",
@@ -82,7 +81,7 @@ class UpdateUserUseCaseTest {
 
         // then
         assertTrue(result)
-        verify(exactly = 1) { fileProvider.deleteFile(userPatchDto.oldProfileImageUrl!!, FileCategory.PROFILE_IMAGE) }
+        verify(exactly = 1) { fileProvider.deleteFile(userPatchDto.oldProfileImageUrl!!) }
     }
 
     @Test
@@ -91,7 +90,7 @@ class UpdateUserUseCaseTest {
         coEvery {
             userRepository.update(TestUserId, any())
         } returns true
-        every { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) } just Runs
+        every { fileProvider.deleteFile(any()) } just Runs
         val userPatchDto = UserPatchDto(
             userName = "name",
             displayId = "did",
@@ -105,7 +104,7 @@ class UpdateUserUseCaseTest {
 
         // then
         assertTrue(result)
-        verify(exactly = 0) { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) }
+        verify(exactly = 0) { fileProvider.deleteFile(any()) }
     }
 
     @Test
@@ -114,7 +113,7 @@ class UpdateUserUseCaseTest {
         coEvery {
             userRepository.update(TestUserId, any())
         } returns true
-        every { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) } just Runs
+        every { fileProvider.deleteFile(any()) } just Runs
         val userPatchDto = UserPatchDto(
             userName = "name",
             displayId = "did",
@@ -128,7 +127,7 @@ class UpdateUserUseCaseTest {
 
         // then
         assertTrue(result)
-        verify(exactly = 1) { fileProvider.deleteFile(userPatchDto.oldProfileImageUrl!!, FileCategory.PROFILE_IMAGE) }
+        verify(exactly = 1) { fileProvider.deleteFile(userPatchDto.oldProfileImageUrl!!) }
     }
 
     @Test
@@ -137,7 +136,7 @@ class UpdateUserUseCaseTest {
         coEvery {
             userRepository.update(TestUserId, any())
         } returns false
-        every { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) } just Runs
+        every { fileProvider.deleteFile(any()) } just Runs
         val userPatchDto = UserPatchDto(
             userName = "name",
             displayId = "did",
@@ -151,7 +150,7 @@ class UpdateUserUseCaseTest {
 
         // then
         assertFalse(result)
-        verify(exactly = 0) { fileProvider.deleteFile(any(), FileCategory.PROFILE_IMAGE) }
+        verify(exactly = 0) { fileProvider.deleteFile(any()) }
     }
 
     companion object {

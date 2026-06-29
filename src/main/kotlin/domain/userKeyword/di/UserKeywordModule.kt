@@ -1,6 +1,6 @@
 package com.turnin.domain.userKeyword.di
 
-import com.turnin.common.di.ApplicationScopeQualifier
+import com.turnin.common.di.IOApplicationScopeQualifier
 import com.turnin.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
 import com.turnin.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
 import com.turnin.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
@@ -39,7 +39,7 @@ val userKeywordModule = module {
             get(),
             get(),
             get(),
-            get(ApplicationScopeQualifier),
+            get(IOApplicationScopeQualifier),
         )
     }
     single { GetUserKeywordsUseCase(get(), get()) }

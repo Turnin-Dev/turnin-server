@@ -65,8 +65,14 @@ class HardDeleteExpiredAccountsBatch(
             }
         }
 
+        val logMessage = if (failCount > 0) {
+            "HardDeleteExpiredAccountsBatch completed with some failures: success=$successCount, fail=$failCount"
+        } else {
+            "HardDeleteExpiredAccountsBatch completed successfully: success=$successCount, fail=$failCount"
+        }
+
         LOGGER.info(
-            message = "HardDeleteExpiredAccountsBatch completed successfully: success=$successCount, fail=$failCount",
+            message = logMessage,
             tags = mapOf(
                 LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
                 LogTag.ACTION.key to LogAction.DELETE_ACCOUNT_BATCH_SUCCESS.value,

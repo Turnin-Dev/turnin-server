@@ -37,14 +37,7 @@ fun Route.authAdminRoutes(route: Api.Admin.Auth, usecase: AuthAdminUseCases) {
             request.validate()
 
             val loginResultDto = usecase.login(request.toDto())
-            if (loginResultDto == null) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest),
-                )
-            } else {
-                call.respond(loginResultDto.toResponse())
-            }
+            call.respond(loginResultDto.toResponse())
         }
 
         post(route.REGISTER, { registerDocs() }) {

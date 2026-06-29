@@ -1,11 +1,13 @@
 package com.turnin.common.util.application
 
-import com.turnin.common.di.ApplicationScopeQualifier
+import com.turnin.common.di.DefaultApplicationScopeQualifier
+import com.turnin.common.di.IOApplicationScopeQualifier
 import com.turnin.common.util.log.AppLoggerFactory
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
@@ -41,59 +43,75 @@ private fun Application.performCleanup(
 ) {
     // ------------------------------ 이미 정리 되었는지 체크 ------------------------------
     if (!cleanupDone.compareAndSet(false, true)) {
-        LOGGER.info("[SHUTDOWN] 이미 정리 완료, 스킵")
+        LOGGER.info("$LOG_NAME 이미 정리 완료, 스킵")
         return
     }
 
     // ------------------------------ 주입 가능 여부 확인 ------------------------------
-    val applicationScope = runCatching {
-        inject<CoroutineScope>(ApplicationScopeQualifier).value
-    }.getOrNull()
+    val qualifiers = listOf(
+        DefaultApplicationScopeQualifier,
+        IOApplicationScopeQualifier,
+    )
+    val applicationScopes = qualifiers.mapNotNull { qualifier ->
+        runCatching { inject<CoroutineScope>(qualifier).value }
+            .getOrNull()
+            .also { if (it == null) LOGGER.error("$LOG_NAME $qualifier 주입 실패") }
+    }
 
-    if (applicationScope == null) {
-        LOGGER.error("[SHUTDOWN] ApplicationScope 주입 실패, Koin 정리만 수행")
+    if (applicationScopes.isEmpty()) {
+        LOGGER.error("$LOG_NAME 모든 ApplicationScope 주입 실패, Koin 정리만 수행")
         runCatching { stopKoin() }
         return
     }
 
+    if (applicationScopes.size < qualifiers.size) {
+        LOGGER.error("$LOG_NAME 일부 ApplicationScope 주입 실패, 해당 scope는 정리되지 않음")
+    }
+
     // ------------------------------ 정리 작업 시작 ------------------------------
-    LOGGER.info("[SHUTDOWN] --- 서버 종료 절차 시작 ---")
+    LOGGER.info("$LOG_NAME --- 서버 종료 절차 시작 ---")
 
     runBlocking {
-        var parentJobGlobal: Job? = null
+        val parentJobsGlobal = mutableListOf<Job>()
 
         // 전체 타임아웃: 참고 수치 (K8s terminationGracePeriodSeconds(30초)보다 짧게)
         withTimeoutOrNull(20_000) {
             // 1. 새 코루틴 생성 차단 + 백그라운드 작업 완료 대기
-            val parentJob = applicationScope.coroutineContext[Job]
-            parentJobGlobal = parentJob
-            if (parentJob is CompletableJob) {
-                val childCount = parentJob.children.count()
-                LOGGER.info("[SHUTDOWN] 백그라운드 작업 대기: ${childCount}개")
-                parentJob.complete()
-                parentJob.join()
+            applicationScopes.forEach { scope ->
+                val parentJob = scope.coroutineContext[Job]
+                if (parentJob is CompletableJob) {
+                    parentJobsGlobal.add(parentJob)
+                    val childCount = parentJob.children.count()
+                    LOGGER.info(
+                        message = "$LOG_NAME 백그라운드 작업 대기: ${childCount}개 " +
+                            "(${scope.coroutineContext[CoroutineName]?.name})",
+                    )
+                    parentJob.complete()
+                    parentJob.join()
+                }
             }
-            LOGGER.info("[SHUTDOWN] 모든 백그라운드 작업 완료")
+            LOGGER.info("$LOG_NAME 모든 백그라운드 작업 완료")
 
             // 2. 부가 리소스 정리
             cleanups.forEach { cleanup ->
                 runCatching { cleanup() }
-                    .onFailure { LOGGER.error(it, "[SHUTDOWN] 리소스 정리 실패") }
+                    .onFailure { LOGGER.error(it, "$LOG_NAME 리소스 정리 실패") }
             }
-            LOGGER.info("[SHUTDOWN] 부가 리소스 정리 완료")
+            LOGGER.info("$LOG_NAME 부가 리소스 정리 완료")
 
             // 3. Koin 종료 (onClose 트리거 - DB 등)
             stopKoin()
-            LOGGER.info("[SHUTDOWN] Koin 종료 완료")
+            LOGGER.info("$LOG_NAME Koin 종료 완료")
 
-            LOGGER.info("[SHUTDOWN] --- 모든 종료 절차 완료 ---")
+            LOGGER.info("$LOG_NAME --- 모든 종료 절차 완료 ---")
         } ?: run {
-            LOGGER.error("[SHUTDOWN] !!! 타임아웃 - 강제 종료 !!!")
+            LOGGER.error("$LOG_NAME !!! 타임아웃 - 강제 종료 !!!")
             // 타임아웃 시에도 Koin과 코루틴은 반드시 정리
-            runCatching { parentJobGlobal?.cancel() }
+            parentJobsGlobal.forEach { runCatching { it.cancel() } }
             runCatching { stopKoin() }
         }
     }
 }
 
-val LOGGER = AppLoggerFactory.createLogger("ShutdownHook")
+private val LOGGER = AppLoggerFactory.createLogger("ShutdownHook")
+private const val LOG_NAME = "[SHUTDOWN]"

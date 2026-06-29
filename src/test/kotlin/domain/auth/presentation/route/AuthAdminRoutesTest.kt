@@ -68,24 +68,6 @@ class AuthAdminRouteTest {
     }
 
     @Test
-    fun `관리자 로그인 - 로그인 정보가 일치하지 않는 경우 BadRequest를 반환한다`() = testApplication {
-        coEvery { usecase.validateAdminSecretKey(any()) } just Runs
-        coEvery { usecase.login(any()) } returns null
-
-        val client = createTestClient()
-        testPlugin(routing = { authAdminRoutes(route, usecase) })
-
-        val response = client.post("${route.ROUTE}${route.LOGIN}") {
-            contentType(ContentType.Application.Json)
-            setBody(MockValidAdminLoginRequest)
-        }
-        val responseBody = response.bodyAsText()
-
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(responseBody.contains(AuthErrorCode.LoginFailed.code))
-    }
-
-    @Test
     fun `관리자 로그인 - 요청 바디 유효성 검사를 실패하는 경우 BadRequest를 반환한다`() = testApplication {
         coEvery { usecase.validateAdminSecretKey(any()) } just Runs
 

@@ -1,6 +1,6 @@
 package com.turnin.domain.friend.di
 
-import com.turnin.common.di.ApplicationScopeQualifier
+import com.turnin.common.di.IOApplicationScopeQualifier
 import com.turnin.domain.friend.application.provider.FriendDeletionSupportApi
 import com.turnin.domain.friend.application.provider.FriendProviderApi
 import com.turnin.domain.friend.application.usecase.AddFriendUseCase
@@ -29,8 +29,8 @@ val friendModule = module {
 
     // Usecase
     single { GetFriendsUseCase(get()) }
-    single { AddFriendUseCase(get(), get(), get(ApplicationScopeQualifier)) }
-    single { UpdateFriendRequestStatusUseCase(get(), get(), get(ApplicationScopeQualifier)) }
+    single { AddFriendUseCase(get(), get(), get(IOApplicationScopeQualifier)) }
+    single { UpdateFriendRequestStatusUseCase(get(), get(), get(IOApplicationScopeQualifier)) }
     single { DeleteFriendUseCase(get()) }
     single { GetFriendStatusUseCase(get()) }
     single { GetIncomingRequestsUseCase(get()) }

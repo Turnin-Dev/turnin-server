@@ -23,7 +23,6 @@ import com.turnin.domain.auth.infrastructure.repository.impl.RefreshTokenReposit
 import com.turnin.domain.block.application.provider.BlockDeletionSupportApi
 import com.turnin.domain.block.infrastructure.repository.BlockRepositoryImpl
 import com.turnin.domain.file.application.provider.FileDeletionSupportApi
-import com.turnin.domain.file.domain.model.FileCategory
 import com.turnin.domain.friend.application.provider.FriendDeletionSupportApi
 import com.turnin.domain.friend.infrastructure.repository.FriendRepositoryImpl
 import com.turnin.domain.notification.application.provider.NotificationDeletionSupportApi
@@ -127,7 +126,7 @@ class DeleteAccountUseCaseIntegrationTest {
 
         // 파일 삭제 검증
         coVerify(exactly = 1) {
-            mockFileDeletionSupportApi.deleteFile("https://r2.example.com/profile.jpg", FileCategory.PROFILE_IMAGE)
+            mockFileDeletionSupportApi.deleteFile("https://r2.example.com/profile.jpg")
         }
 
         // notification 삭제 검증
@@ -160,7 +159,7 @@ class DeleteAccountUseCaseIntegrationTest {
         assertNotEquals(originalProviderId, foundUser.providerId)
 
         // 파일 삭제 호출 안됨 검증
-        coVerify(exactly = 0) { mockFileDeletionSupportApi.deleteFile(any(), FileCategory.PROFILE_IMAGE) }
+        coVerify(exactly = 0) { mockFileDeletionSupportApi.deleteFile(any()) }
     }
 
     @Test
@@ -180,7 +179,7 @@ class DeleteAccountUseCaseIntegrationTest {
         val user = insertUser("1", profileImageUrl = "https://r2.example.com/profile.jpg")
         val originalProviderId = user.providerId
         coEvery {
-            mockFileDeletionSupportApi.deleteFile(any(), FileCategory.PROFILE_IMAGE)
+            mockFileDeletionSupportApi.deleteFile(any())
         } throws RuntimeException("R2 connection failed")
 
         // when
@@ -196,7 +195,7 @@ class DeleteAccountUseCaseIntegrationTest {
 
         // 파일 삭제 시도는 했는지 검증
         coVerify(exactly = 1) {
-            mockFileDeletionSupportApi.deleteFile("https://r2.example.com/profile.jpg", FileCategory.PROFILE_IMAGE)
+            mockFileDeletionSupportApi.deleteFile("https://r2.example.com/profile.jpg")
         }
     }
 
@@ -265,7 +264,7 @@ class DeleteAccountUseCaseIntegrationTest {
 
         // 파일 삭제 호출 안됨 검증 (트랜잭션 실패로 파일 삭제 단계까지 도달하지 않아야 함)
         coVerify(exactly = 0) {
-            mockFileDeletionSupportApi.deleteFile(any(), FileCategory.PROFILE_IMAGE)
+            mockFileDeletionSupportApi.deleteFile(any())
         }
     }
 

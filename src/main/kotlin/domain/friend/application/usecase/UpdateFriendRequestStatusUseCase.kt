@@ -5,7 +5,6 @@ import com.turnin.common.firebase.RefType
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
-import com.turnin.common.util.AppDispatchers
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.domain.friend.domain.message.FriendNotificationMessage
 import com.turnin.domain.friend.domain.model.FriendNotificationCommand
@@ -13,7 +12,6 @@ import com.turnin.domain.friend.domain.provider.NotificationProvider
 import com.turnin.domain.friend.domain.repository.FriendRepository
 import com.turnin.domain.friend.exception.FriendException
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -26,7 +24,6 @@ class UpdateFriendRequestStatusUseCase(
     private val friendRepository: FriendRepository,
     private val notificationProvider: NotificationProvider,
     private val applicationScope: CoroutineScope,
-    private val ioDispatcher: CoroutineDispatcher = AppDispatchers.ioDispatcher,
 ) {
     /**
      * 친구 상태를 수정한다.
@@ -94,7 +91,7 @@ class UpdateFriendRequestStatusUseCase(
         }
 
         // 6) 친구 수락 시 원래 요청을 보낸 사람(requesterId)에게 수락 알림 전송 비동기 실행 (실패해도 상태 수정은 성공으로 처리)
-        applicationScope.launch(ioDispatcher) {
+        applicationScope.launch {
             runCatching {
                 notificationProvider.sendNotification(
                     FriendNotificationCommand(
