@@ -5,13 +5,17 @@ import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.toKstDate
 import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
-import io.mockk.verify
 import java.io.File
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -19,6 +23,7 @@ import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.rules.TemporaryFolder
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LogBackupBatchTest {
     @get:Rule
     val tempFolder = TemporaryFolder()
@@ -57,21 +62,22 @@ class LogBackupBatchTest {
             r2Client = r2Client,
             normalLogDir = normalLogDir.absolutePath,
             privacyLogDir = privacyLogDir.absolutePath,
+            coroutineDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
     // ================ run() - 성공 케이스 ================
 
     @Test
-    fun `run - 정상 및 개인정보 로그 모두 업로드 성공 시 두 파일 모두 삭제된다`() {
+    fun `run - 정상 및 개인정보 로그 모두 업로드 성공 시 두 파일 모두 삭제된다`() = runTest {
         val normalFile = createTempLogFile(normalLogDir, "app-normal")
         val privacyFile = createTempLogFile(privacyLogDir, "app-privacy")
 
-        every { r2Client.putObject(any(), any(), any(), any()) } just Runs
+        coEvery { r2Client.putObject(any(), any(), any(), any()) } just Runs
 
         batch.run()
 
-        verify(exactly = 1) {
+        coVerify(exactly = 1) {
             r2Client.putObject(
                 normalBucket,
                 "logs/normal/app-normal-$dateStr.log.gz",
@@ -79,7 +85,7 @@ class LogBackupBatchTest {
                 "application/gzip",
             )
         }
-        verify(exactly = 1) {
+        coVerify(exactly = 1) {
             r2Client.putObject(
                 privacyBucket,
                 "logs/privacy/app-privacy-$dateStr.log.gz",
@@ -94,12 +100,12 @@ class LogBackupBatchTest {
     // ================ run() - 실패 케이스 ================
 
     @Test
-    fun `run - 정상 로그 업로드 실패 시 해당 파일이 삭제되지 않는다`() {
+    fun `run - 정상 로그 업로드 실패 시 해당 파일이 삭제되지 않는다`() = runTest {
         val normalFile = createTempLogFile(normalLogDir, "app-normal")
         val privacyFile = createTempLogFile(privacyLogDir, "app-privacy")
 
-        every { r2Client.putObject(normalBucket, any(), any(), any()) } throws RuntimeException("R2 upload error")
-        every { r2Client.putObject(privacyBucket, any(), any(), any()) } just Runs
+        coEvery { r2Client.putObject(normalBucket, any(), any(), any()) } throws RuntimeException("R2 upload error")
+        coEvery { r2Client.putObject(privacyBucket, any(), any(), any()) } just Runs
 
         batch.run()
 
@@ -108,12 +114,12 @@ class LogBackupBatchTest {
     }
 
     @Test
-    fun `run - 개인정보 로그 업로드 실패 시 해당 파일이 삭제되지 않는다`() {
+    fun `run - 개인정보 로그 업로드 실패 시 해당 파일이 삭제되지 않는다`() = runTest {
         val normalFile = createTempLogFile(normalLogDir, "app-normal")
         val privacyFile = createTempLogFile(privacyLogDir, "app-privacy")
 
-        every { r2Client.putObject(normalBucket, any(), any(), any()) } just Runs
-        every { r2Client.putObject(privacyBucket, any(), any(), any()) } throws RuntimeException("R2 upload error")
+        coEvery { r2Client.putObject(normalBucket, any(), any(), any()) } just Runs
+        coEvery { r2Client.putObject(privacyBucket, any(), any(), any()) } throws RuntimeException("R2 upload error")
 
         batch.run()
 
@@ -122,11 +128,13 @@ class LogBackupBatchTest {
     }
 
     @Test
-    fun `run - 두 로그 모두 업로드 실패 시 두 파일 모두 삭제되지 않는다`() {
+    fun `run - 두 로그 모두 업로드 실패 시 두 파일 모두 삭제되지 않는다`() = runTest {
         val normalFile = createTempLogFile(normalLogDir, "app-normal")
         val privacyFile = createTempLogFile(privacyLogDir, "app-privacy")
 
-        every { r2Client.putObject(any(), any(), any(), any()) } throws RuntimeException("R2 upload error")
+        coEvery {
+            r2Client.putObject(any(), any(), any(), any())
+        } throws RuntimeException("R2 upload error")
 
         batch.run()
 
@@ -137,46 +145,46 @@ class LogBackupBatchTest {
     // ================ run() - 파일 없음 ================
 
     @Test
-    fun `run - 로그 파일이 존재하지 않으면 R2 업로드를 호출하지 않는다`() {
+    fun `run - 로그 파일이 존재하지 않으면 R2 업로드를 호출하지 않는다`() = runTest {
         batch.run()
 
-        verify(exactly = 0) { r2Client.putObject(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { r2Client.putObject(any(), any(), any(), any()) }
     }
 
     @Test
-    fun `run - 정상 로그 파일만 없는 경우 개인정보 로그만 업로드한다`() {
+    fun `run - 정상 로그 파일만 없는 경우 개인정보 로그만 업로드한다`() = runTest {
         val privacyFile = createTempLogFile(privacyLogDir, "app-privacy")
 
-        every { r2Client.putObject(privacyBucket, any(), any(), any()) } just Runs
+        coEvery { r2Client.putObject(privacyBucket, any(), any(), any()) } just Runs
 
         batch.run()
 
-        verify(exactly = 0) { r2Client.putObject(normalBucket, any(), any(), any()) }
-        verify(exactly = 1) { r2Client.putObject(privacyBucket, any(), privacyFile, any()) }
+        coVerify(exactly = 0) { r2Client.putObject(normalBucket, any(), any(), any()) }
+        coVerify(exactly = 1) { r2Client.putObject(privacyBucket, any(), privacyFile, any()) }
         assertTrue(!privacyFile.exists())
     }
 
     @Test
-    fun `run - 개인정보 로그 파일만 없는 경우 정상 로그만 업로드한다`() {
+    fun `run - 개인정보 로그 파일만 없는 경우 정상 로그만 업로드한다`() = runTest {
         val normalFile = createTempLogFile(normalLogDir, "app-normal")
 
-        every { r2Client.putObject(normalBucket, any(), any(), any()) } just Runs
+        coEvery { r2Client.putObject(normalBucket, any(), any(), any()) } just Runs
 
         batch.run()
 
-        verify(exactly = 1) { r2Client.putObject(normalBucket, any(), normalFile, any()) }
-        verify(exactly = 0) { r2Client.putObject(privacyBucket, any(), any(), any()) }
+        coVerify(exactly = 1) { r2Client.putObject(normalBucket, any(), normalFile, any()) }
+        coVerify(exactly = 0) { r2Client.putObject(privacyBucket, any(), any(), any()) }
         assertTrue(!normalFile.exists())
     }
 
     // ================ R2 key 경로 검증 ================
 
     @Test
-    fun `backupLog - R2 key가 올바른 prefix와 파일명으로 구성된다`() {
+    fun `backupLog - R2 key가 올바른 prefix와 파일명으로 구성된다`() = runTest {
         createTempLogFile(normalLogDir, "app-normal")
 
         val keySlot = slot<String>()
-        every { r2Client.putObject(any(), capture(keySlot), any(), any()) } just Runs
+        coEvery { r2Client.putObject(any(), capture(keySlot), any(), any()) } just Runs
 
         batch.run()
 
@@ -186,25 +194,25 @@ class LogBackupBatchTest {
     // ================ 오늘 날짜 파일 제외 ================
 
     @Test
-    fun `run - 오늘 날짜 로그 파일은 업로드하지 않는다`() {
+    fun `run - 오늘 날짜 로그 파일은 업로드하지 않는다`() = runTest {
         createTempLogFileWithDate(normalLogDir, "app-normal", todayStr)
 
         batch.run()
 
-        verify(exactly = 0) { r2Client.putObject(any(), any(), any(), any()) }
+        coVerify(exactly = 0) { r2Client.putObject(any(), any(), any(), any()) }
     }
 
     @Test
-    fun `run - 오늘 날짜 파일과 이전 날짜 파일이 혼재할 때 이전 날짜 파일만 업로드한다`() {
+    fun `run - 오늘 날짜 파일과 이전 날짜 파일이 혼재할 때 이전 날짜 파일만 업로드한다`() = runTest {
         val yesterdayFile = createTempLogFile(normalLogDir, "app-normal")
         val todayFile = createTempLogFileWithDate(normalLogDir, "app-normal", todayStr)
 
-        every { r2Client.putObject(any(), any(), any(), any()) } just Runs
+        coEvery { r2Client.putObject(any(), any(), any(), any()) } just Runs
 
         batch.run()
 
-        verify(exactly = 1) { r2Client.putObject(any(), any(), yesterdayFile, any()) }
-        verify(exactly = 0) { r2Client.putObject(any(), any(), todayFile, any()) }
+        coVerify(exactly = 1) { r2Client.putObject(any(), any(), yesterdayFile, any()) }
+        coVerify(exactly = 0) { r2Client.putObject(any(), any(), todayFile, any()) }
         assertTrue(!yesterdayFile.exists()) { "yesterdayFile should be deleted" }
         assertTrue(todayFile.exists()) { "todayFile should NOT be deleted" }
     }
@@ -212,27 +220,27 @@ class LogBackupBatchTest {
     // ================ 미백업 파일 재시도 ================
 
     @Test
-    fun `run - 이전에 실패한 파일이 남아있으면 재시도한다`() {
+    fun `run - 이전에 실패한 파일이 남아있으면 재시도한다`() = runTest {
         val twoDaysAgoStr = today.minusDays(2).format(DateTimeFormatter.ISO_LOCAL_DATE)
         val oldFile = createTempLogFileWithDate(normalLogDir, "app-normal", twoDaysAgoStr)
         val yesterdayFile = createTempLogFile(normalLogDir, "app-normal")
 
-        every { r2Client.putObject(any(), any(), any(), any()) } just Runs
+        coEvery { r2Client.putObject(any(), any(), any(), any()) } just Runs
 
         batch.run()
 
-        verify(exactly = 1) { r2Client.putObject(any(), any(), oldFile, any()) }
-        verify(exactly = 1) { r2Client.putObject(any(), any(), yesterdayFile, any()) }
+        coVerify(exactly = 1) { r2Client.putObject(any(), any(), oldFile, any()) }
+        coVerify(exactly = 1) { r2Client.putObject(any(), any(), yesterdayFile, any()) }
         assertTrue(!oldFile.exists()) { "oldFile should be deleted" }
         assertTrue(!yesterdayFile.exists()) { "yesterdayFile should be deleted" }
     }
 
     @Test
-    fun `run - 이전에 실패한 파일 재시도 중 실패하면 파일이 삭제되지 않는다`() {
+    fun `run - 이전에 실패한 파일 재시도 중 실패하면 파일이 삭제되지 않는다`() = runTest {
         val twoDaysAgoStr = today.minusDays(2).format(DateTimeFormatter.ISO_LOCAL_DATE)
         val oldFile = createTempLogFileWithDate(normalLogDir, "app-normal", twoDaysAgoStr)
 
-        every { r2Client.putObject(any(), any(), any(), any()) } throws RuntimeException("R2 upload error")
+        coEvery { r2Client.putObject(any(), any(), any(), any()) } throws RuntimeException("R2 upload error")
 
         batch.run()
 
