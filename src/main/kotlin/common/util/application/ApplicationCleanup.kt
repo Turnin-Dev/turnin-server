@@ -19,6 +19,13 @@ import org.koin.ktor.ext.inject
 /**
  * 애플리케이션 종료 시 리소스 정리 수행 함수
  *
+ * 단, [cancellableJobs]에 해당되는 작업들은 명시적 취소를 수행한다.
+ *
+ * 만약, [cancellableJobs]에 해당되는 작업 중 중요한 작업이 있다면 확인이 필요하다.
+ *
+ * 대부분의 경우 [cancellableJobs]에는 배치 작업들이 포함되는데 `배치 작업 시간`을 고려하여 겹치지 않게
+ * 애플리케이션을 안전하게 종료해야 한다.
+ *
  * @param cleanups 부가 리소스 정리 작업 리스트
  * @param cancellableJobs 수동 취소할 무한 대기 루프 작업(배치 등) 리스트
  */
@@ -95,6 +102,7 @@ private fun Application.performCleanup(
             if (cancellableJobs.isNotEmpty()) {
                 LOGGER.info("$LOG_NAME Jobs 수동 취소 (${cancellableJobs.size}개)")
                 cancellableJobs.forEach { it.cancel() }
+                cancellableJobs.joinAll()
             }
 
             // 나머지 작업 종료까지 대기
@@ -117,11 +125,16 @@ private fun Application.performCleanup(
             LOGGER.info("$LOG_NAME --- 모든 종료 절차 완료 ---")
         } ?: run {
             LOGGER.error("$LOG_NAME !!! 타임아웃 - 강제 종료 !!!")
-            // 타임아웃 시에도 Koin과 코루틴은 반드시 정리
-            parentJobsGlobal.forEach { runCatching { it.cancel() } }
+            // 타임아웃 시에도 Koin과 코루틴은 반드시 정리 (best-effort)
+
+            // 취소 대상(배치 등)과 부모 Job 모두에 취소 신호 전달
+            val allJobs = cancellableJobs + parentJobsGlobal
+            allJobs.forEach { runCatching { it.cancel() } }
+
+            // cancel 신호가 최소한 처리될 여유만 짧게 부여
             runCatching {
-                withTimeoutOrNull(1_000) {
-                    parentJobsGlobal.joinAll()
+                withTimeoutOrNull(2_000) {
+                    allJobs.joinAll()
                 }
             }
 
