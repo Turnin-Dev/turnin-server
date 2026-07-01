@@ -7,7 +7,6 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CompletableJob
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
@@ -81,16 +80,14 @@ private fun Application.performCleanup(
                 val parentJob = scope.coroutineContext[Job]
                 if (parentJob is CompletableJob) {
                     parentJobsGlobal.add(parentJob)
-                    val childCount = parentJob.children.count()
-                    LOGGER.info(
-                        message = "$LOG_NAME 백그라운드 작업 대기: ${childCount}개 " +
-                            "(${scope.coroutineContext[CoroutineName]?.name})",
-                    )
                     parentJob.complete()
-                    parentJob.join()
                 }
             }
-            LOGGER.info("$LOG_NAME 모든 백그라운드 작업 완료")
+
+            parentJobsGlobal.forEach { parentJob ->
+                LOGGER.info("$LOG_NAME 백그라운드 작업 대기 ($parentJob)")
+                parentJob.join()
+            }
 
             // 2. 부가 리소스 정리
             cleanups.forEach { cleanup ->
@@ -108,6 +105,10 @@ private fun Application.performCleanup(
             LOGGER.error("$LOG_NAME !!! 타임아웃 - 강제 종료 !!!")
             // 타임아웃 시에도 Koin과 코루틴은 반드시 정리
             parentJobsGlobal.forEach { runCatching { it.cancel() } }
+            cleanups.forEach { cleanup ->
+                runCatching { cleanup() }
+                    .onFailure { LOGGER.error(it, "$LOG_NAME 리소스 정리 실패") }
+            }
             runCatching { stopKoin() }
         }
     }
