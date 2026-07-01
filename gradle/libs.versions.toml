@@ -16,7 +16,7 @@ ksp = "2.1.10-1.0.30"
 mockk-version = "1.14.2"
 swagger-codegen-version = "1.0.56"
 smiley-openapi-version = "5.0.2"
-aws-s3 = "2.32.26"
+aws-s3 = "1.5.123"
 onnx-runtime = "1.23.2"
 huggingface-tokenizers = "0.36.0"
 test-container-pg = "1.21.4"
@@ -82,7 +82,7 @@ ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-vers
 # CORS
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor-version" }
 # AWS S3
-amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-s3" }
+amazon-awssdk-s3 = { module = "aws.sdk.kotlin:s3-jvm", version.ref = "aws-s3" }
 # ONNX, Tokenizers
 onnx-runtime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnx-runtime" }
 huggingface-tokenizers = { module = "ai.djl.huggingface:tokenizers", version.ref = "huggingface-tokenizers" }
