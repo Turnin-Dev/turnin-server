@@ -4,6 +4,6 @@ import com.turnin.domain.file.application.provider.FileProviderApi
 import com.turnin.domain.user.domain.provider.FileProvider
 
 class FileProviderImpl(private val fileProviderApi: FileProviderApi) : FileProvider {
-    override fun deleteFile(fileUrl: String) =
+    override suspend fun deleteFile(fileUrl: String) =
         fileProviderApi.deleteFile(fileUrl)
 }

@@ -11,6 +11,9 @@ import com.turnin.common.util.toKstDate
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
 /**
  * 로그 백업 배치
@@ -25,6 +28,7 @@ class LogBackupBatch(
     private val r2Client: CloudflareR2Client,
     private val normalLogDir: String = "/logs/normal",
     private val privacyLogDir: String = "/logs/privacy",
+    private val coroutineDispatcher: CoroutineDispatcher,
 ) {
     private val normalLogBucketName by lazy {
         appConfig.getRequired("ktor.security.cloudflare.s3LogNormalBucketName")
@@ -39,8 +43,11 @@ class LogBackupBatch(
      * 일반 로그와 개인정보 로그를 각각 다른 버킷에 업로드하고
      * 업로드 성공한 파일만 로컬에서 삭제한다.
      * 이전에 실패한 파일도 재시도한다. (오늘 날짜 파일 제외)
+     *
+     * **내부 작동:** 파일 작업은 IO 스레드풀에서 스레드를 점유한 채 수행되고,
+     *  네트워크 작업도 IO 스레드풀에 실행되지만 내부적으로 스레드 점유/반납으로 더 효율적으로 수행된다.
      */
-    fun run() {
+    suspend fun run() {
         val today = TurninDateTime.now().toKstDate()
         LOGGER.info(
             "LogBackupBatch running: date=$today",
@@ -96,18 +103,18 @@ class LogBackupBatch(
      * @param today 오늘 날짜 (제외 기준)
      * @return 성공 여부 (true = 성공)
      */
-    private fun backupLogs(
+    private suspend fun backupLogs(
         dir: String,
         prefix: String,
         bucketName: String,
         r2Prefix: String,
         today: LocalDate,
-    ): Boolean {
+    ): Boolean = withContext(coroutineDispatcher) {
         val todayStr = today.format(DateTimeFormatter.ISO_LOCAL_DATE)
         val logDir = File(dir)
         if (!logDir.exists() || !logDir.isDirectory) {
             LOGGER.error("Invalid log backup directory: $dir")
-            return false
+            return@withContext false
         }
 
         val files = logDir.listFiles { f ->
@@ -116,19 +123,19 @@ class LogBackupBatch(
                 !f.name.contains(todayStr)
         } ?: run {
             LOGGER.error("Failed to list log files in $dir")
-            return false
+            return@withContext false
         }
 
         if (files.isEmpty()) {
             LOGGER.info("No log files to backup in $dir")
-            return true
+            return@withContext true
         }
 
         var success = true
         files.forEach { file ->
             success = backupLog(file, bucketName, r2Prefix) && success
         }
-        return success
+        return@withContext success
     }
 
     /**
@@ -139,7 +146,7 @@ class LogBackupBatch(
      * @param r2Prefix R2 저장 경로 접두사
      * @return 성공 여부 (true = 성공)
      */
-    private fun backupLog(
+    private suspend fun backupLog(
         file: File,
         bucketName: String,
         r2Prefix: String,
@@ -158,6 +165,8 @@ class LogBackupBatch(
             LOGGER.error("Failed to delete local log file after upload: ${file.path}")
             false
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         LOGGER.error(e, "Log backup failed: ${file.path}")
         false

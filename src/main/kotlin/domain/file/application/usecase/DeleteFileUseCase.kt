@@ -15,7 +15,7 @@ class DeleteFileUseCase(private val fileService: FileService) {
      *
      * @see [FileService.deleteFile]
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         fileUrl: String,
     ) = fileService.deleteFile(fileUrl)
 }

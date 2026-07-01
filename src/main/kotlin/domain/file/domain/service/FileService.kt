@@ -20,7 +20,7 @@ interface FileService {
      * @throws FileException.InvalidS3PresignerArgument 잘못된 인자 값(버킷이름, 키 등) 사용 시 발생 - (Global ExceptionHandler에서 자동 처리)
      * @throws FileException.S3CredentialException 서명 생성 과정에서 에러 발생 시 예외가 발생한다.
      */
-    fun createPresignedUrlWithInfo(
+    suspend fun createPresignedUrlWithInfo(
         fileName: String,
         mimeType: String,
     ): UploadFileInfo
@@ -36,7 +36,7 @@ interface FileService {
      * @throws FileException.InvalidS3PresignerArgument 잘못된 인자 값(버킷이름, 키 등) 사용 시 발생 - (Global ExceptionHandler에서 자동 처리)
      * @throws FileException.S3CredentialException 서명 생성 과정에서 에러 발생 시 예외가 발생한다.
      */
-    fun createPresignedUpdateUrlWithInfo(
+    suspend fun createPresignedUpdateUrlWithInfo(
         newFileName: String,
         mimeType: String,
     ): UploadFileInfo
@@ -53,5 +53,5 @@ interface FileService {
      *
      * @throws FileException.R2DeleteFailed 파일을 삭제하는 과정에서 에러가 발생하면 예외가 발생한다.
      */
-    fun deleteFile(fileUrl: String)
+    suspend fun deleteFile(fileUrl: String)
 }

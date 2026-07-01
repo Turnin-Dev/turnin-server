@@ -18,7 +18,7 @@ class GetFileUploadUrlUseCase(private val fileService: FileService) {
      * @param mimeType MIME 타입
      * @param fileCategory 파일 카테고리
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         fileName: String,
         mimeType: String,
         fileCategory: FileCategory,
