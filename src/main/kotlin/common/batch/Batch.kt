@@ -7,8 +7,10 @@ import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.hours
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.ktor.ext.inject
@@ -18,13 +20,13 @@ import org.koin.ktor.ext.inject
 /**
  * 배치 설정
  */
-fun Application.configureBatch() {
+fun Application.configureBatch(): List<Job> {
     val applicationScope by inject<CoroutineScope>(DefaultApplicationScopeQualifier)
     val logBackupBatch by inject<LogBackupBatch>()
     val hardDeleteExpiredAccountsBatch by inject<HardDeleteExpiredAccountsBatch>()
 
     // 로그 백업: KST 01:00
-    applicationScope.launch {
+    val logBackupJob = applicationScope.launch {
         val logBackUpBatchName = "LogBackupBatch"
         delayUntilNextRun(kstHour = 1, kstMinute = 0, batchName = logBackUpBatchName)
         while (true) {
@@ -36,7 +38,7 @@ fun Application.configureBatch() {
     }
 
     // 만료 계정 삭제(Hard Delete): KST 02:00
-    applicationScope.launch {
+    val accountDeletionJob = applicationScope.launch {
         val accountDeletionBatchName = "AccountDeletionBatch"
         delayUntilNextRun(kstHour = 2, kstMinute = 0, batchName = accountDeletionBatchName)
         while (true) {
@@ -56,6 +58,8 @@ fun Application.configureBatch() {
 //            delay(24.hours)
 //        }
 //    }
+
+    return listOf(logBackupJob, accountDeletionJob)
 }
 
 /**
@@ -97,6 +101,8 @@ private suspend inline fun batchTryCatch(
 ) {
     try {
         block()
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         LOGGER.error(e, "Batch '$batchName' failed")
     }

@@ -11,6 +11,7 @@ import com.turnin.common.util.toKstDate
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -164,6 +165,8 @@ class LogBackupBatch(
             LOGGER.error("Failed to delete local log file after upload: ${file.path}")
             false
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         LOGGER.error(e, "Log backup failed: ${file.path}")
         false

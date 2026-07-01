@@ -20,7 +20,7 @@ class ImageR2Service(
     /**
      * Presigned URL을 생성한다.
      *
-     * @param bucketName 대상 버킷명
+     * @param fileName 업로드할 파일명
      * @param mimeType MIME 타입
      *
      * @return [String] 타입의 PresignedUrl
@@ -40,7 +40,7 @@ class ImageR2Service(
     /**
      * R2에서 파일을 삭제한다.
      *
-     * @param bucketName 대상 버킷명
+     * @param fileName 삭제할 파일명
      */
     suspend fun deleteFile(fileName: String) =
         r2Client.deleteObject(

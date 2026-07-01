@@ -53,7 +53,7 @@ fun Application.module() {
     configureRouting()
 
     // ------------------------------ Batch ------------------------------
-    configureBatch()
+    val batchJobs = configureBatch()
 
     // ------------------------------ Print ------------------------------
     val timeZoneInfo = getTimeZoneInfo()
@@ -66,5 +66,7 @@ fun Application.module() {
     // 프로세스 종료 시 아래 순서로 정리된다:
     // 1. 실행 중인 백그라운드 코루틴 완료 대기
     // 2. Koin onClose 블록 실행 (DB, 외부 서비스 등 리소스 해제)
-    applicationCleanup()
+    applicationCleanup(
+        cancellableJobs = batchJobs,
+    )
 }

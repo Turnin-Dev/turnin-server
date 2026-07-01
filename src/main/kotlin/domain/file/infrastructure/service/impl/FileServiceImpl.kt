@@ -16,7 +16,7 @@ class FileServiceImpl(private val r2Service: ImageR2Service) : FileService {
             val presignedUrl = r2Service.createPresignedUrl(fileName, mimeType)
             val uploadFileInfo = UploadFileInfo(
                 presignedUrl = presignedUrl,
-                method = presignedUrl,
+                method = "PUT",
                 expiresInSeconds = r2Service.signatureDuration.seconds,
             )
             return uploadFileInfo
@@ -37,7 +37,7 @@ class FileServiceImpl(private val r2Service: ImageR2Service) : FileService {
             val presignedUrl = r2Service.createPresignedUrl(newFileName, mimeType)
             val uploadFileInfo = UploadFileInfo(
                 presignedUrl = presignedUrl,
-                method = presignedUrl,
+                method = "PUT",
                 expiresInSeconds = r2Service.signatureDuration.seconds,
             )
             return uploadFileInfo
