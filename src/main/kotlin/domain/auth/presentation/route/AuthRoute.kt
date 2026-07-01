@@ -143,7 +143,7 @@ private fun RouteConfig.loginDocs() {
                     value = ErrorResponse(
                         code = AuthErrorCode.LoginFailed.code,
                         message = "Login failed",
-                        status = HttpStatusCode.BadRequest.value,
+                        status = HttpStatusCode.NotFound.value,
                     )
                 }
             }
