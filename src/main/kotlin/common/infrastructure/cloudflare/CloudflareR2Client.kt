@@ -1,24 +1,25 @@
 package com.turnin.common.infrastructure.cloudflare
 
+import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.deleteObject
+import aws.sdk.kotlin.services.s3.model.PutObjectRequest
+import aws.sdk.kotlin.services.s3.presigners.presignPutObject
+import aws.sdk.kotlin.services.s3.putObject
+import aws.smithy.kotlin.runtime.auth.awscredentials.Credentials
+import aws.smithy.kotlin.runtime.auth.awscredentials.CredentialsProvider
+import aws.smithy.kotlin.runtime.collections.Attributes
+import aws.smithy.kotlin.runtime.content.ByteStream
+import aws.smithy.kotlin.runtime.content.fromFile
+import aws.smithy.kotlin.runtime.net.url.Url
 import com.turnin.common.util.config.AppConfig
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.masking
 import java.io.File
-import java.net.URI
 import java.time.Duration
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
-import software.amazon.awssdk.core.sync.RequestBody
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import software.amazon.awssdk.services.s3.presigner.S3Presigner
-import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
+import kotlin.time.toKotlinDuration
 
 /**
- * Cloudflare R2 저수준 클라이언트
+ * Cloudflare R2 저수준 클라이언트 (Kotlin SDK 버전)
  *
  * 버킷을 파라미터로 받아 범용적으로 사용 가능하다.
  */
@@ -29,37 +30,31 @@ class CloudflareR2Client(private val appConfig: AppConfig) : AutoCloseable {
     private val secretKey by lazy {
         appConfig.getRequired("ktor.security.cloudflare.s3SecretKey")
     }
-    private val region by lazy {
-        Region.of(appConfig.getRequired("ktor.security.cloudflare.s3Region"))
+    private val regionName by lazy {
+        appConfig.getRequired("ktor.security.cloudflare.s3Region")
     }
     private val endpoint by lazy {
-        URI.create(appConfig.getRequired("ktor.security.cloudflare.s3Endpoint"))
-    }
-    private val credentialsProvider by lazy {
-        StaticCredentialsProvider.create(
-            AwsBasicCredentials.create(accessKey, secretKey),
-        )
+        appConfig.getRequired("ktor.security.cloudflare.s3Endpoint")
     }
 
+    // 자격 증명 프로바이더 구성
+    private val r2CredentialProvider = object : CredentialsProvider {
+        override suspend fun resolve(attributes: Attributes): Credentials =
+            Credentials(
+                accessKeyId = accessKey,
+                secretAccessKey = secretKey,
+            )
+    }
+
+    // 코틀린 S3Client는 단 하나로 일반 요청과 Presign을 모두 처리한다.
     private val s3ClientDelegate = lazy {
-        S3Client
-            .builder()
-            .credentialsProvider(credentialsProvider)
-            .region(region)
-            .endpointOverride(endpoint)
-            .build()
+        S3Client {
+            region = regionName
+            endpointUrl = Url.parse(endpoint)
+            credentialsProvider = r2CredentialProvider
+        }
     }
     private val s3Client: S3Client by s3ClientDelegate
-
-    private val s3PresignerDelegate = lazy {
-        S3Presigner
-            .builder()
-            .credentialsProvider(credentialsProvider)
-            .region(region)
-            .endpointOverride(endpoint)
-            .build()
-    }
-    private val s3Presigner: S3Presigner by s3PresignerDelegate
 
     /**
      * 파일을 R2에 직접 업로드한다.
@@ -73,7 +68,7 @@ class CloudflareR2Client(private val appConfig: AppConfig) : AutoCloseable {
      * @param contentType MIME 타입 (기본값: text/plain)
      * @param cacheControl 캐시 설정 (null이면 설정 안 함, 이미지처럼 장기 캐시가 필요한 경우에만 사용)
      */
-    fun putObject(
+    suspend fun putObject(
         bucketName: String,
         key: String,
         file: File,
@@ -81,16 +76,13 @@ class CloudflareR2Client(private val appConfig: AppConfig) : AutoCloseable {
         cacheControl: String? = null,
     ) {
         try {
-            s3Client.putObject(
-                PutObjectRequest
-                    .builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .contentType(contentType)
-                    .apply { cacheControl?.let { cacheControl(it) } }
-                    .build(),
-                RequestBody.fromFile(file),
-            )
+            s3Client.putObject {
+                this.bucket = bucketName
+                this.key = key
+                this.contentType = contentType
+                this.cacheControl = cacheControl
+                this.body = ByteStream.fromFile(file)
+            }
         } catch (e: Exception) {
             LOGGER.error(e, "Failed to put object (bucket=${bucketName.masking()}, key=${key.masking()})")
             throw e
@@ -103,15 +95,12 @@ class CloudflareR2Client(private val appConfig: AppConfig) : AutoCloseable {
      * @param bucketName 대상 버킷명
      * @param key 삭제할 파일 경로
      */
-    fun deleteObject(bucketName: String, key: String) {
+    suspend fun deleteObject(bucketName: String, key: String) {
         try {
-            s3Client.deleteObject(
-                DeleteObjectRequest
-                    .builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build(),
-            )
+            s3Client.deleteObject {
+                this.bucket = bucketName
+                this.key = key
+            }
         } catch (e: Exception) {
             LOGGER.error(e, "Failed to delete object (bucket=${bucketName.masking()}, key=${key.masking()})")
             throw e
@@ -129,29 +118,27 @@ class CloudflareR2Client(private val appConfig: AppConfig) : AutoCloseable {
      * @param mimeType MIME 타입
      * @param duration URL 유효 기간 (기본값: 5분)
      * @param cacheControl 캐시 설정 (null이면 설정 안 함, 이미지처럼 장기 캐시가 필요한 경우에만 사용)
+     *
+     * @return [String] 타입의 PresignedUrl
      */
-    fun createPresignedPutUrl(
+    suspend fun createPresignedPutUrl(
         bucketName: String,
         key: String,
         mimeType: String,
         duration: Duration = Duration.ofMinutes(5),
         cacheControl: String? = null,
-    ): PresignedPutObjectRequest {
+    ): String {
         try {
-            return s3Presigner.presignPutObject(
-                PutObjectPresignRequest
-                    .builder()
-                    .putObjectRequest(
-                        PutObjectRequest
-                            .builder()
-                            .bucket(bucketName)
-                            .key(key)
-                            .contentType(mimeType)
-                            .apply { cacheControl?.let { cacheControl(it) } }
-                            .build(),
-                    ).signatureDuration(duration)
-                    .build(),
-            )
+            val unsignedRequest = PutObjectRequest {
+                this.bucket = bucketName
+                this.key = key
+                this.contentType = mimeType
+                this.cacheControl = cacheControl
+            }
+
+            val presignedHttpRequest = s3Client.presignPutObject(unsignedRequest, duration.toKotlinDuration())
+
+            return presignedHttpRequest.url.toString()
         } catch (e: Exception) {
             LOGGER.error(e, "Failed to create presigned URL (bucket=${bucketName.masking()}, key=${key.masking()})")
             throw e
@@ -168,10 +155,6 @@ class CloudflareR2Client(private val appConfig: AppConfig) : AutoCloseable {
         if (s3ClientDelegate.isInitialized()) {
             runCatching { s3Client.close() }
                 .onFailure { LOGGER.error(it, "Failed to close S3Client") }
-        }
-        if (s3PresignerDelegate.isInitialized()) {
-            runCatching { s3Presigner.close() }
-                .onFailure { LOGGER.error(it, "Failed to close S3Presigner") }
         }
     }
 }

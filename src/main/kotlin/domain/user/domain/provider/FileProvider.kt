@@ -9,5 +9,5 @@ interface FileProvider {
      *
      * @param fileUrl 파일 URL
      */
-    fun deleteFile(fileUrl: String)
+    suspend fun deleteFile(fileUrl: String)
 }

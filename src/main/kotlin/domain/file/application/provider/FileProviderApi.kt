@@ -13,7 +13,7 @@ class FileProviderApi(private val deleteFileUseCase: DeleteFileUseCase) {
      *
      * @see DeleteFileUseCase
      */
-    fun deleteFile(
+    suspend fun deleteFile(
         fileUrl: String,
     ) = deleteFileUseCase(fileUrl)
 }

@@ -1,19 +1,22 @@
 package com.turnin.domain.file.infrastructure.service.impl
 
+import aws.sdk.kotlin.services.s3.model.S3Exception
+import aws.smithy.kotlin.runtime.SdkBaseException
 import com.turnin.domain.file.domain.model.UploadFileInfo
 import com.turnin.domain.file.domain.service.FileService
 import com.turnin.domain.file.exception.FileException
 import java.net.URI
-import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.services.s3.model.S3Exception
 
 class FileServiceImpl(private val r2Service: ImageR2Service) : FileService {
-    override fun createPresignedUrlWithInfo(fileName: String, mimeType: String): UploadFileInfo {
+    override suspend fun createPresignedUrlWithInfo(
+        fileName: String,
+        mimeType: String,
+    ): UploadFileInfo {
         try {
-            val presignedRequest = r2Service.createPresignedRequest(fileName, mimeType)
+            val presignedUrl = r2Service.createPresignedUrl(fileName, mimeType)
             val uploadFileInfo = UploadFileInfo(
-                presignedUrl = presignedRequest.url().toString(),
-                method = presignedRequest.httpRequest().method().name,
+                presignedUrl = presignedUrl,
+                method = presignedUrl,
                 expiresInSeconds = r2Service.signatureDuration.seconds,
             )
             return uploadFileInfo
@@ -21,20 +24,20 @@ class FileServiceImpl(private val r2Service: ImageR2Service) : FileService {
             throw FileException.InvalidS3PresignerArgument(e)
         } catch (e: IllegalStateException) {
             throw FileException.InvalidS3PresignerArgument(e)
-        } catch (e: SdkClientException) {
+        } catch (e: SdkBaseException) {
             throw FileException.S3CredentialException(e)
         }
     }
 
-    override fun createPresignedUpdateUrlWithInfo(
+    override suspend fun createPresignedUpdateUrlWithInfo(
         newFileName: String,
         mimeType: String,
     ): UploadFileInfo {
         try {
-            val presignedRequest = r2Service.createPresignedRequest(newFileName, mimeType)
+            val presignedUrl = r2Service.createPresignedUrl(newFileName, mimeType)
             val uploadFileInfo = UploadFileInfo(
-                presignedUrl = presignedRequest.url().toString(),
-                method = presignedRequest.httpRequest().method().name,
+                presignedUrl = presignedUrl,
+                method = presignedUrl,
                 expiresInSeconds = r2Service.signatureDuration.seconds,
             )
             return uploadFileInfo
@@ -42,18 +45,18 @@ class FileServiceImpl(private val r2Service: ImageR2Service) : FileService {
             throw FileException.InvalidS3PresignerArgument(e)
         } catch (e: IllegalStateException) {
             throw FileException.InvalidS3PresignerArgument(e)
-        } catch (e: SdkClientException) {
+        } catch (e: SdkBaseException) {
             throw FileException.S3CredentialException(e)
         }
     }
 
-    override fun deleteFile(fileUrl: String) {
+    override suspend fun deleteFile(fileUrl: String) {
         try {
             val parsedFileName = parseFileName(fileUrl)
             r2Service.deleteFile(parsedFileName)
         } catch (e: S3Exception) {
             throw FileException.R2DeleteFailed(e)
-        } catch (e: SdkClientException) {
+        } catch (e: SdkBaseException) {
             throw FileException.R2DeleteFailed(e)
         }
     }
