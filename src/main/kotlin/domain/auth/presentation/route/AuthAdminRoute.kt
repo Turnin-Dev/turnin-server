@@ -6,9 +6,12 @@ import com.turnin.common.model.id.DisplayId
 import com.turnin.common.route.Api
 import com.turnin.domain.auth.application.usecase.AuthAdminUseCases
 import com.turnin.domain.auth.exception.AuthErrorCode
+import com.turnin.domain.auth.presentation.dto.AdminLoginRequest
 import com.turnin.domain.auth.presentation.dto.AdminRegisterRequest
+import com.turnin.domain.auth.presentation.dto.LoginResultResponse
 import com.turnin.domain.auth.presentation.dto.RegisterResultResponse
 import com.turnin.domain.auth.presentation.dto.toDto
+import com.turnin.domain.auth.presentation.dto.toLoginRequest
 import com.turnin.domain.auth.presentation.dto.toRegisterRequest
 import com.turnin.domain.auth.presentation.dto.toResponse
 import com.turnin.domain.auth.presentation.dto.validate
@@ -26,6 +29,17 @@ fun Route.authAdminRoutes(route: Api.Admin.Auth, usecase: AuthAdminUseCases) {
         description = "Auth Admin API"
         specName = "admin"
     }) {
+        post(route.LOGIN, { loginDocs() }) {
+            val originalRequest = call.receive<AdminLoginRequest>()
+            usecase.validateAdminSecretKey(originalRequest.secretKey)
+
+            val request = originalRequest.toLoginRequest()
+            request.validate()
+
+            val loginResultDto = usecase.login(request.toDto())
+            call.respond(loginResultDto.toResponse())
+        }
+
         post(route.REGISTER, { registerDocs() }) {
             val originalRequest = call.receive<AdminRegisterRequest>()
             usecase.validateAdminSecretKey(originalRequest.secretKey)
@@ -44,6 +58,40 @@ fun Route.authAdminRoutes(route: Api.Admin.Auth, usecase: AuthAdminUseCases) {
                     HttpStatusCode.Conflict,
                     AuthErrorCode.UserDuplicated.toErrorResponse(HttpStatusCode.Conflict),
                 )
+            }
+        }
+    }
+}
+
+private fun RouteConfig.loginDocs() {
+    summary = "소셜 로그인 (관리자용)"
+    description = "소셜 로그인 (관리자용)"
+    request {
+        body<AdminLoginRequest> {
+            description = "로그인 요청 본문"
+            example("AdminLoginRequest") {
+                value = AdminLoginRequest.sample
+            }
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<LoginResultResponse> {
+                description = "로그인 응답 본문 (사용자 ID + JWT 토큰)"
+                example("LoginResultResponse") {
+                    value = LoginResultResponse.sample
+                }
+            }
+        }
+        default {
+            body<ErrorResponse> {
+                example("ErrorResponse") {
+                    value = ErrorResponse(
+                        code = AuthErrorCode.LoginFailed.code,
+                        message = "Login failed",
+                        status = HttpStatusCode.BadRequest.value,
+                    )
+                }
             }
         }
     }

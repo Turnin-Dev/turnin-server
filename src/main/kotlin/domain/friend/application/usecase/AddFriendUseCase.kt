@@ -6,7 +6,6 @@ import com.turnin.common.firebase.RefType
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
-import com.turnin.common.util.AppDispatchers
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.domain.friend.domain.message.FriendNotificationMessage
 import com.turnin.domain.friend.domain.model.FriendNotificationCommand
@@ -103,7 +102,7 @@ class AddFriendUseCase(
         }
 
         // 6) 알림 전송 비동기 실행 (실패해도 친구 요청/수락은 성공으로 처리)
-        applicationScope.launch(AppDispatchers.ioDispatcher) {
+        applicationScope.launch {
             runCatching {
                 if (isAutoAccepted) {
                     // 6-1) 역방향 자동 수락: 원래 요청자(receiverId)에게 수락 알림 전송

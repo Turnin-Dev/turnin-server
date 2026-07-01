@@ -3,6 +3,7 @@ package com.turnin.domain.file.presentation.route
 import com.turnin.common.route.Api
 import com.turnin.domain.file.application.dto.UploadFileInfoDto
 import com.turnin.domain.file.application.usecase.FileUseCases
+import com.turnin.domain.file.domain.model.FileCategory
 import com.turnin.domain.file.exception.FileException
 import com.turnin.util.TestClientFactory.createTestClient
 import com.turnin.util.testPlugin
@@ -24,7 +25,7 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 성공 테스트`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { usecase.getFileUploadUrl(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { usecase.getFileUploadUrl(any(), any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
             routing = { fileRoutes(route, usecase) },
@@ -35,6 +36,7 @@ class FileRouteTest {
             url {
                 parameters.append("fileName", MOCK_VALID_FILE_NAME)
                 parameters.append("mime", MOCK_VALID_MIME)
+                parameters.append("fileCategory", FileCategory.PROFILE_IMAGE.name)
             }
         }
         val responseBody = response.bodyAsText()
@@ -52,7 +54,7 @@ class FileRouteTest {
         val expectedException = FileException.InvalidS3PresignerArgument()
         val client = createTestClient()
         coEvery {
-            usecase.getFileUploadUrl(any(), any())
+            usecase.getFileUploadUrl(any(), any(), any())
         } throws expectedException
 
         testPlugin(
@@ -64,6 +66,7 @@ class FileRouteTest {
             url {
                 parameters.append("fileName", MOCK_VALID_FILE_NAME)
                 parameters.append("mime", MOCK_VALID_MIME)
+                parameters.append("fileCategory", FileCategory.PROFILE_IMAGE.name)
             }
         }
         val responseBody = response.bodyAsText()
@@ -77,7 +80,7 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 실패 테스트 - 파일이름 유효성 검사 실패 시 상태코드 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { usecase.getFileUploadUrl(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { usecase.getFileUploadUrl(any(), any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
             routing = { fileRoutes(route, usecase) },
@@ -88,6 +91,7 @@ class FileRouteTest {
             url {
                 parameters.append("fileName", MOCK_INVALID_FILE_NAME)
                 parameters.append("mime", MOCK_VALID_MIME)
+                parameters.append("fileCategory", FileCategory.PROFILE_IMAGE.name)
             }
         }
 
@@ -99,7 +103,7 @@ class FileRouteTest {
     fun `파일 업로드를 위한 객체를 반환받는 GET 요청 실패 테스트 - MIME 유효성 검사 실패 시 상태코드 BadRequest를 반환한다`() = testApplication {
         // given
         val client = createTestClient()
-        coEvery { usecase.getFileUploadUrl(any(), any()) } returns mockUploadFileInfoDto
+        coEvery { usecase.getFileUploadUrl(any(), any(), any()) } returns mockUploadFileInfoDto
 
         testPlugin(
             routing = { fileRoutes(route, usecase) },
@@ -110,6 +114,7 @@ class FileRouteTest {
             url {
                 parameters.append("fileName", MOCK_VALID_FILE_NAME)
                 parameters.append("mime", MOCK_INVALID_MIME)
+                parameters.append("fileCategory", FileCategory.PROFILE_IMAGE.name)
             }
         }
 

@@ -1,6 +1,6 @@
 package com.turnin.common.batch
 
-import com.turnin.common.di.ApplicationScopeQualifier
+import com.turnin.common.di.DefaultApplicationScopeQualifier
 import com.turnin.common.util.log.AppLoggerFactory
 import io.ktor.server.application.Application
 import java.time.Clock
@@ -13,11 +13,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.ktor.ext.inject
 
+// TODO: 배치 등록은 Default 에서 실제 작업(IO 작업?)은 IO 에서 실행해야 하지 않나?
+
 /**
  * 배치 설정
  */
 fun Application.configureBatch() {
-    val applicationScope by inject<CoroutineScope>(ApplicationScopeQualifier)
+    val applicationScope by inject<CoroutineScope>(DefaultApplicationScopeQualifier)
     val logBackupBatch by inject<LogBackupBatch>()
     val hardDeleteExpiredAccountsBatch by inject<HardDeleteExpiredAccountsBatch>()
 

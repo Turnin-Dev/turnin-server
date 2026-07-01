@@ -41,14 +41,7 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
             val request = call.receive<LoginRequest>()
             request.validate()
             val loginResultDto = usecase.login(request.toDto())
-            if (loginResultDto == null) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest),
-                )
-            } else {
-                call.respond(loginResultDto.toResponse())
-            }
+            call.respond(loginResultDto.toResponse())
         }
 
         post(route.REGISTER, { registerDocs() }) {

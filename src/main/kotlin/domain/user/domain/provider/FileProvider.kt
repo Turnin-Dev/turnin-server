@@ -7,7 +7,7 @@ interface FileProvider {
     /**
      * 파일 삭제
      *
-     * @param fileName
+     * @param fileUrl 파일 URL
      */
-    fun deleteFile(fileName: String)
+    fun deleteFile(fileUrl: String)
 }

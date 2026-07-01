@@ -2,6 +2,11 @@ package com.turnin.domain.auth.application.usecase
 
 data class AuthAdminUseCases(
     /**
+     * 로그인
+     * @see LoginUseCase
+     */
+    val login: LoginUseCase,
+    /**
      * 회원가입
      * @see RegisterUseCase
      */

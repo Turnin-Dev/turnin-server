@@ -5,8 +5,10 @@ import com.turnin.common.exception.common.CommonErrorCode
 import com.turnin.common.exception.toErrorResponse
 import com.turnin.common.route.Api
 import com.turnin.domain.file.application.usecase.FileUseCases
+import com.turnin.domain.file.domain.model.FileCategory
 import com.turnin.domain.file.presentation.dto.UploadFileResponse
 import com.turnin.domain.file.presentation.dto.toResponse
+import com.turnin.domain.file.presentation.validation.validateFileCategory
 import com.turnin.domain.file.presentation.validation.validateFileNameAndReturn
 import com.turnin.domain.file.presentation.validation.validateImageMimeAndReturn
 import io.github.smiley4.ktoropenapi.config.RouteConfig
@@ -24,9 +26,12 @@ fun Route.fileRoutes(route: Api.V1.File, usecase: FileUseCases) {
         get(route.UPLOAD, { uploadFileDocs() }) {
             val fileNameParam = call.request.queryParameters["fileName"]
             val mimeRaw = call.request.queryParameters["mime"]
+            val fileCategoryParam = call.request.queryParameters["fileCategory"]
             val fileName = fileNameParam?.trim().validateFileNameAndReturn()
             val mime = mimeRaw?.trim().validateImageMimeAndReturn()
-            val uploadFileInfoDto = usecase.getFileUploadUrl(fileName, mime)
+            val fileCategory = fileCategoryParam.validateFileCategory()
+            val uploadFileInfoDto = usecase.getFileUploadUrl(fileName, mime, fileCategory)
+
             call.respond(
                 HttpStatusCode.OK,
                 uploadFileInfoDto.toResponse(),
@@ -36,9 +41,12 @@ fun Route.fileRoutes(route: Api.V1.File, usecase: FileUseCases) {
         get(route.UPDATE, { updateFileDocs() }) {
             val newFileNameParam = call.request.queryParameters["newFileName"]
             val mimeRaw = call.request.queryParameters["mime"]
+            val fileCategoryParam = call.request.queryParameters["fileCategory"]
             val newFileName = newFileNameParam?.trim().validateFileNameAndReturn()
             val mime = mimeRaw?.trim().validateImageMimeAndReturn()
-            val uploadFileInfoDto = usecase.getFileUpdateUrl(newFileName, mime)
+            val fileCategory = fileCategoryParam.validateFileCategory()
+            val uploadFileInfoDto = usecase.getFileUpdateUrl(newFileName, mime, fileCategory)
+
             call.respond(
                 HttpStatusCode.OK,
                 uploadFileInfoDto.toResponse(),
@@ -61,6 +69,12 @@ private fun RouteConfig.uploadFileDocs() {
             description = "파일 MIME 타입 (일단은 이미지 파일만 허용)"
             example("mime") {
                 value = "image/jpeg"
+            }
+        }
+        queryParameter<FileCategory>("fileCategory") {
+            description = "파일 카테고리 (프로필 사진, 게시물 사진 등)"
+            example("fileCategory") {
+                value = "PROFILE_IMAGE"
             }
         }
     }
@@ -112,6 +126,12 @@ private fun RouteConfig.updateFileDocs() {
             description = "파일 MIME 타입 (일단은 이미지 파일만 허용)"
             example("mime") {
                 value = "image/jpeg"
+            }
+        }
+        queryParameter<FileCategory>("fileCategory") {
+            description = "파일 카테고리 (프로필 사진, 게시물 사진 등)"
+            example("fileCategory") {
+                value = "PROFILE_IMAGE"
             }
         }
     }

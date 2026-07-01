@@ -16,12 +16,12 @@ class GetFileUploadUrlUseCase(private val fileService: FileService) {
      *
      * @param fileName 업로드할 파일명
      * @param mimeType MIME 타입
-     * @param fileCategory 파일 카테고리 (기본 값은 프로필 사진)
+     * @param fileCategory 파일 카테고리
      */
     operator fun invoke(
         fileName: String,
         mimeType: String,
-        fileCategory: FileCategory = FileCategory.PROFILE_IMAGE,
+        fileCategory: FileCategory,
     ): UploadFileInfoDto {
         val fileFullName = "${fileCategory.prefix}/$fileName"
         return fileService.createPresignedUrlWithInfo(fileFullName, mimeType).toDto()

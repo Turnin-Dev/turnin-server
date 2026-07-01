@@ -28,7 +28,20 @@ val authModule = module {
     single { AuthDeletionSupportApi(get()) }
 
     // UseCase
-    single { LoginUseCase(get(), get(), get(named("user"))) }
+    single(named("user")) {
+        LoginUseCase(
+            get(),
+            get(),
+            get(named("user")),
+        )
+    }
+    single(named("admin")) {
+        LoginUseCase(
+            get(),
+            get(),
+            get(named("admin")),
+        )
+    }
     single(named("user")) {
         RegisterUseCase(
             get(),
@@ -52,7 +65,7 @@ val authModule = module {
 
     single {
         AuthUseCases(
-            login = get(),
+            login = get(named("user")),
             register = get(named("user")),
             refresh = get(),
             existsDisplayId = get(),
@@ -63,6 +76,7 @@ val authModule = module {
     single {
         AuthAdminUseCases(
             register = get(named("admin")),
+            login = get(named("admin")),
             existsDisplayId = get(),
             validateAdminSecretKey = get(),
         )

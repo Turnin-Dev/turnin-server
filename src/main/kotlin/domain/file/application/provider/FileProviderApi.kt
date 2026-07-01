@@ -9,7 +9,11 @@ class FileProviderApi(private val deleteFileUseCase: DeleteFileUseCase) {
     /**
      * 파일을 서버에서 직접 삭제한다.
      *
+     * @param fileUrl 파일 URL
+     *
      * @see DeleteFileUseCase
      */
-    fun deleteFile(fileName: String) = deleteFileUseCase(fileName)
+    fun deleteFile(
+        fileUrl: String,
+    ) = deleteFileUseCase(fileUrl)
 }
