@@ -7,8 +7,10 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.context.stopKoin
@@ -42,7 +44,7 @@ private fun Application.performCleanup(
 ) {
     // ------------------------------ 이미 정리 되었는지 체크 ------------------------------
     if (!cleanupDone.compareAndSet(false, true)) {
-        LOGGER.info("$LOG_NAME 이미 정리 완료, 스킵")
+        LOGGER.info("$LOG_NAME 정리 작업이 이미 진행/완료되어 중복 실행 스킵")
         return
     }
 
@@ -78,15 +80,19 @@ private fun Application.performCleanup(
             // 1. 새 코루틴 생성 차단 + 백그라운드 작업 완료 대기
             applicationScopes.forEach { scope ->
                 val parentJob = scope.coroutineContext[Job]
+                val parentName = scope.coroutineContext[CoroutineName]?.name ?: "unnamed"
                 if (parentJob is CompletableJob) {
                     parentJobsGlobal.add(parentJob)
+                    LOGGER.info("$LOG_NAME 백그라운드 작업 대상 ($parentName): $parentJob ")
                     parentJob.complete()
+                    parentJob.cancelChildren()
                 }
             }
 
             parentJobsGlobal.forEach { parentJob ->
                 LOGGER.info("$LOG_NAME 백그라운드 작업 대기 ($parentJob)")
                 parentJob.join()
+                LOGGER.info("$LOG_NAME 백그라운드 작업 정리 완료")
             }
 
             // 2. 부가 리소스 정리
