@@ -1,6 +1,8 @@
 package com.turnin.domain.file.presentation.validation
 
 import com.turnin.common.validator.TurninValidator.validation
+import com.turnin.domain.file.domain.model.FileCategory
+import com.turnin.domain.file.domain.model.FileCategory.Companion.toFileCategory
 
 internal fun String?.validateFileNameAndReturn(): String {
     validation(!this.isNullOrBlank()) {
@@ -19,6 +21,13 @@ internal fun String?.validateImageMimeAndReturn(): String {
         "파일이 이미지 타입이 아닙니다."
     }
     return normalized
+}
+
+internal fun String?.validateFileCategory(): FileCategory {
+    validation(!this.isNullOrBlank()) { "파일 카테고리가 비어있습니다." }
+    val category = this?.toFileCategory()
+    validation(category != null) { "지원하지 않는 파일 카테고리입니다." }
+    return category!!
 }
 
 private fun String.isImageType(): Boolean = IMAGE_MIME_REGEX.matches(this)

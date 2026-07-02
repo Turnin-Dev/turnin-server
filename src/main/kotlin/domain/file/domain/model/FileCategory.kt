@@ -4,5 +4,14 @@ package com.turnin.domain.file.domain.model
  * 파일 카테고리
  */
 enum class FileCategory(val prefix: String) {
-    PROFILE_IMAGE("profile_image"),
+    PROFILE_IMAGE("profile_images"),
+    ;
+
+    companion object {
+        fun String.toFileCategory(): FileCategory? =
+            when (this) {
+                FileCategory.PROFILE_IMAGE.name -> PROFILE_IMAGE
+                else -> null
+            }
+    }
 }

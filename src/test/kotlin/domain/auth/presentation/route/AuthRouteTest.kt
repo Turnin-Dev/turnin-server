@@ -1,7 +1,6 @@
 package com.turnin.domain.auth.presentation.route
 
 import com.turnin.common.exception.common.CommonErrorCode
-import com.turnin.common.exception.toErrorResponse
 import com.turnin.common.jwt.application.dto.JWTTokenDto
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
@@ -137,36 +136,6 @@ class AuthRouteTest {
         // then
         assertEquals(HttpStatusCode.InternalServerError, response.status)
         assertTrue(responseBody.contains("${HttpStatusCode.InternalServerError.value}"))
-    }
-
-    @Test
-    fun `login 실패 테스트 - 토큰이 Null을 반환하는 경우`() = testApplication {
-        // given
-        val route = Api.V1.Auth
-        val client = createTestClient()
-        coEvery {
-            authUseCase.login(any())
-        } returns null
-
-        testPlugin(
-            routing = { authRoutes(route, authUseCase) },
-        )
-
-        // when
-        val loginEndPoint = "${route.ROUTE}${route.LOGIN}"
-        val response = client.post(loginEndPoint) {
-            contentType(ContentType.Application.Json)
-            setBody(MockValidLoginRequest)
-        }
-        val responseBody = response.bodyAsText()
-
-        // then
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(
-            responseBody.contains(
-                AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest).message,
-            ),
-        )
     }
 
     @Test

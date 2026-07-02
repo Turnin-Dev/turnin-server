@@ -3,7 +3,6 @@ package com.turnin.domain.userKeyword.application.usecase
 import com.turnin.common.db.suspendTransaction
 import com.turnin.common.firebase.RefType
 import com.turnin.common.model.NotificationType
-import com.turnin.common.util.AppDispatchers
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.domain.userKeyword.application.dto.CreateUserKeywordDto
 import com.turnin.domain.userKeyword.application.dto.UserKeywordDto
@@ -69,7 +68,7 @@ class CreateUserKeywordUseCase(
 
         // 4) 친구들에게 새 키워드 알림 전송 (비동기 - 사용자 응답과 무관)
         //    알림 전송 실패 시에도 키워드 생성은 성공으로 처리
-        applicationScope.launch(AppDispatchers.ioDispatcher) {
+        applicationScope.launch {
             runCatching {
                 val fcmContext = friendProvider.getFriendFcmContext(createUserKeywordDto.userId)
                 if (fcmContext.friendTokens.isNotEmpty()) {

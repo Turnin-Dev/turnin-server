@@ -41,14 +41,7 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
             val request = call.receive<LoginRequest>()
             request.validate()
             val loginResultDto = usecase.login(request.toDto())
-            if (loginResultDto == null) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    AuthErrorCode.LoginFailed.toErrorResponse(HttpStatusCode.BadRequest),
-                )
-            } else {
-                call.respond(loginResultDto.toResponse())
-            }
+            call.respond(loginResultDto.toResponse())
         }
 
         post(route.REGISTER, { registerDocs() }) {
@@ -146,11 +139,27 @@ private fun RouteConfig.loginDocs() {
         }
         default {
             body<ErrorResponse> {
-                example("ErrorResponse") {
+                example("ErrorResponse(404)") {
                     value = ErrorResponse(
-                        code = AuthErrorCode.LoginFailed.code,
-                        message = "Login failed",
-                        status = HttpStatusCode.BadRequest.value,
+                        code = AuthErrorCode.UserNotFound.code,
+                        message = AuthErrorCode.UserNotFound.description,
+                        status = HttpStatusCode.NotFound.value,
+                    )
+                }
+
+                example("ErrorResponse(401)") {
+                    value = ErrorResponse(
+                        code = AuthErrorCode.Unauthorized.code,
+                        message = AuthErrorCode.Unauthorized.description,
+                        status = HttpStatusCode.Unauthorized.value,
+                    )
+                }
+
+                example("ErrorResponse(500)") {
+                    value = ErrorResponse(
+                        code = AuthErrorCode.RefreshTokenSaveFailed.code,
+                        message = AuthErrorCode.RefreshTokenSaveFailed.description,
+                        status = HttpStatusCode.NotFound.value,
                     )
                 }
             }

@@ -8,7 +8,6 @@ import com.turnin.common.jwt.domain.model.JWTTokenPayload
 import com.turnin.common.jwt.domain.service.JWTTokenService
 import com.turnin.common.jwt.exception.TokenException
 import com.turnin.common.model.Role
-import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.util.log.AppLoggerFactory
@@ -17,7 +16,6 @@ import com.turnin.common.util.log.LogTag
 import com.turnin.common.util.log.LogType
 import com.turnin.domain.auth.application.dto.LoginDto
 import com.turnin.domain.auth.application.dto.LoginResultDto
-import com.turnin.domain.auth.domain.model.AuthUser
 import com.turnin.domain.auth.domain.repository.AuthRepository
 import com.turnin.domain.auth.domain.repository.RefreshTokenRepository
 import com.turnin.domain.auth.exception.AuthException
@@ -35,12 +33,13 @@ class LoginUseCase(
     /**
      * 소셜로그인
      *
+     * 로그인 실패 혹은 사용자를 가져올 수 없는 경우 예외가 발생한다.
+     *
      * @param loginDto [LoginDto]
      *
      * @return [LoginResultDto] 정상적으로 로그인이 진행된 경우
-     * (로그인 실패 혹은 사용자를 가져올 수 없는 경우 **`null`** 반환)
      */
-    suspend operator fun invoke(loginDto: LoginDto): LoginResultDto? {
+    suspend operator fun invoke(loginDto: LoginDto): LoginResultDto {
         LOGGER.info(
             message = "Login attempt: provider=${loginDto.provider}",
             tags = mapOf(
@@ -79,7 +78,7 @@ class LoginUseCase(
     // 로그인 수행
     private suspend fun performLogin(loginDto: LoginDto): LoginResultDto {
         // 1) 사용자 조회
-        val authUser = getAuthUser(loginDto.provider, loginDto.providerId)
+        val authUser = authRepository.findAuthUserByProviderAndProviderId(loginDto.provider, loginDto.providerId)
             ?: throw AuthException.UserNotFound()
 
         // 2) JWT 토큰 생성
@@ -109,13 +108,6 @@ class LoginUseCase(
         // 5) 결과 반환
         return LoginResultDto(authUser.userId, jwtToken.toDto())
     }
-
-    // 사용자 조회
-    private suspend fun getAuthUser(
-        provider: SocialLoginProvider,
-        providerId: String,
-    ): AuthUser? =
-        authRepository.findAuthUserByProviderAndProviderId(provider, providerId)
 
     // JWT 토큰 생성
     private fun generateJWTToken(

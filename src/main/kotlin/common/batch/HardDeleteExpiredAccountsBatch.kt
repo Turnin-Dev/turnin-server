@@ -5,6 +5,7 @@ import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.log.LogAction
 import com.turnin.common.util.log.LogTag
 import com.turnin.common.util.log.LogType
+import com.turnin.common.util.toKstDate
 import com.turnin.domain.account.application.HardDeleteExpiredAccountsUseCase
 import com.turnin.domain.user.application.provider.UserDeletionSupportApi
 import kotlin.time.Duration.Companion.days
@@ -18,8 +19,9 @@ class HardDeleteExpiredAccountsBatch(
     private val userDeletionSupportApi: UserDeletionSupportApi,
 ) {
     suspend fun run() {
+        val today = TurninDateTime.now().toKstDate()
         LOGGER.info(
-            message = "HardDeleteExpiredAccountsBatch started",
+            message = "HardDeleteExpiredAccountsBatch running: date=$today",
             tags = mapOf(
                 LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
                 LogTag.ACTION.key to LogAction.DELETE_ACCOUNT_BATCH_STARTED.value,
@@ -63,8 +65,14 @@ class HardDeleteExpiredAccountsBatch(
             }
         }
 
+        val logMessage = if (failCount > 0) {
+            "HardDeleteExpiredAccountsBatch completed with some failures: success=$successCount, fail=$failCount"
+        } else {
+            "HardDeleteExpiredAccountsBatch completed successfully: success=$successCount, fail=$failCount"
+        }
+
         LOGGER.info(
-            message = "HardDeleteExpiredAccountsBatch finished: success=$successCount, fail=$failCount",
+            message = logMessage,
             tags = mapOf(
                 LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
                 LogTag.ACTION.key to LogAction.DELETE_ACCOUNT_BATCH_SUCCESS.value,
