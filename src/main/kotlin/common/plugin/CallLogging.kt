@@ -90,9 +90,6 @@ private val pathMaskingRules: List<Pair<Regex, (MatchResult) -> String>> = listO
     // /auth/exists/displayId/{displayId} → displayId 마스킹
     Regex("/auth/exists/displayId/[^/]+") to
         { _ -> "/auth/exists/displayId/***" },
-    // 숫자로 된 경로 파라미터 마스킹 (userId, notificationId, keywordId 등)
-    Regex("/[0-9]+") to
-        { _ -> "/***" },
 )
 
 /** 경로 마스킹 */
