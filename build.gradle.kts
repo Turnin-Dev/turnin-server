@@ -149,6 +149,9 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
 
+    // Forwarded Header
+    implementation(libs.ktor.server.forwarded.header)
+
     // Test
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
