@@ -32,6 +32,9 @@ enum class LogTag(val key: String) {
 
     /** IP */
     IP("ip"),
+
+    /** 마스킹된 IP */
+    IP_MASKED("ip_masked"),
 }
 
 /** 로그 타입 */

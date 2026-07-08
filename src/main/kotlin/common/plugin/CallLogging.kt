@@ -8,7 +8,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.calllogging.processingTimeMillis
-import io.ktor.server.plugins.origin
+import io.ktor.server.plugins.forwardedheaders.XForwardedHeaders
 import io.ktor.server.request.httpMethod
 import io.ktor.server.request.path
 import org.koin.ktor.ext.inject
@@ -19,10 +19,15 @@ fun Application.configureCallLogging() {
     val appConfig by inject<AppConfig>()
     val isDevelopment = appConfig.getOrDefault("ktor.development", "false") == "true"
 
+    install(XForwardedHeaders)
+
     install(CallLogging) {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
+
         mdc(LogTag.IP.key) { call -> call.clientIp() }
+        mdc(LogTag.IP_MASKED.key) { call -> maskIp(call.clientIp()) }
+
         format { call ->
             val status = call.response.status()
             val httpMethod = call.request.httpMethod.value
@@ -33,7 +38,7 @@ fun Application.configureCallLogging() {
                     .entries()
                     .joinToString(", ") { "${it.key}=${it.value}" }
             val duration = call.processingTimeMillis()
-            val remoteHost = call.request.origin.remoteHost
+            val clientIp = maskIp(call.clientIp())
 
             if (isDevelopment) {
                 // 개발 환경: 색상 + 멀티라인
@@ -52,7 +57,7 @@ fun Application.configureCallLogging() {
         |Method: $coloredMethod
         |Path: $path
         |Query Params: $queryParams
-        |Remote Host: $remoteHost
+        |Remote Host: $clientIp
         |User Agent: $userAgent
         |Duration: ${duration}ms
         |------------------------------------------------------------------
@@ -65,7 +70,7 @@ fun Application.configureCallLogging() {
                     "method=$httpMethod " +
                     "path=${LogSanitizer.sanitize(path)} " +
                     "query=\"${LogSanitizer.sanitize(queryParams)}\" " +
-                    "remote=${LogSanitizer.sanitize(remoteHost)} " +
+                    "remote=${LogSanitizer.sanitize(clientIp)} " +
                     "ua=\"${LogSanitizer.sanitize(userAgent)}\" " +
                     "duration=${duration}ms"
             }
@@ -90,10 +95,28 @@ private val pathMaskingRules: List<Pair<Regex, (MatchResult) -> String>> = listO
         { _ -> "/***" },
 )
 
+/** 경로 마스킹 */
 private fun maskPath(path: String): String {
     var masked = path
     pathMaskingRules.forEach { (regex, transform) ->
         masked = regex.replace(masked, transform)
     }
     return masked
+}
+
+/** IP 마스킹 - 가장 마지막 옥텟 마스킹 */
+private fun maskIp(ip: String): String = when {
+    ip.isBlank() -> {
+        "unknown"
+    }
+
+    ip.contains(":") -> {
+        val split = ip.split(":")
+        val head = split.dropLast(2)
+        head.joinToString(":") + ":xxxx:xxxx"
+    }
+
+    else -> {
+        ip.replaceAfterLast(".", "***")
+    }
 }

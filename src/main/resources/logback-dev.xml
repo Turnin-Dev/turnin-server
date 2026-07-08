@@ -32,7 +32,9 @@
             <fileNamePattern>./logs/privacy/app-privacy-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <maxHistory>2</maxHistory>
         </rollingPolicy>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <excludeMdcKeyName>ip_masked</excludeMdcKeyName>
+        </encoder>
     </appender>
 
     <root level="DEBUG">
