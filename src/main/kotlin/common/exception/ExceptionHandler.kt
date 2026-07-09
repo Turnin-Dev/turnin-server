@@ -31,6 +31,7 @@ private const val TAG_ERROR_CODE = "error_code"
 
 fun Application.configureExceptionHandler() {
     install(StatusPages) {
+        // ------------------------------ Exception ------------------------------
         exception<DatabaseException> { call, cause ->
             warnLogging(call, "DatabaseException", cause)
             call.respond(
@@ -112,6 +113,20 @@ fun Application.configureExceptionHandler() {
                     code = UNKNOWN_ERROR_CODE,
                     message = UNKNOWN_ERROR_MESSAGE,
                     status = statusCode.value,
+                ),
+            )
+        }
+
+        // ------------------------------ Status ------------------------------
+        // status 영역은 어차피 CallLogging에서 로깅이 되기 때문에,
+        // 별도 로깅이 불필요하다고 판단
+        status(HttpStatusCode.TooManyRequests) { call, status ->
+            call.respond(
+                status = HttpStatusCode.TooManyRequests,
+                message = ErrorResponse(
+                    code = CommonErrorCode.TooManyRequests.code,
+                    message = CommonErrorCode.TooManyRequests.description,
+                    status = status.value,
                 ),
             )
         }

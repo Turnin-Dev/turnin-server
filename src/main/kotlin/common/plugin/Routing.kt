@@ -40,6 +40,7 @@ import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktoropenapi.route
 import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.server.application.Application
+import io.ktor.server.plugins.ratelimit.rateLimit
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.routing
 import kotlin.getValue
@@ -79,28 +80,34 @@ fun Application.configureRouting() {
                 authRoutes(route = Api.V1.Auth, usecase = authUseCases)
                 fileRoutes(route = Api.V1.File, usecase = fileUseCases)
                 authenticatedUserRoute {
-                    accountRoutes(route = Api.V1.Account, usecase = accountUseCases)
-                    userRoutes(route = Api.V1.User, usecase = userUseCases)
-                    keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
-                    userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
-                    reportRoutes(route = Api.V1.Report, usecase = reportUseCases)
-                    friendRoutes(route = Api.V1.Friend, usecase = friendUseCases)
-                    discoverRoutes(route = Api.V1.Discover, usecase = discoverUseCases)
-                    feedRoutes(route = Api.V1.Feed, usecase = feedUseCases)
-                    blockRoutes(route = Api.V1.Block, usecase = blockUseCases)
-                    notificationRoutes(route = Api.V1.Notification, usecase = notificationUseCases)
-                    announcementRoutes(route = Api.V1.Announcement, usecase = announcementUseCases)
+                    rateLimit(RateLimitType.AUTHENTICATED_DEFAULT.ktorName) {
+                        accountRoutes(route = Api.V1.Account, usecase = accountUseCases)
+                        userRoutes(route = Api.V1.User, usecase = userUseCases)
+                        keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
+                        userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
+                        reportRoutes(route = Api.V1.Report, usecase = reportUseCases)
+                        friendRoutes(route = Api.V1.Friend, usecase = friendUseCases)
+                        discoverRoutes(route = Api.V1.Discover, usecase = discoverUseCases)
+                        feedRoutes(route = Api.V1.Feed, usecase = feedUseCases)
+                        blockRoutes(route = Api.V1.Block, usecase = blockUseCases)
+                        notificationRoutes(route = Api.V1.Notification, usecase = notificationUseCases)
+                        announcementRoutes(route = Api.V1.Announcement, usecase = announcementUseCases)
 
-                    // 도메인과 API 명세서에 표시되는 위치가 다른 라우트
-                    externalUserKeywordRoutes(route = Api.V1.User, usecase = userKeywordUseCases)
+                        // 도메인과 API 명세서에 표시되는 위치가 다른 라우트
+                        externalUserKeywordRoutes(route = Api.V1.User, usecase = userKeywordUseCases)
+                    }
                 }
             }
 
             // 관리자 라우트
             route(Api.Admin.ROUTE, { description = "Admin API" }) {
-                authAdminRoutes(route = Api.Admin.Auth, usecase = authAdminUseCases)
+                rateLimit(RateLimitType.ADMIN.ktorName) {
+                    authAdminRoutes(route = Api.Admin.Auth, usecase = authAdminUseCases)
+                }
                 authenticatedAdminRoute {
-                    announcementAdminRoutes(route = Api.Admin.Announcement, usecase = announcementAdminUseCases)
+                    rateLimit(RateLimitType.ADMIN.ktorName) {
+                        announcementAdminRoutes(route = Api.Admin.Announcement, usecase = announcementAdminUseCases)
+                    }
                 }
             }
         }

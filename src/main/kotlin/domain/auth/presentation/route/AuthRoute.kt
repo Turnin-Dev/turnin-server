@@ -7,6 +7,7 @@ import com.turnin.common.jwt.JWTValidator
 import com.turnin.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
+import com.turnin.common.plugin.RateLimitType
 import com.turnin.common.route.Api
 import com.turnin.common.route.Api.byPathParam
 import com.turnin.common.validator.inputValidationAndReturn
@@ -27,6 +28,7 @@ import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.plugins.ratelimit.rateLimit
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -37,26 +39,30 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
         tags = setOf(route.TAG)
         description = "Auth API"
     }) {
-        post(route.LOGIN, { loginDocs() }) {
-            val request = call.receive<LoginRequest>()
-            request.validate()
-            val loginResultDto = usecase.login(request.toDto())
-            call.respond(loginResultDto.toResponse())
+        rateLimit(RateLimitType.LOGIN.ktorName) {
+            post(route.LOGIN, { loginDocs() }) {
+                val request = call.receive<LoginRequest>()
+                request.validate()
+                val loginResultDto = usecase.login(request.toDto())
+                call.respond(loginResultDto.toResponse())
+            }
         }
 
-        post(route.REGISTER, { registerDocs() }) {
-            val request = call.receive<RegisterRequest>()
-            request.validate()
-            val displayId = DisplayId(request.displayId)
-            val existsByDisplayId = usecase.existsDisplayId(displayId)
-            if (!existsByDisplayId) {
-                val registerResultDto = usecase.register(request.toDto())
-                call.respond(HttpStatusCode.Created, registerResultDto.toResponse())
-            } else {
-                call.respond(
-                    HttpStatusCode.Conflict,
-                    AuthErrorCode.UserDuplicated.toErrorResponse(HttpStatusCode.Conflict),
-                )
+        rateLimit(RateLimitType.REGISTER.ktorName) {
+            post(route.REGISTER, { registerDocs() }) {
+                val request = call.receive<RegisterRequest>()
+                request.validate()
+                val displayId = DisplayId(request.displayId)
+                val existsByDisplayId = usecase.existsDisplayId(displayId)
+                if (!existsByDisplayId) {
+                    val registerResultDto = usecase.register(request.toDto())
+                    call.respond(HttpStatusCode.Created, registerResultDto.toResponse())
+                } else {
+                    call.respond(
+                        HttpStatusCode.Conflict,
+                        AuthErrorCode.UserDuplicated.toErrorResponse(HttpStatusCode.Conflict),
+                    )
+                }
             }
         }
 
