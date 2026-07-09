@@ -66,58 +66,64 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
             }
         }
 
-        get(route.REFRESH, { refreshDocs() }) {
-            val refreshTokenParam = call.request.headers["Authorization"].inputValidationAndReturn("인증 토큰")
-            JWTValidator.validate(refreshTokenParam)
-            val refreshToken = refreshTokenParam.removeBearerHeader()
-            val token = usecase.refresh(refreshToken)
-            if (token == null) {
-                call.respond(
-                    HttpStatusCode.Unauthorized,
-                    AuthErrorCode.RefreshTokenExpired.toErrorResponse(HttpStatusCode.Unauthorized),
-                )
-            } else {
-                call.respond(token.toResponse())
+        rateLimit(RateLimitType.TOKEN_REFRESH.ktorName) {
+            get(route.REFRESH, { refreshDocs() }) {
+                val refreshTokenParam = call.request.headers["Authorization"].inputValidationAndReturn("인증 토큰")
+                JWTValidator.validate(refreshTokenParam)
+                val refreshToken = refreshTokenParam.removeBearerHeader()
+                val token = usecase.refresh(refreshToken)
+                if (token == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        AuthErrorCode.RefreshTokenExpired.toErrorResponse(HttpStatusCode.Unauthorized),
+                    )
+                } else {
+                    call.respond(token.toResponse())
+                }
             }
         }
 
-        get(route.EXISTS_USER.byPathParam("provider", "providerId"), { findUserDocs() }) {
-            val provider = call.request.pathVariables["provider"] ?: return@get
-            val providerId = call.request.pathVariables["providerId"] ?: return@get
+        rateLimit(RateLimitType.EXISTS_CHECK.ktorName) {
+            get(route.EXISTS_USER.byPathParam("provider", "providerId"), { findUserDocs() }) {
+                val provider = call.request.pathVariables["provider"] ?: return@get
+                val providerId = call.request.pathVariables["providerId"] ?: return@get
 
-            try {
-                val findUserResultDto = usecase.findUser(
-                    provider = SocialLoginProvider.valueOf(provider.trim().uppercase()),
-                    providerId = providerId.trim(),
-                )
-                call.respond(findUserResultDto.toResponse())
-            } catch (e: IllegalArgumentException) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    AuthErrorCode
-                        .PathParameterInvalid("provider")
-                        .toErrorResponse(HttpStatusCode.BadRequest),
-                )
+                try {
+                    val findUserResultDto = usecase.findUser(
+                        provider = SocialLoginProvider.valueOf(provider.trim().uppercase()),
+                        providerId = providerId.trim(),
+                    )
+                    call.respond(findUserResultDto.toResponse())
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        AuthErrorCode
+                            .PathParameterInvalid("provider")
+                            .toErrorResponse(HttpStatusCode.BadRequest),
+                    )
+                }
             }
         }
 
-        get(route.EXISTS_DISPLAY_ID.byPathParam("displayId"), { existsDisplayIdDocs() }) {
-            val displayIdParam = call.request.pathVariables["displayId"]
-            displayIdParam?.validateDisplayId()
-            if (displayIdParam.isNullOrBlank()) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    CommonErrorCode.ValidationDefault.toErrorResponse(HttpStatusCode.BadRequest),
-                )
-                return@get
-            }
+        rateLimit(RateLimitType.EXISTS_CHECK.ktorName) {
+            get(route.EXISTS_DISPLAY_ID.byPathParam("displayId"), { existsDisplayIdDocs() }) {
+                val displayIdParam = call.request.pathVariables["displayId"]
+                displayIdParam?.validateDisplayId()
+                if (displayIdParam.isNullOrBlank()) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        CommonErrorCode.ValidationDefault.toErrorResponse(HttpStatusCode.BadRequest),
+                    )
+                    return@get
+                }
 
-            val displayId = DisplayId(displayIdParam.trim())
-            val existsDisplayId = usecase.existsDisplayId(displayId)
-            call.respond(
-                HttpStatusCode.OK,
-                ExistsResultResponse(exists = existsDisplayId),
-            )
+                val displayId = DisplayId(displayIdParam.trim())
+                val existsDisplayId = usecase.existsDisplayId(displayId)
+                call.respond(
+                    HttpStatusCode.OK,
+                    ExistsResultResponse(exists = existsDisplayId),
+                )
+            }
         }
     }
 }

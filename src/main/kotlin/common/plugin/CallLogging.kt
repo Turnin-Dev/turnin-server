@@ -19,6 +19,13 @@ fun Application.configureCallLogging() {
     val appConfig by inject<AppConfig>()
     val isDevelopment = appConfig.getOrDefault("ktor.development", "false") == "true"
 
+    // RateLimit이 헤더 위조로 우회될 수 있는 문제:
+    // 서버/인프라 레벨에서 조치.
+    // - Nginx에 Cloudflare Authenticated Origin Pulls(전역) 적용
+    // - Origin(AWS)이 Cloudflare를 거치지 않은 연결을 TLS 핸드셰이크 단계에서 거부하도록 설정
+    // - 따라서 헤더 위조를 통한 origin 직접 접근 자체가 인프라 단에서 차단되어,
+    //  애플리케이션 레벨의 신뢰 프록시 검증은 현재 우선순위 낮음으로 보류
+    // - 관련 참고: AOP 설정 문서 등
     install(XForwardedHeaders)
 
     install(CallLogging) {

@@ -21,6 +21,8 @@ enum class RateLimitType(private val value: String) {
     REGISTER("register"),
     CREATE_KEYWORD("create_keyword"),
     ADMIN("admin"),
+    EXISTS_CHECK("exists_check"),
+    TOKEN_REFRESH("token_refresh"),
     ;
 
     val ktorName: RateLimitName
@@ -61,6 +63,19 @@ fun Application.configureRateLimit() {
         register(RateLimitType.CREATE_KEYWORD.ktorName) {
             rateLimiter(limit = 5, refillPeriod = 10.seconds)
             requestKey { call -> call.getRequestKey() }
+        }
+
+        register(RateLimitType.EXISTS_CHECK.ktorName) {
+            rateLimiter(limit = 30, refillPeriod = 10.seconds)
+            requestKey { call -> call.getRequestKey() }
+        }
+
+        register(RateLimitType.TOKEN_REFRESH.ktorName) {
+            rateLimiter(limit = 10, refillPeriod = 60.seconds)
+            requestKey { call ->
+                call.request.headers["Authorization"]
+                    ?: call.getRequestKey()
+            }
         }
 
         register(RateLimitType.ADMIN.ktorName) {
