@@ -152,6 +152,9 @@ dependencies {
     // Forwarded Header
     implementation(libs.ktor.server.forwarded.header)
 
+    // Rate Limit
+    implementation(libs.ktor.server.rate.limit)
+
     // Test
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
