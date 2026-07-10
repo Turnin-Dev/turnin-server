@@ -13,4 +13,4 @@ fun ApplicationCall.clientIp(): String =
             ?.first()
             ?.trim()
             ?.takeIf { it.isNotEmpty() } // fallback 1
-        ?: request.origin.remoteHost // fallback 2
+        ?: request.origin.remoteAddress // fallback 2

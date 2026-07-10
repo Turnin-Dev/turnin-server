@@ -24,10 +24,10 @@ sealed class CommonErrorCode(
             ErrorCodes.EmptyRequest.Header.description,
         )
 
-    data object EmptyRequestParam :
+    data object TooManyRequests :
         CommonErrorCode(
-            ErrorCodes.EmptyRequest.Parameter.code,
-            ErrorCodes.EmptyRequest.Parameter.description,
+            ErrorCodes.TooManyRequests.code,
+            ErrorCodes.TooManyRequests.description,
         )
 
     data object DomainError :
@@ -65,7 +65,6 @@ private object ErrorCodes {
         val description: String,
     ) {
         Header("EMP001", "요청 헤더 값이 비어있습니다."),
-        Parameter("EMP002", "요청 파라미터 값이 비어있습니다."),
     }
 
     enum class Domain(
@@ -81,4 +80,7 @@ private object ErrorCodes {
     ) {
         AccessDenied("AD001", "액세스 접근 불가"),
     }
+
+    data object TooManyRequests :
+        CommonErrorCode("TMR001", "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.")
 }
