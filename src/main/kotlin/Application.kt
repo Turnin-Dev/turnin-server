@@ -13,6 +13,7 @@ import com.turnin.common.plugin.configureAPIDocuments
 import com.turnin.common.plugin.configureCallLogging
 import com.turnin.common.plugin.configureContentNegotiation
 import com.turnin.common.plugin.configureCors
+import com.turnin.common.plugin.configureRateLimit
 import com.turnin.common.plugin.configureResources
 import com.turnin.common.plugin.configureRouting
 import com.turnin.common.util.application.applicationCleanup
@@ -50,6 +51,7 @@ fun Application.module() {
     configureJwtSecurity()
 
     configureAPIDocuments()
+    configureRateLimit()
     configureRouting()
 
     // ------------------------------ Batch ------------------------------

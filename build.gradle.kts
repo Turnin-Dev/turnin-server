@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.turnin"
-version = "1.1.0"
+version = "1.2.0"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
@@ -148,6 +148,12 @@ dependencies {
     implementation(libs.h2)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
+
+    // Forwarded Header
+    implementation(libs.ktor.server.forwarded.header)
+
+    // Rate Limit
+    implementation(libs.ktor.server.rate.limit)
 
     // Test
     testImplementation(libs.ktor.server.test.host)

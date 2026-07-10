@@ -30,7 +30,8 @@ fun Application.configureAPIDocuments() {
         spec("admin") {
             info {
                 title = "Turnin Admin API"
-                description = "Turnin Admin API with Swagger-UI"
+                description = "Turnin Admin API with Swagger-UI\n " +
+                    "모든 관리자 API는 요청 시 필수 헤더를 포함해야 한다. (CF-Access-Client-Id, CF-Access-Client-Secret)"
             }
         }
     }
