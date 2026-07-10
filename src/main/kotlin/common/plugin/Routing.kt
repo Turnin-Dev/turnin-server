@@ -80,7 +80,7 @@ fun Application.configureRouting() {
                 authRoutes(route = Api.V1.Auth, usecase = authUseCases)
                 fileRoutes(route = Api.V1.File, usecase = fileUseCases)
                 authenticatedUserRoute {
-                    rateLimit(RateLimitType.AUTHENTICATED_DEFAULT.ktorName) {
+                    rateLimit(RateLimitToken.AUTHENTICATED_DEFAULT.ktorName) {
                         accountRoutes(route = Api.V1.Account, usecase = accountUseCases)
                         userRoutes(route = Api.V1.User, usecase = userUseCases)
                         keywordRoutes(route = Api.V1.Keyword, usecase = keywordUseCases)
@@ -101,11 +101,11 @@ fun Application.configureRouting() {
 
             // 관리자 라우트
             route(Api.Admin.ROUTE, { description = "Admin API" }) {
-                rateLimit(RateLimitType.ADMIN.ktorName) {
+                rateLimit(RateLimitToken.ADMIN.ktorName) {
                     authAdminRoutes(route = Api.Admin.Auth, usecase = authAdminUseCases)
                 }
                 authenticatedAdminRoute {
-                    rateLimit(RateLimitType.ADMIN.ktorName) {
+                    rateLimit(RateLimitToken.ADMIN.ktorName) {
                         announcementAdminRoutes(route = Api.Admin.Announcement, usecase = announcementAdminUseCases)
                     }
                 }

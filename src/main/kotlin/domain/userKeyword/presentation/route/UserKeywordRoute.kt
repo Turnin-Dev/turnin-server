@@ -3,6 +3,7 @@ package com.turnin.domain.userKeyword.presentation.route
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.plugin.RateLimitToken
 import com.turnin.common.route.Api
 import com.turnin.common.validator.inputValidationAndReturn
 import com.turnin.domain.userKeyword.application.usecase.UserKeywordUseCases
@@ -20,6 +21,7 @@ import io.github.smiley4.ktoropenapi.patch
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.plugins.ratelimit.rateLimit
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 
@@ -49,13 +51,15 @@ fun AuthenticatedRoute.userKeywordRoutes(route: Api.V1.UserKeyword, usecase: Use
             }
         }
 
-        post(route.ROUTE, { createUserKeywordDocs() }) {
-            val createUserKeywordRequest = call.receive<CreateUserKeywordRequest>()
-            val ownerId = UserId(createUserKeywordRequest.userId)
-            verifyAuthUserId(ownerId)
-            val addUserKeywordRequestDto = createUserKeywordRequest.toDto().copy(userId = ownerId)
-            val userKeywordDto = usecase.create(addUserKeywordRequestDto)
-            call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
+        rateLimit(RateLimitToken.CREATE_KEYWORD.ktorName) {
+            post(route.ROUTE, { createUserKeywordDocs() }) {
+                val createUserKeywordRequest = call.receive<CreateUserKeywordRequest>()
+                val ownerId = UserId(createUserKeywordRequest.userId)
+                verifyAuthUserId(ownerId)
+                val addUserKeywordRequestDto = createUserKeywordRequest.toDto().copy(userId = ownerId)
+                val userKeywordDto = usecase.create(addUserKeywordRequestDto)
+                call.respond(HttpStatusCode.Created, userKeywordDto.toResponse())
+            }
         }
 
         patch(route.ROUTE, { updateUserKeywordDocs() }) {
@@ -132,7 +136,11 @@ private fun RouteConfig.getDetailDocs() {
 
 private fun RouteConfig.createUserKeywordDocs() {
     summary = "사용자 키워드 생성"
-    description = "사용자 키워드를 생성한다."
+    description = """
+        사용자 키워드를 생성한다.
+
+        - Rate Limit: ${RateLimitToken.CREATE_KEYWORD.toPrettyString()}
+    """.trimIndent()
     request {
         body<CreateUserKeywordRequest> {
             description = "사용자 키워드 생성 요청 바디"
