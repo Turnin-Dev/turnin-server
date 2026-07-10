@@ -40,16 +40,13 @@ enum class RateLimitType(private val value: String) {
  */
 fun Application.configureRateLimit() {
     install(RateLimit) {
+        // ------------------------------ 전역 ------------------------------
         global {
-            rateLimiter(limit = 300, refillPeriod = 60.seconds)
+            rateLimiter(limit = 1000, refillPeriod = 60.seconds)
             requestKey { call -> call.getRequestKey() } // 인증 전엔 사실상 IP가 주 키가 됨
         }
 
-        register(RateLimitType.AUTHENTICATED_DEFAULT.ktorName) {
-            rateLimiter(limit = 100, refillPeriod = 60.seconds)
-            requestKey { call -> call.getRequestKey() }
-        }
-
+        // ------------------------------ 비인증(키 -> ip) ------------------------------
         register(RateLimitType.LOGIN.ktorName) {
             rateLimiter(limit = 5, refillPeriod = 10.seconds)
             requestKey { call -> call.getRequestKey() }
@@ -57,11 +54,6 @@ fun Application.configureRateLimit() {
 
         register(RateLimitType.REGISTER.ktorName) {
             rateLimiter(limit = 2, refillPeriod = 10.seconds)
-            requestKey { call -> call.getRequestKey() }
-        }
-
-        register(RateLimitType.CREATE_KEYWORD.ktorName) {
-            rateLimiter(limit = 5, refillPeriod = 10.seconds)
             requestKey { call -> call.getRequestKey() }
         }
 
@@ -78,6 +70,18 @@ fun Application.configureRateLimit() {
             }
         }
 
+        // ------------------------------ 인증(키 -> 사용자 ID) ------------------------------
+        register(RateLimitType.AUTHENTICATED_DEFAULT.ktorName) {
+            rateLimiter(limit = 100, refillPeriod = 60.seconds)
+            requestKey { call -> call.getRequestKey() }
+        }
+
+        register(RateLimitType.CREATE_KEYWORD.ktorName) {
+            rateLimiter(limit = 5, refillPeriod = 10.seconds)
+            requestKey { call -> call.getRequestKey() }
+        }
+
+        // ------------------------------ 혼용 ------------------------------
         register(RateLimitType.ADMIN.ktorName) {
             rateLimiter(limit = 60, refillPeriod = 60.seconds)
             requestKey { call -> call.getRequestKey() }
