@@ -7,6 +7,7 @@ import com.turnin.common.jwt.exception.TokenException
 import com.turnin.common.model.Role
 import com.turnin.common.plugin.AuthRole
 import com.turnin.common.plugin.AuthenticatedRoute
+import com.turnin.common.plugin.RateLimitToken
 import com.turnin.common.plugin.authenticatedAdminRoute
 import com.turnin.common.plugin.authenticatedUserRoute
 import io.ktor.serialization.kotlinx.json.json
@@ -17,9 +18,11 @@ import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.ratelimit.RateLimit
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.ApplicationTestBuilder
+import kotlin.time.Duration.Companion.seconds
 import org.koin.core.module.Module
 import org.koin.ktor.plugin.Koin
 
@@ -40,6 +43,8 @@ fun ApplicationTestBuilder.testPlugin(
     routingApplicationScope: Application.() -> Unit = {},
 ) {
     application {
+        testRateLimit()
+
         module?.let {
             if (pluginOrNull(Koin) == null) {
                 testKoinModule(module = module)
@@ -68,6 +73,16 @@ fun ApplicationTestBuilder.testPlugin(
             }
         }
         routingApplicationScope()
+    }
+}
+
+private fun Application.testRateLimit() {
+    install(RateLimit) {
+        RateLimitToken.entries.forEach { token ->
+            register(token.ktorName) {
+                rateLimiter(limit = Int.MAX_VALUE, refillPeriod = 60.seconds)
+            }
+        }
     }
 }
 
