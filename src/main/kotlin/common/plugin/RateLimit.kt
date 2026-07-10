@@ -8,25 +8,52 @@ import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal
 import io.ktor.server.plugins.ratelimit.RateLimit
 import io.ktor.server.plugins.ratelimit.RateLimitName
+import io.ktor.server.plugins.ratelimit.RateLimitProviderConfig
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /**
- * RateLimit 이름
+ * RateLimit 토큰
  *
  * [ktorName] 값으로 사용한다.
  */
-enum class RateLimitType(private val value: String) {
-    AUTHENTICATED_DEFAULT("authenticated_default"),
-    LOGIN("login"),
-    REGISTER("register"),
-    CREATE_KEYWORD("create_keyword"),
-    ADMIN("admin"),
-    EXISTS_CHECK("exists_check"),
-    TOKEN_REFRESH("token_refresh"),
+enum class RateLimitToken(
+    private val value: String,
+    val limit: Int,
+    val refillPeriod: Duration,
+) {
+    GLOBAL("global", limit = 1000, refillPeriod = 60.seconds),
+    LOGIN("login", limit = 5, refillPeriod = 10.seconds),
+    REGISTER("register", limit = 2, refillPeriod = 10.seconds),
+    EXISTS_CHECK("exists_check", limit = 30, refillPeriod = 10.seconds),
+    TOKEN_REFRESH("token_refresh", limit = 10, refillPeriod = 60.seconds),
+    AUTHENTICATED_DEFAULT("authenticated_default", limit = 100, refillPeriod = 60.seconds),
+    CREATE_KEYWORD("create_keyword", limit = 5, refillPeriod = 10.seconds),
+    ADMIN("admin", limit = 60, refillPeriod = 60.seconds),
     ;
 
     val ktorName: RateLimitName
         get() = RateLimitName(this.value)
+
+    fun toPrettyString(): String =
+        "$limit req / ${refillPeriod.toString(DurationUnit.SECONDS)}"
+}
+
+/**
+ * RateLimiter 적용 헬퍼 함수
+ *
+ * [RateLimitToken]을 사용하여 적용한다.
+ *
+ * @param token [RateLimitToken]
+ * @param requestKeySelector RateLimit 측정 기준이 될 요청 키
+ */
+private fun RateLimitProviderConfig.applyRateLimiter(
+    token: RateLimitToken,
+    requestKeySelector: (ApplicationCall) -> Any = { it.getRequestKey() },
+) {
+    rateLimiter(limit = token.limit, refillPeriod = token.refillPeriod)
+    requestKey { call -> requestKeySelector(call) }
 }
 
 /**
@@ -42,49 +69,44 @@ fun Application.configureRateLimit() {
     install(RateLimit) {
         // ------------------------------ 전역 ------------------------------
         global {
-            rateLimiter(limit = 1000, refillPeriod = 60.seconds)
-            requestKey { call -> call.getRequestKey() } // 인증 전엔 사실상 IP가 주 키가 됨
+            applyRateLimiter(RateLimitToken.GLOBAL) // 인증 전엔 사실상 IP가 주 키가 됨
         }
 
         // ------------------------------ 비인증(키 -> ip) ------------------------------
-        register(RateLimitType.LOGIN.ktorName) {
-            rateLimiter(limit = 5, refillPeriod = 10.seconds)
-            requestKey { call -> call.getRequestKey() }
+        register(RateLimitToken.LOGIN.ktorName) {
+            applyRateLimiter(RateLimitToken.LOGIN)
         }
 
-        register(RateLimitType.REGISTER.ktorName) {
-            rateLimiter(limit = 2, refillPeriod = 10.seconds)
-            requestKey { call -> call.getRequestKey() }
+        register(RateLimitToken.REGISTER.ktorName) {
+            applyRateLimiter(RateLimitToken.REGISTER)
         }
 
-        register(RateLimitType.EXISTS_CHECK.ktorName) {
-            rateLimiter(limit = 30, refillPeriod = 10.seconds)
-            requestKey { call -> call.getRequestKey() }
+        register(RateLimitToken.EXISTS_CHECK.ktorName) {
+            applyRateLimiter(RateLimitToken.EXISTS_CHECK)
         }
 
-        register(RateLimitType.TOKEN_REFRESH.ktorName) {
-            rateLimiter(limit = 10, refillPeriod = 60.seconds)
-            requestKey { call ->
-                call.request.headers["Authorization"]
-                    ?: call.getRequestKey()
-            }
+        register(RateLimitToken.TOKEN_REFRESH.ktorName) {
+            applyRateLimiter(
+                token = RateLimitToken.TOKEN_REFRESH,
+                requestKeySelector = { call ->
+                    call.request.headers["Authorization"]
+                        ?: call.getRequestKey()
+                },
+            )
         }
 
         // ------------------------------ 인증(키 -> 사용자 ID) ------------------------------
-        register(RateLimitType.AUTHENTICATED_DEFAULT.ktorName) {
-            rateLimiter(limit = 100, refillPeriod = 60.seconds)
-            requestKey { call -> call.getRequestKey() }
+        register(RateLimitToken.AUTHENTICATED_DEFAULT.ktorName) {
+            applyRateLimiter(RateLimitToken.AUTHENTICATED_DEFAULT)
         }
 
-        register(RateLimitType.CREATE_KEYWORD.ktorName) {
-            rateLimiter(limit = 5, refillPeriod = 10.seconds)
-            requestKey { call -> call.getRequestKey() }
+        register(RateLimitToken.CREATE_KEYWORD.ktorName) {
+            applyRateLimiter(RateLimitToken.CREATE_KEYWORD)
         }
 
         // ------------------------------ 혼용 ------------------------------
-        register(RateLimitType.ADMIN.ktorName) {
-            rateLimiter(limit = 60, refillPeriod = 60.seconds)
-            requestKey { call -> call.getRequestKey() }
+        register(RateLimitToken.ADMIN.ktorName) {
+            applyRateLimiter(RateLimitToken.ADMIN)
         }
     }
 }

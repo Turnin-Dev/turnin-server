@@ -7,7 +7,7 @@ import com.turnin.common.jwt.JWTValidator
 import com.turnin.common.jwt.domain.model.JWTToken.Companion.removeBearerHeader
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.DisplayId
-import com.turnin.common.plugin.RateLimitType
+import com.turnin.common.plugin.RateLimitToken
 import com.turnin.common.route.Api
 import com.turnin.common.route.Api.byPathParam
 import com.turnin.common.validator.inputValidationAndReturn
@@ -39,7 +39,7 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
         tags = setOf(route.TAG)
         description = "Auth API"
     }) {
-        rateLimit(RateLimitType.LOGIN.ktorName) {
+        rateLimit(RateLimitToken.LOGIN.ktorName) {
             post(route.LOGIN, { loginDocs() }) {
                 val request = call.receive<LoginRequest>()
                 request.validate()
@@ -48,7 +48,7 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
             }
         }
 
-        rateLimit(RateLimitType.REGISTER.ktorName) {
+        rateLimit(RateLimitToken.REGISTER.ktorName) {
             post(route.REGISTER, { registerDocs() }) {
                 val request = call.receive<RegisterRequest>()
                 request.validate()
@@ -66,7 +66,7 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
             }
         }
 
-        rateLimit(RateLimitType.TOKEN_REFRESH.ktorName) {
+        rateLimit(RateLimitToken.TOKEN_REFRESH.ktorName) {
             get(route.REFRESH, { refreshDocs() }) {
                 val refreshTokenParam = call.request.headers["Authorization"].inputValidationAndReturn("인증 토큰")
                 JWTValidator.validate(refreshTokenParam)
@@ -83,7 +83,7 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
             }
         }
 
-        rateLimit(RateLimitType.EXISTS_CHECK.ktorName) {
+        rateLimit(RateLimitToken.EXISTS_CHECK.ktorName) {
             get(route.EXISTS_USER.byPathParam("provider", "providerId"), { findUserDocs() }) {
                 val provider = call.request.pathVariables["provider"] ?: return@get
                 val providerId = call.request.pathVariables["providerId"] ?: return@get
@@ -105,7 +105,7 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
             }
         }
 
-        rateLimit(RateLimitType.EXISTS_CHECK.ktorName) {
+        rateLimit(RateLimitToken.EXISTS_CHECK.ktorName) {
             get(route.EXISTS_DISPLAY_ID.byPathParam("displayId"), { existsDisplayIdDocs() }) {
                 val displayIdParam = call.request.pathVariables["displayId"]
                 displayIdParam?.validateDisplayId()
@@ -131,7 +131,11 @@ fun Route.authRoutes(route: Api.V1.Auth, usecase: AuthUseCases) {
 // ------------------------------ Route Docs ------------------------------
 private fun RouteConfig.loginDocs() {
     summary = "소셜 로그인"
-    description = "소셜 로그인"
+    description = """
+        소셜 로그인
+
+        - Rate Limit: ${RateLimitToken.LOGIN.toPrettyString()}
+    """.trimIndent()
     request {
         body<LoginRequest> {
             description = "로그인 요청 본문"
@@ -181,7 +185,11 @@ private fun RouteConfig.loginDocs() {
 
 private fun RouteConfig.registerDocs() {
     summary = "회원가입"
-    description = "회원가입"
+    description = """
+        회원가입
+
+        - Rate Limit: ${RateLimitToken.REGISTER.toPrettyString()}
+    """.trimIndent()
     request {
         body<RegisterRequest> {
             description = "회원가입 요청 본문"
@@ -212,7 +220,11 @@ private fun RouteConfig.registerDocs() {
 
 private fun RouteConfig.refreshDocs() {
     summary = "리프레쉬 토큰 갱신"
-    description = "리프레쉬 토큰 갱신 요청"
+    description = """
+        리프레쉬 토큰 갱신 요청
+
+        - Rate Limit: ${RateLimitToken.TOKEN_REFRESH.toPrettyString()}
+    """.trimIndent()
     request {
         headerParameter<String>("Authorization") {
             description = "리프레쉬 토큰"
@@ -248,7 +260,11 @@ private fun RouteConfig.refreshDocs() {
 
 private fun RouteConfig.findUserDocs() {
     summary = "사용자 찾기"
-    description = "사용자 존재 여부 확인"
+    description = """
+        사용자 존재 여부 확인
+
+        - Rate Limit: ${RateLimitToken.EXISTS_CHECK.toPrettyString()}
+    """.trimIndent()
     request {
         pathParameter<String>("provider") {
             description = "소셜로그인 플랫폼 (대문자 형식)"
@@ -294,7 +310,11 @@ private fun RouteConfig.findUserDocs() {
 
 private fun RouteConfig.existsDisplayIdDocs() {
     summary = "사용자 표시 ID 존재 여부 확인"
-    description = "사용자 표시 ID 존재 여부 확인"
+    description = """
+        사용자 표시 ID 존재 여부 확인
+
+        - Rate Limit: ${RateLimitToken.EXISTS_CHECK.toPrettyString()}
+    """.trimIndent()
     request {
         pathParameter<String>("displayId") {
             description = "사용자 표시 ID"
