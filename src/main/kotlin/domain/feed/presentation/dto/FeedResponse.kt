@@ -2,6 +2,7 @@ package com.turnin.domain.feed.presentation.dto
 
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.domain.feed.application.dto.FeedCursor
+import com.turnin.domain.feed.application.dto.FeedCursorCodec
 import com.turnin.domain.feed.application.dto.FeedDto
 import kotlinx.serialization.Serializable
 
@@ -16,8 +17,6 @@ import kotlinx.serialization.Serializable
  * @property keyword 키워드 명
  * @property description 키워드 내용
  * @property createdAt 키워드 생성 일자
- * @property score 피드 점수(피드 표시 조건을 위한 점수, 높을수록 피드가 표시될 확률이 높음)
- * @property similarity 유사도(사용자의 키워드들과 유사한 정도를 나타냄, 1.0에 가까울수록 유사함)
  */
 @Serializable
 data class FeedResponse(
@@ -29,8 +28,6 @@ data class FeedResponse(
     val keyword: String,
     val description: String,
     val createdAt: Long,
-    val score: Double,
-    val similarity: Double,
 ) {
     companion object {
         val sample = CursorPage(
@@ -44,13 +41,16 @@ data class FeedResponse(
                     keyword = "keyword",
                     description = "description",
                     createdAt = 1000L,
-                    score = 50.0,
-                    similarity = 0.9,
                 )
             },
-            nextCursor = FeedCursor(
-                score = 50.0,
-                userKeywordId = 2L,
+            nextCursor = FeedCursorCodec.encode(
+                FeedCursor(
+                    seed = "sample-seed-1234",
+                    sessionMaxId = 100L,
+                    windowAnchorId = null,
+                    lastShuffleKey = 4213,
+                    lastUkId = 2L,
+                ),
             ),
         )
     }
@@ -66,6 +66,4 @@ fun FeedDto.toResponse(): FeedResponse =
         keyword = keyword,
         description = description,
         createdAt = createdAt,
-        score = score,
-        similarity = similarity,
     )

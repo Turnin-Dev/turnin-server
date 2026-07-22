@@ -8,90 +8,103 @@ import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.common.util.toOffsetDateTime
 import com.turnin.domain.feed.domain.model.Feed
+import com.turnin.domain.feed.domain.model.FeedWindowResult
 import com.turnin.domain.feed.domain.repository.FeedRepository
 import com.turnin.domain.userKeyword.domain.model.Description
-import org.jetbrains.exposed.sql.DoubleColumnType
 import org.jetbrains.exposed.sql.IColumnType
 import org.jetbrains.exposed.sql.IntegerColumnType
 import org.jetbrains.exposed.sql.LongColumnType
+import org.jetbrains.exposed.sql.VarCharColumnType
 import org.jetbrains.exposed.sql.statements.StatementType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 class FeedRepositoryImpl : FeedRepository {
-    override suspend fun getFeeds(
+    override suspend fun getFriendFeeds(
         userId: UserId,
-        cursorScore: Double?,
-        cursorUkId: UserKeywordId?,
+        seed: String,
+        sessionMaxId: Long?,
+        windowAnchorId: UserKeywordId?,
+        lastShuffleKey: Int?,
+        lastUkId: Long?,
+        windowSize: Int,
         limit: Int,
-        similarPoolLimit: Int,
-        fallbackPoolLimit: Int,
-    ): List<Feed> = suspendTransaction {
-        val sql = getFeedsNativeSQL()
+    ): FeedWindowResult = suspendTransaction {
+        val sql = getFriendFeedsNativeSQL()
         val params = buildList {
-            // my_top_keywords
-            add(LongColumnType() to userId.value) // uk.user_id = ?
-
             // friends
+            add(LongColumnType() to userId.value) // requester_id = ? (CASE)
             add(LongColumnType() to userId.value) // requester_id = ?
-            add(LongColumnType() to userId.value) // requester_id = ? OR receiver_id = ?
-            add(LongColumnType() to userId.value) // receiver_id = ?  (CASE WHEN)
+            add(LongColumnType() to userId.value) // receiver_id = ?
 
             // blocked_users
             add(LongColumnType() to userId.value) // blocker_id = ?
             add(LongColumnType() to userId.value) // blocked_id = ?
 
-            // similar_pool
-            add(LongColumnType() to userId.value) // uk.user_id != ?
-            add(IntegerColumnType() to similarPoolLimit) // LIMIT ?
+            // params: session_max_id
+            add(LongColumnType() to sessionMaxId) // COALESCE(?::bigint, MAX(id))
 
-            // fallback_pool
-            add(LongColumnType() to userId.value) // uk.user_id != ?
-            add(IntegerColumnType() to fallbackPoolLimit) // LIMIT ?
+            // window_pool anchor
+            add(LongColumnType() to windowAnchorId?.value) // ?::bigint IS NULL
+            add(LongColumnType() to windowAnchorId?.value) // uk.id < ?
+            add(IntegerColumnType() to windowSize) // LIMIT ?
 
-            // result_list
-            add(DoubleColumnType() to cursorScore) // IS NULL
-            add(DoubleColumnType() to cursorScore) // final_score
-            add(DoubleColumnType() to cursorScore) // final_score =
-            add(LongColumnType() to cursorUkId?.value) // uk_id
-            add(IntegerColumnType() to limit) // LIMIT
-        }
+            // shuffled: shuffle_key 계산 (딱 한 번만 사용)
+            add(VarCharColumnType() to seed) // hashtext(? || '-' || uk_id)
 
-        executeFeedQuery(sql, params)
-    }
+            // 커서 필터 (offset 대체)
+            add(IntegerColumnType() to lastShuffleKey) // ?::int IS NULL
+            add(IntegerColumnType() to lastShuffleKey) // (shuffle_key, uk_id) > (?, ?)
+            add(LongColumnType() to lastUkId)
 
-    override suspend fun getFallbackFeeds(
-        userId: UserId,
-        cursorUkId: UserKeywordId?,
-        limit: Int,
-    ): List<Feed> = suspendTransaction {
-        val sql = getFallbackFeedsNativeSQL()
-        val params = buildList {
-            add(LongColumnType() to userId.value) // uk.user_id != ?
-            add(LongColumnType() to userId.value) // blocker_id = ?
-            add(LongColumnType() to userId.value) // blocked_id = ?
-            add(LongColumnType() to cursorUkId?.value) // ?::bigint IS NULL
-            add(LongColumnType() to cursorUkId?.value) // uk.id < ?
+            // page size
             add(IntegerColumnType() to limit) // LIMIT ?
         }
 
-        executeFeedQuery(sql, params)
+        executeFeedWindowQuery(sql, params)
     }
 
-    private fun getFeedsNativeSQL(): String = """
-        WITH my_top_keywords AS (
-            SELECT uk.keyword_id, k.category
-            FROM user_keyword uk
-            JOIN keyword k ON uk.keyword_id = k.id
-            WHERE uk.user_id = ?
-              AND uk.is_active = true
-              AND k.category IS NOT NULL
-            ORDER BY uk.created_at DESC
-            LIMIT 5
-        ),
-        my_categories AS MATERIALIZED (
-            SELECT DISTINCT category FROM my_top_keywords
-        ),
-        friends AS (
+    override suspend fun getAllFeeds(
+        userId: UserId,
+        seed: String,
+        sessionMaxId: Long?,
+        windowAnchorId: UserKeywordId?,
+        lastShuffleKey: Int?,
+        lastUkId: Long?,
+        windowSize: Int,
+        limit: Int,
+    ): FeedWindowResult = suspendTransaction {
+        val sql = getAllFeedsNativeSQL()
+        val params = buildList {
+            // blocked_users
+            add(LongColumnType() to userId.value) // blocker_id = ?
+            add(LongColumnType() to userId.value) // blocked_id = ?
+
+            // params: session_max_id
+            add(LongColumnType() to sessionMaxId) // COALESCE(?::bigint, MAX(id))
+
+            // window_pool
+            add(LongColumnType() to userId.value) // uk.user_id != ?
+            add(LongColumnType() to windowAnchorId?.value) // ?::bigint IS NULL
+            add(LongColumnType() to windowAnchorId?.value) // uk.id < ?
+            add(IntegerColumnType() to windowSize) // LIMIT ?
+
+            // shuffled: shuffle_key 계산
+            add(VarCharColumnType() to seed)
+
+            // 커서 필터
+            add(IntegerColumnType() to lastShuffleKey) // ?::int IS NULL
+            add(IntegerColumnType() to lastShuffleKey) // (shuffle_key, uk_id) > (?, ?)
+            add(LongColumnType() to lastUkId)
+
+            // page size
+            add(IntegerColumnType() to limit)
+        }
+
+        executeFeedWindowQuery(sql, params)
+    }
+
+    private fun getFriendFeedsNativeSQL(): String = """
+        WITH friends AS (
             SELECT
                 CASE
                     WHEN requester_id = ? THEN receiver_id
@@ -106,133 +119,115 @@ class FeedRepositoryImpl : FeedRepository {
             UNION
             SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
         ),
-        friend_pool AS (
+        params AS (
+            -- 세션 시작 시점의 최신 id 스냅샷. 커서에 값이 있으면 그대로 쓰고,
+            -- 첫 요청(null)일 때만 현재 MAX(id)를 계산해 이후 페이지에 고정 전달
+            SELECT COALESCE(?::bigint, (SELECT MAX(id) FROM user_keyword)) AS session_max_id
+        ),
+        window_pool AS (
             SELECT
                 uk.id AS uk_id,
                 uk.user_id AS uk_user_id,
                 uk.keyword_id AS uk_keyword_id,
                 uk.description AS uk_description,
-                uk.created_at AS uk_created_at,
-                1 AS priority,
-                0.0 AS similarity  -- 친구는 similarity 미사용
-            FROM user_keyword uk
+                uk.created_at AS uk_created_at
+            FROM user_keyword uk, params p
             WHERE uk.user_id IN (SELECT id FROM friends)
               AND uk.is_active = true
               AND NOT EXISTS (SELECT 1 FROM blocked_users b WHERE b.user_id = uk.user_id)
-        ),
-        similar_pool AS (
-            SELECT
-                uk.id AS uk_id,
-                uk.user_id AS uk_user_id,
-                uk.keyword_id AS uk_keyword_id,
-                uk.description AS uk_description,
-                uk.created_at AS uk_created_at,
-                2 AS priority,
-                0.5 AS similarity
-            FROM my_categories mc  -- my_categories가 비어있으면 조인 결과도 0행
-            JOIN keyword k ON k.category = mc.category
-            JOIN user_keyword uk ON uk.keyword_id = k.id
-            WHERE uk.is_active = true
-              AND uk.user_id != ?
-              AND NOT EXISTS (SELECT 1 FROM friends f WHERE f.id = uk.user_id)
-              AND NOT EXISTS (SELECT 1 FROM blocked_users b WHERE b.user_id = uk.user_id)
-              AND EXISTS (SELECT 1 FROM my_categories)  -- 빈 경우 즉시 종료
-            ORDER BY uk.created_at DESC, uk.id DESC
+              AND uk.id <= p.session_max_id
+              AND (?::bigint IS NULL OR uk.id < ?)
+            ORDER BY uk.id DESC
             LIMIT ?
         ),
-        fallback_pool AS (
+        -- 윈도우 함수는 여기서 "청크 전체"에 대해 먼저 계산.
+        -- 바깥에서 커서로 WHERE 필터링을 해도 window_fetched_count/window_min_uk_id는
+        -- 청크 전체 기준값을 그대로 유지해야 하기 때문 (아래서 필터링하면 값이 오염됨)
+        shuffled AS (
             SELECT
-                uk.id AS uk_id,
-                uk.user_id AS uk_user_id,
-                uk.keyword_id AS uk_keyword_id,
-                uk.description AS uk_description,
-                uk.created_at AS uk_created_at,
-                3 AS priority,
-                0.0 AS similarity
-            FROM user_keyword uk
-            WHERE uk.user_id != ?
-              AND uk.is_active = true
-              AND NOT EXISTS (SELECT 1 FROM friends f WHERE f.id = uk.user_id)
-              AND NOT EXISTS (SELECT 1 FROM blocked_users b WHERE b.user_id = uk.user_id)
-            ORDER BY uk.created_at DESC, uk.id DESC
-            LIMIT ?
-        ),
-        combined AS (
-            SELECT * FROM friend_pool
-            UNION ALL
-            SELECT * FROM similar_pool
-            UNION ALL
-            SELECT * FROM fallback_pool
-        ),
-        scored_pool AS (
-            SELECT DISTINCT ON (uk_id)
-                *,
-                (
-                    (similarity * 50) +
-                    (CASE WHEN priority = 1 THEN 100 ELSE 0 END)
-                ) AS final_score
-            FROM combined
-            ORDER BY uk_id, priority ASC
-        ),
-        result_list AS (
-            SELECT
-                uk_id, uk_user_id, uk_keyword_id, uk_description, uk_created_at,
-                similarity, final_score
-            FROM scored_pool
-            WHERE (?::float8 IS NULL OR
-                final_score < ?::float8 OR
-                (final_score = ?::float8 AND uk_id < ?))
-            ORDER BY final_score DESC, uk_id DESC
-            LIMIT ?
+                wp.uk_id, wp.uk_user_id, wp.uk_keyword_id, wp.uk_description, wp.uk_created_at,
+                u.name, u.profile_image_url, k.keyword,
+                (abs(hashtext(? || '-' || wp.uk_id::text)) % 100000) AS shuffle_key,
+                MIN(wp.uk_id) OVER () AS window_min_uk_id,
+                COUNT(*)      OVER () AS window_fetched_count,
+                (SELECT session_max_id FROM params) AS session_max_id
+            FROM window_pool wp
+            JOIN "user" u ON wp.uk_user_id = u.id
+            JOIN keyword k ON wp.uk_keyword_id = k.id
         )
-        SELECT
-            rl.uk_id, rl.uk_user_id, rl.uk_keyword_id, rl.uk_description, rl.uk_created_at,
-            rl.similarity, rl.final_score,
-            u.name, u.profile_image_url,
-            k.keyword
-        FROM result_list rl
-        JOIN "user" u ON rl.uk_user_id = u.id
-        JOIN keyword k ON rl.uk_keyword_id = k.id
-        ORDER BY rl.final_score DESC, rl.uk_id DESC;
-        """.trimIndent()
-
-    private fun getFallbackFeedsNativeSQL(): String = """
-        SELECT
-            uk.id AS uk_id,
-            uk.user_id AS uk_user_id,
-            uk.keyword_id AS uk_keyword_id,
-            uk.description AS uk_description,
-            uk.created_at AS uk_created_at,
-            0.0 AS similarity,
-            0.0 AS final_score,
-            u.name,
-            u.profile_image_url,
-            k.keyword
-        FROM user_keyword uk
-        JOIN "user" u ON uk.user_id = u.id
-        JOIN keyword k ON uk.keyword_id = k.id
-        WHERE uk.user_id != ?
-            AND uk.is_active = true
-            AND NOT EXISTS (
-                SELECT 1 FROM block
-                WHERE (block.blocker_id = ? AND block.blocked_id = uk.user_id)
-                    OR (block.blocked_id = ? AND block.blocker_id = uk.user_id)
-            )
-            AND (?::bigint IS NULL OR uk.id < ?)
-        ORDER BY uk.id DESC
+        SELECT *
+        FROM shuffled
+        WHERE (
+            -- (shuffle_key, uk_id) 튜플 커서로 다음 페이지를 특정
+            ?::int IS NULL OR (shuffle_key, uk_id) > (?, ?)
+        )
+        ORDER BY shuffle_key, uk_id
         LIMIT ?;
         """.trimIndent()
 
-    private fun executeFeedQuery(
+    private fun getAllFeedsNativeSQL(): String = """
+        WITH blocked_users AS MATERIALIZED (
+            SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
+            UNION
+            SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
+        ),
+        params AS (
+            SELECT COALESCE(?::bigint, (SELECT MAX(id) FROM user_keyword)) AS session_max_id
+        ),
+        window_pool AS (
+            SELECT
+                uk.id AS uk_id,
+                uk.user_id AS uk_user_id,
+                uk.keyword_id AS uk_keyword_id,
+                uk.description AS uk_description,
+                uk.created_at AS uk_created_at
+            FROM user_keyword uk, params p
+            WHERE uk.user_id != ?
+              AND uk.is_active = true
+              AND NOT EXISTS (SELECT 1 FROM blocked_users b WHERE b.user_id = uk.user_id)
+              AND uk.id <= p.session_max_id
+              AND (?::bigint IS NULL OR uk.id < ?)
+            ORDER BY uk.id DESC
+            LIMIT ?
+        ),
+        shuffled AS (
+            SELECT
+                wp.uk_id, wp.uk_user_id, wp.uk_keyword_id, wp.uk_description, wp.uk_created_at,
+                u.name, u.profile_image_url, k.keyword,
+                (abs(hashtext(? || '-' || wp.uk_id::text)) % 100000) AS shuffle_key,
+                MIN(wp.uk_id) OVER () AS window_min_uk_id,
+                COUNT(*)      OVER () AS window_fetched_count,
+                (SELECT session_max_id FROM params) AS session_max_id
+            FROM window_pool wp
+            JOIN "user" u ON wp.uk_user_id = u.id
+            JOIN keyword k ON wp.uk_keyword_id = k.id
+        )
+        SELECT *
+        FROM shuffled
+        WHERE (
+            ?::int IS NULL
+            OR (shuffle_key, uk_id) > (?, ?)
+        )
+        ORDER BY shuffle_key, uk_id
+        LIMIT ?;
+        """.trimIndent()
+
+    private fun executeFeedWindowQuery(
         sql: String,
         params: List<Pair<IColumnType<*>, Any?>>,
-    ): List<Feed> =
+    ): FeedWindowResult =
         TransactionManager.current().exec(
             stmt = sql,
             args = params,
             explicitStatementType = StatementType.SELECT,
         ) { rs ->
             val feeds = mutableListOf<Feed>()
+            var windowMinUkId: Long? = null
+            var windowFetchedCount = 0
+            var sessionMaxId: Long? = null
+            var lastShuffleKey: Int? = null
+            var lastUkId: Long? = null
+
             while (rs.next()) {
                 feeds.add(
                     Feed(
@@ -248,11 +243,26 @@ class FeedRepositoryImpl : FeedRepository {
                             .toInstant()
                             .toOffsetDateTime()
                             .toEpochSecond(),
-                        score = rs.getDouble("final_score"),
-                        similarity = rs.getDouble("similarity"),
                     ),
                 )
+
+                // 윈도우 함수 / 세션 값은 모든 행에 동일하게 붙어오므로 한 번만 읽어도 됨
+                windowMinUkId = rs.getLong("window_min_uk_id").let { if (rs.wasNull()) null else it }
+                windowFetchedCount = rs.getInt("window_fetched_count")
+                sessionMaxId = rs.getLong("session_max_id").let { if (rs.wasNull()) null else it }
+
+                // 다음 페이지 커서를 위해 "이번 응답의 마지막 행" 값을 계속 갱신
+                lastShuffleKey = rs.getInt("shuffle_key").let { if (rs.wasNull()) null else it }
+                lastUkId = rs.getLong("uk_id")
             }
-            feeds
-        } ?: emptyList()
+
+            FeedWindowResult(
+                feeds = feeds,
+                windowMinUkId = windowMinUkId,
+                windowFetchedCount = windowFetchedCount,
+                sessionMaxId = sessionMaxId,
+                lastShuffleKey = lastShuffleKey,
+                lastUkId = lastUkId,
+            )
+        } ?: FeedWindowResult(emptyList(), null, 0, null, null, null)
 }

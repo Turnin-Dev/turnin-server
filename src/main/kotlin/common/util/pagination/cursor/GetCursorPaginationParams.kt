@@ -1,7 +1,6 @@
 package com.turnin.common.util.pagination.cursor
 
 import com.turnin.common.validator.inputValidationAndReturn
-import com.turnin.domain.feed.application.dto.FeedCursor
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.routing.RoutingContext
 
@@ -24,13 +23,10 @@ fun RoutingContext.getCursorPaginationParams(): CursorPaginationParams<Long> {
     )
 }
 
-fun RoutingContext.getFeedCursorPaginationParams(): CursorPaginationParams<FeedCursor> {
-    val cursorScore = call.request.queryParameters["cursorScore"]
+fun RoutingContext.getFeedCursorPaginationParams(): CursorPaginationParams<String> {
+    val cursor = call.request.queryParameters["cursor"]
         ?.takeIf { it.isNotBlank() }
-        ?.toDoubleOrNull()
-    val cursorUserKeywordId = call.request.queryParameters["cursorUserKeywordId"]
-        ?.takeIf { it.isNotBlank() }
-        ?.toLongOrNull()
+
     val size = call.request.queryParameters["size"]
         ?.toIntOrNull()
         .inputValidationAndReturn("CursorPaginationParams(pageSize)")
@@ -40,17 +36,8 @@ fun RoutingContext.getFeedCursorPaginationParams(): CursorPaginationParams<FeedC
         size > 25 -> throw BadRequestException("Page size number too large.")
     }
 
-    val feedCursor = if (cursorScore == null || cursorUserKeywordId == null) {
-        null
-    } else {
-        FeedCursor(
-            score = cursorScore,
-            userKeywordId = cursorUserKeywordId,
-        )
-    }
-
     return CursorPaginationParams(
-        cursor = feedCursor,
+        cursor = cursor,
         size = size,
     )
 }
