@@ -8,6 +8,7 @@ import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.common.util.toOffsetDateTime
 import com.turnin.domain.feed.domain.model.Feed
+import com.turnin.domain.feed.domain.model.FeedRow
 import com.turnin.domain.feed.domain.model.FeedWindowResult
 import com.turnin.domain.feed.domain.repository.FeedRepository
 import com.turnin.domain.userKeyword.domain.model.Description
@@ -221,28 +222,32 @@ class FeedRepositoryImpl : FeedRepository {
             args = params,
             explicitStatementType = StatementType.SELECT,
         ) { rs ->
-            val feeds = mutableListOf<Feed>()
+            val feedRows = mutableListOf<FeedRow>()
             var windowMinUkId: Long? = null
             var windowFetchedCount = 0
             var sessionMaxId: Long? = null
-            var lastShuffleKey: Int? = null
-            var lastUkId: Long? = null
 
             while (rs.next()) {
-                feeds.add(
-                    Feed(
-                        userKeywordId = UserKeywordId(rs.getLong("uk_id")),
-                        userId = UserId(rs.getLong("uk_user_id")),
-                        userName = UserName(rs.getString("name")),
-                        keywordId = KeywordId(rs.getLong("uk_keyword_id")),
-                        profileImageUrl = rs.getString("profile_image_url"),
-                        keyword = KeywordName(rs.getString("keyword")),
-                        description = Description(rs.getString("uk_description")),
-                        createdAt = rs
-                            .getTimestamp("uk_created_at")
-                            .toInstant()
-                            .toOffsetDateTime()
-                            .toEpochSecond(),
+                feedRows.add(
+                    FeedRow(
+                        feed = Feed(
+                            userKeywordId = UserKeywordId(rs.getLong("uk_id")),
+                            userId = UserId(rs.getLong("uk_user_id")),
+                            userName = UserName(rs.getString("name")),
+                            keywordId = KeywordId(rs.getLong("uk_keyword_id")),
+                            profileImageUrl = rs.getString("profile_image_url"),
+                            keyword = KeywordName(rs.getString("keyword")),
+                            description = Description(rs.getString("uk_description")),
+                            createdAt = rs
+                                .getTimestamp("uk_created_at")
+                                .toInstant()
+                                .toOffsetDateTime()
+                                .toEpochSecond(),
+                        ),
+                        // 다음 페이지 커서를 위해 "이번 응답의 마지막 행" 값을 계속 갱신
+                        shuffleKey = rs.getInt("shuffle_key").also {
+                            check(!rs.wasNull()) { "shuffle_key must not be null" }
+                        },
                     ),
                 )
 
@@ -250,19 +255,13 @@ class FeedRepositoryImpl : FeedRepository {
                 windowMinUkId = rs.getLong("window_min_uk_id").let { if (rs.wasNull()) null else it }
                 windowFetchedCount = rs.getInt("window_fetched_count")
                 sessionMaxId = rs.getLong("session_max_id").let { if (rs.wasNull()) null else it }
-
-                // 다음 페이지 커서를 위해 "이번 응답의 마지막 행" 값을 계속 갱신
-                lastShuffleKey = rs.getInt("shuffle_key").let { if (rs.wasNull()) null else it }
-                lastUkId = rs.getLong("uk_id")
             }
 
             FeedWindowResult(
-                feeds = feeds,
+                feedsRows = feedRows,
                 windowMinUkId = windowMinUkId,
                 windowFetchedCount = windowFetchedCount,
                 sessionMaxId = sessionMaxId,
-                lastShuffleKey = lastShuffleKey,
-                lastUkId = lastUkId,
             )
-        } ?: FeedWindowResult(emptyList(), null, 0, null, null, null)
+        } ?: FeedWindowResult(emptyList(), null, 0, null)
 }

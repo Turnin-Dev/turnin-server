@@ -33,7 +33,7 @@ fun RoutingContext.getFeedCursorPaginationParams(): CursorPaginationParams<Strin
 
     when {
         size < 1 -> throw BadRequestException("Page size number must be positive.")
-        size > 25 -> throw BadRequestException("Page size number too large.")
+        size > 30 -> throw BadRequestException("Page size number too large.")
     }
 
     return CursorPaginationParams(

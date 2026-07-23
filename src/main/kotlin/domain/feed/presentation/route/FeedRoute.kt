@@ -5,9 +5,9 @@ import com.turnin.common.route.Api
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.common.util.pagination.cursor.getFeedCursorPaginationParams
 import com.turnin.common.util.pagination.cursor.toResponse
+import com.turnin.domain.feed.application.dto.FeedType
 import com.turnin.domain.feed.application.usecase.FeedUseCases
 import com.turnin.domain.feed.presentation.dto.FeedResponse
-import com.turnin.domain.feed.presentation.dto.FeedType
 import com.turnin.domain.feed.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.get
@@ -27,10 +27,7 @@ fun AuthenticatedRoute.feedRoutes(route: Api.V1.Feed, usecase: FeedUseCases) {
             )
             val feedCursorParams = getFeedCursorPaginationParams()
 
-            val page = when (feedType) {
-                FeedType.ALL -> usecase.allFeeds(userId, feedCursorParams.cursor, feedCursorParams.size)
-                FeedType.FRIEND -> usecase.friendFeeds(userId, feedCursorParams.cursor, feedCursorParams.size)
-            }
+            val page = usecase.getFeeds(feedType, userId, feedCursorParams.cursor, feedCursorParams.size)
 
             call.respond(HttpStatusCode.OK, page.toResponse { feedDto -> feedDto.toResponse() })
         }
@@ -43,6 +40,7 @@ private fun RouteConfig.getFeedsDocs() {
     request {
         queryParameter<String>("feed_type") {
             description = "피드 유형 (ALL / FRIEND 등)"
+            required = false
         }
         queryParameter<String>("cursor") {
             description = "다음 페이지 조회를 위한 커서. 이전 응답의 nextCursor 값을 그대로 전달하며, 첫 페이지 조회 시에는 생략한다."

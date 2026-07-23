@@ -116,7 +116,6 @@ interface FeedRepository {
      *
      * ## 페이지네이션:
      * - 청크(windowSize) 단위 커서 + 청크 내부 (shuffle_key, uk_id) 값 커서, 2단계 구조.
-     * - offset은 사용하지 않음 (중간에 pool 멤버십이 바뀌면 offset이 밀리면서 중복/누락이 생기는 문제를 값 기반 커서로 회피).
      * - 상위 계층(UseCase)에서 반환된 행 수가 limit보다 적으면 현재 청크가 소진된 것으로 보고
      *   windowAnchorId를 windowMinUkId로 옮기며 청크 내부 커서(lastShuffleKey, lastUkId)를 리셋함.
      *

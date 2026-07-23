@@ -79,8 +79,12 @@ class FeedRepositoryImplTest {
         )
 
         // then
-        assertEquals(1, result.feeds.size)
-        assertEquals(friendUk.id.value, result.feeds[0].userKeywordId.value)
+        assertEquals(1, result.feedsRows.size)
+        assertEquals(
+            friendUk.id.value,
+            result.feedsRows[0]
+                .feed.userKeywordId.value,
+        )
     }
 
     // ==========================================================================================
@@ -125,10 +129,10 @@ class FeedRepositoryImplTest {
         )
 
         // then: 친구 여부와 무관하게 활성 상태인 타인 글은 전부 포함
-        val resultIds = result.feeds.map { it.userKeywordId.value }.toSet()
+        val resultIds = result.feedsRows.map { it.feed.userKeywordId.value }.toSet()
         assertTrue(friendUk.id.value in resultIds)
         assertTrue(strangerUk.id.value in resultIds)
-        assertEquals(2, result.feeds.size)
+        assertEquals(2, result.feedsRows.size)
     }
 
     // ==========================================================================================
@@ -158,7 +162,7 @@ class FeedRepositoryImplTest {
             limit = 100,
         )
         assertNotNull(firstResult.sessionMaxId)
-        assertEquals(2, firstResult.feeds.size)
+        assertEquals(2, firstResult.feedsRows.size)
 
         // 세션 시작 이후 새 글 작성
         val lateAuthor = createUser("lateAuthor")
@@ -175,8 +179,8 @@ class FeedRepositoryImplTest {
             windowSize = 100,
             limit = 100,
         )
-        assertEquals(2, sameSessionResult.feeds.size)
-        assertTrue(lateAuthor.id.value !in sameSessionResult.feeds.map { it.userId.value })
+        assertEquals(2, sameSessionResult.feedsRows.size)
+        assertTrue(lateAuthor.id.value !in sameSessionResult.feedsRows.map { it.feed.userId.value })
 
         // then: 세션을 새로 시작(sessionMaxId = null)하면 새 글이 보여야 함
         val newSessionResult = repository.getAllFeeds(
@@ -189,8 +193,8 @@ class FeedRepositoryImplTest {
             windowSize = 100,
             limit = 100,
         )
-        assertEquals(3, newSessionResult.feeds.size)
-        assertTrue(lateAuthor.id.value in newSessionResult.feeds.map { it.userId.value })
+        assertEquals(3, newSessionResult.feedsRows.size)
+        assertTrue(lateAuthor.id.value in newSessionResult.feedsRows.map { it.feed.userId.value })
     }
 
     // ==========================================================================================
@@ -232,12 +236,14 @@ class FeedRepositoryImplTest {
         )
         val sessionMaxId = page.sessionMaxId
 
-        while (page.feeds.isNotEmpty()) {
-            collected += page.feeds.map { it.userKeywordId.value }
-            lastShuffleKey = page.lastShuffleKey
-            lastUkId = page.lastUkId
+        while (page.feedsRows.isNotEmpty()) {
+            collected += page.feedsRows.map { it.feed.userKeywordId.value }
+            lastShuffleKey = page.feedsRows.last().shuffleKey
+            lastUkId = page.feedsRows
+                .last()
+                .feed.userKeywordId.value
 
-            if (page.feeds.size < 2) break // 청크 소진
+            if (page.feedsRows.size < 2) break // 청크 소진
 
             page = repository.getAllFeeds(
                 userId = myUserId,
@@ -289,7 +295,7 @@ class FeedRepositoryImplTest {
             windowSize = 3,
             limit = 3,
         )
-        assertEquals(3, firstChunk.feeds.size)
+        assertEquals(3, firstChunk.feedsRows.size)
         assertEquals(3, firstChunk.windowFetchedCount)
         assertNotNull(firstChunk.windowMinUkId)
 
@@ -298,7 +304,7 @@ class FeedRepositoryImplTest {
             userId = myUserId,
             seed = "seed-chunk-1",
             sessionMaxId = firstChunk.sessionMaxId,
-            windowAnchorId = UserKeywordId(firstChunk.windowMinUkId!!),
+            windowAnchorId = UserKeywordId(firstChunk.windowMinUkId),
             lastShuffleKey = null,
             lastUkId = null,
             windowSize = 3,
@@ -306,10 +312,13 @@ class FeedRepositoryImplTest {
         )
 
         // then: 남은 2개가 조회되고 첫 청크와 중복 없음
-        assertEquals(2, secondChunk.feeds.size)
-        val firstChunkIds = firstChunk.feeds.map { it.userKeywordId.value }.toSet()
-        secondChunk.feeds.forEach {
-            assertTrue(it.userKeywordId.value !in firstChunkIds, "중복 데이터 발견: ${it.userKeywordId.value}")
+        assertEquals(2, secondChunk.feedsRows.size)
+        val firstChunkIds = firstChunk.feedsRows.map { it.feed.userKeywordId.value }.toSet()
+        secondChunk.feedsRows.forEach {
+            assertTrue(
+                it.feed.userKeywordId.value !in firstChunkIds,
+                "중복 데이터 발견: ${it.feed.userKeywordId.value}",
+            )
         }
 
         // when: 더 이상 조회할 청크가 없는 상태
@@ -325,7 +334,7 @@ class FeedRepositoryImplTest {
         )
 
         // then
-        assertTrue(thirdChunk.feeds.isEmpty())
+        assertTrue(thirdChunk.feedsRows.isEmpty())
         assertEquals(0, thirdChunk.windowFetchedCount)
         assertNull(thirdChunk.windowMinUkId)
     }
@@ -376,10 +385,74 @@ class FeedRepositoryImplTest {
 
         // then: 완전히 동일한 순서
         assertEquals(
-            first.feeds.map { it.userKeywordId.value },
-            second.feeds.map { it.userKeywordId.value },
+            first.feedsRows.map { it.feed.userKeywordId.value },
+            second.feedsRows.map { it.feed.userKeywordId.value },
         )
     }
+
+    // ==========================================================================================
+    // 엣지 케이스
+    // ==========================================================================================
+
+    // TODO: [페이지네이션 버그 티켓](https://peekr-app.atlassian.net/browse/PK-147) 해결 후 주석 해제
+    // 버그 재현: 청크 내 커서가 마지막 지점에 도달하면 windowFetchedCount가 0으로 잘못 반환되어,
+    // 실제로는 남아있는 다음 청크 데이터에 도달하지 못한다
+//    @Test
+//    fun `커서가 청크의 끝을 가리키면 다음 청크에 데이터가 남아있어도 소진된 것으로 잘못 판단된다`() = runTest {
+//        // given: windowSize=5보다 훨씬 많은 8개 글 (1번째 청크 5개 + 2번째 청크 3개)
+//        val me = createUser("me")
+//        val keyword = createKeyword("keyword", createdBy = me)
+//        val users = (1..8).map { createUser("user$it") }
+//        val now = Instant.now()
+//        users.forEachIndexed { index, user ->
+//            createUserKeyword(
+//                user = user,
+//                keyword = keyword,
+//                description = "글_${user.name}",
+//                createdAt = now.minusSeconds((8 - index).toLong()),
+//            )
+//        }
+//
+//        val myUserId = UserId(me.id.value)
+//        val seed = "seed-boundary-1"
+//
+//        // when: 1번째 청크(5개)를 한 번에 조회해서 마지막 행의 커서 값을 얻음
+//        val firstPage = repository.getAllFeeds(
+//            userId = myUserId,
+//            seed = seed,
+//            sessionMaxId = null,
+//            windowAnchorId = null,
+//            lastShuffleKey = null,
+//            lastUkId = null,
+//            windowSize = 5,
+//            limit = 5,
+//        )
+//        assertEquals(5, firstPage.feedsRows.size)
+//        assertEquals(5, firstPage.windowFetchedCount)
+//        assertNotNull(firstPage.windowMinUkId) // 다음 청크로 넘어가기 위한 anchor
+//
+//        val lastRow = firstPage.feedsRows.last()
+//
+//        // when: 같은 청크(anchor 안 옮김) 내에서, 마지막 행을 커서로 삼아 재조회
+//        // (실제로는 이 청크에 더 볼 게 없으므로 windowAnchorId=firstPage.windowMinUkId로 다음 청크로 넘어가야 하는 시점)
+//        val boundaryPage = repository.getAllFeeds(
+//            userId = myUserId,
+//            seed = seed,
+//            sessionMaxId = firstPage.sessionMaxId,
+//            windowAnchorId = null,
+//            lastShuffleKey = lastRow.shuffleKey,
+//            lastUkId = lastRow.feed.userKeywordId.value,
+//            windowSize = 5,
+//            limit = 5,
+//        )
+//
+//        // then: window_pool엔 여전히 5개(firstPage.windowFetchedCount와 동일)가 있었으므로
+//        // windowFetchedCount는 0이 아니라 5, windowMinUkId도 firstPage와 동일해야 함
+//        assertTrue(boundaryPage.feedsRows.isEmpty())
+//        assertEquals(5, boundaryPage.windowFetchedCount) // 현재 실제값 0 -> 이 줄에서 실패해야 정상 (버그 증명)
+//        assertEquals(4L, boundaryPage.windowMinUkId) // 현재 실제값 null -> 이 줄에서 실패해야 정상
+//        assertEquals(firstPage.sessionMaxId, boundaryPage.sessionMaxId) // 현재 실제값 null -> 이 줄에서 실패해야 정상
+//    }
 
     // ==========================================================================================
     // Helper Functions

@@ -1,4 +1,4 @@
-package com.turnin.domain.feed.presentation.dto
+package com.turnin.domain.feed.application.dto
 
 /**
  * 피드 유형

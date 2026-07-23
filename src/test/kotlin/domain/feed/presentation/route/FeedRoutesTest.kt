@@ -5,8 +5,8 @@ import com.turnin.common.route.Api
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.common.util.pagination.cursor.toResponse
 import com.turnin.domain.feed.application.dto.FeedDto
+import com.turnin.domain.feed.application.dto.FeedType
 import com.turnin.domain.feed.application.usecase.FeedUseCases
-import com.turnin.domain.feed.presentation.dto.FeedType
 import com.turnin.domain.feed.presentation.dto.toResponse
 import com.turnin.util.testGetEndpoint
 import com.turnin.util.testPlugin
@@ -23,7 +23,7 @@ class FeedRoutesTest {
     private val usecase: FeedUseCases = mockk()
 
     @Test
-    fun `feed_type이 ALL이고 cursor가 없으면 allFeeds를 첫 페이지로 조회한다`() = testApplication {
+    fun `feed_type이 ALL이고 cursor가 없으면 피드의 첫 페이지를 조회한다`() = testApplication {
         // given: cursor 없는 ALL 피드 첫 페이지
         val pageSize = 3
         val cursorPage = CursorPage<FeedDto, String>(
@@ -31,7 +31,7 @@ class FeedRoutesTest {
             nextCursor = null,
         )
         coEvery {
-            usecase.allFeeds(TestUserId, null, pageSize)
+            usecase.getFeeds(FeedType.ALL, TestUserId, null, pageSize)
         } returns cursorPage
 
         // when, then
@@ -64,7 +64,7 @@ class FeedRoutesTest {
             nextCursor = null,
         )
         coEvery {
-            usecase.allFeeds(TestUserId, null, pageSize)
+            usecase.getFeeds(any(), TestUserId, null, pageSize)
         } returns cursorPage
 
         // when, then
@@ -86,12 +86,12 @@ class FeedRoutesTest {
             },
         )
 
-        // then: friendFeeds는 호출되지 않는다
-        coVerify(exactly = 0) { usecase.friendFeeds(TestUserId, any(), any()) }
+        // then: ALL 유형으로 조회된다.
+        coVerify(exactly = 1) { usecase.getFeeds(FeedType.ALL, TestUserId, any(), any()) }
     }
 
     @Test
-    fun `feed_type이 FRIEND이면 friendFeeds를 조회한다`() = testApplication {
+    fun `feed_type이 FRIEND이면 FRIEND유형으로 피드를 조회한다`() = testApplication {
         // given
         val pageSize = 3
         val cursorPage = CursorPage<FeedDto, String>(
@@ -99,7 +99,7 @@ class FeedRoutesTest {
             nextCursor = null,
         )
         coEvery {
-            usecase.friendFeeds(TestUserId, null, pageSize)
+            usecase.getFeeds(FeedType.FRIEND, TestUserId, null, pageSize)
         } returns cursorPage
 
         // when, then
@@ -122,8 +122,8 @@ class FeedRoutesTest {
             },
         )
 
-        // then: allFeeds는 호출되지 않는다
-        coVerify(exactly = 0) { usecase.allFeeds(TestUserId, any(), any()) }
+        // then: FRIEND 유형으로 조회된다.
+        coVerify(exactly = 1) { usecase.getFeeds(FeedType.FRIEND, TestUserId, any(), any()) }
     }
 
     @Test
@@ -136,7 +136,7 @@ class FeedRoutesTest {
             nextCursor = "next-cursor-raw",
         )
         coEvery {
-            usecase.allFeeds(TestUserId, existingCursor, pageSize)
+            usecase.getFeeds(any(), TestUserId, existingCursor, pageSize)
         } returns cursorPage
 
         // when, then
@@ -170,7 +170,7 @@ class FeedRoutesTest {
             nextCursor = "next-cursor-raw",
         )
         coEvery {
-            usecase.allFeeds(TestUserId, null, pageSize)
+            usecase.getFeeds(any(), TestUserId, null, pageSize)
         } returns cursorPage
 
         // when, then
