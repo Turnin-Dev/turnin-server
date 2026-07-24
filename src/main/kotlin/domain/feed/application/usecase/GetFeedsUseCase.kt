@@ -2,72 +2,118 @@ package com.turnin.domain.feed.application.usecase
 
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
+import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.domain.feed.application.dto.FeedCursor
+import com.turnin.domain.feed.application.dto.FeedCursorCodec
 import com.turnin.domain.feed.application.dto.FeedDto
-import com.turnin.domain.feed.application.dto.toCursor
+import com.turnin.domain.feed.application.dto.FeedType
 import com.turnin.domain.feed.application.dto.toDto
 import com.turnin.domain.feed.domain.repository.FeedRepository
 
 /**
- * 피드 조회
+ * # 전체 피드 조회 유스케이스
+ *
+ * cursor를 디코딩하여 전체 피드의 다음 청크(윈도우)를 조회하고,
+ * 청크 소진 여부에 따라 다음 요청에 사용할 cursor를 재발급한다.
+ *
+ * - cursor가 없으면 (신규 진입 / 새로고침) 새 seed를 발급하고 첫 청크부터 시작한다. 이때 sessionMaxId도 null로 전달되어,
+ *   리포지토리가 현재 시점의 MAX(uk_id)를 계산해 응답에 실어 돌려주고 그 값이 이후 모든 페이지의 커서에 고정된다.
+ * - cursor 디코딩에 실패하면 손상된 것으로 간주하고 첫 페이지로 취급한다.
+ *
+ * ##### **[페이지네이션 버그 티켓](https://peekr-app.atlassian.net/browse/PK-147)**
  *
  * @see invoke
  */
-class GetFeedsUseCase(private val feedRepository: FeedRepository) {
-    /**
-     * ## 피드 조회
-     * 피드를 커서 기반 페이지네이션을 사용하여 조회한다.
-     *
-     * ### 피드 조회 조건
-     * 1. 친구 키워드
-     * 2. 유사 키워드
-     * ### 기본 조건
-     * 1. 최신 순 정렬
-     * 2. 비활성화, 차단 사용자 필터링
-     *
-     * @param userId 조회할 사용자 ID
-     * @param cursor 피드 커서 값
-     * @param pageSize 페이지 사이즈
-     */
+class GetFeedsUseCase(
+    private val feedRepository: FeedRepository,
+    private val windowSize: Int = DEFAULT_WINDOW_SIZE,
+) {
     suspend operator fun invoke(
-        userId: Long,
-        cursor: FeedCursor?,
-        pageSize: Int,
-    ): CursorPage<FeedDto, FeedCursor> {
-        // 0) 데이터 전처리
-        val userIdVO = UserId(userId)
-        val cursorUkIdVO: UserKeywordId? = cursor?.userKeywordId?.let { UserKeywordId(it) }
+        type: FeedType,
+        userId: UserId,
+        cursorRaw: String?,
+        limit: Int,
+    ): CursorPage<FeedDto, String> {
+        // 커서 디코딩
+        val cursor = FeedCursorCodec.decodeOrNull(cursorRaw) ?: FeedCursor.initial()
 
-        // 1) 피드 목록 조회 (폴백 전환 여부에 따라 쿼리 분기)
-        val isFallback = cursor?.score != null && cursor.score == 0.0
-        val feedsWithOneExtra = if (isFallback) {
-            feedRepository.getFallbackFeeds(
-                userId = userIdVO,
-                cursorUkId = cursorUkIdVO,
-                limit = pageSize + 1,
+        // (페이지 크기 + 1)개의 피드와 그 결과를 조회
+        val result = when (type) {
+            FeedType.ALL -> {
+                feedRepository.getAllFeeds(
+                    userId = userId,
+                    seed = cursor.seed,
+                    sessionMaxId = cursor.sessionMaxId,
+                    windowAnchorId = cursor.windowAnchorId?.let { UserKeywordId(it) },
+                    lastShuffleKey = cursor.lastShuffleKey,
+                    lastUkId = cursor.lastUkId,
+                    windowSize = windowSize,
+                    limit = limit + 1,
+                )
+            }
+
+            FeedType.FRIEND -> {
+                feedRepository.getFriendFeeds(
+                    userId = userId,
+                    seed = cursor.seed,
+                    sessionMaxId = cursor.sessionMaxId,
+                    windowAnchorId = cursor.windowAnchorId?.let { UserKeywordId(it) },
+                    lastShuffleKey = cursor.lastShuffleKey,
+                    lastUkId = cursor.lastUkId,
+                    windowSize = windowSize,
+                    limit = limit + 1,
+                )
+            }
+        }
+        val feedRowsWithOneExtra = result.feedsRows
+
+        // 윈도우풀 소진 시 전체 종료
+        if (result.windowFetchedCount == 0) {
+            LOGGER.info(
+                message = "All feed window pools have been exhausted.",
+                tags = mapOf(
+                    LogTag.LOG_TYPE.name to LogType.NORMAL.name,
+                    LogTag.ACTION.name to LogAction.FEED_WINDOW_POOL_EXHAUSTION.name,
+                ),
+            )
+            return CursorPage(items = emptyList(), nextCursor = null)
+        }
+
+        // 커서에 세션 상한 ID 값 설정
+        val cursorWithSessionMaxId = cursor.copy(sessionMaxId = result.sessionMaxId)
+
+        // 다음 페이지 존재 여부 확인, 반환할 피드 정제, 다음 커서 결정
+        val hasNext = feedRowsWithOneExtra.size > limit
+        val feedRows = if (hasNext) feedRowsWithOneExtra.take(limit) else feedRowsWithOneExtra
+        val nextCursor = if (hasNext) {
+            cursorWithSessionMaxId.copy(
+                lastShuffleKey = feedRows.last().shuffleKey,
+                lastUkId = feedRows
+                    .last()
+                    .feed.userKeywordId.value,
             )
         } else {
-            feedRepository.getFeeds(
-                userId = userIdVO,
-                cursorScore = cursor?.score,
-                cursorUkId = cursorUkIdVO,
-                limit = pageSize + 1,
+            cursorWithSessionMaxId.copy(
+                windowAnchorId = result.windowMinUkId,
+                lastShuffleKey = null,
+                lastUkId = null,
             )
         }
 
-        // 2) 다음 페이지 존재 여부 확인 및 반환할 피드 정제
-        val hasNext = feedsWithOneExtra.size > pageSize
-        val feeds = if (hasNext) feedsWithOneExtra.take(pageSize) else feedsWithOneExtra
-        val feedsDto = feeds.map { it.toDto() }
-
-        // 3) 다음 커서 결정
-        val nextCursor = if (hasNext) feedsDto.last().toCursor() else null
-
-        // 4) 최종 반환
+        // 최종 커서 페이지 반환
         return CursorPage(
-            items = feedsDto,
-            nextCursor = nextCursor,
+            items = feedRows.map { it.feed.toDto() },
+            nextCursor = FeedCursorCodec.encode(nextCursor),
         )
     }
+
+    companion object {
+        private const val DEFAULT_WINDOW_SIZE = 1000
+    }
 }
+
+private val LOGGER = AppLoggerFactory.createLogger<GetFeedsUseCase>()
