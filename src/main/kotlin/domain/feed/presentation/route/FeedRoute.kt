@@ -5,7 +5,7 @@ import com.turnin.common.route.Api
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.common.util.pagination.cursor.getFeedCursorPaginationParams
 import com.turnin.common.util.pagination.cursor.toResponse
-import com.turnin.domain.feed.application.dto.FeedCursor
+import com.turnin.domain.feed.application.dto.FeedType
 import com.turnin.domain.feed.application.usecase.FeedUseCases
 import com.turnin.domain.feed.presentation.dto.FeedResponse
 import com.turnin.domain.feed.presentation.dto.toResponse
@@ -22,29 +22,29 @@ fun AuthenticatedRoute.feedRoutes(route: Api.V1.Feed, usecase: FeedUseCases) {
     }) {
         get({ getFeedsDocs() }) {
             val userId = extractUserIdWithToken()
-            val feedCursorParams = getFeedCursorPaginationParams()
-            val cursorPage = usecase.getFeeds(
-                userId = userId.value,
-                cursor = feedCursorParams.cursor,
-                pageSize = feedCursorParams.size,
+            val feedType = FeedType.valueOf(
+                call.queryParameters["feed_type"] ?: FeedType.ALL.name,
             )
-            val response = cursorPage.toResponse { feedDto ->
-                feedDto.toResponse()
-            }
-            call.respond(HttpStatusCode.OK, response)
+            val feedCursorParams = getFeedCursorPaginationParams()
+
+            val page = usecase.getFeeds(feedType, userId, feedCursorParams.cursor, feedCursorParams.size)
+
+            call.respond(HttpStatusCode.OK, page.toResponse { feedDto -> feedDto.toResponse() })
         }
     }
 }
 
 private fun RouteConfig.getFeedsDocs() {
     summary = "피드 조회"
-    description = "피드를 조회한다. 커서 페이지네이션을 사용한다."
+    description = "피드 유형에 따라 피드를 조회한다. 커서 페이지네이션을 사용한다."
     request {
-        queryParameter<Double>("cursorScore") {
-            description = "커서 값 1 (피드 점수)"
+        queryParameter<String>("feed_type") {
+            description = "피드 유형 (ALL / FRIEND 등)"
+            required = false
         }
-        queryParameter<Long>("cursorUserKeywordId") {
-            description = "커서 값 2 (피드의 사용자 키워드 ID)"
+        queryParameter<String>("cursor") {
+            description = "다음 페이지 조회를 위한 커서. 이전 응답의 nextCursor 값을 그대로 전달하며, 첫 페이지 조회 시에는 생략한다."
+            required = false
         }
         queryParameter<Int>("size") {
             description = "페이지네이션에 필요한 페이지 크기"
@@ -53,7 +53,7 @@ private fun RouteConfig.getFeedsDocs() {
     response {
         code(HttpStatusCode.OK) {
             description = "피드 조회 응답 바디"
-            body<CursorPage<FeedResponse, FeedCursor>> {
+            body<CursorPage<FeedResponse, String>> {
                 example("다음 페이지가 존재하는 경우") {
                     value = FeedResponse.sample
                 }
