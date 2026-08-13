@@ -1,8 +1,8 @@
 package com.turnin.domain.feed.presentation.dto
 
+import com.turnin.common.util.pagination.cursor.CursorCodec
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.domain.feed.application.dto.FeedCursor
-import com.turnin.domain.feed.application.dto.FeedCursorCodec
 import com.turnin.domain.feed.application.dto.FeedDto
 import kotlinx.serialization.Serializable
 
@@ -43,7 +43,7 @@ data class FeedResponse(
                     createdAt = 1000L,
                 )
             },
-            nextCursor = FeedCursorCodec.encode(
+            nextCursor = CursorCodec.encode(
                 FeedCursor(
                     seed = "sample-seed-1234",
                     sessionMaxId = 100L,

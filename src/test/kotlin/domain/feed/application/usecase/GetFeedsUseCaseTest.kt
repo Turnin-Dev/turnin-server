@@ -5,8 +5,8 @@ import com.turnin.common.model.UserName
 import com.turnin.common.model.id.KeywordId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
+import com.turnin.common.util.pagination.cursor.CursorCodec
 import com.turnin.domain.feed.application.dto.FeedCursor
-import com.turnin.domain.feed.application.dto.FeedCursorCodec
 import com.turnin.domain.feed.application.dto.FeedType
 import com.turnin.domain.feed.application.dto.toDto
 import com.turnin.domain.feed.domain.model.Feed
@@ -86,7 +86,7 @@ class GetFeedsUseCaseTest {
             lastShuffleKey = 7,
             lastUkId = 20L,
         )
-        val cursorRaw = FeedCursorCodec.encode(cursor)
+        val cursorRaw = CursorCodec.encode(cursor)
 
         stub(
             type = type,
@@ -249,7 +249,7 @@ class GetFeedsUseCaseTest {
             lastShuffleKey = null,
             lastUkId = null,
         )
-        val cursorRaw = FeedCursorCodec.encode(existingCursor)
+        val cursorRaw = CursorCodec.encode(existingCursor)
 
         stub(
             type = type,
@@ -270,7 +270,7 @@ class GetFeedsUseCaseTest {
         assertEquals(TEST_LIMIT, page.items.size)
         assertEquals(rowsWithExtra.take(TEST_LIMIT).map { it.feed.toDto() }, page.items)
 
-        val nextCursor = requireNotNull(FeedCursorCodec.decodeOrNull(page.nextCursor))
+        val nextCursor = requireNotNull(CursorCodec.decodeOrNull<FeedCursor>(page.nextCursor))
         val trimmedLast = rowsWithExtra[TEST_LIMIT - 1] // 20번째(index 19) = 실제로 보여준 마지막 행
         val extraRow = rowsWithExtra[TEST_LIMIT] // 21번째(index 20) = sentinel용 extra row
 
@@ -311,7 +311,7 @@ class GetFeedsUseCaseTest {
             lastShuffleKey = null,
             lastUkId = null,
         )
-        val cursorRaw = FeedCursorCodec.encode(existingCursor)
+        val cursorRaw = CursorCodec.encode(existingCursor)
 
         stub(
             type = type,
@@ -333,7 +333,7 @@ class GetFeedsUseCaseTest {
         assertEquals(exactlyLimitRows.map { it.feed.toDto() }, page.items)
 
         // 청크가 정확히 소진됐으므로 anchor는 windowMinUkId로 이동, 내부 커서는 리셋되어야 함
-        val nextCursor = requireNotNull(FeedCursorCodec.decodeOrNull(page.nextCursor))
+        val nextCursor = requireNotNull(CursorCodec.decodeOrNull<FeedCursor>(page.nextCursor))
         assertEquals(windowResult.windowMinUkId, nextCursor.windowAnchorId)
         assertNull(nextCursor.lastShuffleKey)
         assertNull(nextCursor.lastUkId)

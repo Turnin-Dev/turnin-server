@@ -6,9 +6,9 @@ import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.log.LogAction
 import com.turnin.common.util.log.LogTag
 import com.turnin.common.util.log.LogType
+import com.turnin.common.util.pagination.cursor.CursorCodec
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.domain.feed.application.dto.FeedCursor
-import com.turnin.domain.feed.application.dto.FeedCursorCodec
 import com.turnin.domain.feed.application.dto.FeedDto
 import com.turnin.domain.feed.application.dto.FeedType
 import com.turnin.domain.feed.application.dto.toDto
@@ -39,7 +39,7 @@ class GetFeedsUseCase(
         limit: Int,
     ): CursorPage<FeedDto, String> {
         // 커서 디코딩
-        val cursor = FeedCursorCodec.decodeOrNull(cursorRaw) ?: FeedCursor.initial()
+        val cursor = CursorCodec.decodeOrNull<FeedCursor>(cursorRaw) ?: FeedCursor.initial()
 
         // (페이지 크기 + 1)개의 피드와 그 결과를 조회
         val result = when (type) {
@@ -107,7 +107,7 @@ class GetFeedsUseCase(
         // 최종 커서 페이지 반환
         return CursorPage(
             items = feedRows.map { it.feed.toDto() },
-            nextCursor = FeedCursorCodec.encode(nextCursor),
+            nextCursor = CursorCodec.encode(nextCursor),
         )
     }
 

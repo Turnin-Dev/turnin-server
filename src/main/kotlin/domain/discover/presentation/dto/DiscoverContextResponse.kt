@@ -34,7 +34,7 @@ data class DiscoverContextResponse(
                     ),
                 )
             },
-            nextCursor = 2L,
+            nextCursor = "encoded-cursor-value",
         )
     }
 }
