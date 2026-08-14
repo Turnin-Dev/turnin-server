@@ -157,15 +157,19 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             ),
             candidate_scores AS (
                 SELECT
-                    uk.user_id,
-                    MAX(sk.similarity) AS match_score,
-                    (abs(hashtext(? || '-' || uk.user_id::text)) % 100000) AS shuffle_key
-                FROM similar_keywords sk
-                JOIN user_keyword uk ON uk.keyword_id = sk.candidate_kw_id
-                WHERE uk.is_active = true
-                  AND uk.user_id != ?
-                  AND (?::bigint IS NULL OR uk.user_id != ?)
-                GROUP BY uk.user_id
+                    capped.user_id,
+                    MAX(capped.similarity) AS match_score,
+                    (abs(hashtext(? || '-' || capped.user_id::text)) % 100000) AS shuffle_key
+                FROM (
+                    SELECT sk.candidate_kw_id, sk.similarity, uk.user_id
+                    FROM similar_keywords sk
+                    JOIN user_keyword uk ON uk.keyword_id = sk.candidate_kw_id
+                    WHERE uk.is_active = true
+                      AND uk.user_id != ?
+                      AND (?::bigint IS NULL OR uk.user_id != ?)
+                    LIMIT 20000	-- 이상 상황 대비 후보 풀 상한 값
+                ) capped
+                GROUP BY capped.user_id
             ),
             blocked_users AS (
                 SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
