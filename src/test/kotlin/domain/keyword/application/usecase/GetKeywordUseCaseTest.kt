@@ -54,8 +54,6 @@ class GetKeywordUseCaseTest {
             id = KeywordId(1L),
             name = TestKeywordName,
             embedding = "[0,1,0]",
-            category = null,
-            categorySimilarity = null,
             createdBy = TestUserId,
             createdAt = 1000,
             updatedAt = 1000,

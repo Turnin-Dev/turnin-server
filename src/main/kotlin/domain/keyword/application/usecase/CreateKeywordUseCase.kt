@@ -1,10 +1,10 @@
 package com.turnin.domain.keyword.application.usecase
 
-import com.turnin.common.ml.keywordCategory.KeywordCategoryClassifier
 import com.turnin.common.model.KeywordName
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.keyword.application.dto.KeywordDto
 import com.turnin.domain.keyword.application.dto.toDto
+import com.turnin.domain.keyword.domain.provider.EmbeddingServiceProvider
 import com.turnin.domain.keyword.domain.repository.KeywordRepository
 import com.turnin.domain.keyword.exception.KeywordException
 import kotlinx.coroutines.Dispatchers
@@ -17,16 +17,12 @@ import kotlinx.coroutines.withContext
  */
 class CreateKeywordUseCase(
     private val keywordRepository: KeywordRepository,
-    private val keywordCategoryClassifier: KeywordCategoryClassifier,
+    private val embeddingServiceProvider: EmbeddingServiceProvider,
 ) {
     /**
-     * 키워드를 생성하고 해당 키워드의 카테고리를 분류한다.
+     * 키워드를 생성한다.
      *
-     * 최종적으로 키워드, 임베딩(키워드), 카테고리, 유사도를 저장한다.
-     *
-     * 추후 미분류 키워드에 대한 폴백 전략이 필요하다.
-     *
-     * (미분류 키워드끼리만 벡터 연산 등)
+     * DB에는 키워드, 임베딩을 저장한다.
      *
      * @param keywordName 키워드명
      * @param createdBy 키워드 최초등록자 ID
@@ -41,18 +37,28 @@ class CreateKeywordUseCase(
     ): KeywordDto {
         val keywordNameVO = KeywordName(keywordName)
 
-        // 임베딩 + 카테고리 분류를 같은 스레드풀에서 수행
-        val classificationResult = withContext(Dispatchers.Default) {
-            keywordCategoryClassifier.classify(keywordName)
+        // 전처리 + 임베딩 수행
+        val embeddedKeyword = withContext(Dispatchers.Default) {
+            embeddingServiceProvider.embed(preprocessKeyword(keywordName))
         }
 
         return keywordRepository
             .create(
                 keywordName = keywordNameVO,
-                embeddedKeyword = classificationResult.preprocessedKeywordVector,
-                category = classificationResult.category,
-                categorySimilarity = classificationResult.similarity,
+                embeddedKeyword = embeddedKeyword,
                 createdBy = createdBy,
             ).toDto()
+    }
+
+    // 키워드 전처리
+    private fun preprocessKeyword(keyword: String): String {
+        val trimmed = keyword
+            .trim()
+            .replace(Regex("""[^\w가-힣\s]"""), "") // 특수문자 제거
+            .replace(Regex("""\s+"""), " ") // 연속 공백 정규화
+            .lowercase() // 소문자 통일
+            .trimEnd { it.isDigit() } // 뒤 숫자 제거
+
+        return trimmed.ifEmpty { keyword }
     }
 }

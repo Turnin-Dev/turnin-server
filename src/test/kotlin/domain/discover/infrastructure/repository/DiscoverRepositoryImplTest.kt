@@ -5,7 +5,6 @@ import com.turnin.common.db.schema.Blocks
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
-import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.UserId
@@ -54,10 +53,11 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - 자기 자신은 결과에서 제외되어야 한다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val baseVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 1,
-            keywordsWithCategories = listOf("BaseKey" to KeywordCategory.FOOD),
+            keywordsWithVectors = listOf("BaseKey" to baseVector),
             userKeywordRelation = mapOf(targetUserId.value to listOf(1L)),
         )
 
@@ -74,13 +74,17 @@ class DiscoverRepositoryImplTest {
         // given
         val targetUserId = UserId(1L)
         val viewerUserId = UserId(2L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 3,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
-                "OtherKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                // 1번 키워드
+                "BaseKey" to testVector,
+                // 2번 키워드
+                "SameKey" to testVector,
+                // 3번 키워드
+                "OtherKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -101,12 +105,13 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - viewerUserId가 null이면 필터링되지 않는다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 2,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -126,12 +131,13 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 2,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -153,12 +159,13 @@ class DiscoverRepositoryImplTest {
         // given
         val targetUserId = UserId(1L)
         val blockedUserId = UserId(2L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 2,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -180,12 +187,13 @@ class DiscoverRepositoryImplTest {
         // given
         val targetUserId = UserId(1L)
         val blockedUserId = UserId(2L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 2,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -206,16 +214,17 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - pageSize만큼만 조회된다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 6,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "Key2" to KeywordCategory.FOOD,
-                "Key3" to KeywordCategory.FOOD,
-                "Key4" to KeywordCategory.FOOD,
-                "Key5" to KeywordCategory.FOOD,
-                "Key6" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
+                "Key5" to testVector,
+                "Key6" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -239,15 +248,16 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - cursor가 주어지면 해당 지점 이후의 결과만 조회된다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 5,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "Key2" to KeywordCategory.FOOD,
-                "Key3" to KeywordCategory.FOOD,
-                "Key4" to KeywordCategory.FOOD,
-                "Key5" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
+                "Key5" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -281,16 +291,17 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - cursor와 pageSize를 함께 사용하면 커서 이후 pageSize만큼만 조회된다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 6,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "Key2" to KeywordCategory.FOOD,
-                "Key3" to KeywordCategory.FOOD,
-                "Key4" to KeywordCategory.FOOD,
-                "Key5" to KeywordCategory.FOOD,
-                "Key6" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
+                "Key5" to testVector,
+                "Key6" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -323,14 +334,15 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - seed가 다르면 동점자 정렬 순서가 달라질 수 있다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 4,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "Key2" to KeywordCategory.FOOD,
-                "Key3" to KeywordCategory.FOOD,
-                "Key4" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),

@@ -8,7 +8,6 @@ import com.turnin.common.db.schema.UserEntity
 import com.turnin.common.db.schema.UserKeywordEntity
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
-import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.UserId
@@ -472,13 +471,10 @@ class FeedRepositoryImplTest {
     private suspend fun createKeyword(
         keyword: String,
         createdBy: UserEntity,
-        category: KeywordCategory? = KeywordCategory.TECH,
     ): KeywordEntity = TestDatabaseFactory.dbQuery {
         KeywordEntity.new {
             this.keyword = keyword
             this.embedding = TestVectorFixture.orthogonalVector().toPgVectorString()
-            this.category = category
-            this.categorySimilarity = null
             this.createdBy = createdBy.id
         }
     }
