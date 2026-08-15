@@ -3,7 +3,7 @@ package com.turnin.domain.feed.presentation.route
 import com.turnin.common.plugin.AuthenticatedRoute
 import com.turnin.common.route.Api
 import com.turnin.common.util.pagination.cursor.CursorPage
-import com.turnin.common.util.pagination.cursor.getFeedCursorPaginationParams
+import com.turnin.common.util.pagination.cursor.getStringCursorPaginationParams
 import com.turnin.common.util.pagination.cursor.toResponse
 import com.turnin.domain.feed.application.dto.FeedType
 import com.turnin.domain.feed.application.usecase.FeedUseCases
@@ -25,7 +25,7 @@ fun AuthenticatedRoute.feedRoutes(route: Api.V1.Feed, usecase: FeedUseCases) {
             val feedType = FeedType.valueOf(
                 call.queryParameters["feed_type"] ?: FeedType.ALL.name,
             )
-            val feedCursorParams = getFeedCursorPaginationParams()
+            val feedCursorParams = getStringCursorPaginationParams()
 
             val page = usecase.getFeeds(feedType, userId, feedCursorParams.cursor, feedCursorParams.size)
 

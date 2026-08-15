@@ -4,9 +4,11 @@ import com.turnin.common.model.id.KeywordId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.common.route.Api
+import com.turnin.common.util.pagination.cursor.CursorCodec
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.common.util.pagination.cursor.toResponse
 import com.turnin.domain.discover.application.dto.DiscoverContextDto
+import com.turnin.domain.discover.application.dto.DiscoverCursorDto
 import com.turnin.domain.discover.application.dto.DiscoverKeywordDto
 import com.turnin.domain.discover.application.dto.DiscoverUserDto
 import com.turnin.domain.discover.application.usecase.DiscoverUseCases
@@ -27,7 +29,7 @@ class DiscoverRoutesTest {
     @Test
     fun `탐색 컨텍스트 목록 조회 - 페이지네이션 첫 페이지 조회`() = testApplication {
         val pageSize = 10
-        val testCursorPage = CursorPage<DiscoverContextDto, Long>(
+        val testCursorPage = CursorPage<DiscoverContextDto, String>(
             items = List(pageSize) { pageIndex ->
                 val pageNumber = pageIndex + 1L
                 DiscoverContextDto(
@@ -49,7 +51,12 @@ class DiscoverRoutesTest {
             nextCursor = null,
         )
         coEvery {
-            usecase.getDiscoverContext(TestUserId.value, null, pageSize)
+            usecase.getDiscoverContext(
+                targetUserId = TestUserId.value,
+                viewerUserId = TestUserId.value,
+                cursorRaw = null,
+                pageSize = pageSize,
+            )
         } returns testCursorPage
 
         testGetEndpoint(
@@ -76,8 +83,15 @@ class DiscoverRoutesTest {
     @Test
     fun `탐색 컨텍스트 목록 조회 - 페이지네이션 중간 페이지 조회`() = testApplication {
         val pageSize = 10
-        val cursor = 3L
-        val testCursorPage = CursorPage<DiscoverContextDto, Long>(
+        val cursorDto = DiscoverCursorDto(
+            seed = "test-seed",
+            lastScore = 0.87,
+            lastShuffleKey = 42,
+            lastUserId = 3L,
+        )
+        val cursorRaw = CursorCodec.encode(cursorDto)
+
+        val testCursorPage = CursorPage<DiscoverContextDto, String>(
             items = List(pageSize) { pageIndex ->
                 val pageNumber = pageIndex + 1L
                 DiscoverContextDto(
@@ -99,14 +113,19 @@ class DiscoverRoutesTest {
             nextCursor = null,
         )
         coEvery {
-            usecase.getDiscoverContext(TestUserId.value, cursor, pageSize)
+            usecase.getDiscoverContext(
+                targetUserId = TestUserId.value,
+                viewerUserId = TestUserId.value,
+                cursorRaw = cursorRaw,
+                pageSize = pageSize,
+            )
         } returns testCursorPage
 
         testGetEndpoint(
             endpoint = route.ROUTE,
             queryParameters = mapOf(
                 "userId" to TestUserId.value.toString(),
-                "cursor" to "$cursor",
+                "cursor" to cursorRaw,
                 "size" to "$pageSize",
             ),
             testPlugin = {
