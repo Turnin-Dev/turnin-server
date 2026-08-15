@@ -73,10 +73,7 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
         val sharedUserKeywordMap = sharedUserKeywords.groupBy { it.userId }
         val discoverContextDtoList = matchedUserIds.mapNotNull { matchedUserId ->
             val keywords = sharedUserKeywordMap[matchedUserId] ?: run {
-                LOGGER.warn(
-                    "SharedUserKeyword not found: " +
-                        "matchedUserId=$matchedUserId, userKeywordIds=${sharedUserKeywords.map { it.userKeywordId }}",
-                )
+                LOGGER.warn("SharedUserKeyword not found: matchedUserId=$matchedUserId")
                 return@mapNotNull null
             }
             val first = keywords.first()

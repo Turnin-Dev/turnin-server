@@ -126,71 +126,73 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             ""
         }
         return """
-            WITH my_keywords AS MATERIALIZED (
-                SELECT
-                    my_uk.keyword_id,
-                    k.embedding
-                FROM (
-                    SELECT keyword_id
-                    FROM user_keyword
-                    WHERE user_id = ?
-                      AND is_active = true
-                    ORDER BY created_at DESC
-                    LIMIT 5
-                ) my_uk
-                JOIN keyword k ON k.id = my_uk.keyword_id
-                WHERE k.embedding IS NOT NULL
-            ),
-            similar_keywords AS MATERIALIZED (
-                SELECT DISTINCT ON (candidate_k.id)
-                    candidate_k.id AS candidate_kw_id,
-                    (1 - (candidate_k.embedding <=> mk.embedding)) AS similarity
-                FROM my_keywords mk
-                CROSS JOIN LATERAL (
-                    SELECT id, embedding
-                    FROM keyword
-                    WHERE embedding IS NOT NULL
-                    ORDER BY embedding <=> mk.embedding
-                    LIMIT 15
-                ) candidate_k
-                WHERE (1 - (candidate_k.embedding <=> mk.embedding)) >= ?
-            ),
-            candidate_scores AS (
-                SELECT
-                    capped.user_id,
-                    MAX(capped.similarity) AS match_score,
-                    (abs(hashtext(? || '-' || capped.user_id::text)) % 100000) AS shuffle_key
-                FROM (
-                    SELECT sk.candidate_kw_id, sk.similarity, uk.user_id
-                    FROM similar_keywords sk
-                    JOIN user_keyword uk ON uk.keyword_id = sk.candidate_kw_id
-                    WHERE uk.is_active = true
-                      AND uk.user_id != ?
-                      AND (?::bigint IS NULL OR uk.user_id != ?)
-                    LIMIT 20000	-- 이상 상황 대비 후보 풀 상한 값
-                ) capped
-                GROUP BY capped.user_id
-            ),
-            blocked_users AS (
-                SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
-                UNION
-                SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
-            )
+        WITH my_keywords AS MATERIALIZED (
             SELECT
-                cs.user_id,
-                cs.match_score,
-                cs.shuffle_key
-            FROM candidate_scores cs
-            WHERE cs.user_id NOT IN (SELECT user_id FROM blocked_users)
-              AND (
-                  ?::double precision IS NULL
-                  $cursorCondition
-              )
-            ORDER BY
-                cs.match_score DESC,
-                cs.shuffle_key DESC,
-                cs.user_id DESC
-            LIMIT ?;
+                my_uk.keyword_id,
+                k.embedding
+            FROM (
+                SELECT keyword_id
+                FROM user_keyword
+                WHERE user_id = ?
+                  AND is_active = true
+                ORDER BY created_at DESC
+                LIMIT 5
+            ) my_uk
+            JOIN keyword k ON k.id = my_uk.keyword_id
+            WHERE k.embedding IS NOT NULL
+        ),
+        similar_keywords AS MATERIALIZED (
+            SELECT DISTINCT ON (candidate_k.id)
+                candidate_k.id AS candidate_kw_id,
+                (1 - (candidate_k.embedding <=> mk.embedding)) AS similarity
+            FROM my_keywords mk
+            CROSS JOIN LATERAL (
+                SELECT id, embedding
+                FROM keyword
+                WHERE embedding IS NOT NULL
+                ORDER BY embedding <=> mk.embedding
+                LIMIT 15
+            ) candidate_k
+            WHERE (1 - (candidate_k.embedding <=> mk.embedding)) >= ?
+            ORDER BY candidate_kw_id, similarity DESC
+        ),
+        candidate_scores AS (
+            SELECT
+                capped.user_id,
+                MAX(capped.similarity) AS match_score,
+                (abs(hashtext(? || '-' || capped.user_id::text)::bigint) % 100000) AS shuffle_key
+            FROM (
+                SELECT sk.candidate_kw_id, sk.similarity, uk.user_id
+                FROM similar_keywords sk
+                JOIN user_keyword uk ON uk.keyword_id = sk.candidate_kw_id
+                WHERE uk.is_active = true
+                  AND uk.user_id != ?
+                  AND (?::bigint IS NULL OR uk.user_id != ?)
+                ORDER BY sk.similarity DESC, uk.user_id
+                LIMIT 20000	-- 이상 상황 대비 후보 풀 상한 값 (결정적 정렬 후 적용)
+            ) capped
+            GROUP BY capped.user_id
+        ),
+        blocked_users AS (
+            SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
+            UNION
+            SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
+        )
+        SELECT
+            cs.user_id,
+            cs.match_score,
+            cs.shuffle_key
+        FROM candidate_scores cs
+        WHERE cs.user_id NOT IN (SELECT user_id FROM blocked_users)
+          AND (
+              ?::double precision IS NULL
+              $cursorCondition
+          )
+        ORDER BY
+            cs.match_score DESC,
+            cs.shuffle_key DESC,
+            cs.user_id DESC
+        LIMIT ?;
             """.trimIndent()
     }
 }
