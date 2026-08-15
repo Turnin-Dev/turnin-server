@@ -4,7 +4,6 @@ import com.turnin.common.db.schema.KeywordEntity
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.Users
 import com.turnin.common.db.suspendTransaction
-import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.KeywordName
 import com.turnin.common.model.id.KeywordId
 import com.turnin.common.model.id.UserId
@@ -36,15 +35,11 @@ class KeywordRepositoryImpl : KeywordRepository {
     override suspend fun create(
         keywordName: KeywordName,
         embeddedKeyword: String,
-        category: KeywordCategory?,
-        categorySimilarity: Float?,
         createdBy: UserId,
     ): Keyword = suspendTransaction {
         val savedKeyword = KeywordEntity.new {
             this.keyword = keywordName.value
             this.embedding = embeddedKeyword
-            this.category = category
-            this.categorySimilarity = categorySimilarity?.toDouble()
             this.createdBy = EntityID(createdBy.value, Users)
         }
         savedKeyword.toDomain()

@@ -1,9 +1,7 @@
 package com.turnin.domain.feed.application.dto
 
-import java.util.Base64
-import java.util.UUID
+import com.turnin.common.util.pagination.cursor.CursorCodec
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 /**
  * 피드 조회에 필요한 커서
@@ -26,37 +24,8 @@ data class FeedCursor(
 ) {
     companion object {
         fun initial(): FeedCursor = FeedCursor(
-            seed = FeedCursorCodec.newSeed(),
+            seed = CursorCodec.newSeed(),
             windowAnchorId = null,
         )
     }
-}
-
-/**
- * 피드 커서 코덱
- *
- * 시드 생성 / 인코딩 / 디코딩을 지원한다.
- */
-object FeedCursorCodec {
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-
-    fun encode(cursor: FeedCursor): String =
-        Base64
-            .getUrlEncoder()
-            .withoutPadding()
-            .encodeToString(json.encodeToString(cursor).toByteArray(Charsets.UTF_8))
-
-    fun decodeOrNull(raw: String?): FeedCursor? {
-        if (raw.isNullOrBlank()) return null
-        return try {
-            val decoded = Base64.getUrlDecoder().decode(raw).toString(Charsets.UTF_8)
-            json.decodeFromString<FeedCursor>(decoded)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    fun newSeed(): String = UUID.randomUUID().toString().take(12)
 }

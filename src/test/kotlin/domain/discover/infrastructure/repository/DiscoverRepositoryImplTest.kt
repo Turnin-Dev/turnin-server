@@ -5,11 +5,12 @@ import com.turnin.common.db.schema.Blocks
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
-import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.discover.domain.model.DiscoverCursor
+import com.turnin.domain.discover.domain.repository.DiscoveredResult
 import com.turnin.domain.discover.util.DiscoverTestDataGenerator.setupKeywordRelations
 import com.turnin.domain.discover.util.TestVectorFixture
 import com.turnin.domain.discover.util.TestVectorFixture.toPgVectorString
@@ -31,103 +32,112 @@ class DiscoverRepositoryImplTest {
 
     private val repository = DiscoverRepositoryImpl()
 
-    @Test
-    fun `findUserIdsWithSimilarKeywords - 같은 카테고리 키워드를 가진 유저만 조회되어야 한다`() = runTest {
-        // given
-        val targetUserId = UserId(1L)
-
-        setupKeywordRelations(
-            userCount = 3,
-            keywordsWithCategories = listOf(
-                // 1번: 나의 키워드
-                "BaseKey" to KeywordCategory.FOOD,
-                // 2번: 같은 카테고리 → 조회 대상
-                "SameKey" to KeywordCategory.FOOD,
-                // 3번: 다른 카테고리 → 제외
-                "DiffKey" to KeywordCategory.TECH,
-            ),
-            userKeywordRelation = mapOf(
-                targetUserId.value to listOf(1L),
-                2L to listOf(2L),
-                3L to listOf(3L),
-            ),
-        )
-
-        // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = null,
-            pageSize = 10,
-        )
-
-        // then
-        assertEquals(1, result.size)
-        assertEquals(2L, result.first().value)
-    }
-
-    @Test
-    fun `findUserIdsWithSimilarKeywords - 카테고리가 없는 키워드는 조회되지 않는다`() = runTest {
-        // given
-        val targetUserId = UserId(1L)
-
-        setupKeywordRelations(
-            userCount = 2,
-            keywordsWithCategories = listOf(
-                // 1번: 나의 키워드
-                "BaseKey" to KeywordCategory.FOOD,
-                // 2번: 미분류 → 제외
-                "NullKey" to null,
-            ),
-            userKeywordRelation = mapOf(
-                targetUserId.value to listOf(1L),
-                2L to listOf(2L),
-            ),
-        )
-
-        // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = null,
-            pageSize = 10,
-        )
-
-        // then
-        assertEquals(0, result.size)
-    }
+    /** 테스트 편의를 위한 기본값 래퍼. seed/threshold를 매번 안 적어도 되게 함 */
+    private suspend fun search(
+        targetUserId: UserId,
+        viewerUserId: UserId? = null,
+        seed: String = DEFAULT_SEED,
+        similarityThreshold: Double = DEFAULT_THRESHOLD,
+        cursor: DiscoverCursor? = null,
+        pageSize: Int = 10,
+    ): List<DiscoveredResult> = repository.findUserIdsWithSimilarKeywords(
+        targetUserId = targetUserId,
+        viewerUserId = viewerUserId,
+        seed = seed,
+        similarityThreshold = similarityThreshold,
+        cursor = cursor,
+        pageSize = pageSize,
+    )
 
     @Test
     fun `findUserIdsWithSimilarKeywords - 자기 자신은 결과에서 제외되어야 한다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val baseVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 1,
-            keywordsWithCategories = listOf("BaseKey" to KeywordCategory.FOOD),
+            keywordsWithVectors = listOf("BaseKey" to baseVector),
             userKeywordRelation = mapOf(targetUserId.value to listOf(1L)),
         )
 
         // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = null,
-            pageSize = 10,
-        )
+        val result = search(targetUserId = targetUserId)
 
         // then
         assertEquals(0, result.size)
-        assertTrue(result.none { it == targetUserId })
+        assertTrue(result.none { it.userId == targetUserId })
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - viewerUserId가 주어지면 해당 유저도 결과에서 제외되어야 한다`() = runTest {
+        // given
+        val targetUserId = UserId(1L)
+        val viewerUserId = UserId(2L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+
+        setupKeywordRelations(
+            userCount = 3,
+            keywordsWithVectors = listOf(
+                // 1번 키워드
+                "BaseKey" to testVector,
+                // 2번 키워드
+                "SameKey" to testVector,
+                // 3번 키워드
+                "OtherKey" to testVector,
+            ),
+            userKeywordRelation = mapOf(
+                targetUserId.value to listOf(1L),
+                viewerUserId.value to listOf(2L),
+                3L to listOf(3L),
+            ),
+        )
+
+        // when
+        val result = search(targetUserId = targetUserId, viewerUserId = viewerUserId)
+
+        // then: viewer(2L)는 제외되고 3L만 조회되어야 함
+        assertEquals(1, result.size)
+        assertEquals(3L, result.first().userId.value)
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - viewerUserId가 null이면 필터링되지 않는다`() = runTest {
+        // given
+        val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+
+        setupKeywordRelations(
+            userCount = 2,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
+            ),
+            userKeywordRelation = mapOf(
+                targetUserId.value to listOf(1L),
+                2L to listOf(2L),
+            ),
+        )
+
+        // when
+        val result = search(targetUserId = targetUserId, viewerUserId = null)
+
+        // then
+        assertEquals(1, result.size)
+        assertEquals(2L, result.first().userId.value)
     }
 
     @Test
     fun `findUserIdsWithSimilarKeywords - 비활성화 사용자 키워드는 조회되지 않는다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 2,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -138,11 +148,7 @@ class DiscoverRepositoryImplTest {
         setUserKeywordInactiveForTest(UserKeywordId(2L))
 
         // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = null,
-            pageSize = 10,
-        )
+        val result = search(targetUserId = targetUserId)
 
         // then
         assertEquals(0, result.size)
@@ -153,12 +159,13 @@ class DiscoverRepositoryImplTest {
         // given
         val targetUserId = UserId(1L)
         val blockedUserId = UserId(2L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 2,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -169,11 +176,7 @@ class DiscoverRepositoryImplTest {
         setUpBlock(blockerId = targetUserId, blockedId = blockedUserId)
 
         // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = null,
-            pageSize = 10,
-        )
+        val result = search(targetUserId = targetUserId)
 
         // then
         assertEquals(0, result.size)
@@ -184,12 +187,13 @@ class DiscoverRepositoryImplTest {
         // given
         val targetUserId = UserId(1L)
         val blockedUserId = UserId(2L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 2,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "SameKey" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -200,11 +204,7 @@ class DiscoverRepositoryImplTest {
         setUpBlock(blockerId = targetUserId, blockedId = blockedUserId)
 
         // when: 차단 당한 사용자 입장에서 조회
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = blockedUserId,
-            cursor = null,
-            pageSize = 10,
-        )
+        val result = search(targetUserId = blockedUserId)
 
         // then
         assertEquals(0, result.size)
@@ -214,16 +214,17 @@ class DiscoverRepositoryImplTest {
     fun `findUserIdsWithSimilarKeywords - pageSize만큼만 조회된다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 6,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "Key2" to KeywordCategory.FOOD,
-                "Key3" to KeywordCategory.FOOD,
-                "Key4" to KeywordCategory.FOOD,
-                "Key5" to KeywordCategory.FOOD,
-                "Key6" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
+                "Key5" to testVector,
+                "Key6" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -236,29 +237,27 @@ class DiscoverRepositoryImplTest {
         )
 
         // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = null,
-            pageSize = 3,
-        )
+        val result = search(targetUserId = targetUserId, pageSize = 3)
 
-        // then
+        // then: match_score/shuffle_key가 seed 의존적이라 어떤 유저가 뽑히는지는 검증하지 않고 개수만 확인
         assertEquals(3, result.size)
+        assertEquals(3, result.map { it.userId }.distinct().size) // 중복 없음
     }
 
     @Test
-    fun `findUserIdsWithSimilarKeywords - cursor가 주어지면 해당 user_id보다 작은 유저만 조회된다`() = runTest {
+    fun `findUserIdsWithSimilarKeywords - cursor가 주어지면 해당 지점 이후의 결과만 조회된다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 5,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "Key2" to KeywordCategory.FOOD,
-                "Key3" to KeywordCategory.FOOD,
-                "Key4" to KeywordCategory.FOOD,
-                "Key5" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
+                "Key5" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -269,32 +268,40 @@ class DiscoverRepositoryImplTest {
             ),
         )
 
-        // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = 4L,
-            pageSize = 10,
+        // 커서 없이 전체 조회해서 이 seed/데이터 기준의 "정답 순서"를 확보
+        val baseline = search(targetUserId = targetUserId, pageSize = 10)
+        assertEquals(4, baseline.size) // 대상 유저 4명 (2~5L)
+
+        // 2번째 결과를 커서로 사용
+        val cursorPoint = baseline[1]
+        val cursor = DiscoverCursor(
+            lastScore = cursorPoint.matchScore,
+            lastShuffleKey = cursorPoint.shuffleKey,
+            lastUserId = cursorPoint.userId.value,
         )
 
-        // then
-        assertEquals(2, result.size)
-        assertEquals(listOf(3L, 2L), result.map { it.value })
+        // when
+        val result = search(targetUserId = targetUserId, cursor = cursor, pageSize = 10)
+
+        // then: baseline의 커서 이후 항목들과 정확히 일치해야 함
+        assertEquals(baseline.drop(2).map { it.userId }, result.map { it.userId })
     }
 
     @Test
     fun `findUserIdsWithSimilarKeywords - cursor와 pageSize를 함께 사용하면 커서 이후 pageSize만큼만 조회된다`() = runTest {
         // given
         val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
 
         setupKeywordRelations(
             userCount = 6,
-            keywordsWithCategories = listOf(
-                "BaseKey" to KeywordCategory.FOOD,
-                "Key2" to KeywordCategory.FOOD,
-                "Key3" to KeywordCategory.FOOD,
-                "Key4" to KeywordCategory.FOOD,
-                "Key5" to KeywordCategory.FOOD,
-                "Key6" to KeywordCategory.FOOD,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
+                "Key5" to testVector,
+                "Key6" to testVector,
             ),
             userKeywordRelation = mapOf(
                 targetUserId.value to listOf(1L),
@@ -306,24 +313,62 @@ class DiscoverRepositoryImplTest {
             ),
         )
 
-        // when
-        val result = repository.findUserIdsWithSimilarKeywords(
-            targetUserId = targetUserId,
-            cursor = 6L,
-            pageSize = 2,
+        val baseline = search(targetUserId = targetUserId, pageSize = 10)
+        assertEquals(5, baseline.size) // 대상 유저 5명 (2~6L)
+
+        val cursorPoint = baseline[0]
+        val cursor = DiscoverCursor(
+            lastScore = cursorPoint.matchScore,
+            lastShuffleKey = cursorPoint.shuffleKey,
+            lastUserId = cursorPoint.userId.value,
         )
 
+        // when
+        val result = search(targetUserId = targetUserId, cursor = cursor, pageSize = 2)
+
         // then
-        assertEquals(2, result.size)
-        assertEquals(listOf(5L, 4L), result.map { it.value })
+        assertEquals(baseline.drop(1).take(2).map { it.userId }, result.map { it.userId })
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - seed가 다르면 동점자 정렬 순서가 달라질 수 있다`() = runTest {
+        // given
+        val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+
+        setupKeywordRelations(
+            userCount = 4,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "Key2" to testVector,
+                "Key3" to testVector,
+                "Key4" to testVector,
+            ),
+            userKeywordRelation = mapOf(
+                targetUserId.value to listOf(1L),
+                2L to listOf(2L),
+                3L to listOf(3L),
+                4L to listOf(4L),
+            ),
+        )
+
+        // when
+        val resultA = search(targetUserId = targetUserId, seed = "seed-a")
+        val resultB = search(targetUserId = targetUserId, seed = "seed-b")
+
+        // then: 대상 유저 집합은 동일해야 함 (셔플만 다름)
+        assertEquals(resultA.map { it.userId }.toSet(), resultB.map { it.userId }.toSet())
+
+        // 같은 seed로 다시 조회하면 항상 동일한 순서가 나와야 함 (결정론적 셔플)
+        val resultARepeat = search(targetUserId = targetUserId, seed = "seed-a")
+        assertEquals(resultA.map { it.userId }, resultARepeat.map { it.userId })
     }
 
     @Test
     fun `fetchSharedUserKeywords - 사용자 ID 리스트를 전달하면 해당 사용자들의 상세 정보와 키워드 목록을 최신순으로 반환한다`() = runTest {
-        // given: 데이터 세팅
+        // 변경 없음
         val fakeVector = TestVectorFixture.unitVector(1.0f)
         val (user1, user2) = dbRule.dbQuery {
-            // 사용자 생성
             val u1 = Users.insertAndGetId {
                 it[name] = "테스트유저1"
                 it[role] = Role.USER
@@ -343,7 +388,6 @@ class DiscoverRepositoryImplTest {
                 it[lastLoginAt] = Instant.now()
             }
 
-            // 키워드 생성
             val k1 = Keywords.insertAndGetId {
                 it[keyword] = "키워드1"
                 it[createdBy] = u1
@@ -355,7 +399,6 @@ class DiscoverRepositoryImplTest {
                 it[embedding] = fakeVector.toPgVectorString()
             }
 
-            // 관계 생성 (u1: [k1, k2], u2: [k2])
             UserKeywords.insert {
                 it[userId] = u1
                 it[keywordId] = k1
@@ -374,33 +417,22 @@ class DiscoverRepositoryImplTest {
 
         val targetIds = listOf(UserId(user1.value), UserId(user2.value))
 
-        // when
         val result = repository.fetchSharedUserKeywords(targetIds)
 
-        // then
-        // 유저 1은 키워드 2개, 유저 2는 1개이므로 총 3개의 행이 반환되어야 함
         assertEquals(3, result.size)
-
-        // ORDER BY Users.id DESC에 따라 ID가 큰 user2가 먼저 나와야 함
         assertEquals(user2.value, result[0].userId.value)
         assertEquals("테스트유저2", result[0].userName.value)
         assertEquals("키워드2", result[0].keywordName.value)
-
-        // 그다음 user1의 데이터들이 나옴
         assertEquals(user1.value, result[1].userId.value)
         assertEquals("테스트유저1", result[1].userName.value)
 
-        // 유저 1이 가진 키워드들이 포함되어 있는지 확인
         val user1Keywords = result.filter { it.userId.value == user1.value }.map { it.keywordName.value }
         assertTrue(user1Keywords.containsAll(listOf("키워드1", "키워드2")))
     }
 
     @Test
     fun `fetchSharedUserKeywords - 빈 ID 리스트를 전달하면 빈 결과를 반환한다`() = runTest {
-        // when
         val result = repository.fetchSharedUserKeywords(emptyList())
-
-        // then
         assertTrue(result.isEmpty())
     }
 
@@ -414,5 +446,10 @@ class DiscoverRepositoryImplTest {
             it[this.reasonId] = EntityID(1L, BlockReasons)
             it[this.customReason] = "custom reason"
         }
+    }
+
+    companion object {
+        private const val DEFAULT_SEED = "test-seed"
+        private const val DEFAULT_THRESHOLD = 0.5
     }
 }

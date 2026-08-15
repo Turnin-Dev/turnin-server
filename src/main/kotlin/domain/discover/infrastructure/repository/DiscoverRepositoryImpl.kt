@@ -10,12 +10,16 @@ import com.turnin.common.model.id.DisplayId
 import com.turnin.common.model.id.KeywordId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
+import com.turnin.domain.discover.domain.model.DiscoverCursor
 import com.turnin.domain.discover.domain.model.SharedUserKeyword
 import com.turnin.domain.discover.domain.repository.DiscoverRepository
+import com.turnin.domain.discover.domain.repository.DiscoveredResult
+import org.jetbrains.exposed.sql.DoubleColumnType
 import org.jetbrains.exposed.sql.IColumnType
 import org.jetbrains.exposed.sql.IntegerColumnType
 import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.VarCharColumnType
 import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.statements.StatementType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
@@ -23,26 +27,39 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 class DiscoverRepositoryImpl : DiscoverRepository {
     override suspend fun findUserIdsWithSimilarKeywords(
         targetUserId: UserId,
-        cursor: Long?,
+        viewerUserId: UserId?,
+        seed: String,
+        similarityThreshold: Double,
+        cursor: DiscoverCursor?,
         pageSize: Int,
-    ): List<UserId> = suspendTransaction {
+    ): List<DiscoveredResult> = suspendTransaction {
         val sql = findUserIdsWithSimilarKeywordsNativeSQL(cursor != null)
 
         val params = buildList {
-            add(LongColumnType() to targetUserId.value) // my_categories: user_id = ?
-            add(LongColumnType() to targetUserId.value) // candidate_users: user_id != ?
-            add(LongColumnType() to targetUserId.value) // blocked_users: blocker_id = ?
-            add(LongColumnType() to targetUserId.value) // blocked_users: blocked_id = ?
-            cursor?.let { add(LongColumnType() to it) } // cu.user_id < ?
-            add(IntegerColumnType() to pageSize) // LIMIT ?
+            add(LongColumnType() to targetUserId.value) // 1. my_keywords: user_id = ?
+            add(DoubleColumnType() to similarityThreshold) // 2. similar_keywords: similarity >= ?
+            add(VarCharColumnType() to seed) // 3. shuffle_key seed
+            add(LongColumnType() to targetUserId.value) // 4. uk.user_id != ? (본인 제외)
+            add(LongColumnType() to viewerUserId?.value) // 5. viewerUserId IS NULL
+            add(LongColumnType() to viewerUserId?.value) // 6. uk.user_id != ? (뷰어 제외, 동일 값 재바인딩)
+            add(LongColumnType() to targetUserId.value) // 7. blocker_id = ?
+            add(LongColumnType() to targetUserId.value) // 8. blocked_id = ?
+            add(DoubleColumnType() to cursor?.lastScore) // 9. ?::double precision IS NULL
+            cursor?.let {
+                add(DoubleColumnType() to it.lastScore) // 10. match_score
+                add(IntegerColumnType() to it.lastShuffleKey) // 11. shuffle_key
+                add(LongColumnType() to it.lastUserId) // 12. user_id
+            }
+            add(IntegerColumnType() to pageSize) // 13. LIMIT ?
         }
 
-        executeUserIdQuery(sql, params)
+        executeDiscoverQuery(sql, params)
     }
 
     override suspend fun fetchSharedUserKeywords(
         matchedUserIds: List<UserId>,
     ): List<SharedUserKeyword> = suspendTransaction {
+        // 변경 없음 - 2단계 쿼리 그대로 유지
         val matchedUserIdsValue = matchedUserIds.map { it.value }
 
         val joinQuery = Users
@@ -80,57 +97,102 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             }
     }
 
-    private fun executeUserIdQuery(
+    private fun executeDiscoverQuery(
         sql: String,
         params: List<Pair<IColumnType<*>, Any?>>,
-    ): List<UserId> =
+    ): List<DiscoveredResult> =
         TransactionManager.current().exec(
             stmt = sql,
             args = params,
             explicitStatementType = StatementType.SELECT,
         ) { rs ->
-            val ids = mutableListOf<UserId>()
+            val results = mutableListOf<DiscoveredResult>()
             while (rs.next()) {
-                ids.add(UserId(rs.getLong("user_id")))
+                results.add(
+                    DiscoveredResult(
+                        userId = UserId(rs.getLong("user_id")),
+                        matchScore = rs.getDouble("match_score"),
+                        shuffleKey = rs.getInt("shuffle_key"),
+                    ),
+                )
             }
-            ids
+            results
         } ?: emptyList()
 
     private fun findUserIdsWithSimilarKeywordsNativeSQL(hasCursor: Boolean): String {
-        val cursorCondition = if (hasCursor) "AND cu.user_id < ?" else ""
+        val cursorCondition = if (hasCursor) {
+            "OR (cs.match_score, cs.shuffle_key, cs.user_id) < (?, ?, ?)"
+        } else {
+            ""
+        }
         return """
-            WITH my_categories AS MATERIALIZED (
-                SELECT DISTINCT k.category
-                FROM (
-                    SELECT keyword_id
-                    FROM user_keyword
-                    WHERE user_id = ?
-                      AND is_active = true
-                    ORDER BY created_at DESC
-                    LIMIT 5
-                ) my_uk
-                JOIN keyword k ON k.id = my_uk.keyword_id
-                WHERE k.category IS NOT NULL
-            ),
-            candidate_users AS MATERIALIZED (
-                SELECT DISTINCT uk.user_id
-                FROM my_categories mc
-                JOIN keyword k ON k.category = mc.category
-                JOIN user_keyword uk ON uk.keyword_id = k.id
+        WITH my_keywords AS MATERIALIZED (
+            SELECT
+                my_uk.keyword_id,
+                k.embedding
+            FROM (
+                SELECT keyword_id
+                FROM user_keyword
+                WHERE user_id = ?
+                  AND is_active = true
+                ORDER BY created_at DESC
+                LIMIT 5
+            ) my_uk
+            JOIN keyword k ON k.id = my_uk.keyword_id
+            WHERE k.embedding IS NOT NULL
+        ),
+        similar_keywords AS MATERIALIZED (
+            SELECT DISTINCT ON (candidate_k.id)
+                candidate_k.id AS candidate_kw_id,
+                (1 - (candidate_k.embedding <=> mk.embedding)) AS similarity
+            FROM my_keywords mk
+            CROSS JOIN LATERAL (
+                SELECT id, embedding
+                FROM keyword
+                WHERE embedding IS NOT NULL
+                ORDER BY embedding <=> mk.embedding
+                LIMIT 15
+            ) candidate_k
+            WHERE (1 - (candidate_k.embedding <=> mk.embedding)) >= ?
+            ORDER BY candidate_kw_id, similarity DESC
+        ),
+        candidate_scores AS (
+            SELECT
+                capped.user_id,
+                MAX(capped.similarity) AS match_score,
+                (abs(hashtext(? || '-' || capped.user_id::text)::bigint) % 100000) AS shuffle_key
+            FROM (
+                SELECT sk.candidate_kw_id, sk.similarity, uk.user_id
+                FROM similar_keywords sk
+                JOIN user_keyword uk ON uk.keyword_id = sk.candidate_kw_id
                 WHERE uk.is_active = true
                   AND uk.user_id != ?
-            ),
-            blocked_users AS MATERIALIZED (
-                SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
-                UNION
-                SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
-            )
-            SELECT cu.user_id
-            FROM candidate_users cu
-            WHERE cu.user_id NOT IN (SELECT user_id FROM blocked_users)
+                  AND (?::bigint IS NULL OR uk.user_id != ?)
+                ORDER BY sk.similarity DESC, uk.user_id
+                LIMIT 20000	-- 이상 상황 대비 후보 풀 상한 값 (결정적 정렬 후 적용)
+            ) capped
+            GROUP BY capped.user_id
+        ),
+        blocked_users AS (
+            SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
+            UNION
+            SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
+        )
+        SELECT
+            cs.user_id,
+            cs.match_score,
+            cs.shuffle_key
+        FROM candidate_scores cs
+        WHERE cs.user_id NOT IN (SELECT user_id FROM blocked_users)
+          AND (
+              ?::double precision IS NULL
               $cursorCondition
-            ORDER BY cu.user_id DESC
-            LIMIT ?;
+          )
+        ORDER BY
+            cs.match_score DESC,
+            cs.shuffle_key DESC,
+            cs.user_id DESC
+        LIMIT ?;
             """.trimIndent()
     }
 }

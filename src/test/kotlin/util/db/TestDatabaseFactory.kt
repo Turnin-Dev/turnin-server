@@ -14,7 +14,6 @@ import com.turnin.common.db.schema.Reports
 import com.turnin.common.db.schema.UserFcmTokens
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
-import com.turnin.common.ml.keywordCategory.KeywordCategory
 import com.turnin.common.model.AnnouncementAudience
 import com.turnin.common.model.AnnouncementStatus
 import com.turnin.common.model.FriendRequestStatus
@@ -48,7 +47,6 @@ object TestDatabaseFactory {
                 "social_login_provider" to SocialLoginProvider.entries.map { it.name },
                 "friend_status" to FriendRequestStatus.entries.map { it.name },
                 "noti_type" to NotificationType.entries.map { it.name },
-                "keyword_category" to KeywordCategory.entries.map { it.name },
                 "announcement_audience" to AnnouncementAudience.entries.map { it.name },
                 "announcement_status" to AnnouncementStatus.entries.map { it.name },
             )
