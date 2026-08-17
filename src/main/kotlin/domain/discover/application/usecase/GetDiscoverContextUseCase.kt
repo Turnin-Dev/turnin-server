@@ -2,6 +2,7 @@ package com.turnin.domain.discover.application.usecase
 
 import com.turnin.common.db.suspendTransaction
 import com.turnin.common.model.id.UserId
+import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.log.AppLoggerFactory
 import com.turnin.common.util.pagination.cursor.CursorCodec
 import com.turnin.common.util.pagination.cursor.CursorPage
@@ -45,6 +46,7 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
         // 커서 디코딩. 없으면 새 seed 발급 (첫 페이지), 있으면 기존 seed 재사용 (정렬 일관성 유지)
         val cursorDto = CursorCodec.decodeOrNull<DiscoverCursorDto>(cursorRaw)
         val seed = cursorDto?.seed ?: CursorCodec.newSeed()
+        val snapshotAt = cursorDto?.snapshotAt ?: TurninDateTime.now().toEpochMilli()
         val domainCursor = cursorDto?.toDomain()
 
         // 1) 유사한 키워드를 가지고 있는 사용자 조회 (Native SQL)
@@ -53,6 +55,7 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
             viewerUserId = viewerUserIdVO,
             seed = seed,
             similarityThreshold = SIMILARITY_THRESHOLD,
+            snapshotAt = snapshotAt,
             cursor = domainCursor,
             pageSize = pageSize + 1,
         )
@@ -103,7 +106,8 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
             CursorCodec.encode(
                 DiscoverCursorDto(
                     seed = seed,
-                    lastScore = last.matchScore,
+                    snapshotAt = snapshotAt,
+                    lastScoreChunk = last.scoreChunk,
                     lastShuffleKey = last.shuffleKey,
                     lastUserId = last.userId.value,
                 ),
