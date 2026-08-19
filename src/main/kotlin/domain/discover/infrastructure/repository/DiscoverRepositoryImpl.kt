@@ -30,6 +30,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         viewerUserId: UserId?,
         seed: String,
         similarityThreshold: Double,
+        snapshotAt: Long,
         cursor: DiscoverCursor?,
         pageSize: Int,
     ): List<DiscoveredResult> = suspendTransaction {
@@ -41,16 +42,24 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             add(VarCharColumnType() to seed) // 3. shuffle_key seed
             add(LongColumnType() to targetUserId.value) // 4. uk.user_id != ? (본인 제외)
             add(LongColumnType() to viewerUserId?.value) // 5. viewerUserId IS NULL
-            add(LongColumnType() to viewerUserId?.value) // 6. uk.user_id != ? (뷰어 제외, 동일 값 재바인딩)
-            add(LongColumnType() to targetUserId.value) // 7. blocker_id = ?
-            add(LongColumnType() to targetUserId.value) // 8. blocked_id = ?
-            add(DoubleColumnType() to cursor?.lastScore) // 9. ?::double precision IS NULL
+            add(LongColumnType() to viewerUserId?.value) // 6. uk.user_id != ? (뷰어 제외, 재바인딩)
+            add(LongColumnType() to snapshotAt) // 7. uk.updated_at <= ? (스냅샷 필터)
+            add(LongColumnType() to targetUserId.value) // 8. blocker_id = ?
+            add(LongColumnType() to targetUserId.value) // 9. blocked_id = ?
+            add(IntegerColumnType() to cursor?.lastScoreChunk) // 10. ?::integer IS NULL
+
+            // 정렬 방향이 컬럼마다 다르므로(score_chunk ASC, shuffle_key/user_id DESC),
+            // 튜플 비교(>) 대신 컬럼별 방향에 맞춘 OR 체인으로 바인딩한다.
             cursor?.let {
-                add(DoubleColumnType() to it.lastScore) // 10. match_score
-                add(IntegerColumnType() to it.lastShuffleKey) // 11. shuffle_key
-                add(LongColumnType() to it.lastUserId) // 12. user_id
+                add(IntegerColumnType() to it.lastScoreChunk) // 11. score_chunk > ?
+                add(IntegerColumnType() to it.lastScoreChunk) // 12. score_chunk = ?
+                add(IntegerColumnType() to it.lastShuffleKey) // 13. shuffle_key < ?
+                add(IntegerColumnType() to it.lastScoreChunk) // 14. score_chunk = ?
+                add(IntegerColumnType() to it.lastShuffleKey) // 15. shuffle_key = ?
+                add(LongColumnType() to it.lastUserId) // 16. user_id < ?
             }
-            add(IntegerColumnType() to pageSize) // 13. LIMIT ?
+
+            add(IntegerColumnType() to pageSize) // 17. LIMIT ?
         }
 
         executeDiscoverQuery(sql, params)
@@ -59,7 +68,6 @@ class DiscoverRepositoryImpl : DiscoverRepository {
     override suspend fun fetchSharedUserKeywords(
         matchedUserIds: List<UserId>,
     ): List<SharedUserKeyword> = suspendTransaction {
-        // 변경 없음 - 2단계 쿼리 그대로 유지
         val matchedUserIdsValue = matchedUserIds.map { it.value }
 
         val joinQuery = Users
@@ -113,6 +121,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                         userId = UserId(rs.getLong("user_id")),
                         matchScore = rs.getDouble("match_score"),
                         shuffleKey = rs.getInt("shuffle_key"),
+                        scoreChunk = rs.getInt("score_chunk"),
                     ),
                 )
             }
@@ -120,8 +129,14 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         } ?: emptyList()
 
     private fun findUserIdsWithSimilarKeywordsNativeSQL(hasCursor: Boolean): String {
+        // 정렬: score_chunk ASC, shuffle_key DESC, user_id DESC
+        // 튜플 비교(>) 대신 컬럼별 방향에 맞춘 OR 체인 사용
         val cursorCondition = if (hasCursor) {
-            "OR (cs.match_score, cs.shuffle_key, cs.user_id) < (?, ?, ?)"
+            """
+            OR sc.score_chunk > ?
+            OR (sc.score_chunk = ? AND sc.shuffle_key < ?)
+            OR (sc.score_chunk = ? AND sc.shuffle_key = ? AND sc.user_id < ?)
+            """.trimIndent()
         } else {
             ""
         }
@@ -150,7 +165,7 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 SELECT id, embedding
                 FROM keyword
                 WHERE embedding IS NOT NULL
-                ORDER BY embedding <=> mk.embedding
+                ORDER BY embedding <=> mk.embedding, id
                 LIMIT 15
             ) candidate_k
             WHERE (1 - (candidate_k.embedding <=> mk.embedding)) >= ?
@@ -168,10 +183,19 @@ class DiscoverRepositoryImpl : DiscoverRepository {
                 WHERE uk.is_active = true
                   AND uk.user_id != ?
                   AND (?::bigint IS NULL OR uk.user_id != ?)
+                  AND uk.updated_at <= to_timestamp(? / 1000.0)
                 ORDER BY sk.similarity DESC, uk.user_id
                 LIMIT 20000	-- 이상 상황 대비 후보 풀 상한 값 (결정적 정렬 후 적용)
             ) capped
             GROUP BY capped.user_id
+        ),
+        scored_chunks AS (
+            SELECT
+                cs.user_id,
+                cs.match_score,
+                cs.shuffle_key,
+                NTILE(5) OVER (ORDER BY cs.match_score DESC, cs.shuffle_key DESC, cs.user_id DESC) AS score_chunk
+            FROM candidate_scores cs
         ),
         blocked_users AS (
             SELECT blocked_id AS user_id FROM block WHERE blocker_id = ?
@@ -179,19 +203,20 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             SELECT blocker_id AS user_id FROM block WHERE blocked_id = ?
         )
         SELECT
-            cs.user_id,
-            cs.match_score,
-            cs.shuffle_key
-        FROM candidate_scores cs
-        WHERE cs.user_id NOT IN (SELECT user_id FROM blocked_users)
+            sc.user_id,
+            sc.match_score,
+            sc.shuffle_key,
+            sc.score_chunk
+        FROM scored_chunks sc
+        WHERE sc.user_id NOT IN (SELECT user_id FROM blocked_users)
           AND (
-              ?::double precision IS NULL
+              ?::integer IS NULL
               $cursorCondition
           )
         ORDER BY
-            cs.match_score DESC,
-            cs.shuffle_key DESC,
-            cs.user_id DESC
+            sc.score_chunk ASC,
+            sc.shuffle_key DESC,
+            sc.user_id DESC
         LIMIT ?;
             """.trimIndent()
     }

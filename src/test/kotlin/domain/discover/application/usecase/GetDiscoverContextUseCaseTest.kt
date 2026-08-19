@@ -59,16 +59,18 @@ class GetDiscoverContextUseCaseTest {
 
         // findUserIdsWithSimilarKeywords 조회는 실제로 (pageSize + 1)개가 조회되기 때문에 3명이 조회되었다고 가정
         val matchedResults = listOf(
-            createDiscoveredResult(2L, matchScore = 0.9, shuffleKey = 300),
-            createDiscoveredResult(3L, matchScore = 0.8, shuffleKey = 200),
-            createDiscoveredResult(4L, matchScore = 0.7, shuffleKey = 100),
+            createDiscoveredResult(2L, matchScore = 0.9, shuffleKey = 300, scoreChunk = 1),
+            createDiscoveredResult(3L, matchScore = 0.8, shuffleKey = 200, scoreChunk = 1),
+            createDiscoveredResult(4L, matchScore = 0.7, shuffleKey = 100, scoreChunk = 2),
         )
+        // 첫 페이지(cursor = null)는 snapshotAt이 유스케이스 내부에서 now()로 새로 발급되므로 any()로 매칭
         coEvery {
             discoverRepository.findUserIdsWithSimilarKeywords(
                 targetUserId = targetUserId,
                 viewerUserId = viewerUserId,
                 seed = any(),
                 similarityThreshold = any(),
+                snapshotAt = any(),
                 cursor = null,
                 pageSize = pageSize + 1,
             )
@@ -90,6 +92,7 @@ class GetDiscoverContextUseCaseTest {
                 viewerUserId = viewerUserId,
                 seed = any(),
                 similarityThreshold = any(),
+                snapshotAt = any(),
                 cursor = null,
                 pageSize = pageSize + 1,
             )
@@ -98,7 +101,7 @@ class GetDiscoverContextUseCaseTest {
         // 페이지네이션 크기 검증
         assertEquals(pageSize, result.items.size)
 
-        // 데이터 순서 검증 (match_score/shuffle_key 순서를 따라 2, 3, 4 중 2, 3이 유지되어야 함)
+        // 데이터 순서 검증 (score_chunk/shuffle_key 순서를 따라 2, 3, 4 중 2, 3이 유지되어야 함)
         assertEquals(
             2L,
             result.items[0]
@@ -119,25 +122,29 @@ class GetDiscoverContextUseCaseTest {
         val decodedCursor = CursorCodec.decodeOrNull<DiscoverCursorDto>(result.nextCursor)
         assertNotNull(decodedCursor)
         assertEquals(3L, decodedCursor.lastUserId, "nextCursor는 현재 페이지의 마지막 결과(3L) 정보를 담아야 한다.")
-        assertEquals(0.8, decodedCursor.lastScore)
+        assertEquals(1, decodedCursor.lastScoreChunk)
         assertEquals(200, decodedCursor.lastShuffleKey)
+        assertNotNull(decodedCursor.snapshotAt, "다음 페이지에서 재사용할 snapshotAt이 커서에 담겨야 한다.")
     }
 
     @Test
-    fun `커서가 주어지면 디코딩된 seed와 정렬 키가 리포지토리에 그대로 전달된다`() = runTest {
+    fun `커서가 주어지면 디코딩된 seed와 snapshotAt, 정렬 키가 리포지토리에 그대로 전달된다`() = runTest {
         // given
         val targetUserId = UserId(1L)
         val pageSize = 2
+        val fixedSnapshotAt = 1_700_000_000_000L
         val existingCursorDto = DiscoverCursorDto(
             seed = "fixed-seed",
-            lastScore = 0.95,
+            snapshotAt = fixedSnapshotAt,
+            lastScoreChunk = 3,
             lastShuffleKey = 500,
             lastUserId = 10L,
         )
         val cursorRaw = CursorCodec.encode(existingCursorDto)
 
         val expectedDomainCursor = DiscoverCursor(
-            lastScore = 0.95,
+            snapshotAt = fixedSnapshotAt,
+            lastScoreChunk = 3,
             lastShuffleKey = 500,
             lastUserId = 10L,
         )
@@ -148,6 +155,7 @@ class GetDiscoverContextUseCaseTest {
                 viewerUserId = null,
                 seed = "fixed-seed",
                 similarityThreshold = any(),
+                snapshotAt = fixedSnapshotAt,
                 cursor = expectedDomainCursor,
                 pageSize = pageSize + 1,
             )
@@ -156,13 +164,15 @@ class GetDiscoverContextUseCaseTest {
         // when
         val result = usecase(targetUserId.value, null, cursorRaw, pageSize)
 
-        // then: 커서에 담긴 seed가 그대로 재사용되었는지 검증 (셔플 정렬 일관성 유지를 위해 필수)
+        // then: 커서에 담긴 seed와 snapshotAt이 그대로 재사용되었는지 검증
+        // (seed는 셔플 정렬 일관성, snapshotAt은 후보 풀 고정을 위해 둘 다 필수)
         coVerify(exactly = 1) {
             discoverRepository.findUserIdsWithSimilarKeywords(
                 targetUserId = targetUserId,
                 viewerUserId = null,
                 seed = "fixed-seed",
                 similarityThreshold = any(),
+                snapshotAt = fixedSnapshotAt,
                 cursor = expectedDomainCursor,
                 pageSize = pageSize + 1,
             )
@@ -177,8 +187,8 @@ class GetDiscoverContextUseCaseTest {
 
         // pageSize + 1보다 적은 결과 -> 마지막 페이지
         val matchedResults = listOf(
-            createDiscoveredResult(2L, matchScore = 0.9, shuffleKey = 300),
-            createDiscoveredResult(3L, matchScore = 0.8, shuffleKey = 200),
+            createDiscoveredResult(2L, matchScore = 0.9, shuffleKey = 300, scoreChunk = 1),
+            createDiscoveredResult(3L, matchScore = 0.8, shuffleKey = 200, scoreChunk = 1),
         )
         coEvery {
             discoverRepository.findUserIdsWithSimilarKeywords(
@@ -186,6 +196,7 @@ class GetDiscoverContextUseCaseTest {
                 viewerUserId = null,
                 seed = any(),
                 similarityThreshold = any(),
+                snapshotAt = any(),
                 cursor = null,
                 pageSize = pageSize + 1,
             )
@@ -216,6 +227,7 @@ class GetDiscoverContextUseCaseTest {
                 viewerUserId = null,
                 seed = any(),
                 similarityThreshold = any(),
+                snapshotAt = any(),
                 cursor = null,
                 pageSize = pageSize + 1,
             )
@@ -237,8 +249,8 @@ class GetDiscoverContextUseCaseTest {
         val pageSize = 3
 
         val matchedResults = listOf(
-            createDiscoveredResult(2L, matchScore = 0.9, shuffleKey = 300),
-            createDiscoveredResult(3L, matchScore = 0.8, shuffleKey = 200),
+            createDiscoveredResult(2L, matchScore = 0.9, shuffleKey = 300, scoreChunk = 1),
+            createDiscoveredResult(3L, matchScore = 0.8, shuffleKey = 200, scoreChunk = 1),
         )
         coEvery {
             discoverRepository.findUserIdsWithSimilarKeywords(
@@ -246,6 +258,7 @@ class GetDiscoverContextUseCaseTest {
                 viewerUserId = null,
                 seed = any(),
                 similarityThreshold = any(),
+                snapshotAt = any(),
                 cursor = null,
                 pageSize = pageSize + 1,
             )
@@ -287,10 +300,12 @@ class GetDiscoverContextUseCaseTest {
             userId: Long,
             matchScore: Double,
             shuffleKey: Int,
+            scoreChunk: Int,
         ) = DiscoveredResult(
             userId = UserId(userId),
             matchScore = matchScore,
             shuffleKey = shuffleKey,
+            scoreChunk = scoreChunk,
         )
     }
 }
