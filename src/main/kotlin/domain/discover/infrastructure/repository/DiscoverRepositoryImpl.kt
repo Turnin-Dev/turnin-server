@@ -43,16 +43,23 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             add(LongColumnType() to targetUserId.value) // 4. uk.user_id != ? (본인 제외)
             add(LongColumnType() to viewerUserId?.value) // 5. viewerUserId IS NULL
             add(LongColumnType() to viewerUserId?.value) // 6. uk.user_id != ? (뷰어 제외, 재바인딩)
-            add(LongColumnType() to snapshotAt) // 7. uk.updated_at <= ? (스냅샷 필터) ✅ 신규
+            add(LongColumnType() to snapshotAt) // 7. uk.updated_at <= ? (스냅샷 필터)
             add(LongColumnType() to targetUserId.value) // 8. blocker_id = ?
             add(LongColumnType() to targetUserId.value) // 9. blocked_id = ?
             add(IntegerColumnType() to cursor?.lastScoreChunk) // 10. ?::integer IS NULL
+
+            // 정렬 방향이 컬럼마다 다르므로(score_chunk ASC, shuffle_key/user_id DESC),
+            // 튜플 비교(>) 대신 컬럼별 방향에 맞춘 OR 체인으로 바인딩한다.
             cursor?.let {
-                add(IntegerColumnType() to it.lastScoreChunk) // 11. score_chunk
-                add(IntegerColumnType() to it.lastShuffleKey) // 12. shuffle_key
-                add(LongColumnType() to it.lastUserId) // 13. user_id
+                add(IntegerColumnType() to it.lastScoreChunk) // 11. score_chunk > ?
+                add(IntegerColumnType() to it.lastScoreChunk) // 12. score_chunk = ?
+                add(IntegerColumnType() to it.lastShuffleKey) // 13. shuffle_key < ?
+                add(IntegerColumnType() to it.lastScoreChunk) // 14. score_chunk = ?
+                add(IntegerColumnType() to it.lastShuffleKey) // 15. shuffle_key = ?
+                add(LongColumnType() to it.lastUserId) // 16. user_id < ?
             }
-            add(IntegerColumnType() to pageSize) // 14. LIMIT ?
+
+            add(IntegerColumnType() to pageSize) // 17. LIMIT ?
         }
 
         executeDiscoverQuery(sql, params)
@@ -61,7 +68,6 @@ class DiscoverRepositoryImpl : DiscoverRepository {
     override suspend fun fetchSharedUserKeywords(
         matchedUserIds: List<UserId>,
     ): List<SharedUserKeyword> = suspendTransaction {
-        // 변경 없음 - 2단계 쿼리 그대로 유지
         val matchedUserIdsValue = matchedUserIds.map { it.value }
 
         val joinQuery = Users
@@ -123,9 +129,14 @@ class DiscoverRepositoryImpl : DiscoverRepository {
         } ?: emptyList()
 
     private fun findUserIdsWithSimilarKeywordsNativeSQL(hasCursor: Boolean): String {
+        // 정렬: score_chunk ASC, shuffle_key DESC, user_id DESC
+        // 튜플 비교(>) 대신 컬럼별 방향에 맞춘 OR 체인 사용
         val cursorCondition = if (hasCursor) {
-            // ⚠️ score_chunk는 1(최상위)~5(최하위)라 부등호가 기존과 반대(>)
-            "OR (sc.score_chunk, sc.shuffle_key, sc.user_id) > (?, ?, ?)"
+            """
+            OR sc.score_chunk > ?
+            OR (sc.score_chunk = ? AND sc.shuffle_key < ?)
+            OR (sc.score_chunk = ? AND sc.shuffle_key = ? AND sc.user_id < ?)
+            """.trimIndent()
         } else {
             ""
         }
