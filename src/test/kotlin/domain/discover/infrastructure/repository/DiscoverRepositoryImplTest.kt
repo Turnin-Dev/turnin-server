@@ -9,6 +9,8 @@ import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
+import com.turnin.common.util.TurninDateTime
+import com.turnin.common.util.toOffsetDateTime
 import com.turnin.domain.discover.domain.model.DiscoverCursor
 import com.turnin.domain.discover.domain.repository.DiscoveredResult
 import com.turnin.domain.discover.util.DiscoverTestDataGenerator.setupKeywordRelations
@@ -23,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.update
 import org.junit.Rule
 import org.junit.Test
 
@@ -32,12 +35,13 @@ class DiscoverRepositoryImplTest {
 
     private val repository = DiscoverRepositoryImpl()
 
-    /** 테스트 편의를 위한 기본값 래퍼. seed/threshold를 매번 안 적어도 되게 함 */
+    /** 테스트 편의를 위한 기본값 래퍼. seed/threshold/snapshotAt을 매번 안 적어도 되게 함 */
     private suspend fun search(
         targetUserId: UserId,
         viewerUserId: UserId? = null,
         seed: String = DEFAULT_SEED,
         similarityThreshold: Double = DEFAULT_THRESHOLD,
+        snapshotAt: Long = TurninDateTime.now().toEpochMilli(),
         cursor: DiscoverCursor? = null,
         pageSize: Int = 10,
     ): List<DiscoveredResult> = repository.findUserIdsWithSimilarKeywords(
@@ -45,6 +49,7 @@ class DiscoverRepositoryImplTest {
         viewerUserId = viewerUserId,
         seed = seed,
         similarityThreshold = similarityThreshold,
+        snapshotAt = snapshotAt,
         cursor = cursor,
         pageSize = pageSize,
     )
@@ -239,7 +244,7 @@ class DiscoverRepositoryImplTest {
         // when
         val result = search(targetUserId = targetUserId, pageSize = 3)
 
-        // then: match_score/shuffle_key가 seed 의존적이라 어떤 유저가 뽑히는지는 검증하지 않고 개수만 확인
+        // then: score_chunk/shuffle_key가 seed 의존적이라 어떤 유저가 뽑히는지는 검증하지 않고 개수만 확인
         assertEquals(3, result.size)
         assertEquals(3, result.map { it.userId }.distinct().size) // 중복 없음
     }
@@ -268,20 +273,25 @@ class DiscoverRepositoryImplTest {
             ),
         )
 
+        // setupKeywordRelations 내부의 now()와 시간차 경합을 피하기 위해
+        // 여유를 두고 이후 시점을 snapshotAt으로 사용한다
+        val snapshotAt = TurninDateTime.now().plusSeconds(1).toEpochMilli()
+
         // 커서 없이 전체 조회해서 이 seed/데이터 기준의 "정답 순서"를 확보
-        val baseline = search(targetUserId = targetUserId, pageSize = 10)
+        val baseline = search(targetUserId = targetUserId, snapshotAt = snapshotAt, pageSize = 10)
         assertEquals(4, baseline.size) // 대상 유저 4명 (2~5L)
 
         // 2번째 결과를 커서로 사용
         val cursorPoint = baseline[1]
         val cursor = DiscoverCursor(
-            lastScore = cursorPoint.matchScore,
+            snapshotAt = snapshotAt,
+            lastScoreChunk = cursorPoint.scoreChunk,
             lastShuffleKey = cursorPoint.shuffleKey,
             lastUserId = cursorPoint.userId.value,
         )
 
-        // when
-        val result = search(targetUserId = targetUserId, cursor = cursor, pageSize = 10)
+        // when: 동일 snapshotAt으로 후보 풀을 고정한 채 커서 조회
+        val result = search(targetUserId = targetUserId, snapshotAt = snapshotAt, cursor = cursor, pageSize = 10)
 
         // then: baseline의 커서 이후 항목들과 정확히 일치해야 함
         assertEquals(baseline.drop(2).map { it.userId }, result.map { it.userId })
@@ -313,18 +323,23 @@ class DiscoverRepositoryImplTest {
             ),
         )
 
-        val baseline = search(targetUserId = targetUserId, pageSize = 10)
+        // setupKeywordRelations 내부의 now()와 시간차 경합을 피하기 위해
+        // 여유를 두고 이후 시점을 snapshotAt으로 사용한다
+        val snapshotAt = TurninDateTime.now().plusSeconds(1).toEpochMilli()
+
+        val baseline = search(targetUserId = targetUserId, snapshotAt = snapshotAt, pageSize = 10)
         assertEquals(5, baseline.size) // 대상 유저 5명 (2~6L)
 
         val cursorPoint = baseline[0]
         val cursor = DiscoverCursor(
-            lastScore = cursorPoint.matchScore,
+            snapshotAt = snapshotAt,
+            lastScoreChunk = cursorPoint.scoreChunk,
             lastShuffleKey = cursorPoint.shuffleKey,
             lastUserId = cursorPoint.userId.value,
         )
 
         // when
-        val result = search(targetUserId = targetUserId, cursor = cursor, pageSize = 2)
+        val result = search(targetUserId = targetUserId, snapshotAt = snapshotAt, cursor = cursor, pageSize = 2)
 
         // then
         assertEquals(baseline.drop(1).take(2).map { it.userId }, result.map { it.userId })
@@ -362,6 +377,37 @@ class DiscoverRepositoryImplTest {
         // 같은 seed로 다시 조회하면 항상 동일한 순서가 나와야 함 (결정론적 셔플)
         val resultARepeat = search(targetUserId = targetUserId, seed = "seed-a")
         assertEquals(resultA.map { it.userId }, resultARepeat.map { it.userId })
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - snapshotAt 이후 변경된 사용자 키워드는 후보에서 제외된다`() = runTest {
+        // given
+        val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+
+        setupKeywordRelations(
+            userCount = 2,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey" to testVector,
+            ),
+            userKeywordRelation = mapOf(
+                targetUserId.value to listOf(1L),
+                2L to listOf(2L),
+            ),
+        )
+
+        // 스냅샷 기준 시각을 명시적으로 고정
+        val snapshotAt = Instant.parse("2025-01-01T00:00:00Z").toEpochMilli()
+        // 스냅샷보다 명백히 이후 시각으로 상대방의 updated_at을 직접 갱신
+        val updatedAfterSnapshot = Instant.parse("2025-01-01T00:00:01Z")
+        setUserKeywordUpdatedAtForTest(UserKeywordId(2L), updatedAfterSnapshot)
+
+        // when
+        val result = search(targetUserId = targetUserId, snapshotAt = snapshotAt)
+
+        // then: snapshotAt 이후 변경분이라 후보에서 제외되어야 함
+        assertEquals(0, result.size)
     }
 
     @Test
@@ -445,6 +491,15 @@ class DiscoverRepositoryImplTest {
             it[this.blockedId] = EntityID(blockedId.value, Users)
             it[this.reasonId] = EntityID(1L, BlockReasons)
             it[this.customReason] = "custom reason"
+        }
+    }
+
+    private suspend fun setUserKeywordUpdatedAtForTest(
+        userKeywordId: UserKeywordId,
+        updatedAt: Instant,
+    ) = dbRule.dbQuery {
+        UserKeywords.update({ UserKeywords.id eq userKeywordId.value }) {
+            it[UserKeywords.updatedAt] = updatedAt.toOffsetDateTime()
         }
     }
 

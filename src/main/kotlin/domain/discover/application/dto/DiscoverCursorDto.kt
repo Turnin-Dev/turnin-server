@@ -9,14 +9,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DiscoverCursorDto(
     val seed: String,
-    val lastScore: Double,
+    val snapshotAt: Long,
+    val lastScoreChunk: Int,
     val lastShuffleKey: Int,
     val lastUserId: Long,
 )
 
 fun DiscoverCursorDto.toDomain(): DiscoverCursor =
     DiscoverCursor(
-        lastScore = lastScore,
+        snapshotAt = snapshotAt,
+        lastScoreChunk = lastScoreChunk,
         lastShuffleKey = lastShuffleKey,
         lastUserId = lastUserId,
     )

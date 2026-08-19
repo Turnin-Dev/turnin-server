@@ -85,7 +85,8 @@ class DiscoverRoutesTest {
         val pageSize = 10
         val cursorDto = DiscoverCursorDto(
             seed = "test-seed",
-            lastScore = 0.87,
+            snapshotAt = 1_700_000_000_000L,
+            lastScoreChunk = 3,
             lastShuffleKey = 42,
             lastUserId = 3L,
         )
