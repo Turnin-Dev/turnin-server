@@ -13,7 +13,12 @@ class PrivacyLogFilter : Filter<ILoggingEvent>() {
 
 class NormalLogFilter : Filter<ILoggingEvent>() {
     override fun decide(event: ILoggingEvent): FilterReply {
+        if (event.isHealthCheck()) return FilterReply.DENY
+
         val logType = event.mdcPropertyMap[LogTag.LOG_TYPE.key]
         return if (logType == LogType.PRIVACY.value) FilterReply.DENY else FilterReply.ACCEPT
     }
 }
+
+private fun ILoggingEvent.isHealthCheck(): Boolean =
+    mdcPropertyMap[LogTag.IS_HEALTH_CHECK.key] == "true"
