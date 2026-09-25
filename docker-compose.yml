@@ -34,8 +34,8 @@ services:
       - ./logs/privacy:/logs/privacy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/api/health" ]
-      interval: 1m
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
       start_period: 45s
 

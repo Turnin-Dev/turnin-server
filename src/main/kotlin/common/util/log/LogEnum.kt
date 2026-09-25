@@ -35,6 +35,9 @@ enum class LogTag(val key: String) {
 
     /** 마스킹된 IP */
     IP_MASKED("ip_masked"),
+
+    /** 헬스체크 엔드포인트 구분용 */
+    IS_HEALTH_CHECK("is_health_check"),
 }
 
 /** 로그 타입 */
