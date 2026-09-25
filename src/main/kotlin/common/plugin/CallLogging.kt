@@ -36,7 +36,8 @@ fun Application.configureCallLogging() {
         mdc(LogTag.IP_MASKED.key) { call -> maskIp(call.clientIp()) }
         // 헬스체크 필터링을 위한 태그
         mdc(LogTag.IS_HEALTH_CHECK.key) { call ->
-            if (call.request.path().startsWith("/api/health")) "true" else null
+            val path = call.request.path()
+            if (path == "/api/health" || path.startsWith("/api/health/")) "true" else null
         }
 
         format { call ->
