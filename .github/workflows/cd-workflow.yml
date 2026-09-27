@@ -118,6 +118,9 @@ jobs:
               exit 1
             fi
             
+            # nginx가 새 ktor 컨테이너의 IP를 확실히 인식하도록 (IP가 재사용되지 않았을 경우 대비)
+            docker compose exec nginx nginx -s reload
+            
             # 이미지 정리 (최근 3개 유지)
             docker images turnindev/turnin-api --format "{{.Tag}}" \
               | grep -v latest \
