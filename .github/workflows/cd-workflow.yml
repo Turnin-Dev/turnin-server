@@ -99,8 +99,21 @@ jobs:
             # Docker Login
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             
-            # Docker
             cd ~/turnin
+            
+            # ⭐ 배포 시작: 점검 모드로 전환 (MTN001)
+            docker compose exec -T nginx sh -c "cat > /etc/nginx/conf.d/proxy-maintenance.inc" << 'EOF'
+            location / {
+              default_type application/json;
+              add_header Retry-After 3 always;
+              return 503 '{"code":"MTN001","message":"잠시 서버를 업데이트하는 중입니다. 몇 초 뒤에 다시 시도해주세요.","status":"503"}';
+            }
+            EOF
+            docker compose exec nginx ln -sf /etc/nginx/conf.d/proxy-maintenance.inc /etc/nginx/conf.d/proxy-active.inc
+            docker compose exec nginx nginx -t
+            docker compose exec nginx nginx -s reload
+            
+            # Docker
             docker compose pull ktor
             docker compose up -d --no-deps --force-recreate ktor            
             docker image prune -f
@@ -118,7 +131,9 @@ jobs:
               exit 1
             fi
             
-            # nginx가 새 ktor 컨테이너의 IP를 확실히 인식하도록 (IP가 재사용되지 않았을 경우 대비)
+            # ⭐ 배포 완료: 정상 모드로 복구
+            docker compose exec nginx ln -sf /etc/nginx/conf.d/proxy-normal.inc /etc/nginx/conf.d/proxy-active.inc
+            docker compose exec nginx nginx -t
             docker compose exec nginx nginx -s reload
             
             # 이미지 정리 (최근 3개 유지)
