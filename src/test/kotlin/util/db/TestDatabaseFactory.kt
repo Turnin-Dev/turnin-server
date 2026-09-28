@@ -5,9 +5,11 @@ import com.turnin.common.db.schema.AnnouncementReads
 import com.turnin.common.db.schema.Announcements
 import com.turnin.common.db.schema.BlockReasons
 import com.turnin.common.db.schema.Blocks
+import com.turnin.common.db.schema.ContentReports
 import com.turnin.common.db.schema.Friends
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.Notifications
+import com.turnin.common.db.schema.PingPongs
 import com.turnin.common.db.schema.RefreshTokens
 import com.turnin.common.db.schema.ReportReasons
 import com.turnin.common.db.schema.Reports
@@ -16,8 +18,10 @@ import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
 import com.turnin.common.model.AnnouncementAudience
 import com.turnin.common.model.AnnouncementStatus
+import com.turnin.common.model.ContentReportType
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.NotificationType
+import com.turnin.common.model.PingPongStatus
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -49,6 +53,8 @@ object TestDatabaseFactory {
                 "noti_type" to NotificationType.entries.map { it.name },
                 "announcement_audience" to AnnouncementAudience.entries.map { it.name },
                 "announcement_status" to AnnouncementStatus.entries.map { it.name },
+                "ping_pong_status" to PingPongStatus.entries.map { it.name },
+                "content_report_type" to ContentReportType.entries.map { it.name },
             )
 
             enums.forEach { (typeName, values) ->
@@ -71,6 +77,8 @@ object TestDatabaseFactory {
                 Notifications,
                 Announcements,
                 AnnouncementReads,
+                PingPongs,
+                ContentReports,
             )
 
             initData()
@@ -93,6 +101,8 @@ object TestDatabaseFactory {
                 Notifications,
                 Announcements,
                 AnnouncementReads,
+                PingPongs,
+                ContentReports,
             )
 
             SchemaUtils.create(
@@ -109,6 +119,8 @@ object TestDatabaseFactory {
                 Notifications,
                 Announcements,
                 AnnouncementReads,
+                PingPongs,
+                ContentReports,
             )
 
             initData()
