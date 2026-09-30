@@ -51,3 +51,6 @@ out/
 
 ### JSON (include firebase key) ###
 **/src/main/resources/**/*.json
+
+### Personal Files ###
+**/docs/cs/
