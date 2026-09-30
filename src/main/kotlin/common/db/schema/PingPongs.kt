@@ -3,45 +3,37 @@ package com.turnin.common.db.schema
 import com.turnin.common.db.BaseEntity
 import com.turnin.common.db.BaseEntityClass
 import com.turnin.common.db.BaseLongIdTable
-import com.turnin.common.db.DatabaseUtils.customPostgresEnum
 import com.turnin.common.db.DatabaseUtils.timestamptz
-import com.turnin.common.model.PingPongStatus
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.or
 
-/** 핑퐁 엔티티 클래스 (Exposed DSL 방식) */
+/** 핑퐁(질문) 엔티티 클래스 (Exposed DSL 방식) */
 object PingPongs : BaseLongIdTable("ping_pong") {
     const val MAX_CONTENT_LENGTH = 2200
 
     val userKeywordId = reference("user_keyword_id", UserKeywords, onDelete = ReferenceOption.CASCADE)
     val questionerId = reference("questioner_id", Users, onDelete = ReferenceOption.CASCADE)
     val question = varchar("question", MAX_CONTENT_LENGTH)
-    val answer = varchar("answer", MAX_CONTENT_LENGTH).nullable()
-    val status = customPostgresEnum<PingPongStatus>("status", "ping_pong_status").default(PingPongStatus.PENDING)
-    val answeredAt = timestamptz("answered_at", setDefault = false).nullable()
+
+    /** 신고 누적으로 숨김 처리된 시각 */
+    val questionHiddenAt = timestamptz("question_hidden_at", setDefault = false).nullable()
 
     init {
-        // 게시물별 핑퐁 목록 조회 (최신순)
-        index("idx_ping_pong_user_keyword_created", false, userKeywordId, createdAt, id)
-        // 동일 사용자의 동일 게시물 연속 작성 제한 확인
-        index("idx_ping_pong_questioner_keyword_created", false, questionerId, userKeywordId, createdAt)
-        // 답변 내용과 답변 시각은 항상 함께 존재하거나 함께 없어야 한다.
-        check("chk_ping_pong_answer_consistency") {
-            (answer.isNull() and answeredAt.isNull()) or (answer.isNotNull() and answeredAt.isNotNull())
-        }
+        // 게시물별 핑퐁 목록 조회 (id 역순 = 최신순)
+        index("idx_ping_pong_user_keyword_id", false, userKeywordId, id)
+
+        // questionerId 인덱스는 저장 용량 절약을 위해 두지 않는다.
+        // 계정 Hard Delete 시 CASCADE가 ping_pong을 seq scan 하므로, 배치가 느려지면 인덱스를 추가한다.
+        // (연속 작성 제한은 DB가 아닌 RateLimit 플러그인으로 처리)
     }
 }
 
-/** 핑퐁 엔티티 클래스 (Exposed DAO/ORM 방식) */
+/** 핑퐁(질문) 엔티티 클래스 (Exposed DAO/ORM 방식) */
 class PingPongEntity(id: EntityID<Long>) : BaseEntity(id, PingPongs) {
     companion object : BaseEntityClass<PingPongEntity>(PingPongs)
 
     var userKeywordId by PingPongs.userKeywordId
     var questionerId by PingPongs.questionerId
     var question by PingPongs.question
-    var answer by PingPongs.answer
-    var status by PingPongs.status
-    var answeredAt by PingPongs.answeredAt
+    var questionHiddenAt by PingPongs.questionHiddenAt
 }

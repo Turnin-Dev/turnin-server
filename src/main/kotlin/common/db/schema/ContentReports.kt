@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.ReferenceOption
  *
  * 신고 시점의 콘텐츠 내용을 스냅샷으로 함께 보관하며, 원본 콘텐츠가 삭제되어도 유지된다.
  * [contentId]는 [contentType]에 따라 참조 대상 테이블이 달라지므로 FK를 두지 않는다.
+ * (질문: `ping_pong.id`, 답변: `ping_pong_answer.id`)
  */
 object ContentReports : BaseLongIdTable("content_report") {
     val reporterId = reference("reporter_id", Users, onDelete = ReferenceOption.CASCADE)
@@ -24,12 +25,11 @@ object ContentReports : BaseLongIdTable("content_report") {
     val customReason = text("custom_reason").nullable()
 
     init {
-        // 한 사람이 한 콘텐츠에 대해 한 번만 신고 가능
-        uniqueIndex("uq_content_report_reporter_content", reporterId, contentType, contentId)
-        // 콘텐츠별 신고 집계 (노출 제한 판단)
-        index("idx_content_report_content", false, contentType, contentId)
-        // 피신고자 기준 조회
-        index("idx_content_report_reported_user", false, reportedUserId)
+        // 한 사람이 한 콘텐츠에 대해 한 번만 신고 가능 (선행 컬럼으로 콘텐츠별 신고 수 집계에도 사용)
+        uniqueIndex("uq_content_report_content_reporter", contentType, contentId, reporterId)
+
+        // 신고 발생 빈도가 낮아 테이블이 작으므로 reporterId / reportedUserId 인덱스는 두지 않는다.
+        // 계정 Hard Delete 시 CASCADE가 seq scan 하므로, 배치가 느려지면 인덱스를 추가한다.
         // 자기 자신의 콘텐츠 신고 방지
         check("chk_content_report_not_self") { reporterId neq reportedUserId }
     }
