@@ -55,10 +55,3 @@ CREATE TABLE content_report (
 
 -- 게시물별 핑퐁 목록 조회 (id 역순 = 최신순)
 CREATE INDEX idx_ping_pong_user_keyword_id ON ping_pong (user_keyword_id, id);
-
--- questioner_id 인덱스 미생성 (저장 용량 절약)
--- 계정 Hard Delete 시 CASCADE가 ping_pong을 seq scan 하므로, 배치가 느려지면 아래 인덱스를 추가한다.
--- CREATE INDEX idx_ping_pong_questioner_id ON ping_pong (questioner_id);
-
--- content_report는 신고 발생 빈도가 낮아 테이블이 작으므로 reporter_id / reported_user_id 인덱스를 두지 않는다.
--- 계정 Hard Delete가 느려지면 해당 컬럼 인덱스를 추가한다.
