@@ -31,6 +31,7 @@
 - **[핑퐁 작성]**
     - 게시물 하단에 질문 입력 영역을 노출하며, 최대 글자 수는 2,200자로 제한.
     - 동일 사용자가 동일 게시물에 연속 작성 시 5초당 1회/1분당 5회 작성 간격 제한 적용.
+    - 게시물 작성자 본인의 글에 질문을 작성할 수 없다.
 - **[핑퐁 답변]**
     - 게시물 작성자에게만 답변 작성 권한 부여.
 - **[핑퐁 조회]**
@@ -47,10 +48,10 @@
 
 - **API / DB:**
     - API:
-        - `POST /user-keyword/{userKeywordId}/pingpong/` - 질문 등록
-        - `POST /pingpong/{pingpongId}/answer` - 답변 등록
-        - `GET /user-keyword/{userKeywordId}/pingpong` - 핑퐁 목록 조회
-        - `DELETE /pingpong/{pingpongId}` - 질문/답변 삭제
+        - `POST /user-keyword/{userKeywordId}/ping-pong/` - 질문 등록
+        - `POST /ping-pong/{pingPongId}/answer` - 답변 등록
+        - `GET /user-keyword/{userKeywordId}/ping-pong` - 핑퐁 목록 조회
+        - `DELETE /ping-pong/{pingPongId}` - 질문/답변 삭제
     - DB Table:
         - `ping_pong` (기존 comment 테이블과 컬럼 구조가 유사하지만, 질문/답변 상태(status), 답변자 제한 로직이 다르므로 별도 테이블로 분리 권장)
         - `content_report` (핑퐁만을 위한 테이블은 아니며 특정 컨텐츠 신고 시 해당 내용을 스냅샷 찍어 함께 보관하는 용도의 추가 신고 테이블)
