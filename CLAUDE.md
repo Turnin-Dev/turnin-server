@@ -20,7 +20,7 @@ Full layering conventions, folder structure per layer, and dependency-direction 
 - Run locally: `./gradlew runDev` (loads `.env.dev` + `application-dev.conf`) or `./gradlew runProd` (prod equivalent)
 - Lint: `./gradlew ktlintCheck` / `./gradlew ktlintFormat`
 - Fat jar for deploy: `./gradlew buildFatJar` → `turnin-api.jar`
-- Tests: `./gradlew test` — this also triggers `koinTest` (finalizedBy), a separate task that runs `HardDeleteExpiredAccountsUseCaseIntegrationTest` and `AccountDeletionIntegrationTest` single-threaded (`maxParallelForks = 1`) because they share Koin DI container state; all other tests run in parallel. Don't assume `koinTest` ran just because `test` passed — check both task results.
+- Tests: `./gradlew test` — this also triggers `koinTest` (finalizedBy), a separate task that runs `HardDeleteExpiredAccountsUseCaseIntegrationTest` and `AccountDeletionIntegrationTest` in one Gradle test process (`maxParallelForks = 1`) because they share Koin DI container state. The regular `test` task allows up to `Runtime.getRuntime().availableProcessors()` Gradle test processes for the other tests. Don't assume `koinTest` ran just because `test` passed — check both task results.
 - Integration tests use Testcontainers (Postgres) — **Docker must be running locally** or these tests fail immediately.
 
 ## Conventions
@@ -31,7 +31,9 @@ Full layering conventions, folder structure per layer, and dependency-direction 
 
 ## Secrets
 
-`.env.dev`, `.env.prod`, `.env.localtest`, `application-*.conf`, and `firebase-service-account.json` contain real credentials/config. Never print, echo, or commit their contents — reference key names only.
+- `.env.dev`, `.env.localtest`, `application-*.conf`, and `firebase-service-account.json` contain real credentials/config. Never print, echo, or commit their contents — reference key names only.
+- Keep `.env.prod` separately
+
 
 ## Leave alone
 
