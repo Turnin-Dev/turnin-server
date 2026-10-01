@@ -22,6 +22,33 @@ Full layering conventions, folder structure per layer, and dependency-direction 
 - Fat jar for deploy: `./gradlew buildFatJar` → `turnin-api.jar`
 - Tests: `./gradlew test` — this also triggers `koinTest` (finalizedBy), a separate task that runs `HardDeleteExpiredAccountsUseCaseIntegrationTest` and `AccountDeletionIntegrationTest` in one Gradle test process (`maxParallelForks = 1`) because they share Koin DI container state. The regular `test` task allows up to `Runtime.getRuntime().availableProcessors()` Gradle test processes for the other tests. Don't assume `koinTest` ran just because `test` passed — check both task results.
 - Integration tests use Testcontainers (Postgres) — **Docker must be running locally** or these tests fail immediately.
+- Single test class: `./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest`, then confirm it actually ran in `build/test-results/test/TEST-<fully.qualified.Name>.xml`.
+
+## Skills
+
+Project skills live in `.claude/skills/`. Use them instead of improvising the same steps.
+
+| Skill | Use when |
+|---|---|
+| `write-tests` | Writing or planning tests for any code in this repo. Lists Given-When-Then test cases first, writes them, then compiles, runs, and lints them. Pass `cases-only` to stop at the list. |
+| `verify` | After code changes, before saying the work is done: `ktlintCheck` + full `test` + `koinTest`. |
+| `run-dev` | Starting the server locally. |
+
+## Testing
+
+When asked to write tests, invoke the `write-tests` skill; its `rules/` hold the full conventions. The points below apply to every test in this repo, even without the skill.
+
+- **JUnit 4 only.** Use `kotlin.test.Test` / `org.junit.Test`, `org.junit.Before` / `After` / `Rule` / `Ignore`. JUnit 5 annotations (`@BeforeEach`, `@Nested`, `@ParameterizedTest`, `@Disabled`, ...) compile but are silently ignored by the runner.
+- **Names:** `{TestedClass}Test` in the same package path under `src/test/kotlin`; test functions are Korean backtick sentences stating condition and outcome (`` `신고 대상이 전부 없는 경우 도메인 예외가 발생한다` ``). Route tests prefix the endpoint (`` `신고 생성 - 토큰 없이 요청 시 401 에러를 반환한다` ``).
+- **Structure:** `// given`, `// when`, `// then`; one scenario per test; values the assertion depends on are visible inside the test; no logic or computed expected values in assertions.
+- **Libraries:** `kotlin.test` assertions, MockK (`coEvery` / `coVerify`, `slot` to check objects passed to dependencies), `runTest` for suspend code. Mock repository/provider interfaces only — never the class under test, DTOs, value objects, or domain models.
+- **By layer:**
+  - Use case → real use case with mocked dependencies.
+  - Repository impl → real SQL on `TestDatabaseFactory` (H2, default) or `PostgresRule` (Testcontainers; only for PostgreSQL-specific queries such as pgvector).
+  - Route → `testApplication` + `TestEndpoint` tools (`testGetEndpoint`, `testPostEndpoint`, ...) with `testPlugin(authRouting = { ... })` and a mocked `...UseCases`.
+- **What to cover:** every code branch, each exception type, and each concrete HTTP status as its own test (never merge 400/401/403); both sides of each validation boundary. Skip same-class input variations, collection-size variations, and null for non-nullable parameters.
+- **New tables** must be registered in both `src/test/kotlin/util/db/TestDatabaseFactory.kt` and `PostgresRule.kt` (enum map and every `SchemaUtils.create` / `drop` list), or they do not exist in tests.
+- **Never change production code to make a test pass.** If behavior looks like a bug, make the test document current behavior and report it.
 
 ## Conventions
 
