@@ -2,6 +2,7 @@ package com.turnin.domain.userKeyword.di
 
 import com.turnin.common.di.IOApplicationScopeQualifier
 import com.turnin.domain.userKeyword.application.provider.UserKeywordDeletionSupportApi
+import com.turnin.domain.userKeyword.application.provider.UserKeywordProviderApi
 import com.turnin.domain.userKeyword.application.usecase.CreateUserKeywordUseCase
 import com.turnin.domain.userKeyword.application.usecase.DeleteUserKeywordUseCase
 import com.turnin.domain.userKeyword.application.usecase.GetDetailUseCase
@@ -29,6 +30,7 @@ val userKeywordModule = module {
     single<KeywordProvider> { KeywordProviderImpl(get()) }
     single<ReportProvider> { ReportProviderImpl(get()) }
     single { UserKeywordDeletionSupportApi(get()) }
+    single { UserKeywordProviderApi(get()) }
     single<FriendProvider> { FriendProviderImpl(get()) }
     single<NotificationProvider> { NotificationProviderImpl(get()) }
 

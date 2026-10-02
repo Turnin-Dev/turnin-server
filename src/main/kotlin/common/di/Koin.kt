@@ -16,6 +16,7 @@ import com.turnin.domain.file.di.fileModule
 import com.turnin.domain.friend.di.friendModule
 import com.turnin.domain.keyword.di.keywordModule
 import com.turnin.domain.notification.di.notificationModule
+import com.turnin.domain.pingPong.di.pingPongModule
 import com.turnin.domain.report.di.reportModule
 import com.turnin.domain.user.di.userModule
 import com.turnin.domain.userKeyword.di.userKeywordModule
@@ -38,6 +39,7 @@ fun Application.configureKoin() {
             fileModule,
             keywordModule,
             userKeywordModule,
+            pingPongModule,
             reportModule,
             friendModule,
             discoverModule,
