@@ -4,10 +4,12 @@ import com.turnin.common.exception.ApiException
 import com.turnin.common.exception.common.CommonErrorCode
 import com.turnin.common.model.id.UserId
 import com.turnin.common.route.Api
+import com.turnin.domain.pingPong.application.dto.PingPongAnswerDto
 import com.turnin.domain.pingPong.application.dto.PingPongDto
 import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
 import com.turnin.domain.pingPong.domain.model.PingPongContentValidationException
 import com.turnin.domain.pingPong.exception.PingPongException
+import com.turnin.domain.pingPong.presentation.dto.CreatePingPongAnswerRequest
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongRequest
 import com.turnin.util.testPlugin
 import com.turnin.util.testPostEndpoint
@@ -225,7 +227,269 @@ class PingPongRouteTest {
         )
     }
 
+    @Test
+    fun `핑퐁 답변 작성 - 성공 시 201과 생성된 답변을 반환한다`() = testApplication {
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } returns PingPongAnswerDto(
+            id = 20L,
+            pingPongId = 10L,
+            answer = "답변 내용",
+            createdAt = 2000L,
+            updatedAt = 2000L,
+        )
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = CreatePingPongAnswerRequest(answer = "답변 내용"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.Created,
+            responseValidator = {
+                containsAll("\"id\":20", "\"pingPongId\":10", "\"answer\":\"답변 내용\"")
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 토큰의 사용자 ID와 경로의 핑퐁 ID, 바디의 답변을 유스케이스에 전달한다`() = testApplication {
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } returns TestPingPongAnswerDto
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = CreatePingPongAnswerRequest(answer = "답변 내용"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.Created,
+            additionalAssertions = {
+                coVerify(exactly = 1) { usecase.createAnswer(UserId(1L), 10L, "답변 내용") }
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = TestCreatePingPongAnswerRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 핑퐁 ID가 숫자가 아니면 400 에러를 반환한다`() = testApplication {
+        testPostEndpoint(
+            endpoint = route.answer("abc"),
+            requestBody = TestCreatePingPongAnswerRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 요청 바디에 답변이 없으면 400 에러를 반환한다`() = testApplication {
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = mapOf("content" to "답변 내용"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.BadRequest,
+            responseValidator = {
+                contains(CommonErrorCode.MalformedRequest.code)
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 답변 내용 유효성 검사 실패 시 400 에러를 반환한다`() = testApplication {
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } throws PingPongContentValidationException("핑퐁 내용이 비어있습니다.")
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = CreatePingPongAnswerRequest(answer = " "),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.BadRequest,
+            responseValidator = {
+                containsAll(CommonErrorCode.ValidationDefault.code, "핑퐁 내용이 비어있습니다.")
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 게시물 작성자가 아니면 403 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.NotUserKeywordOwner()
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } throws expectedException
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = TestCreatePingPongAnswerRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.Forbidden,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 핑퐁을 찾을 수 없으면 404 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.PingPongNotFound()
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } throws expectedException
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = TestCreatePingPongAnswerRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NotFound,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 질문이 달린 게시물을 조회할 수 없으면 404 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.UserKeywordNotFound()
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } throws expectedException
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = TestCreatePingPongAnswerRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NotFound,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 이미 답변이 등록된 질문이면 409 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.AlreadyAnswered()
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } throws expectedException
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = TestCreatePingPongAnswerRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.Conflict,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 작성 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        val expectedException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery {
+            usecase.createAnswer(UserId(1L), any(), any())
+        } throws expectedException
+
+        testPostEndpoint(
+            endpoint = route.answer("10"),
+            requestBody = TestCreatePingPongAnswerRequest,
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.InternalServerError,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
     companion object {
+        private val TestCreatePingPongAnswerRequest = CreatePingPongAnswerRequest(answer = "answer")
+        private val TestPingPongAnswerDto = PingPongAnswerDto(
+            id = 20L,
+            pingPongId = 10L,
+            answer = "answer",
+            createdAt = 2000L,
+            updatedAt = 2000L,
+        )
         private val TestCreatePingPongRequest = CreatePingPongRequest(question = "question")
         private val TestPingPongDto = PingPongDto(
             id = 10L,

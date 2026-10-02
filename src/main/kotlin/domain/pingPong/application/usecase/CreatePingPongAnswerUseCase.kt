@@ -1,0 +1,61 @@
+package com.turnin.domain.pingPong.application.usecase
+
+import com.turnin.common.db.DatabaseException
+import com.turnin.common.model.id.PingPongId
+import com.turnin.common.model.id.UserId
+import com.turnin.common.validator.ValidatorException
+import com.turnin.domain.pingPong.application.dto.PingPongAnswerDto
+import com.turnin.domain.pingPong.application.dto.toDto
+import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
+import com.turnin.domain.pingPong.domain.repository.PingPongRepository
+import com.turnin.domain.pingPong.exception.PingPongException
+
+/**
+ * 핑퐁 답변 작성
+ *
+ * 핑퐁(질문)에 답변을 등록한다. 답변은 질문이 달린 게시물(사용자 키워드)의 작성자만 등록할 수 있으며, 질문당 1개만 등록할 수 있다.
+ *
+ * @throws [ValidatorException] 답변 내용이 비어있거나 최대 글자 수를 초과한 경우
+ * @throws [PingPongException.PingPongNotFound] 핑퐁(질문)이 없거나, 신고 누적으로 숨김 처리된 경우
+ * @throws [PingPongException.UserKeywordNotFound] 질문이 달린 게시물이 없거나, 비활성화/차단 관계로 조회할 수 없는 경우
+ * @throws [PingPongException.NotUserKeywordOwner] 게시물 작성자가 아닌 사용자가 답변을 등록하려는 경우
+ * @throws [PingPongException.AlreadyAnswered] 이미 답변이 등록된 질문인 경우
+ */
+class CreatePingPongAnswerUseCase(
+    private val pingPongRepository: PingPongRepository,
+    private val userKeywordProvider: UserKeywordProvider,
+) {
+    /**
+     * @param answererId 답변자(요청자) ID
+     * @param pingPongId 답변을 등록할 핑퐁(질문) ID
+     * @param answer 답변 내용
+     *
+     * @return 생성된 [PingPongAnswerDto]
+     */
+    suspend operator fun invoke(
+        answererId: UserId,
+        pingPongId: Long,
+        answer: String,
+    ): PingPongAnswerDto {
+        val pingPongIdVO = PingPongId(pingPongId)
+        val answerVO = PingPongContent(answer)
+
+        val pingPong = pingPongRepository.findVisibleById(pingPongIdVO)
+            ?: throw PingPongException.PingPongNotFound()
+        val ownerId = userKeywordProvider.findOwnerId(answererId, pingPong.userKeywordId)
+            ?: throw PingPongException.UserKeywordNotFound()
+        if (ownerId != answererId) {
+            throw PingPongException.NotUserKeywordOwner()
+        }
+
+        // 질문당 답변 1개는 DB 유니크 제약으로 보장한다. (동시 요청에도 안전)
+        return try {
+            pingPongRepository
+                .createAnswer(pingPongIdVO, answerVO)
+                .toDto()
+        } catch (e: DatabaseException.DuplicatedDataException) {
+            throw PingPongException.AlreadyAnswered(e)
+        }
+    }
+}
