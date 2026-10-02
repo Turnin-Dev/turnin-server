@@ -1,5 +1,6 @@
 package com.turnin.domain.pingPong.presentation.route
 
+import com.turnin.common.exception.common.CommonErrorCode
 import com.turnin.common.plugin.AuthenticatedRoute
 import com.turnin.common.plugin.RateLimitToken
 import com.turnin.common.route.Api
@@ -130,9 +131,10 @@ private fun RouteConfig.createPingPongAnswerDocs() {
         }
         code(HttpStatusCode.BadRequest) {
             description = """
-                답변이 비어있거나 최대 글자 수를 초과한 경우, 요청 형식이 잘못된 경우
+                답변이 비어있거나 최대 글자 수를 초과한 경우 (`${CommonErrorCode.ValidationDefault.code}`),
+                요청 바디 또는 핑퐁 ID 형식이 잘못된 경우 (`${CommonErrorCode.MalformedRequest.code}`)
 
-                - UI 메시지: "답변은 1자 이상 ${PingPongContent.MAX_LENGTH}자 이내로 입력해 주세요."
+                - UI 메시지: "요청을 처리할 수 없어요. 잠시 후 다시 시도해 주세요."
             """.trimIndent()
         }
         code(HttpStatusCode.Forbidden) {
