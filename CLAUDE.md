@@ -55,6 +55,7 @@ When asked to write tests, invoke the `write-tests` skill; its `rules/` hold the
 
 - Branch flow: feature branches → PR into `develop`; `develop` → `main` for releases (version-bump commits like `chore: 1.5.0로 버전업`).
 - Commit messages: Korean, Conventional-Commits-style prefixes (`feat:`, `fix:`, `refactor:`, `chore:`, `test:`, `chore(deps):`).
+- API docs (the `RouteConfig.*Docs()` functions at the bottom of each route file): every error status code description states the case, the error code when there is one, and the message the app UI should show for it (`- UI 메시지: "..."`). When one status covers several cases with different messages, list each case separately. See `createPingPongAnswerDocs()` in `PingPongRoute.kt` for the format.
 - Endpoint tests use a custom `TestEndpoint` test tool (see existing tests under `src/test/kotlin` for the pattern) rather than raw Ktor test client calls.
 
 ## Secrets
