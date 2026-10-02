@@ -48,7 +48,8 @@ When asked to write tests, invoke the `write-tests` skill; its `rules/` hold the
   - Route → `testApplication` + `TestEndpoint` tools (`testGetEndpoint`, `testPostEndpoint`, ...) with `testPlugin(authRouting = { ... })` and a mocked `...UseCases`.
 - **What to cover:** every code branch, each exception type, and each concrete HTTP status as its own test (never merge 400/401/403); both sides of each validation boundary. Skip same-class input variations, collection-size variations, and null for non-nullable parameters.
 - **New tables** must be registered in both `src/test/kotlin/util/db/TestDatabaseFactory.kt` and `PostgresRule.kt` (enum map and every `SchemaUtils.create` / `drop` list), or they do not exist in tests.
-- **Never change production code to make a test pass.** If behavior looks like a bug, make the test document current behavior and report it.
+- **Never change production code to make a test pass.**
+- **Never change an expected value to match the implementation.** Expected values come from the contract (`docs/spec/`, KDoc, API docs), not from what the code currently returns. If a test fails because the implementation differs from the contract, keep the expectation and report the implementation defect.
 
 ## Conventions
 

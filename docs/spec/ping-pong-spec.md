@@ -48,7 +48,7 @@
 
 - **API / DB:**
     - API:
-        - `POST /user-keyword/{userKeywordId}/ping-pong/` - 질문 등록
+        - `POST /user-keyword/{userKeywordId}/ping-pong` - 질문 등록
         - `POST /ping-pong/{pingPongId}/answer` - 답변 등록
         - `GET /user-keyword/{userKeywordId}/ping-pong` - 핑퐁 목록 조회
         - `DELETE /ping-pong/{pingPongId}` - 질문/답변 삭제

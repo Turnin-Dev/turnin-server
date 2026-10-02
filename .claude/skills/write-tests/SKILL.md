@@ -59,7 +59,7 @@ Cover every branch of the target, including branches inside private functions it
 
 ### Step 4: Verify
 
-Follow `rules/verification.md`: compile, run only the new test class, fix the tests (never production code) until they pass, then lint. Report the result of each.
+Follow `rules/verification.md`: compile, run only the new test class, investigate the cause of every failure, then lint. Fix mistakes in the test itself (imports, stubs, setup), but keep expected values that come from the contract, and never change production code or weaken an assertion just to get a green run. Report the result of each.
 
 ## Rules reference
 
@@ -74,5 +74,5 @@ Follow `rules/verification.md`: compile, run only the new test class, fix the te
 ## Troubleshooting
 
 - **Target not found:** report the exact path searched and ask.
-- **Tests fail because production code behaves differently than expected:** do not change production code. Make the test match the current behavior. If the behavior looks like a bug, add `// NOTE: 현재 동작은 버그일 수 있음 - {설명}` and report it.
+- **Tests fail because production code behaves differently than the contract says:** do not change production code, and do not change the expected value to match the current behavior. Keep the contract-based expectation, leave the test failing, and report it as an implementation defect: test name, the contract it is based on, expected vs. actual. Change an expectation only when the investigation shows the test's own assumption about the contract was wrong.
 - **Docker errors in a `PostgresRule` test:** tell the user to start Docker; do not debug the test logic.
