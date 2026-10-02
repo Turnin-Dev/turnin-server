@@ -1,5 +1,6 @@
 package com.turnin.domain.pingPong.di
 
+import com.turnin.domain.pingPong.application.usecase.CreatePingPongAnswerUseCase
 import com.turnin.domain.pingPong.application.usecase.CreatePingPongUseCase
 import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
@@ -17,5 +18,6 @@ val pingPongModule = module {
 
     // UseCases
     single { CreatePingPongUseCase(get(), get()) }
-    single { PingPongUseCases(get()) }
+    single { CreatePingPongAnswerUseCase(get(), get()) }
+    single { PingPongUseCases(get(), get()) }
 }

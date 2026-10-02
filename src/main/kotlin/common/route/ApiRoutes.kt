@@ -90,6 +90,8 @@ object Api {
             const val TAG = "PingPong"
 
             fun byUserKeyword(pathParam: String): String = "${UserKeyword.ROUTE}/$pathParam$ROUTE"
+
+            fun answer(pathParam: String): String = "$ROUTE/$pathParam/answer"
         }
 
         object Report {

@@ -26,4 +26,26 @@ sealed class PingPongException(
             code = PingPongErrorCode.CannotQuestionOwnUserKeyword,
             status = HttpStatusCode.BadRequest,
         )
+
+    /** 핑퐁(질문)이 없거나, 신고 누적으로 숨김 처리된 경우 */
+    class PingPongNotFound :
+        PingPongException(
+            code = PingPongErrorCode.PingPongNotFound,
+            status = HttpStatusCode.NotFound,
+        )
+
+    /** 게시물 작성자가 아닌 사용자가 답변을 등록하려는 경우 */
+    class NotUserKeywordOwner :
+        PingPongException(
+            code = PingPongErrorCode.NotUserKeywordOwner,
+            status = HttpStatusCode.Forbidden,
+        )
+
+    /** 이미 답변이 등록된 질문에 답변을 등록하려는 경우 */
+    class AlreadyAnswered(cause: Throwable? = null) :
+        PingPongException(
+            code = PingPongErrorCode.AlreadyAnswered,
+            status = HttpStatusCode.Conflict,
+            cause = cause,
+        )
 }
