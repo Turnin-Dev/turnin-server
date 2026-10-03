@@ -7,6 +7,7 @@ import com.turnin.common.validator.ValidatorException
 import com.turnin.domain.pingPong.application.dto.PingPongAnswerDto
 import com.turnin.domain.pingPong.application.dto.toDto
 import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.provider.BlockProvider
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.exception.PingPongException
@@ -19,12 +20,16 @@ import com.turnin.domain.pingPong.exception.PingPongException
  * @throws [ValidatorException] 답변 내용이 비어있거나 최대 글자 수를 초과한 경우
  * @throws [PingPongException.PingPongNotFound] 핑퐁(질문)이 없거나, 신고 누적으로 숨김 처리된 경우
  * @throws [PingPongException.UserKeywordNotFound] 질문이 달린 게시물이 없거나, 비활성화/차단 관계로 조회할 수 없는 경우
+ * 차단 전에 달린 질문은 작성자에게 노출되지만(삭제/신고용), 차단 관계(양방향)인 질문자의 질문에는 답변할 수 없다.
+ *
  * @throws [PingPongException.NotUserKeywordOwner] 게시물 작성자가 아닌 사용자가 답변을 등록하려는 경우
+ * @throws [PingPongException.CannotAnswerBlockedQuestioner] 질문자와 차단 관계(양방향)인 경우
  * @throws [PingPongException.AlreadyAnswered] 이미 답변이 등록된 질문인 경우
  */
 class CreatePingPongAnswerUseCase(
     private val pingPongRepository: PingPongRepository,
     private val userKeywordProvider: UserKeywordProvider,
+    private val blockProvider: BlockProvider,
 ) {
     /**
      * @param answererId 답변자(요청자) ID
@@ -47,6 +52,9 @@ class CreatePingPongAnswerUseCase(
             ?: throw PingPongException.UserKeywordNotFound()
         if (ownerId != answererId) {
             throw PingPongException.NotUserKeywordOwner()
+        }
+        if (blockProvider.isBlockedRelationship(answererId, pingPong.questionerId)) {
+            throw PingPongException.CannotAnswerBlockedQuestioner()
         }
 
         // 질문당 답변 1개는 DB 유니크 제약으로 보장한다. (동시 요청에도 안전)

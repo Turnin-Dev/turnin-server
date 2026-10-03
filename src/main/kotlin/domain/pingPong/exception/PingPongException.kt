@@ -48,4 +48,11 @@ sealed class PingPongException(
             status = HttpStatusCode.Conflict,
             cause = cause,
         )
+
+    /** 차단 관계(양방향)인 질문자의 질문에 답변을 등록하려는 경우 */
+    class CannotAnswerBlockedQuestioner :
+        PingPongException(
+            code = PingPongErrorCode.CannotAnswerBlockedQuestioner,
+            status = HttpStatusCode.Forbidden,
+        )
 }

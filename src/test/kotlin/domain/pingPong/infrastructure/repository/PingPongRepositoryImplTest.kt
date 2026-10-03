@@ -1,6 +1,8 @@
 package com.turnin.domain.pingPong.infrastructure.repository
 
 import com.turnin.common.db.DatabaseException
+import com.turnin.common.db.schema.BlockReasons
+import com.turnin.common.db.schema.Blocks
 import com.turnin.common.db.schema.KeywordEntity
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.PingPongAnswers
@@ -15,6 +17,7 @@ import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.util.db.TestDatabaseFactory
+import com.turnin.util.db.setUserInactiveForTest
 import java.time.Instant
 import java.time.OffsetDateTime
 import kotlin.test.assertEquals
@@ -22,6 +25,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
 import org.junit.After
@@ -229,14 +233,398 @@ class PingPongRepositoryImplTest {
         }
     }
 
-    private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
+    @Test
+    fun `핑퐁 목록 조회 시 게시물의 핑퐁을 최신순으로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val first = repository.create(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
+        val second = repository.create(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(second.id, first.id), result.map { it.pingPong.id })
+        assertEquals(listOf("두 번째 질문", "첫 번째 질문"), result.map { it.pingPong.question.value })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 다른 게시물의 핑퐁은 반환하지 않는다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword1")
+        val otherUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword2")
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.create(otherUserKeywordId, questionerId, PingPongContent("다른 게시물 질문"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(pingPong.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 숨김 처리된 질문은 반환하지 않는다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val visible = repository.create(userKeywordId, questionerId, PingPongContent("노출 질문"))
+        val hidden = repository.create(userKeywordId, questionerId, PingPongContent("숨김 질문"))
+        TestDatabaseFactory.dbQuery {
+            PingPongs.update({ PingPongs.id eq hidden.id.value }) {
+                it[questionHiddenAt] = OffsetDateTime.parse("2026-01-01T00:00:00Z")
+            }
+        }
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(visible.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 비활성화된 질문자의 핑퐁은 반환하지 않는다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val activeQuestionerId = insertUserAndReturnId("2")
+        val inactiveQuestionerId = insertUserAndReturnId("3")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val visible = repository.create(userKeywordId, activeQuestionerId, PingPongContent("활성 사용자 질문"))
+        repository.create(userKeywordId, inactiveQuestionerId, PingPongContent("비활성 사용자 질문"))
+        setUserInactiveForTest(inactiveQuestionerId)
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(visible.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 조회자가 차단한 질문자의 핑퐁은 반환하지 않는다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val viewerId = insertUserAndReturnId("2")
+        val questionerId = insertUserAndReturnId("3")
+        val blockedQuestionerId = insertUserAndReturnId("4")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val visible = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.create(userKeywordId, blockedQuestionerId, PingPongContent("차단된 사용자 질문"))
+        insertBlock(blockerId = viewerId, blockedId = blockedQuestionerId)
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            viewerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(visible.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 조회자를 차단한 질문자의 핑퐁은 반환하지 않는다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val viewerId = insertUserAndReturnId("2")
+        val questionerId = insertUserAndReturnId("3")
+        val blockingQuestionerId = insertUserAndReturnId("4")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val visible = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.create(userKeywordId, blockingQuestionerId, PingPongContent("차단한 사용자 질문"))
+        insertBlock(blockerId = blockingQuestionerId, blockedId = viewerId)
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            viewerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(visible.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 차단 필터를 끄면 조회자가 차단한 질문자의 핑퐁도 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val blockedQuestionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, blockedQuestionerId, PingPongContent("차단된 사용자 질문"))
+        insertBlock(blockerId = ownerId, blockedId = blockedQuestionerId)
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = false,
+        )
+
+        // then
+        assertEquals(listOf(pingPong.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 차단 필터를 끄면 조회자를 차단한 질문자의 핑퐁도 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val blockingQuestionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, blockingQuestionerId, PingPongContent("차단한 사용자 질문"))
+        insertBlock(blockerId = blockingQuestionerId, blockedId = ownerId)
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = false,
+        )
+
+        // then
+        assertEquals(listOf(pingPong.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 조회자 본인이 작성한 핑퐁을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val viewerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val myPingPong = repository.create(userKeywordId, viewerId, PingPongContent("내 질문"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            viewerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(myPingPong.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 질문자 정보를 함께 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId(
+            uniqueValue = "2",
+            name = "질문자",
+            profileImageUrl = "https://example.com/profile.jpg",
+        )
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        val questioner = result.single().questioner
+        assertEquals(questionerId, questioner.userId)
+        assertEquals("질문자", questioner.userName.value)
+        assertEquals("https://example.com/profile.jpg", questioner.profileImageUrl)
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 답변이 있으면 답변을 함께 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        val resultAnswer = result.single().answer
+        assertNotNull(resultAnswer)
+        assertEquals(answer.id, resultAnswer.id)
+        assertEquals(pingPong.id, resultAnswer.pingPongId)
+        assertEquals("답변 내용", resultAnswer.answer.value)
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 답변이 없으면 답변을 null로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertNull(result.single().answer)
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 답변이 숨김 처리되었으면 질문은 반환하고 답변은 null로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+        TestDatabaseFactory.dbQuery {
+            PingPongAnswers.update({ PingPongAnswers.id eq answer.id.value }) {
+                it[hiddenAt] = OffsetDateTime.parse("2026-01-01T00:00:00Z")
+            }
+        }
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(pingPong.id, result.single().pingPong.id)
+        assertNull(result.single().answer)
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 커서가 있으면 커서보다 작은 ID의 핑퐁만 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val first = repository.create(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
+        val second = repository.create(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
+        repository.create(userKeywordId, questionerId, PingPongContent("세 번째 질문"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            second.id,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(first.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 조회 개수만큼만 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        repository.create(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
+        val second = repository.create(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
+        val third = repository.create(userKeywordId, questionerId, PingPongContent("세 번째 질문"))
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            2,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(listOf(third.id, second.id), result.map { it.pingPong.id })
+    }
+
+    @Test
+    fun `핑퐁 목록 조회 시 핑퐁이 없으면 빈 목록을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+
+        // when
+        val result = repository.findVisibleDetailsByUserKeywordId(
+            ownerId,
+            userKeywordId,
+            null,
+            10,
+            excludeBlockedQuestioners = true,
+        )
+
+        // then
+        assertEquals(emptyList(), result)
+    }
+
+    private suspend fun insertUserAndReturnId(
+        uniqueValue: String,
+        name: String = "honggd",
+        profileImageUrl: String? = null,
+    ): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
             this.provider = SocialLoginProvider.GOOGLE
             this.providerId = "pid$uniqueValue"
             this.displayId = "did$uniqueValue"
-            this.name = "honggd"
-            this.profileImageUrl = null
+            this.name = name
+            this.profileImageUrl = profileImageUrl
             this.introduce = "hello"
             this.isActive = true
             this.lastLoginAt = Instant.now()
@@ -245,10 +633,13 @@ class PingPongRepositoryImplTest {
         UserId(savedUser.id.value)
     }
 
-    private suspend fun insertUserKeywordAndReturnId(userId: Long): UserKeywordId = TestDatabaseFactory.dbQuery {
+    private suspend fun insertUserKeywordAndReturnId(
+        userId: Long,
+        keyword: String = "keyword",
+    ): UserKeywordId = TestDatabaseFactory.dbQuery {
         val keywordId = KeywordEntity
             .new {
-                this.keyword = "keyword"
+                this.keyword = keyword
                 this.embedding = "embedding"
                 this.createdBy = EntityID(userId, Users)
             }.id.value
@@ -260,5 +651,13 @@ class PingPongRepositoryImplTest {
         }
 
         UserKeywordId(savedUserKeyword.id.value)
+    }
+
+    private suspend fun insertBlock(blockerId: UserId, blockedId: UserId) = TestDatabaseFactory.dbQuery {
+        Blocks.insert {
+            it[Blocks.blockerId] = EntityID(blockerId.value, Users)
+            it[Blocks.blockedId] = EntityID(blockedId.value, Users)
+            it[Blocks.reasonId] = EntityID(1L, BlockReasons) // 기존 initData에서 생성된 차단 사유
+        }
     }
 }

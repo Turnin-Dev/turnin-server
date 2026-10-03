@@ -5,4 +5,6 @@ data class PingPongUseCases(
     val create: CreatePingPongUseCase,
     /** @see CreatePingPongAnswerUseCase */
     val createAnswer: CreatePingPongAnswerUseCase,
+    /** @see GetPingPongsUseCase */
+    val getPingPongs: GetPingPongsUseCase,
 )

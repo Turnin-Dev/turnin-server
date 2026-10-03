@@ -4,6 +4,9 @@ import com.turnin.common.exception.common.CommonErrorCode
 import com.turnin.common.plugin.AuthenticatedRoute
 import com.turnin.common.plugin.RateLimitToken
 import com.turnin.common.route.Api
+import com.turnin.common.util.pagination.cursor.CursorPage
+import com.turnin.common.util.pagination.cursor.getCursorPaginationParams
+import com.turnin.common.util.pagination.cursor.toResponse
 import com.turnin.common.validator.inputValidationAndReturn
 import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
 import com.turnin.domain.pingPong.domain.model.PingPongContent
@@ -11,9 +14,11 @@ import com.turnin.domain.pingPong.exception.PingPongErrorCode
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongAnswerRequest
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongRequest
 import com.turnin.domain.pingPong.presentation.dto.PingPongAnswerResponse
+import com.turnin.domain.pingPong.presentation.dto.PingPongDetailResponse
 import com.turnin.domain.pingPong.presentation.dto.PingPongResponse
 import com.turnin.domain.pingPong.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
 import io.ktor.http.HttpStatusCode
@@ -57,6 +62,24 @@ fun AuthenticatedRoute.pingPongRoutes(route: Api.V1.PingPong, usecase: PingPongU
                 createPingPongAnswerRequest.answer,
             )
             call.respond(HttpStatusCode.Created, pingPongAnswerDto.toResponse())
+        }
+
+        get(route.byUserKeyword(pathParam = "{userKeywordId}"), { getPingPongsDocs() }) {
+            val userKeywordIdParam = call.parameters["userKeywordId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("사용자 키워드 ID")
+            val currentUserId = extractUserIdWithToken()
+            val params = getCursorPaginationParams()
+            val cursorPage = usecase.getPingPongs(
+                currentUserId,
+                userKeywordIdParam,
+                params.cursor,
+                params.size,
+            )
+            val response = cursorPage.toResponse { pingPongDetailDto ->
+                pingPongDetailDto.toResponse()
+            }
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 }
@@ -107,6 +130,7 @@ private fun RouteConfig.createPingPongAnswerDocs() {
         핑퐁(질문)에 답변을 등록한다.
 
         - 질문이 달린 게시물(사용자 키워드)의 작성자만 답변을 등록할 수 있으며, 질문당 답변은 1개만 등록할 수 있다.
+        - 질문자와 차단 관계(양방향)이면 답변을 등록할 수 없다. (차단 전에 달린 질문은 삭제/신고만 가능)
         - 답변은 공백만으로 이루어질 수 없으며, 최대 ${PingPongContent.MAX_LENGTH}자까지 작성할 수 있다.
     """.trimIndent()
     request {
@@ -142,6 +166,10 @@ private fun RouteConfig.createPingPongAnswerDocs() {
                 게시물 작성자가 아닌 사용자가 답변을 등록하려는 경우 (`${PingPongErrorCode.NotUserKeywordOwner.code}`)
 
                 - UI 메시지: "게시물 작성자만 답변할 수 있어요."
+
+                질문자와 차단 관계인 경우 (`${PingPongErrorCode.CannotAnswerBlockedQuestioner.code}`)
+
+                - UI 메시지: "답변할 수 없는 질문이에요."
             """.trimIndent()
         }
         code(HttpStatusCode.NotFound) {
@@ -160,6 +188,53 @@ private fun RouteConfig.createPingPongAnswerDocs() {
                 이미 답변이 등록된 질문인 경우 (`${PingPongErrorCode.AlreadyAnswered.code}`)
 
                 - UI 메시지: "이미 답변한 질문이에요."
+            """.trimIndent()
+        }
+    }
+}
+
+private fun RouteConfig.getPingPongsDocs() {
+    summary = "핑퐁 목록 조회"
+    description = """
+        게시물(사용자 키워드)에 달린 핑퐁(질문 + 답변) 목록을 최신순으로 조회한다. (커서 기반 페이지네이션)
+
+        - 신고 누적으로 숨김 처리된 질문, 비활성화된 질문자, 조회자와 차단 관계인 질문자의 핑퐁은 목록에서 제외된다.
+        - 단, 게시물 작성자가 조회하면 차단 관계인 질문자의 핑퐁(차단 전에 달린 질문)도 포함된다. (작성자가 삭제/신고할 수 있도록)
+        - 답변이 없거나 신고 누적으로 숨김 처리된 경우 `answer`는 `null`이다.
+    """.trimIndent()
+    request {
+        pathParameter<Long>("userKeywordId") {
+            description = "조회할 사용자 키워드(게시물) ID"
+        }
+        queryParameter<Long?>("cursor") {
+            description = "페이지네이션에 필요한 커서 값 (초기 호출 시 null 로 요청, 이후 응답의 nextCursor 사용)"
+        }
+        queryParameter<Int>("size") {
+            description = "페이지네이션에 필요한 페이지 크기 (1 ~ 25)"
+        }
+    }
+    response {
+        code(HttpStatusCode.OK) {
+            body<CursorPage<PingPongDetailResponse, Long>> {
+                description = "핑퐁 목록 (다음 페이지가 없으면 nextCursor는 null)"
+                example("CursorPage(PingPongDetailResponse)") {
+                    value = PingPongDetailResponse.sample
+                }
+            }
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = """
+                게시물 ID가 0 이하이거나, 커서가 0 이하인 경우 (`${CommonErrorCode.ValidationDefault.code}`),
+                게시물 ID 또는 페이지 크기 형식이 잘못되었거나, 페이지 크기가 1 ~ 25 범위를 벗어난 경우 (`${CommonErrorCode.MalformedRequest.code}`)
+
+                - UI 메시지: "요청을 처리할 수 없어요. 잠시 후 다시 시도해 주세요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.NotFound) {
+            description = """
+                게시물을 조회할 수 없는 경우 (존재하지 않음, 비활성화, 차단 관계) (`${PingPongErrorCode.UserKeywordNotFound.code}`)
+
+                - UI 메시지: "삭제되었거나 볼 수 없는 게시물이에요."
             """.trimIndent()
         }
     }

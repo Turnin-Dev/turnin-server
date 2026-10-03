@@ -23,6 +23,9 @@ sealed class PingPongErrorCode(
 
     /** 이미 답변이 등록된 질문에 답변을 등록하려는 경우 */
     data object AlreadyAnswered : PingPongErrorCode(PP005, "이미 답변이 등록된 질문입니다.")
+
+    /** 차단 관계(양방향)인 질문자의 질문에 답변을 등록하려는 경우 (차단 방향은 노출하지 않는다) */
+    data object CannotAnswerBlockedQuestioner : PingPongErrorCode(PP006, "답변할 수 없는 질문입니다.")
 }
 
 private const val PP001 = "PP001"
@@ -30,3 +33,4 @@ private const val PP002 = "PP002"
 private const val PP003 = "PP003"
 private const val PP004 = "PP004"
 private const val PP005 = "PP005"
+private const val PP006 = "PP006"
