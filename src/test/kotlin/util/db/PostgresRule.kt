@@ -27,6 +27,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insertIgnore
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect
@@ -72,7 +73,11 @@ private object TestDBContainerFactory {
             driver = "org.postgresql.Driver",
             user = container.username,
             password = container.password,
-        )
+        ).also {
+            // 테스트마다 새 컨테이너로 연결되므로, 현재 컨테이너를 기본 DB로 지정한다.
+            // (지정하지 않으면 다른 스레드의 트랜잭션이 이전 테스트의 종료된 컨테이너로 연결될 수 있다)
+            TransactionManager.defaultDatabase = it
+        }
 
         transaction(database) {
             // pgvector 확장 기능 활성화 (매우 중요)
@@ -175,6 +180,9 @@ private object TestDBContainerFactory {
 
     fun shutdown() {
         container.stop()
+        if (TransactionManager.defaultDatabase == database) {
+            TransactionManager.defaultDatabase = null
+        }
         database = null
     }
 
