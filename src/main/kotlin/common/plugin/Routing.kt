@@ -17,6 +17,8 @@ import com.turnin.domain.auth.presentation.route.authAdminRoutes
 import com.turnin.domain.auth.presentation.route.authRoutes
 import com.turnin.domain.block.application.usecase.BlockUseCases
 import com.turnin.domain.block.presentation.route.blockRoutes
+import com.turnin.domain.contentReport.application.usecase.ContentReportUseCases
+import com.turnin.domain.contentReport.presentation.route.contentReportRoutes
 import com.turnin.domain.discover.application.usecase.DiscoverUseCases
 import com.turnin.domain.discover.presentation.route.discoverRoutes
 import com.turnin.domain.feed.application.usecase.FeedUseCases
@@ -62,6 +64,7 @@ fun Application.configureRouting() {
     val userKeywordUseCases by inject<UserKeywordUseCases>()
     val pingPongUseCases by inject<PingPongUseCases>()
     val reportUseCases by inject<ReportUseCases>()
+    val contentReportUseCases by inject<ContentReportUseCases>()
     val friendUseCases by inject<FriendUseCases>()
     val discoverUseCases by inject<DiscoverUseCases>()
     val feedUseCases by inject<FeedUseCases>()
@@ -90,6 +93,7 @@ fun Application.configureRouting() {
                         userKeywordRoutes(route = Api.V1.UserKeyword, usecase = userKeywordUseCases)
                         pingPongRoutes(route = Api.V1.PingPong, usecase = pingPongUseCases)
                         reportRoutes(route = Api.V1.Report, usecase = reportUseCases)
+                        contentReportRoutes(route = Api.V1.ContentReport, usecase = contentReportUseCases)
                         friendRoutes(route = Api.V1.Friend, usecase = friendUseCases)
                         discoverRoutes(route = Api.V1.Discover, usecase = discoverUseCases)
                         feedRoutes(route = Api.V1.Feed, usecase = feedUseCases)

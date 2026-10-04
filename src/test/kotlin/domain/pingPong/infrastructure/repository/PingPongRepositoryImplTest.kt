@@ -12,6 +12,7 @@ import com.turnin.common.db.schema.UserKeywordEntity
 import com.turnin.common.db.schema.Users
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
+import com.turnin.common.model.id.PingPongAnswerId
 import com.turnin.common.model.id.PingPongId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
@@ -21,8 +22,10 @@ import com.turnin.util.db.setUserInactiveForTest
 import java.time.Instant
 import java.time.OffsetDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
@@ -612,6 +615,315 @@ class PingPongRepositoryImplTest {
         // then
         assertEquals(emptyList(), result)
     }
+
+    @Test
+    fun `질문별 답변 조회 시 답변이 있으면 해당 답변을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        val result = repository.findVisibleAnswerByPingPongId(pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertEquals(answer.id, result.id)
+        assertEquals(pingPong.id, result.pingPongId)
+        assertEquals("답변 내용", result.answer.value)
+    }
+
+    @Test
+    fun `질문별 답변 조회 시 답변이 없으면 null을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+
+        // when
+        val result = repository.findVisibleAnswerByPingPongId(pingPong.id)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `질문별 답변 조회 시 숨김 처리된 답변이면 null을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+        setAnswerHiddenAt(answer.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        val result = repository.findVisibleAnswerByPingPongId(pingPong.id)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `답변자 정보와 함께 답변 조회 시 게시물 작성자를 답변자로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        val result = repository.findVisibleAnswerWithAnswererById(answer.id)
+
+        // then
+        assertNotNull(result)
+        assertEquals(ownerId, result.answererId)
+        assertEquals(answer.id, result.answer.id)
+        assertEquals(pingPong.id, result.answer.pingPongId)
+        assertEquals("답변 내용", result.answer.answer.value)
+    }
+
+    @Test
+    fun `답변자 정보와 함께 답변 조회 시 숨김 처리된 답변이면 null을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+        setAnswerHiddenAt(answer.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        val result = repository.findVisibleAnswerWithAnswererById(answer.id)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `답변자 정보와 함께 답변 조회 시 답변이 달린 질문이 숨김 처리되었으면 null을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+        setQuestionHiddenAt(pingPong.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        val result = repository.findVisibleAnswerWithAnswererById(answer.id)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `답변자 정보와 함께 답변 조회 시 답변이 없으면 null을 반환한다`() = runTest {
+        // given
+        val notExistsAnswerId = PingPongAnswerId(999L)
+
+        // when
+        val result = repository.findVisibleAnswerWithAnswererById(notExistsAnswerId)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `핑퐁 삭제 시 핑퐁과 연결된 답변이 함께 삭제되고 true를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        val result = repository.delete(pingPong.id)
+
+        // then
+        assertTrue(result)
+        val (pingPongCount, answerCount) = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.count() to
+                PingPongAnswers.selectAll().where { PingPongAnswers.pingPongId eq pingPong.id.value }.count()
+        }
+        assertEquals(0, pingPongCount)
+        assertEquals(0, answerCount)
+    }
+
+    @Test
+    fun `핑퐁 삭제 시 핑퐁이 없으면 false를 반환한다`() = runTest {
+        // given
+        val notExistsPingPongId = PingPongId(999L)
+
+        // when
+        val result = repository.delete(notExistsPingPongId)
+
+        // then
+        assertFalse(result)
+    }
+
+    @Test
+    fun `답변 삭제 시 답변만 삭제되고 질문은 유지되며 true를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        val result = repository.deleteAnswer(answer.id)
+
+        // then
+        assertTrue(result)
+        val (pingPongCount, answerCount) = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.count() to
+                PingPongAnswers.selectAll().where { PingPongAnswers.id eq answer.id.value }.count()
+        }
+        assertEquals(1, pingPongCount)
+        assertEquals(0, answerCount)
+    }
+
+    @Test
+    fun `답변 삭제 시 답변이 없으면 false를 반환한다`() = runTest {
+        // given
+        val notExistsAnswerId = PingPongAnswerId(999L)
+
+        // when
+        val result = repository.deleteAnswer(notExistsAnswerId)
+
+        // then
+        assertFalse(result)
+    }
+
+    @Test
+    fun `핑퐁 숨김 처리 시 숨김 시각을 기록하고 true를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+
+        // when
+        val result = repository.hide(pingPong.id)
+
+        // then
+        assertTrue(result)
+        val hiddenAt = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.single()[PingPongs.questionHiddenAt]
+        }
+        assertNotNull(hiddenAt)
+    }
+
+    @Test
+    fun `핑퐁 숨김 처리 시 이미 숨김 처리된 핑퐁이면 숨김 시각을 유지하고 false를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        setQuestionHiddenAt(pingPong.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        val result = repository.hide(pingPong.id)
+
+        // then
+        assertFalse(result)
+        val hiddenAt = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.single()[PingPongs.questionHiddenAt]
+        }
+        assertEquals(OffsetDateTime.parse("2026-01-01T00:00:00Z").toInstant(), hiddenAt?.toInstant())
+    }
+
+    @Test
+    fun `핑퐁 숨김 처리 시 핑퐁이 없으면 false를 반환한다`() = runTest {
+        // given
+        val notExistsPingPongId = PingPongId(999L)
+
+        // when
+        val result = repository.hide(notExistsPingPongId)
+
+        // then
+        assertFalse(result)
+    }
+
+    @Test
+    fun `답변 숨김 처리 시 숨김 시각을 기록하고 true를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        val result = repository.hideAnswer(answer.id)
+
+        // then
+        assertTrue(result)
+        val hiddenAt = TestDatabaseFactory.dbQuery {
+            PingPongAnswers
+                .selectAll()
+                .where { PingPongAnswers.id eq answer.id.value }
+                .single()[PingPongAnswers.hiddenAt]
+        }
+        assertNotNull(hiddenAt)
+    }
+
+    @Test
+    fun `답변 숨김 처리 시 이미 숨김 처리된 답변이면 숨김 시각을 유지하고 false를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.create(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+        setAnswerHiddenAt(answer.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        val result = repository.hideAnswer(answer.id)
+
+        // then
+        assertFalse(result)
+        val hiddenAt = TestDatabaseFactory.dbQuery {
+            PingPongAnswers
+                .selectAll()
+                .where { PingPongAnswers.id eq answer.id.value }
+                .single()[PingPongAnswers.hiddenAt]
+        }
+        assertEquals(OffsetDateTime.parse("2026-01-01T00:00:00Z").toInstant(), hiddenAt?.toInstant())
+    }
+
+    @Test
+    fun `답변 숨김 처리 시 답변이 없으면 false를 반환한다`() = runTest {
+        // given
+        val notExistsAnswerId = PingPongAnswerId(999L)
+
+        // when
+        val result = repository.hideAnswer(notExistsAnswerId)
+
+        // then
+        assertFalse(result)
+    }
+
+    private suspend fun setQuestionHiddenAt(pingPongId: PingPongId, hiddenAt: OffsetDateTime) =
+        TestDatabaseFactory.dbQuery {
+            PingPongs.update({ PingPongs.id eq pingPongId.value }) {
+                it[questionHiddenAt] = hiddenAt
+            }
+        }
+
+    private suspend fun setAnswerHiddenAt(pingPongAnswerId: PingPongAnswerId, hiddenAt: OffsetDateTime) =
+        TestDatabaseFactory.dbQuery {
+            PingPongAnswers.update({ PingPongAnswers.id eq pingPongAnswerId.value }) {
+                it[PingPongAnswers.hiddenAt] = hiddenAt
+            }
+        }
 
     private suspend fun insertUserAndReturnId(
         uniqueValue: String,

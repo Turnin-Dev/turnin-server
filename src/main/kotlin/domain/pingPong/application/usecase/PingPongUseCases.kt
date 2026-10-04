@@ -7,4 +7,8 @@ data class PingPongUseCases(
     val createAnswer: CreatePingPongAnswerUseCase,
     /** @see GetPingPongsUseCase */
     val getPingPongs: GetPingPongsUseCase,
+    /** @see DeletePingPongUseCase */
+    val delete: DeletePingPongUseCase,
+    /** @see DeletePingPongAnswerUseCase */
+    val deleteAnswer: DeletePingPongAnswerUseCase,
 )

@@ -15,13 +15,16 @@ import com.turnin.domain.pingPong.domain.model.PingPongContentValidationExceptio
 import com.turnin.domain.pingPong.exception.PingPongException
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongAnswerRequest
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongRequest
+import com.turnin.util.testDeleteEndpoint
 import com.turnin.util.testGetEndpoint
 import com.turnin.util.testPlugin
 import com.turnin.util.testPostEndpoint
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.Test
 
@@ -796,6 +799,343 @@ class PingPongRouteTest {
         testGetEndpoint(
             endpoint = route.byUserKeyword("3"),
             queryParameters = mapOf("size" to "10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.InternalServerError,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 성공 시 204를 반환한다`() = testApplication {
+        coEvery { usecase.delete(UserId(1L), any()) } just Runs
+
+        testDeleteEndpoint(
+            endpoint = route.byId("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NoContent,
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 토큰의 사용자 ID와 경로의 핑퐁 ID를 유스케이스에 전달한다`() = testApplication {
+        coEvery { usecase.delete(UserId(1L), any()) } just Runs
+
+        testDeleteEndpoint(
+            endpoint = route.byId("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NoContent,
+            additionalAssertions = {
+                coVerify(exactly = 1) { usecase.delete(UserId(1L), 10L) }
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        testDeleteEndpoint(
+            endpoint = route.byId("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 핑퐁 ID가 숫자가 아니면 400 에러를 반환한다`() = testApplication {
+        testDeleteEndpoint(
+            endpoint = route.byId("abc"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 유효성 검사 실패 시 400 에러를 반환한다`() = testApplication {
+        coEvery {
+            usecase.delete(UserId(1L), any())
+        } throws PingPongIdValidationException("핑퐁 ID는 0이나 음수가 될 수 없습니다.")
+
+        testDeleteEndpoint(
+            endpoint = route.byId("0"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.BadRequest,
+            responseValidator = {
+                containsAll(CommonErrorCode.ValidationDefault.code, "핑퐁 ID는 0이나 음수가 될 수 없습니다.")
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 삭제 권한이 없으면 403 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.NoPermissionToDelete()
+        coEvery { usecase.delete(UserId(1L), any()) } throws expectedException
+
+        testDeleteEndpoint(
+            endpoint = route.byId("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.Forbidden,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 핑퐁을 찾을 수 없으면 404 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.PingPongNotFound()
+        coEvery { usecase.delete(UserId(1L), any()) } throws expectedException
+
+        testDeleteEndpoint(
+            endpoint = route.byId("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NotFound,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 삭제 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        val expectedException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery { usecase.delete(UserId(1L), any()) } throws expectedException
+
+        testDeleteEndpoint(
+            endpoint = route.byId("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.InternalServerError,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 성공 시 204를 반환한다`() = testApplication {
+        coEvery { usecase.deleteAnswer(UserId(1L), any()) } just Runs
+
+        testDeleteEndpoint(
+            endpoint = route.answer("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NoContent,
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 토큰의 사용자 ID와 경로의 핑퐁 ID를 유스케이스에 전달한다`() = testApplication {
+        coEvery { usecase.deleteAnswer(UserId(1L), any()) } just Runs
+
+        testDeleteEndpoint(
+            endpoint = route.answer("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NoContent,
+            additionalAssertions = {
+                coVerify(exactly = 1) { usecase.deleteAnswer(UserId(1L), 10L) }
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
+        testDeleteEndpoint(
+            endpoint = route.answer("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = null,
+            expectedStatus = HttpStatusCode.Unauthorized,
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 핑퐁 ID가 숫자가 아니면 400 에러를 반환한다`() = testApplication {
+        testDeleteEndpoint(
+            endpoint = route.answer("abc"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.BadRequest,
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 유효성 검사 실패 시 400 에러를 반환한다`() = testApplication {
+        coEvery {
+            usecase.deleteAnswer(UserId(1L), any())
+        } throws PingPongIdValidationException("핑퐁 ID는 0이나 음수가 될 수 없습니다.")
+
+        testDeleteEndpoint(
+            endpoint = route.answer("0"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.BadRequest,
+            responseValidator = {
+                containsAll(CommonErrorCode.ValidationDefault.code, "핑퐁 ID는 0이나 음수가 될 수 없습니다.")
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 삭제 권한이 없으면 403 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.NoPermissionToDelete()
+        coEvery { usecase.deleteAnswer(UserId(1L), any()) } throws expectedException
+
+        testDeleteEndpoint(
+            endpoint = route.answer("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.Forbidden,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 핑퐁을 찾을 수 없으면 404 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.PingPongNotFound()
+        coEvery { usecase.deleteAnswer(UserId(1L), any()) } throws expectedException
+
+        testDeleteEndpoint(
+            endpoint = route.answer("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NotFound,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 답변을 찾을 수 없으면 404 에러를 반환한다`() = testApplication {
+        val expectedException = PingPongException.PingPongAnswerNotFound()
+        coEvery { usecase.deleteAnswer(UserId(1L), any()) } throws expectedException
+
+        testDeleteEndpoint(
+            endpoint = route.answer("10"),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { pingPongRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = "1",
+            expectedStatus = HttpStatusCode.NotFound,
+            responseValidator = {
+                containsAll(
+                    expectedException.errorCode.code,
+                    expectedException.errorCode.description,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `핑퐁 답변 삭제 - 예외 발생 시 정상적으로 에러 바디를 반환한다`() = testApplication {
+        val expectedException = ApiException(
+            errorCode = CommonErrorCode.Unexpected,
+            status = HttpStatusCode.InternalServerError,
+            message = "unexpected error",
+        )
+        coEvery { usecase.deleteAnswer(UserId(1L), any()) } throws expectedException
+
+        testDeleteEndpoint(
+            endpoint = route.answer("10"),
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },

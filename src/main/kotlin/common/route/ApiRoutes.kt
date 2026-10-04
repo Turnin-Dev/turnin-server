@@ -91,7 +91,14 @@ object Api {
 
             fun byUserKeyword(pathParam: String): String = "${UserKeyword.ROUTE}/$pathParam$ROUTE"
 
+            fun byId(pathParam: String): String = "$ROUTE/$pathParam"
+
             fun answer(pathParam: String): String = "$ROUTE/$pathParam/answer"
+        }
+
+        object ContentReport {
+            const val ROUTE = "/content-report"
+            const val TAG = "ContentReport"
         }
 
         object Report {

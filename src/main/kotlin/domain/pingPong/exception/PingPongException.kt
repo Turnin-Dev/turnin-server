@@ -55,4 +55,18 @@ sealed class PingPongException(
             code = PingPongErrorCode.CannotAnswerBlockedQuestioner,
             status = HttpStatusCode.Forbidden,
         )
+
+    /** 질문자/게시물 작성자가 아닌 사용자가 질문을 삭제하거나, 게시물 작성자가 아닌 사용자가 답변을 삭제하려는 경우 */
+    class NoPermissionToDelete :
+        PingPongException(
+            code = PingPongErrorCode.NoPermissionToDelete,
+            status = HttpStatusCode.Forbidden,
+        )
+
+    /** 핑퐁 답변이 없거나, 신고 누적으로 숨김 처리된 경우 */
+    class PingPongAnswerNotFound :
+        PingPongException(
+            code = PingPongErrorCode.PingPongAnswerNotFound,
+            status = HttpStatusCode.NotFound,
+        )
 }

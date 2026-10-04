@@ -18,6 +18,7 @@ import com.turnin.domain.pingPong.presentation.dto.PingPongDetailResponse
 import com.turnin.domain.pingPong.presentation.dto.PingPongResponse
 import com.turnin.domain.pingPong.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
@@ -80,6 +81,24 @@ fun AuthenticatedRoute.pingPongRoutes(route: Api.V1.PingPong, usecase: PingPongU
                 pingPongDetailDto.toResponse()
             }
             call.respond(HttpStatusCode.OK, response)
+        }
+
+        delete(route.byId(pathParam = "{pingPongId}"), { deletePingPongDocs() }) {
+            val pingPongIdParam = call.parameters["pingPongId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("핑퐁 ID")
+            val requesterId = extractUserIdWithToken()
+            usecase.delete(requesterId, pingPongIdParam)
+            call.respond(HttpStatusCode.NoContent)
+        }
+
+        delete(route.answer(pathParam = "{pingPongId}"), { deletePingPongAnswerDocs() }) {
+            val pingPongIdParam = call.parameters["pingPongId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("핑퐁 ID")
+            val requesterId = extractUserIdWithToken()
+            usecase.deleteAnswer(requesterId, pingPongIdParam)
+            call.respond(HttpStatusCode.NoContent)
         }
     }
 }
@@ -235,6 +254,93 @@ private fun RouteConfig.getPingPongsDocs() {
                 게시물을 조회할 수 없는 경우 (존재하지 않음, 비활성화, 차단 관계) (`${PingPongErrorCode.UserKeywordNotFound.code}`)
 
                 - UI 메시지: "삭제되었거나 볼 수 없는 게시물이에요."
+            """.trimIndent()
+        }
+    }
+}
+
+private fun RouteConfig.deletePingPongDocs() {
+    summary = "핑퐁(질문) 삭제"
+    description = """
+        핑퐁(질문)을 삭제한다. 질문에 달린 답변도 함께 삭제된다.
+
+        - 질문자 본인 또는 질문이 달린 게시물(사용자 키워드)의 작성자만 삭제할 수 있다.
+        - 차단 관계여도 차단 전에 달린 질문은 각 사용자가 직접 삭제할 수 있다.
+    """.trimIndent()
+    request {
+        pathParameter<Long>("pingPongId") {
+            description = "삭제할 핑퐁(질문) ID"
+        }
+    }
+    response {
+        code(HttpStatusCode.NoContent) {
+            description = "삭제 성공"
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = """
+                핑퐁 ID가 0 이하인 경우 (`${CommonErrorCode.ValidationDefault.code}`),
+                핑퐁 ID 형식이 잘못된 경우 (`${CommonErrorCode.MalformedRequest.code}`)
+
+                - UI 메시지: "요청을 처리할 수 없어요. 잠시 후 다시 시도해 주세요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.Forbidden) {
+            description = """
+                질문자도 게시물 작성자도 아닌 사용자가 삭제하려는 경우 (`${PingPongErrorCode.NoPermissionToDelete.code}`)
+
+                - UI 메시지: "삭제할 수 없는 질문이에요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.NotFound) {
+            description = """
+                핑퐁(질문)이 없거나 숨김 처리된 경우 (`${PingPongErrorCode.PingPongNotFound.code}`)
+
+                - UI 메시지: "이미 삭제되었거나 볼 수 없는 질문이에요."
+            """.trimIndent()
+        }
+    }
+}
+
+private fun RouteConfig.deletePingPongAnswerDocs() {
+    summary = "핑퐁 답변 삭제"
+    description = """
+        핑퐁(질문)에 달린 답변을 삭제한다. 질문은 유지되며, 삭제 후 다시 답변할 수 있다.
+
+        - 질문이 달린 게시물(사용자 키워드)의 작성자만 삭제할 수 있다.
+    """.trimIndent()
+    request {
+        pathParameter<Long>("pingPongId") {
+            description = "삭제할 답변이 달린 핑퐁(질문) ID"
+        }
+    }
+    response {
+        code(HttpStatusCode.NoContent) {
+            description = "삭제 성공"
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = """
+                핑퐁 ID가 0 이하인 경우 (`${CommonErrorCode.ValidationDefault.code}`),
+                핑퐁 ID 형식이 잘못된 경우 (`${CommonErrorCode.MalformedRequest.code}`)
+
+                - UI 메시지: "요청을 처리할 수 없어요. 잠시 후 다시 시도해 주세요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.Forbidden) {
+            description = """
+                게시물 작성자가 아닌 사용자가 삭제하려는 경우 (`${PingPongErrorCode.NoPermissionToDelete.code}`)
+
+                - UI 메시지: "삭제할 수 없는 답변이에요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.NotFound) {
+            description = """
+                핑퐁(질문)이 없거나 숨김 처리된 경우 (`${PingPongErrorCode.PingPongNotFound.code}`)
+
+                - UI 메시지: "이미 삭제되었거나 볼 수 없는 질문이에요."
+
+                답변이 없거나 숨김 처리된 경우 (`${PingPongErrorCode.PingPongAnswerNotFound.code}`)
+
+                - UI 메시지: "이미 삭제되었거나 볼 수 없는 답변이에요."
             """.trimIndent()
         }
     }
