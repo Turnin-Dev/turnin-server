@@ -55,13 +55,13 @@ internal object PingPongMapper {
                 userName = UserName(this[Users.name]),
                 profileImageUrl = this[Users.profileImageUrl],
             ),
-            answer = this.getOrNull(PingPongAnswers.id)?.let { this.toPingPongAnswer() },
+            answer = this.getOrNull(PingPongAnswers.id)?.let { this.toAnswer() },
         )
 
     /**
      * `ping_pong_answer` 컬럼을 포함한 조회 결과를 [PingPongAnswer]로 변환한다.
      */
-    fun ResultRow.toPingPongAnswer(): PingPongAnswer =
+    fun ResultRow.toAnswer(): PingPongAnswer =
         PingPongAnswer(
             id = PingPongAnswerId(this[PingPongAnswers.id].value),
             pingPongId = PingPongId(this[PingPongAnswers.pingPongId].value),

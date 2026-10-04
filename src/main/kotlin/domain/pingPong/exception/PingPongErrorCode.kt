@@ -15,7 +15,7 @@ sealed class PingPongErrorCode(
     /** 본인 게시물에 질문을 등록하려는 경우 */
     data object CannotQuestionOwnUserKeyword : PingPongErrorCode(PP002, "본인 게시물에는 질문을 등록할 수 없습니다.")
 
-    /** 핑퐁(질문)을 찾을 수 없는 경우 */
+    /** 핑퐁을 찾을 수 없는 경우 */
     data object PingPongNotFound : PingPongErrorCode(PP003, "핑퐁을 찾을 수 없습니다.")
 
     /** 게시물 작성자가 아닌 사용자가 답변을 등록하려는 경우 */
@@ -28,9 +28,9 @@ sealed class PingPongErrorCode(
     data object CannotAnswerBlockedQuestioner : PingPongErrorCode(PP006, "답변할 수 없는 질문입니다.")
 
     /** 질문자/게시물 작성자가 아닌 사용자가 질문을 삭제하거나, 게시물 작성자가 아닌 사용자가 답변을 삭제하려는 경우 */
-    data object NoPermissionToDelete : PingPongErrorCode(PP007, "핑퐁을 삭제할 권한이 없습니다.")
+    data object NoPermissionToDelete : PingPongErrorCode(PP007, "삭제할 권한이 없습니다.")
 
-    /** 핑퐁 답변을 찾을 수 없는 경우 */
+    /** 답변을 찾을 수 없는 경우 */
     data object PingPongAnswerNotFound : PingPongErrorCode(PP008, "답변을 찾을 수 없습니다.")
 }
 

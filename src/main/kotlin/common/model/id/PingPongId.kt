@@ -7,7 +7,7 @@ class PingPongIdValidationException(message: String) : ValidatorException(messag
 @JvmInline
 value class PingPongId private constructor(val value: Long) {
     /**
-     * 핑퐁(질문) ID VO
+     * 핑퐁 ID VO
      *
      * @throws ValidatorException
      */

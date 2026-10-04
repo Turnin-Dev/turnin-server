@@ -94,13 +94,13 @@ class ReportableContentProviderImplTest {
     @Test
     fun `핑퐁 질문 숨김 처리 시 해당 질문을 숨김 처리한다`() = runTest {
         // given
-        coEvery { pingPongRepository.hide(PingPongId(10L)) } returns true
+        coEvery { pingPongRepository.hideQuestion(PingPongId(10L)) } returns true
 
         // when
         provider.hide(ContentReportType.PING_PONG_QUESTION, 10L)
 
         // then
-        coVerify(exactly = 1) { pingPongRepository.hide(PingPongId(10L)) }
+        coVerify(exactly = 1) { pingPongRepository.hideQuestion(PingPongId(10L)) }
     }
 
     @Test

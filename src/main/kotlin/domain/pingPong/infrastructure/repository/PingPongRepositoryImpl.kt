@@ -22,8 +22,8 @@ import com.turnin.domain.pingPong.domain.model.PingPongAnswerWithAnswerer
 import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.domain.pingPong.domain.model.PingPongDetail
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
+import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toAnswer
 import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toDomain
-import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toPingPongAnswer
 import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toPingPongDetail
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.JoinType
@@ -35,7 +35,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
 
 class PingPongRepositoryImpl : PingPongRepository {
-    override suspend fun create(
+    override suspend fun createQuestion(
         userKeywordId: UserKeywordId,
         questionerId: UserId,
         question: PingPongContent,
@@ -110,12 +110,12 @@ class PingPongRepositoryImpl : PingPongRepository {
         pingPongId: PingPongId,
         answer: PingPongContent,
     ): PingPongAnswer = suspendTransaction {
-        val savedPingPongAnswerEntity = PingPongAnswerEntity.new {
+        val savedAnswerEntity = PingPongAnswerEntity.new {
             this.pingPongId = EntityID(pingPongId.value, PingPongs)
             this.answer = answer.value
         }
 
-        savedPingPongAnswerEntity.toDomain()
+        savedAnswerEntity.toDomain()
     }
 
     override suspend fun findVisibleAnswerByPingPongId(pingPongId: PingPongId): PingPongAnswer? = suspendTransaction {
@@ -126,7 +126,7 @@ class PingPongRepositoryImpl : PingPongRepository {
     }
 
     override suspend fun findVisibleAnswerWithAnswererById(
-        pingPongAnswerId: PingPongAnswerId,
+        answerId: PingPongAnswerId,
     ): PingPongAnswerWithAnswerer? = suspendTransaction {
         // 답변자 = 질문이 달린 게시물(사용자 키워드)의 작성자
         PingPongAnswers
@@ -146,35 +146,35 @@ class PingPongRepositoryImpl : PingPongRepository {
                 PingPongAnswers.updatedAt,
                 UserKeywords.userId,
             ).where {
-                (PingPongAnswers.id eq pingPongAnswerId.value) and
+                (PingPongAnswers.id eq answerId.value) and
                     PingPongAnswers.hiddenAt.isNull() and
                     PingPongs.questionHiddenAt.isNull()
             }.singleOrNull()
             ?.let { row ->
                 PingPongAnswerWithAnswerer(
-                    answer = row.toPingPongAnswer(),
+                    answer = row.toAnswer(),
                     answererId = UserId(row[UserKeywords.userId].value),
                 )
             }
     }
 
-    override suspend fun delete(pingPongId: PingPongId): Boolean = suspendTransaction {
+    override suspend fun deleteQuestion(pingPongId: PingPongId): Boolean = suspendTransaction {
         PingPongs.deleteWhere { PingPongs.id eq pingPongId.value } > 0
     }
 
-    override suspend fun deleteAnswer(pingPongAnswerId: PingPongAnswerId): Boolean = suspendTransaction {
-        PingPongAnswers.deleteWhere { PingPongAnswers.id eq pingPongAnswerId.value } > 0
+    override suspend fun deleteAnswer(answerId: PingPongAnswerId): Boolean = suspendTransaction {
+        PingPongAnswers.deleteWhere { PingPongAnswers.id eq answerId.value } > 0
     }
 
-    override suspend fun hide(pingPongId: PingPongId): Boolean = suspendTransaction {
+    override suspend fun hideQuestion(pingPongId: PingPongId): Boolean = suspendTransaction {
         PingPongs.updateWithTimestamp({ (PingPongs.id eq pingPongId.value) and PingPongs.questionHiddenAt.isNull() }) {
             it[questionHiddenAt] = TurninDateTime.now().toOffsetDateTime()
         } > 0
     }
 
-    override suspend fun hideAnswer(pingPongAnswerId: PingPongAnswerId): Boolean = suspendTransaction {
+    override suspend fun hideAnswer(answerId: PingPongAnswerId): Boolean = suspendTransaction {
         PingPongAnswers.updateWithTimestamp({
-            (PingPongAnswers.id eq pingPongAnswerId.value) and PingPongAnswers.hiddenAt.isNull()
+            (PingPongAnswers.id eq answerId.value) and PingPongAnswers.hiddenAt.isNull()
         }) {
             it[hiddenAt] = TurninDateTime.now().toOffsetDateTime()
         } > 0

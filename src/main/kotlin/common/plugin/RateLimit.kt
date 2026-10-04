@@ -30,8 +30,8 @@ enum class RateLimitToken(
     TOKEN_REFRESH("token_refresh", limit = 10, refillPeriod = 60.seconds),
     AUTHENTICATED_DEFAULT("authenticated_default", limit = 100, refillPeriod = 60.seconds),
     CREATE_KEYWORD("create_keyword", limit = 5, refillPeriod = 10.seconds),
-    CREATE_PING_PONG_BURST("create_ping_pong_burst", limit = 1, refillPeriod = 5.seconds),
-    CREATE_PING_PONG("create_ping_pong", limit = 5, refillPeriod = 60.seconds),
+    CREATE_PING_PONG_QUESTION_BURST("create_ping_pong_question_burst", limit = 1, refillPeriod = 5.seconds),
+    CREATE_PING_PONG_QUESTION("create_ping_pong_question", limit = 5, refillPeriod = 60.seconds),
     ADMIN("admin", limit = 60, refillPeriod = 60.seconds),
     ;
 
@@ -106,17 +106,17 @@ fun Application.configureRateLimit() {
             applyRateLimiter(RateLimitToken.CREATE_KEYWORD)
         }
 
-        // 핑퐁 작성: 동일 사용자가 동일 게시물에 5초당 1회 / 1분당 5회 (두 토큰을 중첩 적용)
-        register(RateLimitToken.CREATE_PING_PONG_BURST.ktorName) {
+        // 핑퐁 질문 작성: 동일 사용자가 동일 게시물에 5초당 1회 / 1분당 5회 (두 토큰을 중첩 적용)
+        register(RateLimitToken.CREATE_PING_PONG_QUESTION_BURST.ktorName) {
             applyRateLimiter(
-                token = RateLimitToken.CREATE_PING_PONG_BURST,
+                token = RateLimitToken.CREATE_PING_PONG_QUESTION_BURST,
                 requestKeySelector = { call -> call.getUserKeywordScopedRequestKey() },
             )
         }
 
-        register(RateLimitToken.CREATE_PING_PONG.ktorName) {
+        register(RateLimitToken.CREATE_PING_PONG_QUESTION.ktorName) {
             applyRateLimiter(
-                token = RateLimitToken.CREATE_PING_PONG,
+                token = RateLimitToken.CREATE_PING_PONG_QUESTION,
                 requestKeySelector = { call -> call.getUserKeywordScopedRequestKey() },
             )
         }

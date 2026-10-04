@@ -10,7 +10,7 @@ import com.turnin.domain.pingPong.domain.repository.PingPongRepository
  */
 class PingPongContentReportApi(private val pingPongRepository: PingPongRepository) {
     /**
-     * 노출 중인 핑퐁(질문)을 신고 대상 정보로 조회한다.
+     * 노출 중인 질문을 신고 대상 정보로 조회한다.
      *
      * @param pingPongId 핑퐁 ID
      *
@@ -22,32 +22,32 @@ class PingPongContentReportApi(private val pingPongRepository: PingPongRepositor
         }
 
     /**
-     * 노출 중인 핑퐁 답변을 신고 대상 정보로 조회한다.
+     * 노출 중인 답변을 신고 대상 정보로 조회한다.
      *
-     * @param pingPongAnswerId 핑퐁 답변 ID
+     * @param answerId 답변 ID
      *
      * @return 노출 중인 답변이 있다면 [ReportablePingPongContentDto]를 반환하고, 답변 또는 질문이 없거나 숨김 처리되었다면 `null`을 반환한다.
      */
-    suspend fun findVisibleAnswer(pingPongAnswerId: PingPongAnswerId): ReportablePingPongContentDto? =
-        pingPongRepository.findVisibleAnswerWithAnswererById(pingPongAnswerId)?.let {
+    suspend fun findVisibleAnswer(answerId: PingPongAnswerId): ReportablePingPongContentDto? =
+        pingPongRepository.findVisibleAnswerWithAnswererById(answerId)?.let {
             ReportablePingPongContentDto(authorId = it.answererId, content = it.answer.answer.value)
         }
 
     /**
-     * 핑퐁(질문)을 숨김 처리한다.
+     * 질문을 숨김 처리한다.
      *
      * @param pingPongId 핑퐁 ID
      */
     suspend fun hideQuestion(pingPongId: PingPongId) {
-        pingPongRepository.hide(pingPongId)
+        pingPongRepository.hideQuestion(pingPongId)
     }
 
     /**
-     * 핑퐁 답변을 숨김 처리한다.
+     * 답변을 숨김 처리한다.
      *
-     * @param pingPongAnswerId 핑퐁 답변 ID
+     * @param answerId 답변 ID
      */
-    suspend fun hideAnswer(pingPongAnswerId: PingPongAnswerId) {
-        pingPongRepository.hideAnswer(pingPongAnswerId)
+    suspend fun hideAnswer(answerId: PingPongAnswerId) {
+        pingPongRepository.hideAnswer(answerId)
     }
 }

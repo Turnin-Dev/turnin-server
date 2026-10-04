@@ -68,7 +68,7 @@ class CreatePingPongAnswerUseCaseTest {
         coEvery { blockProvider.isBlockedRelationship(UserId(2L), UserId(1L)) } returns false
         coEvery {
             pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
-        } returns TestPingPongAnswer
+        } returns TestAnswer
 
         // when
         usecase(UserId(2L), 10L, "답변 내용")
@@ -187,7 +187,7 @@ class CreatePingPongAnswerUseCaseTest {
             createdAt = 1000L,
             updatedAt = 1000L,
         )
-        private val TestPingPongAnswer = PingPongAnswer(
+        private val TestAnswer = PingPongAnswer(
             id = PingPongAnswerId(20L),
             pingPongId = PingPongId(10L),
             answer = PingPongContent("답변 내용"),

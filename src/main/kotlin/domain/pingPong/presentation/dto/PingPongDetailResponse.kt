@@ -8,9 +8,9 @@ import kotlinx.serialization.Serializable
 /**
  * 핑퐁 상세 응답 바디 (목록 조회용)
  *
- * @property pingPong 핑퐁(질문)
+ * @property pingPong 핑퐁
  * @property questioner 질문자 정보
- * @property answer 핑퐁 답변 (답변이 없거나 숨김 처리된 경우 `null`)
+ * @property answer 답변 (답변이 없거나 숨김 처리된 경우 `null`)
  */
 @Serializable
 data class PingPongDetailResponse(

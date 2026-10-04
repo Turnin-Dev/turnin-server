@@ -27,7 +27,7 @@ sealed class PingPongException(
             status = HttpStatusCode.BadRequest,
         )
 
-    /** 핑퐁(질문)이 없거나, 신고 누적으로 숨김 처리된 경우 */
+    /** 핑퐁이 없거나, 질문이 신고 누적으로 숨김 처리된 경우 */
     class PingPongNotFound :
         PingPongException(
             code = PingPongErrorCode.PingPongNotFound,
@@ -63,7 +63,7 @@ sealed class PingPongException(
             status = HttpStatusCode.Forbidden,
         )
 
-    /** 핑퐁 답변이 없거나, 신고 누적으로 숨김 처리된 경우 */
+    /** 답변이 없거나, 신고 누적으로 숨김 처리된 경우 */
     class PingPongAnswerNotFound :
         PingPongException(
             code = PingPongErrorCode.PingPongAnswerNotFound,

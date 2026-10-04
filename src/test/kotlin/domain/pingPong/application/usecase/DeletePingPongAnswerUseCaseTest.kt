@@ -29,7 +29,7 @@ class DeletePingPongAnswerUseCaseTest {
         val ownerId = UserId(2L)
         coEvery { pingPongRepository.findVisibleById(PingPongId(10L)) } returns TestPingPong
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
-        coEvery { pingPongRepository.findVisibleAnswerByPingPongId(PingPongId(10L)) } returns TestPingPongAnswer.copy(
+        coEvery { pingPongRepository.findVisibleAnswerByPingPongId(PingPongId(10L)) } returns TestAnswer.copy(
             id = PingPongAnswerId(20L),
         )
         coEvery { pingPongRepository.deleteAnswer(PingPongAnswerId(20L)) } returns true
@@ -114,7 +114,7 @@ class DeletePingPongAnswerUseCaseTest {
             createdAt = 1000L,
             updatedAt = 1000L,
         )
-        private val TestPingPongAnswer = PingPongAnswer(
+        private val TestAnswer = PingPongAnswer(
             id = PingPongAnswerId(20L),
             pingPongId = PingPongId(10L),
             answer = PingPongContent("답변 내용"),

@@ -7,7 +7,7 @@ import com.turnin.common.db.DatabaseUtils.timestamptz
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
 
-/** 핑퐁(질문) 엔티티 클래스 (Exposed DSL 방식) */
+/** 핑퐁 엔티티 클래스 (Exposed DSL 방식) */
 object PingPongs : BaseLongIdTable("ping_pong") {
     const val MAX_CONTENT_LENGTH = 2200
 
@@ -28,7 +28,7 @@ object PingPongs : BaseLongIdTable("ping_pong") {
     }
 }
 
-/** 핑퐁(질문) 엔티티 클래스 (Exposed DAO/ORM 방식) */
+/** 핑퐁 엔티티 클래스 (Exposed DAO/ORM 방식) */
 class PingPongEntity(id: EntityID<Long>) : BaseEntity(id, PingPongs) {
     companion object : BaseEntityClass<PingPongEntity>(PingPongs)
 

@@ -5,7 +5,7 @@ import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 
 /**
- * 핑퐁(질문) 모델
+ * 핑퐁 모델 (핑퐁 묶음의 루트로, 질문 내용을 포함한다)
  *
  * @property id 핑퐁 ID
  * @property userKeywordId 질문이 달린 사용자 키워드(게시물) ID

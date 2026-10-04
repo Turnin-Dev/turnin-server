@@ -3,7 +3,7 @@ package com.turnin.domain.pingPong.application.dto
 import com.turnin.domain.pingPong.domain.model.PingPong
 
 /**
- * 핑퐁(질문) DTO
+ * 핑퐁 DTO
  *
  * @property id 핑퐁 ID
  * @property userKeywordId 질문이 달린 사용자 키워드(게시물) ID

@@ -19,17 +19,17 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.assertThrows
 
-class CreatePingPongUseCaseTest {
+class CreatePingPongQuestionUseCaseTest {
     private val pingPongRepository = mockk<PingPongRepository>()
     private val userKeywordProvider = mockk<UserKeywordProvider>()
-    private val usecase = CreatePingPongUseCase(pingPongRepository, userKeywordProvider)
+    private val usecase = CreatePingPongQuestionUseCase(pingPongRepository, userKeywordProvider)
 
     @Test
     fun `타인의 게시물에 질문을 작성하면 생성된 핑퐁을 반환한다`() = runTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.create(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         } returns PingPong(
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
@@ -55,11 +55,11 @@ class CreatePingPongUseCaseTest {
     }
 
     @Test
-    fun `질문 작성 시 요청한 게시물 ID와 질문자 ID, 질문 내용으로 핑퐁을 저장한다`() = runTest {
+    fun `질문 작성 시 요청한 게시물 ID와 질문자 ID, 질문 내용으로 질문을 저장한다`() = runTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.create(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         } returns TestPingPong
 
         // when
@@ -67,12 +67,12 @@ class CreatePingPongUseCaseTest {
 
         // then
         coVerify(exactly = 1) {
-            pingPongRepository.create(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         }
     }
 
     @Test
-    fun `게시물을 조회할 수 없으면 게시물 없음 예외가 발생하고 핑퐁을 저장하지 않는다`() = runTest {
+    fun `게시물을 조회할 수 없으면 게시물 없음 예외가 발생하고 질문을 저장하지 않는다`() = runTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns null
 
@@ -81,12 +81,12 @@ class CreatePingPongUseCaseTest {
             usecase(UserId(1L), 3L, "질문 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.create(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         }
     }
 
     @Test
-    fun `본인 게시물에 질문을 작성하면 예외가 발생하고 핑퐁을 저장하지 않는다`() = runTest {
+    fun `본인 게시물에 질문을 작성하면 예외가 발생하고 질문을 저장하지 않는다`() = runTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns UserId(1L)
 
@@ -95,7 +95,7 @@ class CreatePingPongUseCaseTest {
             usecase(UserId(1L), 3L, "질문 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.create(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         }
     }
 

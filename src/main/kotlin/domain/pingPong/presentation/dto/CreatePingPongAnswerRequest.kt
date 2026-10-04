@@ -3,7 +3,7 @@ package com.turnin.domain.pingPong.presentation.dto
 import kotlinx.serialization.Serializable
 
 /**
- * 핑퐁 답변 작성 요청 바디
+ * 답변 작성 요청 바디
  *
  * @property answer 답변 내용
  */
