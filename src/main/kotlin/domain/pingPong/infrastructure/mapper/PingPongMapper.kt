@@ -55,14 +55,18 @@ internal object PingPongMapper {
                 userName = UserName(this[Users.name]),
                 profileImageUrl = this[Users.profileImageUrl],
             ),
-            answer = this.getOrNull(PingPongAnswers.id)?.let { answerId ->
-                PingPongAnswer(
-                    id = PingPongAnswerId(answerId.value),
-                    pingPongId = PingPongId(this[PingPongAnswers.pingPongId].value),
-                    answer = PingPongContent(this[PingPongAnswers.answer]),
-                    createdAt = this[PingPongAnswers.createdAt].toEpochSecond(),
-                    updatedAt = this[PingPongAnswers.updatedAt].toEpochSecond(),
-                )
-            },
+            answer = this.getOrNull(PingPongAnswers.id)?.let { this.toAnswer() },
+        )
+
+    /**
+     * `ping_pong_answer` 컬럼을 포함한 조회 결과를 [PingPongAnswer]로 변환한다.
+     */
+    fun ResultRow.toAnswer(): PingPongAnswer =
+        PingPongAnswer(
+            id = PingPongAnswerId(this[PingPongAnswers.id].value),
+            pingPongId = PingPongId(this[PingPongAnswers.pingPongId].value),
+            answer = PingPongContent(this[PingPongAnswers.answer]),
+            createdAt = this[PingPongAnswers.createdAt].toEpochSecond(),
+            updatedAt = this[PingPongAnswers.updatedAt].toEpochSecond(),
         )
 }

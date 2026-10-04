@@ -11,7 +11,7 @@ import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.exception.PingPongException
 
 /**
- * 핑퐁(질문) 작성
+ * 질문 작성
  *
  * 게시물(사용자 키워드)에 질문을 등록한다.
  *
@@ -21,7 +21,7 @@ import com.turnin.domain.pingPong.exception.PingPongException
  * @throws [PingPongException.UserKeywordNotFound] 게시물이 없거나, 비활성화/차단 관계로 조회할 수 없는 경우
  * @throws [PingPongException.CannotQuestionOwnUserKeyword] 본인 게시물에 질문을 등록하려는 경우
  */
-class CreatePingPongUseCase(
+class CreatePingPongQuestionUseCase(
     private val pingPongRepository: PingPongRepository,
     private val userKeywordProvider: UserKeywordProvider,
 ) {
@@ -47,7 +47,7 @@ class CreatePingPongUseCase(
         }
 
         return pingPongRepository
-            .create(userKeywordIdVO, questionerId, questionVO)
+            .createQuestion(userKeywordIdVO, questionerId, questionVO)
             .toDto()
     }
 }

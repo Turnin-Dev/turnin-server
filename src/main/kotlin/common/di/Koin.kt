@@ -10,6 +10,7 @@ import com.turnin.domain.account.di.accountModule
 import com.turnin.domain.announcement.di.announcementModule
 import com.turnin.domain.auth.di.authModule
 import com.turnin.domain.block.di.blockModule
+import com.turnin.domain.contentReport.di.contentReportModule
 import com.turnin.domain.discover.di.discoverModule
 import com.turnin.domain.feed.di.feedModule
 import com.turnin.domain.file.di.fileModule
@@ -41,6 +42,7 @@ fun Application.configureKoin() {
             userKeywordModule,
             pingPongModule,
             reportModule,
+            contentReportModule,
             friendModule,
             discoverModule,
             feedModule,

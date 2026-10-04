@@ -12,12 +12,13 @@ import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
 import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.domain.pingPong.exception.PingPongErrorCode
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongAnswerRequest
-import com.turnin.domain.pingPong.presentation.dto.CreatePingPongRequest
+import com.turnin.domain.pingPong.presentation.dto.CreatePingPongQuestionRequest
 import com.turnin.domain.pingPong.presentation.dto.PingPongAnswerResponse
 import com.turnin.domain.pingPong.presentation.dto.PingPongDetailResponse
 import com.turnin.domain.pingPong.presentation.dto.PingPongResponse
 import com.turnin.domain.pingPong.presentation.dto.toResponse
 import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.delete
 import io.github.smiley4.ktoropenapi.get
 import io.github.smiley4.ktoropenapi.post
 import io.github.smiley4.ktoropenapi.route
@@ -32,36 +33,36 @@ fun AuthenticatedRoute.pingPongRoutes(route: Api.V1.PingPong, usecase: PingPongU
         description = "PingPong API"
     }) {
         // 동일 사용자가 동일 게시물에 5초당 1회 / 1분당 5회 (두 토큰을 중첩 적용)
-        rateLimit(RateLimitToken.CREATE_PING_PONG_BURST.ktorName) {
-            rateLimit(RateLimitToken.CREATE_PING_PONG.ktorName) {
-                post(route.byUserKeyword(pathParam = "{userKeywordId}"), { createPingPongDocs() }) {
+        rateLimit(RateLimitToken.CREATE_PING_PONG_QUESTION_BURST.ktorName) {
+            rateLimit(RateLimitToken.CREATE_PING_PONG_QUESTION.ktorName) {
+                post(route.byUserKeyword(pathParam = "{userKeywordId}"), { createQuestionDocs() }) {
                     val userKeywordIdParam = call.parameters["userKeywordId"]
                         ?.toLongOrNull()
                         .inputValidationAndReturn("사용자 키워드 ID")
                     val questionerId = extractUserIdWithToken()
-                    val createPingPongRequest = call.receive<CreatePingPongRequest>()
-                    val pingPongDto = usecase.create(
+                    val createQuestionRequest = call.receive<CreatePingPongQuestionRequest>()
+                    val pingPongDto = usecase.createQuestion(
                         questionerId,
                         userKeywordIdParam,
-                        createPingPongRequest.question,
+                        createQuestionRequest.question,
                     )
                     call.respond(HttpStatusCode.Created, pingPongDto.toResponse())
                 }
             }
         }
 
-        post(route.answer(pathParam = "{pingPongId}"), { createPingPongAnswerDocs() }) {
+        post(route.answer(pathParam = "{pingPongId}"), { createAnswerDocs() }) {
             val pingPongIdParam = call.parameters["pingPongId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("핑퐁 ID")
             val answererId = extractUserIdWithToken()
-            val createPingPongAnswerRequest = call.receive<CreatePingPongAnswerRequest>()
-            val pingPongAnswerDto = usecase.createAnswer(
+            val createAnswerRequest = call.receive<CreatePingPongAnswerRequest>()
+            val answerDto = usecase.createAnswer(
                 answererId,
                 pingPongIdParam,
-                createPingPongAnswerRequest.answer,
+                createAnswerRequest.answer,
             )
-            call.respond(HttpStatusCode.Created, pingPongAnswerDto.toResponse())
+            call.respond(HttpStatusCode.Created, answerDto.toResponse())
         }
 
         get(route.byUserKeyword(pathParam = "{userKeywordId}"), { getPingPongsDocs() }) {
@@ -81,32 +82,50 @@ fun AuthenticatedRoute.pingPongRoutes(route: Api.V1.PingPong, usecase: PingPongU
             }
             call.respond(HttpStatusCode.OK, response)
         }
+
+        delete(route.byId(pathParam = "{pingPongId}"), { deleteQuestionDocs() }) {
+            val pingPongIdParam = call.parameters["pingPongId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("핑퐁 ID")
+            val requesterId = extractUserIdWithToken()
+            usecase.deleteQuestion(requesterId, pingPongIdParam)
+            call.respond(HttpStatusCode.NoContent)
+        }
+
+        delete(route.answer(pathParam = "{pingPongId}"), { deleteAnswerDocs() }) {
+            val pingPongIdParam = call.parameters["pingPongId"]
+                ?.toLongOrNull()
+                .inputValidationAndReturn("핑퐁 ID")
+            val requesterId = extractUserIdWithToken()
+            usecase.deleteAnswer(requesterId, pingPongIdParam)
+            call.respond(HttpStatusCode.NoContent)
+        }
     }
 }
 
-private fun RouteConfig.createPingPongDocs() {
-    summary = "핑퐁(질문) 작성"
+private fun RouteConfig.createQuestionDocs() {
+    summary = "질문 작성"
     description = """
         게시물(사용자 키워드)에 질문을 등록한다.
 
         - 질문은 공백만으로 이루어질 수 없으며, 최대 ${PingPongContent.MAX_LENGTH}자까지 작성할 수 있다.
-        - Rate Limit (동일 사용자 + 동일 게시물 기준): ${RateLimitToken.CREATE_PING_PONG_BURST.toPrettyString()}, ${RateLimitToken.CREATE_PING_PONG.toPrettyString()}
+        - Rate Limit (동일 사용자 + 동일 게시물 기준): ${RateLimitToken.CREATE_PING_PONG_QUESTION_BURST.toPrettyString()}, ${RateLimitToken.CREATE_PING_PONG_QUESTION.toPrettyString()}
     """.trimIndent()
     request {
         pathParameter<Long>("userKeywordId") {
             description = "질문을 등록할 사용자 키워드(게시물) ID"
         }
-        body<CreatePingPongRequest> {
-            description = "핑퐁(질문) 작성 요청 바디"
-            example("CreatePingPongRequest") {
-                value = CreatePingPongRequest.sample
+        body<CreatePingPongQuestionRequest> {
+            description = "질문 작성 요청 바디"
+            example("CreatePingPongQuestionRequest") {
+                value = CreatePingPongQuestionRequest.sample
             }
         }
     }
     response {
         code(HttpStatusCode.Created) {
             body<PingPongResponse> {
-                description = "생성된 핑퐁(질문)"
+                description = "생성된 핑퐁"
                 example("PingPongResponse") {
                     value = PingPongResponse.sample
                 }
@@ -124,10 +143,10 @@ private fun RouteConfig.createPingPongDocs() {
     }
 }
 
-private fun RouteConfig.createPingPongAnswerDocs() {
-    summary = "핑퐁 답변 작성"
+private fun RouteConfig.createAnswerDocs() {
+    summary = "답변 작성"
     description = """
-        핑퐁(질문)에 답변을 등록한다.
+        질문에 답변을 등록한다.
 
         - 질문이 달린 게시물(사용자 키워드)의 작성자만 답변을 등록할 수 있으며, 질문당 답변은 1개만 등록할 수 있다.
         - 질문자와 차단 관계(양방향)이면 답변을 등록할 수 없다. (차단 전에 달린 질문은 삭제/신고만 가능)
@@ -135,10 +154,10 @@ private fun RouteConfig.createPingPongAnswerDocs() {
     """.trimIndent()
     request {
         pathParameter<Long>("pingPongId") {
-            description = "답변을 등록할 핑퐁(질문) ID"
+            description = "답변을 등록할 질문의 핑퐁 ID"
         }
         body<CreatePingPongAnswerRequest> {
-            description = "핑퐁 답변 작성 요청 바디"
+            description = "답변 작성 요청 바디"
             example("CreatePingPongAnswerRequest") {
                 value = CreatePingPongAnswerRequest.sample
             }
@@ -147,7 +166,7 @@ private fun RouteConfig.createPingPongAnswerDocs() {
     response {
         code(HttpStatusCode.Created) {
             body<PingPongAnswerResponse> {
-                description = "생성된 핑퐁 답변"
+                description = "생성된 답변"
                 example("PingPongAnswerResponse") {
                     value = PingPongAnswerResponse.sample
                 }
@@ -174,7 +193,7 @@ private fun RouteConfig.createPingPongAnswerDocs() {
         }
         code(HttpStatusCode.NotFound) {
             description = """
-                핑퐁(질문)이 없거나 숨김 처리된 경우 (`${PingPongErrorCode.PingPongNotFound.code}`)
+                핑퐁이 없거나 질문이 숨김 처리된 경우 (`${PingPongErrorCode.PingPongNotFound.code}`)
 
                 - UI 메시지: "삭제되었거나 볼 수 없는 질문이에요."
 
@@ -235,6 +254,93 @@ private fun RouteConfig.getPingPongsDocs() {
                 게시물을 조회할 수 없는 경우 (존재하지 않음, 비활성화, 차단 관계) (`${PingPongErrorCode.UserKeywordNotFound.code}`)
 
                 - UI 메시지: "삭제되었거나 볼 수 없는 게시물이에요."
+            """.trimIndent()
+        }
+    }
+}
+
+private fun RouteConfig.deleteQuestionDocs() {
+    summary = "질문 삭제"
+    description = """
+        질문을 삭제한다. 질문에 달린 답변도 함께 삭제된다.
+
+        - 질문자 본인 또는 질문이 달린 게시물(사용자 키워드)의 작성자만 삭제할 수 있다.
+        - 차단 관계여도 차단 전에 달린 질문은 각 사용자가 직접 삭제할 수 있다.
+    """.trimIndent()
+    request {
+        pathParameter<Long>("pingPongId") {
+            description = "삭제할 질문의 핑퐁 ID"
+        }
+    }
+    response {
+        code(HttpStatusCode.NoContent) {
+            description = "삭제 성공"
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = """
+                핑퐁 ID가 0 이하인 경우 (`${CommonErrorCode.ValidationDefault.code}`),
+                핑퐁 ID 형식이 잘못된 경우 (`${CommonErrorCode.MalformedRequest.code}`)
+
+                - UI 메시지: "요청을 처리할 수 없어요. 잠시 후 다시 시도해 주세요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.Forbidden) {
+            description = """
+                질문자도 게시물 작성자도 아닌 사용자가 삭제하려는 경우 (`${PingPongErrorCode.NoPermissionToDelete.code}`)
+
+                - UI 메시지: "삭제할 수 없는 질문이에요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.NotFound) {
+            description = """
+                핑퐁이 없거나 질문이 숨김 처리된 경우 (`${PingPongErrorCode.PingPongNotFound.code}`)
+
+                - UI 메시지: "이미 삭제되었거나 볼 수 없는 질문이에요."
+            """.trimIndent()
+        }
+    }
+}
+
+private fun RouteConfig.deleteAnswerDocs() {
+    summary = "답변 삭제"
+    description = """
+        질문에 달린 답변을 삭제한다. 질문은 유지되며, 삭제 후 다시 답변할 수 있다.
+
+        - 질문이 달린 게시물(사용자 키워드)의 작성자만 삭제할 수 있다.
+    """.trimIndent()
+    request {
+        pathParameter<Long>("pingPongId") {
+            description = "삭제할 답변이 달린 핑퐁 ID"
+        }
+    }
+    response {
+        code(HttpStatusCode.NoContent) {
+            description = "삭제 성공"
+        }
+        code(HttpStatusCode.BadRequest) {
+            description = """
+                핑퐁 ID가 0 이하인 경우 (`${CommonErrorCode.ValidationDefault.code}`),
+                핑퐁 ID 형식이 잘못된 경우 (`${CommonErrorCode.MalformedRequest.code}`)
+
+                - UI 메시지: "요청을 처리할 수 없어요. 잠시 후 다시 시도해 주세요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.Forbidden) {
+            description = """
+                게시물 작성자가 아닌 사용자가 삭제하려는 경우 (`${PingPongErrorCode.NoPermissionToDelete.code}`)
+
+                - UI 메시지: "삭제할 수 없는 답변이에요."
+            """.trimIndent()
+        }
+        code(HttpStatusCode.NotFound) {
+            description = """
+                핑퐁이 없거나 질문이 숨김 처리된 경우 (`${PingPongErrorCode.PingPongNotFound.code}`)
+
+                - UI 메시지: "이미 삭제되었거나 볼 수 없는 질문이에요."
+
+                답변이 없거나 숨김 처리된 경우 (`${PingPongErrorCode.PingPongAnswerNotFound.code}`)
+
+                - UI 메시지: "이미 삭제되었거나 볼 수 없는 답변이에요."
             """.trimIndent()
         }
     }

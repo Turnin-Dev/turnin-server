@@ -4,7 +4,7 @@ import com.turnin.domain.pingPong.application.dto.PingPongDto
 import kotlinx.serialization.Serializable
 
 /**
- * 핑퐁(질문) 응답 바디
+ * 핑퐁 응답 바디
  *
  * @property id 핑퐁 ID
  * @property userKeywordId 질문이 달린 사용자 키워드(게시물) ID

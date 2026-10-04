@@ -27,6 +27,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insertIgnore
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.vendors.PostgreSQLDialect
@@ -67,12 +68,20 @@ private object TestDBContainerFactory {
             start()
         }
 
-        database = Database.connect(
-            url = container.jdbcUrl,
-            driver = "org.postgresql.Driver",
-            user = container.username,
-            password = container.password,
-        )
+        database = Database
+            .connect(
+                url = container.jdbcUrl,
+                driver = "org.postgresql.Driver",
+                user = container.username,
+                password = container.password,
+            ).also {
+                // 테스트마다 새 컨테이너로 연결되므로, 현재 컨테이너를 기본 DB로 지정한다.
+                // 지정하지 않으면 다른 스레드의 트랜잭션이 이전 테스트의 종료된 컨테이너로 연결될 수 있다.
+                // (테스트마다 컨테이너를 새로 띄우지만 기본 DB를 지정하지 않아,
+                // 재사용되는 스레드(ForkJoinPool 등)의 트랜잭션이
+                // 이전 테스트의 종료된 컨테이너로 연결되던 문제가 있었다.)
+                TransactionManager.defaultDatabase = it
+            }
 
         transaction(database) {
             // pgvector 확장 기능 활성화 (매우 중요)
@@ -174,6 +183,10 @@ private object TestDBContainerFactory {
     }
 
     fun shutdown() {
+        // 컨테이너를 멈추기 전에 Exposed에서 이 DB를 등록 해제한다.
+        // 기본 DB를 null로만 되돌리면, Exposed는 "가장 최근에 생성된 DB"(= 이 종료된 DB)를 기본 DB로 사용한다.
+        // 등록을 해제하면 기본 DB 지정도 함께 해제되고, 남아 있는 다른 DB(예: H2)가 있으면 그 DB가 기본 DB가 된다.
+        database?.let { TransactionManager.closeAndUnregister(it) }
         container.stop()
         database = null
     }

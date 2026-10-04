@@ -3,10 +3,10 @@ package com.turnin.domain.pingPong.application.dto
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
 
 /**
- * 핑퐁 답변 DTO
+ * 답변 DTO
  *
- * @property id 핑퐁 답변 ID
- * @property pingPongId 답변이 달린 핑퐁(질문) ID
+ * @property id 답변 ID
+ * @property pingPongId 답변이 달린 핑퐁 ID
  * @property answer 답변 내용
  * @property createdAt 생성 일자
  * @property updatedAt 수정 일자

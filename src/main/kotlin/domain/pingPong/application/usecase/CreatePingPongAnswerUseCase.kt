@@ -13,12 +13,12 @@ import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.exception.PingPongException
 
 /**
- * 핑퐁 답변 작성
+ * 답변 작성
  *
- * 핑퐁(질문)에 답변을 등록한다. 답변은 질문이 달린 게시물(사용자 키워드)의 작성자만 등록할 수 있으며, 질문당 1개만 등록할 수 있다.
+ * 질문에 답변을 등록한다. 답변은 질문이 달린 게시물(사용자 키워드)의 작성자만 등록할 수 있으며, 질문당 1개만 등록할 수 있다.
  *
  * @throws [ValidatorException] 답변 내용이 비어있거나 최대 글자 수를 초과한 경우
- * @throws [PingPongException.PingPongNotFound] 핑퐁(질문)이 없거나, 신고 누적으로 숨김 처리된 경우
+ * @throws [PingPongException.PingPongNotFound] 핑퐁이 없거나, 질문이 신고 누적으로 숨김 처리된 경우
  * @throws [PingPongException.UserKeywordNotFound] 질문이 달린 게시물이 없거나, 비활성화/차단 관계로 조회할 수 없는 경우
  * 차단 전에 달린 질문은 작성자에게 노출되지만(삭제/신고용), 차단 관계(양방향)인 질문자의 질문에는 답변할 수 없다.
  *
@@ -33,7 +33,7 @@ class CreatePingPongAnswerUseCase(
 ) {
     /**
      * @param answererId 답변자(요청자) ID
-     * @param pingPongId 답변을 등록할 핑퐁(질문) ID
+     * @param pingPongId 답변을 등록할 질문의 핑퐁 ID
      * @param answer 답변 내용
      *
      * @return 생성된 [PingPongAnswerDto]
