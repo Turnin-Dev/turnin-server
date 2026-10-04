@@ -11,12 +11,18 @@ import com.turnin.common.model.id.UserId
 import com.turnin.domain.contentReport.domain.model.ContentReportDetail
 import com.turnin.util.db.PostgresRule
 import java.time.Instant
+import java.util.concurrent.CompletableFuture
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertTrue
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
+import org.postgresql.util.PSQLException
 
 /**
  * `content_type`이 PostgreSQL enum 타입이므로, enum 바인딩/비교를 실제 PostgreSQL에서 검증한다.
@@ -145,6 +151,85 @@ class ContentReportRepositoryImplTest {
         // then
         assertEquals(0L, result)
     }
+
+    @Test
+    fun `같은 콘텐츠의 잠금을 다른 트랜잭션이 보유 중이면 잠금을 획득하지 못하고 대기한다`() = runTest {
+        // given
+        val result = newSuspendedTransaction {
+            repository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L)
+
+            // when
+            lockContentInOtherTransaction(ContentReportType.PING_PONG_QUESTION, 10L)
+        }
+
+        // then
+        // 커넥션 오류 등 다른 DB 예외와 구분하기 위해, lock_timeout으로 인한 실패(SQLState 55P03)인지 확인한다.
+        val rootCause = generateSequence(result.exceptionOrNull()) { it.cause }.last()
+        assertIs<PSQLException>(rootCause)
+        assertEquals("55P03", rootCause.sqlState)
+    }
+
+    @Test
+    fun `다른 콘텐츠 ID의 잠금은 대기 없이 획득한다`() = runTest {
+        // given
+        val result = newSuspendedTransaction {
+            repository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L)
+
+            // when
+            lockContentInOtherTransaction(ContentReportType.PING_PONG_QUESTION, 11L)
+        }
+
+        // then
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `같은 ID라도 다른 콘텐츠 유형의 잠금은 대기 없이 획득한다`() = runTest {
+        // given
+        val result = newSuspendedTransaction {
+            repository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L)
+
+            // when
+            lockContentInOtherTransaction(ContentReportType.PING_PONG_ANSWER, 10L)
+        }
+
+        // then
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `잠금을 보유한 트랜잭션이 끝나면 같은 콘텐츠의 잠금을 획득한다`() = runTest {
+        // given
+        newSuspendedTransaction {
+            repository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L)
+        }
+
+        // when
+        val result = lockContentInOtherTransaction(ContentReportType.PING_PONG_QUESTION, 10L)
+
+        // then
+        assertTrue(result.isSuccess)
+    }
+
+    /**
+     * 별도 스레드의 새 트랜잭션(별도 커넥션)에서 잠금을 획득한다.
+     *
+     * 잠금 대기가 무한히 이어지지 않도록 `lock_timeout`을 걸어, 대기 시 예외로 끝나도록 한다.
+     */
+    private fun lockContentInOtherTransaction(
+        contentType: ContentReportType,
+        contentId: Long,
+    ): Result<Unit> = CompletableFuture.supplyAsync {
+        // newSuspendedTransaction 내부 예외는 부모 코루틴(runBlocking)까지 취소시키므로, runBlocking 바깥에서 잡는다.
+        runCatching {
+            runBlocking {
+                newSuspendedTransaction {
+                    exec("SET LOCAL lock_timeout = '100ms'")
+                    repository.lockContent(contentType, contentId)
+                }
+            }
+        }
+    }.get()
 
     private fun contentReportDetail(
         reporterId: UserId,

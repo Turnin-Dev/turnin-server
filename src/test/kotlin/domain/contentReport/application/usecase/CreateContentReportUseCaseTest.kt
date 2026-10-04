@@ -16,6 +16,7 @@ import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
@@ -45,8 +46,29 @@ class CreateContentReportUseCaseTest {
     }
 
     @Test
+    fun `신고 처리 전에 콘텐츠 단위 잠금을 먼저 획득한다`() = runTest {
+        // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L) } just Runs
+        coEvery {
+            reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
+        } returns TestReportableContent
+        coEvery { contentReportRepository.create(any()) } just Runs
+        coEvery { contentReportRepository.countByContent(ContentReportType.PING_PONG_QUESTION, 10L) } returns 1L
+
+        // when
+        usecase(UserId(1L), TestContentReportDto)
+
+        // then
+        coVerifyOrder {
+            contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L)
+            reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
+        }
+    }
+
+    @Test
     fun `신고 시 콘텐츠 작성자를 피신고자로, 콘텐츠 내용을 스냅샷으로 저장한다`() = runTest {
         // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_ANSWER, 20L) } just Runs
         coEvery {
             reportableContentProvider.findVisible(ContentReportType.PING_PONG_ANSWER, 20L)
         } returns ReportableContent(authorId = UserId(2L), snapshot = "답변 내용")
@@ -81,6 +103,7 @@ class CreateContentReportUseCaseTest {
     @Test
     fun `신고 누적 횟수가 5회가 되면 콘텐츠를 숨김 처리한다`() = runTest {
         // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L) } just Runs
         coEvery {
             reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
         } returns TestReportableContent
@@ -98,6 +121,7 @@ class CreateContentReportUseCaseTest {
     @Test
     fun `신고 누적 횟수가 4회이면 콘텐츠를 숨김 처리하지 않는다`() = runTest {
         // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L) } just Runs
         coEvery {
             reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
         } returns TestReportableContent
@@ -114,6 +138,7 @@ class CreateContentReportUseCaseTest {
     @Test
     fun `신고할 콘텐츠가 없으면 콘텐츠 없음 예외가 발생하고 신고를 저장하지 않는다`() = runTest {
         // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L) } just Runs
         coEvery {
             reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
         } returns null
@@ -128,6 +153,7 @@ class CreateContentReportUseCaseTest {
     @Test
     fun `본인이 작성한 콘텐츠를 신고하면 본인 콘텐츠 신고 예외가 발생하고 신고를 저장하지 않는다`() = runTest {
         // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L) } just Runs
         coEvery {
             reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
         } returns ReportableContent(authorId = UserId(1L), snapshot = "질문 내용")
@@ -142,6 +168,7 @@ class CreateContentReportUseCaseTest {
     @Test
     fun `이미 신고한 콘텐츠이면 중복 신고 예외가 발생하고 숨김 처리하지 않는다`() = runTest {
         // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L) } just Runs
         coEvery {
             reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
         } returns TestReportableContent
@@ -159,6 +186,7 @@ class CreateContentReportUseCaseTest {
     @Test
     fun `존재하지 않는 신고 사유이면 신고 사유 오류 예외가 발생한다`() = runTest {
         // given
+        coEvery { contentReportRepository.lockContent(ContentReportType.PING_PONG_QUESTION, 10L) } just Runs
         coEvery {
             reportableContentProvider.findVisible(ContentReportType.PING_PONG_QUESTION, 10L)
         } returns TestReportableContent

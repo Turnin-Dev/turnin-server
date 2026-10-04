@@ -21,6 +21,8 @@ import com.turnin.domain.contentReport.exception.ContentReportException
  *
  * 신고 시점의 콘텐츠 내용을 스냅샷으로 함께 저장하며, 신고 누적 횟수가 운영 정책 기준([ContentReportPolicy]) 이상이 되면 콘텐츠를 숨김 처리한다.
  *
+ * 동시 신고로 누적 횟수 집계가 어긋나 숨김 처리가 누락되지 않도록, 콘텐츠 단위 잠금으로 같은 콘텐츠의 신고 처리를 직렬화한다.
+ *
  * 차단 관계여도 차단 전에 노출된 콘텐츠는 신고할 수 있다.
  *
  * @throws [ValidatorException] 콘텐츠 ID 또는 신고 사유 ID가 0 이하인 경우
@@ -56,6 +58,10 @@ class CreateContentReportUseCase(
 
         // 신고 저장과 누적 횟수 집계, 숨김 처리를 하나의 트랜잭션으로 처리한다.
         val isHidden = suspendTransaction {
+            // 같은 콘텐츠의 신고를 직렬화한다. (READ COMMITTED에서 동시 신고가 서로의 신고를 보지 못해 숨김이 누락되는 것을 방지)
+            // 대기 후 이미 숨김 처리된 콘텐츠를 신고하지 않도록, 콘텐츠 조회보다 먼저 잠금을 획득한다.
+            contentReportRepository.lockContent(contentType, contentId)
+
             val reportableContent = reportableContentProvider.findVisible(contentType, contentId)
                 ?: throw ContentReportException.ContentNotFound()
             val contentReportDetail = ContentReportDetail.create(
