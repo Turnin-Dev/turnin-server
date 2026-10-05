@@ -4,6 +4,7 @@ import com.turnin.common.db.suspendTransaction
 import com.turnin.common.firebase.FcmDataKey
 import com.turnin.common.firebase.FcmMessage
 import com.turnin.common.firebase.FcmService
+import com.turnin.common.firebase.toStringKeyMap
 import com.turnin.domain.notification.application.dto.NotificationDto
 import com.turnin.domain.notification.application.dto.toDto
 import com.turnin.domain.notification.domain.model.Notification
@@ -29,7 +30,7 @@ class SendNotificationUseCase(
      * @return 저장된 [Notification]
      */
     suspend operator fun invoke(command: NotificationCommand): NotificationDto {
-        val userId = command.userId
+        val receiverId = command.receiverId
             ?: throw NotificationException.MissingUserIdInPersonalNotification()
 
         val (notification, tokens) = suspendTransaction {
@@ -39,7 +40,7 @@ class SendNotificationUseCase(
             val notification = notificationRepository.save(command)
 
             // 2. 활성 토큰 조회
-            val tokens = fcmTokenRepository.findActiveTokens(userId)
+            val tokens = fcmTokenRepository.findActiveTokens(receiverId)
 
             notification to tokens
         }
@@ -54,6 +55,7 @@ class SendNotificationUseCase(
                     imageUrl = command.imageUrl,
                     notiType = command.notiType,
                     data = buildMap {
+                        command.refData?.let { putAll(it.toStringKeyMap()) }
                         command.refType?.let { put(FcmDataKey.REF_TYPE, it) }
                         command.refId?.let { put(FcmDataKey.REF_ID, it.toString()) }
                     },

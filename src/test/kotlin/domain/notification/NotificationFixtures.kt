@@ -1,5 +1,6 @@
 package com.turnin.domain.notification
 
+import com.turnin.common.firebase.toStringKeyMap
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.FcmTokenId
 import com.turnin.common.model.id.NotificationId
@@ -24,6 +25,7 @@ fun notificationFixture(
     isBroadcast = command?.isBroadcast ?: false,
     refId = command?.refId,
     refType = command?.refType,
+    refData = command?.refData?.toStringKeyMap(),
     createdAt = System.currentTimeMillis() / 1000,
     updatedAt = System.currentTimeMillis() / 1000,
 )

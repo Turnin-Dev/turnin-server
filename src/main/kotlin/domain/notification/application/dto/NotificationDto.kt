@@ -16,6 +16,7 @@ import com.turnin.domain.notification.domain.model.Notification
  * @param isBroadcast 브로드캐스트 여부
  * @param refId 참조 리소스 ID
  * @param refType 참조 리소스 타입
+ * @param refData 딥링크용 부가 데이터
  * @param createdAt 생성 일자
  * @param updatedAt 수정 일자
  */
@@ -30,6 +31,7 @@ data class NotificationDto(
     val isBroadcast: Boolean,
     val refId: Long?,
     val refType: String?,
+    val refData: Map<String, String>?,
     val createdAt: Long,
     val updatedAt: Long,
 )
@@ -45,6 +47,7 @@ fun Notification.toDto() = NotificationDto(
     isBroadcast = this.isBroadcast,
     refId = this.refId,
     refType = this.refType,
+    refData = this.refData,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
 )

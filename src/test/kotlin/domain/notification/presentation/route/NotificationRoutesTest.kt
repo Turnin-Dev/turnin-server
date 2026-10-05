@@ -22,6 +22,11 @@ import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just
 import io.mockk.mockk
+import kotlin.test.assertEquals
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Test
 
 class NotificationRoutesTest {
@@ -157,6 +162,7 @@ class NotificationRoutesTest {
                     isBroadcast = false,
                     refId = it + 1L,
                     refType = "USER",
+                    refData = null,
                     createdAt = 1716000000L,
                     updatedAt = 1716000000L,
                 )
@@ -187,6 +193,61 @@ class NotificationRoutesTest {
                     cursorPage.items.first().title!!,
                     cursorPage.items.last().title!!,
                 )
+            },
+        )
+    }
+
+    @Test
+    fun `알림 목록 조회 - 딥링크 부가 데이터를 응답에 포함한다`() = testApplication {
+        // given
+        val cursorPage = CursorPage<NotificationDto, Long>(
+            items = listOf(
+                NotificationDto(
+                    id = 1L,
+                    userId = TestUserId.value,
+                    notiType = NotificationType.PING_PONG_ANSWER,
+                    title = "새 답변",
+                    message = "작성자 님이 질문에 답변했어요.",
+                    imageUrl = null,
+                    isRead = false,
+                    isBroadcast = false,
+                    refId = 3L,
+                    refType = "KEYWORD",
+                    refData = mapOf("ref_owner_id" to "34"),
+                    createdAt = 1716000000L,
+                    updatedAt = 1716000000L,
+                ),
+            ),
+            nextCursor = null,
+        )
+        coEvery {
+            usecase.getNotifications(TestUserId, any(), any())
+        } returns cursorPage
+
+        // when, then
+        testGetEndpoint(
+            endpoint = route.ROUTE,
+            queryParameters = mapOf(
+                "size" to "10",
+            ),
+            testPlugin = {
+                testPlugin(
+                    authRouting = { notificationRoutes(route, usecase) },
+                )
+            },
+            tokenSubject = TestUserId.value.toString(),
+            expectedStatus = HttpStatusCode.OK,
+            responseValidator = {
+                custom { body, _ ->
+                    val item = Json
+                        .parseToJsonElement(body)
+                        .jsonObject["items"]!!
+                        .jsonArray
+                        .first()
+                        .jsonObject
+                    val refData = item["refData"]!!.jsonObject
+                    assertEquals("34", refData["ref_owner_id"]!!.jsonPrimitive.content)
+                }
             },
         )
     }

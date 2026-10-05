@@ -9,7 +9,7 @@ import com.turnin.domain.notification.domain.model.NotificationCommand
 interface NotificationRepository {
     /**
      * 알림을 저장한다.
-     * 브로드캐스트 알림의 경우 [NotificationCommand.userId] 는 null 이다.
+     * 브로드캐스트 알림의 경우 [NotificationCommand.receiverId] 는 null 이다.
      *
      * @param command 저장할 알림 도메인 모델
      */

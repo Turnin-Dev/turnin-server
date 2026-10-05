@@ -132,7 +132,7 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
      * data-only 방식 사용 시 setDirectBootOk(true) 설정으로
      * 기기 잠금 상태에서도 알림 수신 가능하다.
      *
-     * - HIGH : 즉각적인 확인이 필요한 사용자 액션 (예: 친구 요청, 친구 수락)
+     * - HIGH : 즉각적인 확인이 필요한 사용자 액션 (예: 친구 요청, 친구 수락, 핑퐁 질문/답변)
      * - NORMAL : 즉각적이지 않아도 되는 알림 (예: 새 키워드, 공지, 이벤트)
      *
      * @param type 알림 유형 ([NotificationType])
@@ -142,6 +142,8 @@ class FcmService(private val ioDispatcher: CoroutineDispatcher) {
             // 즉각적인 반응이 필요한 알림
             NotificationType.FRIEND_REQUEST,
             NotificationType.FRIEND_ACCEPT,
+            NotificationType.PING_PONG_QUESTION,
+            NotificationType.PING_PONG_ANSWER,
             -> AndroidConfig.Priority.HIGH
 
             // 즉각적이지 않아도 되는 알림

@@ -1,11 +1,11 @@
-package com.turnin.domain.friend.infrastructure.provider
+package com.turnin.domain.pingPong.infrastructure.provider
 
-import com.turnin.domain.friend.domain.model.FriendNotificationCommand
-import com.turnin.domain.friend.domain.provider.NotificationProvider
 import com.turnin.domain.notification.application.provider.NotificationProviderApi
+import com.turnin.domain.pingPong.domain.model.PingPongNotificationCommand
+import com.turnin.domain.pingPong.domain.provider.NotificationProvider
 
 class NotificationProviderImpl(private val notificationProviderApi: NotificationProviderApi) : NotificationProvider {
-    override suspend fun sendNotification(command: FriendNotificationCommand) {
+    override suspend fun sendNotification(command: PingPongNotificationCommand) {
         notificationProviderApi.sendNotification(
             receiverId = command.receiverId,
             notiType = command.notiType,
@@ -13,6 +13,7 @@ class NotificationProviderImpl(private val notificationProviderApi: Notification
             message = command.message,
             refId = command.refId,
             refType = command.refType,
+            refData = command.refData,
         )
     }
 }

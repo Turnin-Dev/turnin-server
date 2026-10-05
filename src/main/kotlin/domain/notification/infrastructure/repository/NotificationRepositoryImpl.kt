@@ -5,12 +5,14 @@ import com.turnin.common.db.schema.Notifications
 import com.turnin.common.db.schema.Users
 import com.turnin.common.db.suspendTransaction
 import com.turnin.common.db.updateWithTimestamp
+import com.turnin.common.firebase.toStringKeyMap
 import com.turnin.common.model.id.NotificationId
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.notification.domain.model.Notification
 import com.turnin.domain.notification.domain.model.NotificationCommand
 import com.turnin.domain.notification.domain.repository.NotificationRepository
 import com.turnin.domain.notification.infrastructure.mapper.NotificationMapper.toDomain
+import com.turnin.domain.notification.infrastructure.mapper.NotificationMapper.toRefDataJson
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -24,7 +26,7 @@ class NotificationRepositoryImpl : NotificationRepository {
         suspendTransaction {
             NotificationEntity
                 .new {
-                    this.userId = command.userId?.let { EntityID(it.value, Users) }
+                    this.userId = command.receiverId?.let { EntityID(it.value, Users) }
                     this.notiType = command.notiType
                     this.title = command.title
                     this.message = command.message
@@ -32,6 +34,7 @@ class NotificationRepositoryImpl : NotificationRepository {
                     this.isBroadcast = command.isBroadcast
                     this.refId = command.refId
                     this.refType = command.refType
+                    this.refData = command.refData?.toStringKeyMap()?.toRefDataJson()
                 }.toDomain()
         }
 
