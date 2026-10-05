@@ -89,7 +89,7 @@ class NotificationProviderApi(
                         put(RefDataKey.REF_OWNER_ID.key, it.toString())
                         // 구버전 앱 하위 호환: 최소 지원 앱 버전이 REF_OWNER_ID를 읽는 버전 이상이 되면 제거한다.
                         @Suppress("DEPRECATION")
-                        put(FcmDataKey.USER_ID, it.toString())
+                        put(RefDataKey.USER_ID.key, it.toString())
                     }
                 },
             ),

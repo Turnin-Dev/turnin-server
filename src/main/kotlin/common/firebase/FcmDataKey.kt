@@ -1,6 +1,10 @@
 package com.turnin.common.firebase
 
-/** FCM data 필드 키 상수 */
+/**
+ * FCM data 기본 필드 키 상수
+ *
+ * 모든 알림 메시지에 공통으로 담기는 필드의 키이다. 딥링크용 부가 데이터 키는 [RefDataKey]에서 관리한다.
+ */
 object FcmDataKey {
     /** 알림 유형 */
     const val NOTI_TYPE = "noti_type"
@@ -16,15 +20,6 @@ object FcmDataKey {
 
     /** 알림 본문 */
     const val BODY = "body"
-
-    /**
-     * 게시자 사용자 ID (NEW_KEYWORD 알림 하위 호환용)
-     *
-     * [RefDataKey.REF_OWNER_ID]로 대체되었다. 구버전 앱이 이 키로 딥링크를 처리하므로,
-     * 최소 지원 앱 버전이 [RefDataKey.REF_OWNER_ID]를 읽는 버전 이상으로 올라가면 제거한다.
-     */
-    @Deprecated("RefDataKey.REF_OWNER_ID로 대체. 구버전 앱 하위 호환용으로만 사용한다.")
-    const val USER_ID = "user_id"
 }
 
 /**
@@ -49,6 +44,15 @@ object RefType {
 enum class RefDataKey(val key: String) {
     /** 참조 리소스(ref_id)의 소유자 사용자 ID (예: 키워드 게시물 작성자 ID) */
     REF_OWNER_ID("ref_owner_id"),
+
+    /**
+     * 게시자 사용자 ID (NEW_KEYWORD 알림 하위 호환용)
+     *
+     * [REF_OWNER_ID]로 대체되었다. 구버전 앱이 이 키로 딥링크를 처리하므로,
+     * 최소 지원 앱 버전이 [REF_OWNER_ID]를 읽는 버전 이상으로 올라가면 제거한다.
+     */
+    @Deprecated("REF_OWNER_ID로 대체. 구버전 앱 하위 호환용으로만 사용한다.", ReplaceWith("REF_OWNER_ID"))
+    USER_ID("user_id"),
 }
 
 /** 딥링크용 부가 데이터를 저장/전송용 문자열 키 맵으로 변환한다. */
