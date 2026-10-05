@@ -7,7 +7,7 @@ import com.turnin.domain.notification.exception.NotificationErrorCode
 /**
  * 알림 저장 요청용 모델
  *
- * @property userId 사용자 ID (수신자)
+ * @property receiverId 수신자 ID (브로드캐스트 알림은 null)
  * @property notiType 알림 유형
  * @property title 알림 제목
  * @property message 알림 본문
@@ -19,7 +19,7 @@ import com.turnin.domain.notification.exception.NotificationErrorCode
  */
 @ConsistentCopyVisibility
 data class NotificationCommand private constructor(
-    val userId: UserId?,
+    val receiverId: UserId?,
     val notiType: NotificationType,
     val title: String?,
     val message: String,
@@ -35,7 +35,7 @@ data class NotificationCommand private constructor(
          * @see [NotificationCommand]
          */
         fun personal(
-            userId: UserId,
+            receiverId: UserId,
             notiType: NotificationType,
             title: String?,
             message: String,
@@ -48,7 +48,7 @@ data class NotificationCommand private constructor(
                 NotificationErrorCode.InvalidPersonalNotificationType.description
             }
             return NotificationCommand(
-                userId = userId,
+                receiverId = receiverId,
                 notiType = notiType,
                 title = title,
                 message = message,
@@ -75,7 +75,7 @@ data class NotificationCommand private constructor(
                 NotificationErrorCode.InvalidBroadcastNotificationType.description
             }
             return NotificationCommand(
-                userId = null,
+                receiverId = null,
                 notiType = notiType,
                 title = title,
                 message = message,

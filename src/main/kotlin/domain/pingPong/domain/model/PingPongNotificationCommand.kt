@@ -6,7 +6,7 @@ import com.turnin.common.model.id.UserId
 /**
  * 핑퐁 알림 전송 요청 모델
  *
- * @property userId 수신자 ID
+ * @property receiverId 수신자 ID
  * @property notiType 알림 유형
  * @property title 알림 제목
  * @property message 알림 본문
@@ -15,7 +15,7 @@ import com.turnin.common.model.id.UserId
  * @property refData 딥링크용 부가 데이터
  */
 data class PingPongNotificationCommand(
-    val userId: UserId,
+    val receiverId: UserId,
     val notiType: NotificationType,
     val title: String,
     val message: String,

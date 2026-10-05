@@ -20,7 +20,7 @@ class NotificationProviderApi(
     /**
      * 외부 기능 모듈에서 알림을 전송할 때 사용하는 단일 창구
      *
-     * @param userId 수신자 ID
+     * @param receiverId 수신자 ID
      * @param notiType 알림 유형
      * @param title 알림 제목
      * @param message 알림 본문
@@ -29,7 +29,7 @@ class NotificationProviderApi(
      * @param refData 딥링크용 부가 데이터 (알림 내역과 FCM data에 함께 담긴다)
      */
     suspend fun sendNotification(
-        userId: UserId,
+        receiverId: UserId,
         notiType: NotificationType,
         title: String,
         message: String,
@@ -39,7 +39,7 @@ class NotificationProviderApi(
     ) {
         sendNotification.invoke(
             NotificationCommand.personal(
-                userId = userId,
+                receiverId = receiverId,
                 notiType = notiType,
                 title = title,
                 message = message,

@@ -29,7 +29,7 @@ class SendNotificationUseCase(
      * @return 저장된 [Notification]
      */
     suspend operator fun invoke(command: NotificationCommand): NotificationDto {
-        val userId = command.userId
+        val receiverId = command.receiverId
             ?: throw NotificationException.MissingUserIdInPersonalNotification()
 
         val (notification, tokens) = suspendTransaction {
@@ -39,7 +39,7 @@ class SendNotificationUseCase(
             val notification = notificationRepository.save(command)
 
             // 2. 활성 토큰 조회
-            val tokens = fcmTokenRepository.findActiveTokens(userId)
+            val tokens = fcmTokenRepository.findActiveTokens(receiverId)
 
             notification to tokens
         }

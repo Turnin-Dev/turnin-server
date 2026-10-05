@@ -219,7 +219,7 @@ class CreatePingPongAnswerUseCaseTest {
 
         // then
         val expected = PingPongNotificationCommand(
-            userId = UserId(1L),
+            receiverId = UserId(1L),
             notiType = NotificationType.PING_PONG_ANSWER,
             title = "새 답변",
             message = "작성자 님이 질문에 답변했어요.",

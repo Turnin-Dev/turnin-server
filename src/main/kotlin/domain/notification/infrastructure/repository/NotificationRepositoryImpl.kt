@@ -25,7 +25,7 @@ class NotificationRepositoryImpl : NotificationRepository {
         suspendTransaction {
             NotificationEntity
                 .new {
-                    this.userId = command.userId?.let { EntityID(it.value, Users) }
+                    this.userId = command.receiverId?.let { EntityID(it.value, Users) }
                     this.notiType = command.notiType
                     this.title = command.title
                     this.message = command.message

@@ -7,7 +7,7 @@ import com.turnin.domain.pingPong.domain.provider.NotificationProvider
 class NotificationProviderImpl(private val notificationProviderApi: NotificationProviderApi) : NotificationProvider {
     override suspend fun sendNotification(command: PingPongNotificationCommand) {
         notificationProviderApi.sendNotification(
-            userId = command.userId,
+            receiverId = command.receiverId,
             notiType = command.notiType,
             title = command.title,
             message = command.message,

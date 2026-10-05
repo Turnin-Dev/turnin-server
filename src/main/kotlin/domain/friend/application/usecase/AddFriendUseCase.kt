@@ -108,7 +108,7 @@ class AddFriendUseCase(
                     // 6-1) 역방향 자동 수락: 원래 요청자(receiverId)에게 수락 알림 전송
                     notificationProvider.sendNotification(
                         FriendNotificationCommand(
-                            userId = notificationTargetId,
+                            receiverId = notificationTargetId,
                             notiType = NotificationType.FRIEND_ACCEPT,
                             title = FriendNotificationMessage.FriendAccept.TITLE,
                             message = FriendNotificationMessage.FriendAccept.message(requesterName),
@@ -120,7 +120,7 @@ class AddFriendUseCase(
                     // 6-2) 신규 친구 요청: 수신자(receiverId)에게 요청 알림 전송
                     notificationProvider.sendNotification(
                         FriendNotificationCommand(
-                            userId = notificationTargetId,
+                            receiverId = notificationTargetId,
                             notiType = NotificationType.FRIEND_REQUEST,
                             title = FriendNotificationMessage.FriendRequest.TITLE,
                             message = FriendNotificationMessage.FriendRequest.message(requesterName),

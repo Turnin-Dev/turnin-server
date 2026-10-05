@@ -161,7 +161,7 @@ class CreatePingPongQuestionUseCaseTest {
 
         // then
         val expected = PingPongNotificationCommand(
-            userId = UserId(2L),
+            receiverId = UserId(2L),
             notiType = NotificationType.PING_PONG_QUESTION,
             title = "새 질문",
             message = "질문자 님이 질문을 남겼어요.",

@@ -4,7 +4,7 @@ import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
 
 data class FriendNotificationCommand(
-    val userId: UserId,
+    val receiverId: UserId,
     val notiType: NotificationType,
     val title: String,
     val message: String,

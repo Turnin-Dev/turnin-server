@@ -71,7 +71,7 @@ class CreatePingPongQuestionUseCase(
                     ?: return@launch
                 notificationProvider.sendNotification(
                     PingPongNotificationCommand(
-                        userId = ownerId,
+                        receiverId = ownerId,
                         notiType = NotificationType.PING_PONG_QUESTION,
                         title = PingPongNotificationMessage.Question.TITLE,
                         message = PingPongNotificationMessage.Question.message(questionerName.value),

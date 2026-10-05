@@ -45,7 +45,7 @@ class SendNotificationUseCaseTest {
         // given
         val userId = UserId(1L)
         val command = NotificationCommand.personal(
-            userId = userId,
+            receiverId = userId,
             notiType = NotificationType.FRIEND_REQUEST,
             title = "친구 요청",
             message = "테스트 유저님이 친구 요청을 보냈어요.",
@@ -73,7 +73,7 @@ class SendNotificationUseCaseTest {
         // given
         val userId = UserId(1L)
         val command = NotificationCommand.personal(
-            userId = userId,
+            receiverId = userId,
             notiType = NotificationType.PING_PONG_ANSWER,
             title = "새 답변",
             message = "작성자 님이 질문에 답변했어요.",
@@ -103,7 +103,7 @@ class SendNotificationUseCaseTest {
         // given
         val userId = UserId(1L)
         val command = NotificationCommand.personal(
-            userId = userId,
+            receiverId = userId,
             notiType = NotificationType.FRIEND_REQUEST,
             title = "친구 요청",
             message = "테스트 유저님이 친구 요청을 보냈어요.",

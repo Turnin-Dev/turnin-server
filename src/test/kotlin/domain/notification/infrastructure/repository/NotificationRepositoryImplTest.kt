@@ -40,7 +40,7 @@ class NotificationRepositoryImplTest {
         // given
         val userId = insertUserAndReturnId("1")
         val command = NotificationCommand.personal(
-            userId = userId,
+            receiverId = userId,
             notiType = NotificationType.FRIEND_REQUEST,
             title = "친구 요청",
             message = "테스트 유저님이 친구 요청을 보냈어요.",
@@ -84,7 +84,7 @@ class NotificationRepositoryImplTest {
         // given
         val userId = insertUserAndReturnId("1")
         val command = NotificationCommand.personal(
-            userId = userId,
+            receiverId = userId,
             notiType = NotificationType.FRIEND_ACCEPT,
             title = null,
             message = "친구 요청이 수락됐어요.",
@@ -103,7 +103,7 @@ class NotificationRepositoryImplTest {
         val userId = insertUserAndReturnId("1")
         repository.save(
             NotificationCommand.personal(
-                userId = userId,
+                receiverId = userId,
                 notiType = NotificationType.PING_PONG_ANSWER,
                 title = "새 답변",
                 message = "작성자 님이 질문에 답변했어요.",
@@ -126,7 +126,7 @@ class NotificationRepositoryImplTest {
         val userId = insertUserAndReturnId("1")
         repository.save(
             NotificationCommand.personal(
-                userId = userId,
+                receiverId = userId,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "테스트 유저님이 친구 요청을 보냈어요.",
@@ -151,7 +151,7 @@ class NotificationRepositoryImplTest {
         repeat(3) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId,
+                    receiverId = userId,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -174,7 +174,7 @@ class NotificationRepositoryImplTest {
         val userId = insertUserAndReturnId("1")
         repository.save(
             NotificationCommand.personal(
-                userId = userId,
+                receiverId = userId,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",
@@ -203,7 +203,7 @@ class NotificationRepositoryImplTest {
         repeat(5) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId,
+                    receiverId = userId,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -253,7 +253,7 @@ class NotificationRepositoryImplTest {
         val userId = insertUserAndReturnId("1")
         val notification = repository.save(
             NotificationCommand.personal(
-                userId = userId,
+                receiverId = userId,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",
@@ -289,7 +289,7 @@ class NotificationRepositoryImplTest {
         val userId2 = insertUserAndReturnId("2")
         val notification = repository.save(
             NotificationCommand.personal(
-                userId = userId1,
+                receiverId = userId1,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",
@@ -314,7 +314,7 @@ class NotificationRepositoryImplTest {
         repeat(3) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId,
+                    receiverId = userId,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -338,7 +338,7 @@ class NotificationRepositoryImplTest {
         repeat(3) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId1,
+                    receiverId = userId1,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -347,7 +347,7 @@ class NotificationRepositoryImplTest {
         }
         repository.save(
             NotificationCommand.personal(
-                userId = userId2,
+                receiverId = userId2,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",
