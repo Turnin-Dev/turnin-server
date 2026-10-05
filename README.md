@@ -78,7 +78,7 @@ flowchart LR
 ```mermaid
 graph LR
     subgraph Feature A
-        uc(UseCase) -- 의존 --> pi(domain: ProviderInterface)
+        uc(application: UseCase) -- 의존 --> pi(domain: ProviderInterface)
         pimpl(infrastructure: ProviderImpl) -- 구현 --> pi
     end
     subgraph Feature B
