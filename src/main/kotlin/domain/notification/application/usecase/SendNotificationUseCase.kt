@@ -54,6 +54,7 @@ class SendNotificationUseCase(
                     imageUrl = command.imageUrl,
                     notiType = command.notiType,
                     data = buildMap {
+                        command.refData?.let { putAll(it) }
                         command.refType?.let { put(FcmDataKey.REF_TYPE, it) }
                         command.refId?.let { put(FcmDataKey.REF_ID, it.toString()) }
                     },

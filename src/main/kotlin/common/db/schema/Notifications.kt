@@ -18,6 +18,7 @@ object Notifications : BaseLongIdTable("notification") {
     val isBroadcast = bool("is_broadcast").default(false)
     val refId = long("ref_id").nullable()
     val refType = varchar("ref_type", 50).nullable()
+    val refData = text("ref_data").nullable()
 
     init {
         index("idx_notification_user_id", false, userId)
@@ -39,4 +40,5 @@ class NotificationEntity(id: EntityID<Long>) : BaseEntity(id, Notifications) {
     var isBroadcast by Notifications.isBroadcast
     var refId by Notifications.refId
     var refType by Notifications.refType
+    var refData by Notifications.refData
 }

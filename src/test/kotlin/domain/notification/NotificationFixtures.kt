@@ -24,6 +24,7 @@ fun notificationFixture(
     isBroadcast = command?.isBroadcast ?: false,
     refId = command?.refId,
     refType = command?.refType,
+    refData = command?.refData,
     createdAt = System.currentTimeMillis() / 1000,
     updatedAt = System.currentTimeMillis() / 1000,
 )

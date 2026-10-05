@@ -7,8 +7,14 @@ import com.turnin.common.model.id.NotificationId
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.notification.domain.model.FcmToken
 import com.turnin.domain.notification.domain.model.Notification
+import kotlinx.serialization.json.Json
 
 object NotificationMapper {
+    /** 딥링크용 부가 데이터([Notification.refData]) JSON 문자열 직렬화 */
+    fun Map<String, String>.toRefDataJson(): String = Json.encodeToString(this)
+
+    private fun String.toRefData(): Map<String, String> = Json.decodeFromString(this)
+
     fun NotificationEntity.toDomain() = Notification(
         id = NotificationId(this.id.value),
         userId = this.userId?.let { UserId(it.value) },
@@ -20,6 +26,7 @@ object NotificationMapper {
         isBroadcast = this.isBroadcast,
         refId = this.refId,
         refType = this.refType,
+        refData = this.refData?.toRefData(),
         createdAt = this.createdAt.toEpochSecond(),
         updatedAt = this.updatedAt.toEpochSecond(),
     )

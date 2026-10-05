@@ -97,6 +97,51 @@ class NotificationRepositoryImplTest {
         assertNull(result.title)
     }
 
+    @Test
+    fun `딥링크 부가 데이터와 함께 저장한 알림은 조회 시 같은 부가 데이터를 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        repository.save(
+            NotificationCommand.personal(
+                userId = userId,
+                notiType = NotificationType.PING_PONG_ANSWER,
+                title = "새 답변",
+                message = "작성자 님이 질문에 답변했어요.",
+                refId = 3L,
+                refType = "KEYWORD",
+                refData = mapOf("ref_owner_id" to "34"),
+            ),
+        )
+
+        // when
+        val result = repository.findByUserId(userId, cursor = null, size = 10)
+
+        // then
+        assertEquals(mapOf("ref_owner_id" to "34"), result.single().refData)
+    }
+
+    @Test
+    fun `딥링크 부가 데이터 없이 저장한 알림은 조회 시 부가 데이터가 null이다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        repository.save(
+            NotificationCommand.personal(
+                userId = userId,
+                notiType = NotificationType.FRIEND_REQUEST,
+                title = "친구 요청",
+                message = "테스트 유저님이 친구 요청을 보냈어요.",
+                refId = 2L,
+                refType = "USER",
+            ),
+        )
+
+        // when
+        val result = repository.findByUserId(userId, cursor = null, size = 10)
+
+        // then
+        assertNull(result.single().refData)
+    }
+
     // ======================== findByUserId ========================
 
     @Test

@@ -26,6 +26,7 @@ class NotificationProviderApi(
      * @param message 알림 본문
      * @param refId 딥링크용 참조 ID
      * @param refType 딥링크용 참조 타입
+     * @param refData 딥링크용 부가 데이터 (알림 내역과 FCM data에 함께 담긴다)
      */
     suspend fun sendNotification(
         userId: UserId,
@@ -34,6 +35,7 @@ class NotificationProviderApi(
         message: String,
         refId: Long? = null,
         refType: String? = null,
+        refData: Map<String, String>? = null,
     ) {
         sendNotification.invoke(
             NotificationCommand.personal(
@@ -43,6 +45,7 @@ class NotificationProviderApi(
                 message = message,
                 refId = refId,
                 refType = refType,
+                refData = refData,
             ),
         )
     }
@@ -81,7 +84,12 @@ class NotificationProviderApi(
                     put(FcmDataKey.NOTI_TYPE, notiType.name)
                     refType?.let { put(FcmDataKey.REF_TYPE, it) }
                     refId?.let { put(FcmDataKey.REF_ID, it.toString()) }
-                    senderUserId?.let { put(FcmDataKey.USER_ID, it.toString()) }
+                    senderUserId?.let {
+                        put(FcmDataKey.REF_OWNER_ID, it.toString())
+                        // 구버전 앱 하위 호환: 최소 지원 앱 버전이 REF_OWNER_ID를 읽는 버전 이상이 되면 제거한다.
+                        @Suppress("DEPRECATION")
+                        put(FcmDataKey.USER_ID, it.toString())
+                    }
                 },
             ),
         )

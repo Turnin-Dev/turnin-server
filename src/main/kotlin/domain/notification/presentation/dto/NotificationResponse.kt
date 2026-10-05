@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
  * @param isBroadcast 브로드캐스트 여부
  * @param refId 참조 리소스 ID
  * @param refType 참조 리소스 타입
+ * @param refData 딥링크용 부가 데이터 (FCM data와 동일한 key-value 맵, 예: 키워드 게시물 작성자 ID `ref_owner_id`)
  * @param createdAt 생성 일자
  */
 @Serializable
@@ -30,6 +31,7 @@ data class NotificationResponse(
     val isBroadcast: Boolean,
     val refId: Long?,
     val refType: String?,
+    val refData: Map<String, String>?,
     val createdAt: Long,
 ) {
     companion object {
@@ -46,6 +48,7 @@ data class NotificationResponse(
                     isBroadcast = false,
                     refId = it + 1L,
                     refType = "USER",
+                    refData = null,
                     createdAt = 1716000000L,
                 )
             },
@@ -65,5 +68,6 @@ fun NotificationDto.toResponse() = NotificationResponse(
     isBroadcast = this.isBroadcast,
     refId = this.refId,
     refType = this.refType,
+    refData = this.refData,
     createdAt = this.createdAt,
 )

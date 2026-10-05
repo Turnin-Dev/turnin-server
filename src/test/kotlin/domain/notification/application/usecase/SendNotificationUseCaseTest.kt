@@ -1,5 +1,6 @@
 package com.turnin.domain.notification.application.usecase
 
+import com.turnin.common.firebase.FcmMessage
 import com.turnin.common.firebase.FcmService
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
@@ -15,6 +16,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -64,6 +66,36 @@ class SendNotificationUseCaseTest {
         assertEquals(expectedNotification.toDto(), result)
         coVerify(exactly = 1) { fcmService.sendToUsers(any(), any()) }
         coVerify(exactly = 1) { notificationRepository.save(command) }
+    }
+
+    @Test
+    fun `딥링크 부가 데이터가 있으면 FCM data에 참조 타입, 참조 ID와 함께 담아 전송한다`() = runTest {
+        // given
+        val userId = UserId(1L)
+        val command = NotificationCommand.personal(
+            userId = userId,
+            notiType = NotificationType.PING_PONG_ANSWER,
+            title = "새 답변",
+            message = "작성자 님이 질문에 답변했어요.",
+            refId = 3L,
+            refType = "KEYWORD",
+            refData = mapOf("ref_owner_id" to "34"),
+        )
+        val fcmMessage = slot<FcmMessage>()
+        coEvery { notificationRepository.save(command) } returns notificationFixture(userId = userId, command = command)
+        coEvery { fcmTokenRepository.findActiveTokens(userId) } returns listOf("token1")
+        coEvery { fcmService.sendToUsers(listOf("token1"), capture(fcmMessage)) } just Runs
+
+        // when
+        usecase(command)
+
+        // then
+        val expectedData = mapOf(
+            "ref_owner_id" to "34",
+            "ref_type" to "KEYWORD",
+            "ref_id" to "3",
+        )
+        assertEquals(expectedData, fcmMessage.captured.data)
     }
 
     @Test
