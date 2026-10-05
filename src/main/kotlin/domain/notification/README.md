@@ -39,6 +39,8 @@ Notification ──→ User     ❌
 
 ### 딥링크 데이터 구성
 
+> 클라이언트와의 계약은 **알림 목록 조회 API 문서**(`NotificationRoute.getNotificationsDocs`)가 기준이다. 아래 표를 수정할 때 API 문서도 함께 수정한다.
+
 - 이동할 화면의 핵심 ID는 `refType` + `refId`에 담는다.
 - 그 외 화면 이동에 필요한 부가 값은 `refData`(key-value 맵)에 담는다. (FCM data 키와 동일)
 - `refData`는 FCM data와 알림 내역(`notification.ref_data`)에 함께 저장되므로, 푸시와 알림 목록에서 같은 값으로 딥링크를 구성할 수 있다.

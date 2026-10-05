@@ -110,6 +110,7 @@ private fun RouteConfig.createQuestionDocs() {
 
         - 질문은 공백만으로 이루어질 수 없으며, 최대 ${PingPongContent.MAX_LENGTH}자까지 작성할 수 있다.
         - Rate Limit (동일 사용자 + 동일 게시물 기준): ${RateLimitToken.CREATE_PING_PONG_QUESTION_BURST.toPrettyString()}, ${RateLimitToken.CREATE_PING_PONG_QUESTION.toPrettyString()}
+        - 등록 시 게시물 작성자에게 `PING_PONG_QUESTION` 알림을 전송한다. (딥링크 데이터는 알림 목록 조회 API 참고)
     """.trimIndent()
     request {
         pathParameter<Long>("userKeywordId") {
@@ -151,6 +152,7 @@ private fun RouteConfig.createAnswerDocs() {
         - 질문이 달린 게시물(사용자 키워드)의 작성자만 답변을 등록할 수 있으며, 질문당 답변은 1개만 등록할 수 있다.
         - 질문자와 차단 관계(양방향)이면 답변을 등록할 수 없다. (차단 전에 달린 질문은 삭제/신고만 가능)
         - 답변은 공백만으로 이루어질 수 없으며, 최대 ${PingPongContent.MAX_LENGTH}자까지 작성할 수 있다.
+        - 등록 시 질문자에게 `PING_PONG_ANSWER` 알림을 전송한다. (딥링크 데이터는 알림 목록 조회 API 참고)
     """.trimIndent()
     request {
         pathParameter<Long>("pingPongId") {
