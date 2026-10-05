@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.turnin"
-version = "1.5.3"
+version = "1.6.0"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
