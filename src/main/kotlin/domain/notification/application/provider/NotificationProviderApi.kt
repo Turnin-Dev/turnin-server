@@ -3,6 +3,7 @@ package com.turnin.domain.notification.application.provider
 import com.turnin.common.firebase.FcmDataKey
 import com.turnin.common.firebase.FcmMessage
 import com.turnin.common.firebase.FcmService
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.notification.application.usecase.SendNotificationUseCase
@@ -35,7 +36,7 @@ class NotificationProviderApi(
         message: String,
         refId: Long? = null,
         refType: String? = null,
-        refData: Map<String, String>? = null,
+        refData: Map<RefDataKey, String>? = null,
     ) {
         sendNotification.invoke(
             NotificationCommand.personal(
@@ -85,7 +86,7 @@ class NotificationProviderApi(
                     refType?.let { put(FcmDataKey.REF_TYPE, it) }
                     refId?.let { put(FcmDataKey.REF_ID, it.toString()) }
                     senderUserId?.let {
-                        put(FcmDataKey.REF_OWNER_ID, it.toString())
+                        put(RefDataKey.REF_OWNER_ID.key, it.toString())
                         // 구버전 앱 하위 호환: 최소 지원 앱 버전이 REF_OWNER_ID를 읽는 버전 이상이 되면 제거한다.
                         @Suppress("DEPRECATION")
                         put(FcmDataKey.USER_ID, it.toString())

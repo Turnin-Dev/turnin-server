@@ -5,6 +5,7 @@ import com.turnin.common.db.schema.Notifications
 import com.turnin.common.db.schema.Users
 import com.turnin.common.db.suspendTransaction
 import com.turnin.common.db.updateWithTimestamp
+import com.turnin.common.firebase.toStringKeyMap
 import com.turnin.common.model.id.NotificationId
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.notification.domain.model.Notification
@@ -33,7 +34,7 @@ class NotificationRepositoryImpl : NotificationRepository {
                     this.isBroadcast = command.isBroadcast
                     this.refId = command.refId
                     this.refType = command.refType
-                    this.refData = command.refData?.toRefDataJson()
+                    this.refData = command.refData?.toStringKeyMap()?.toRefDataJson()
                 }.toDomain()
         }
 

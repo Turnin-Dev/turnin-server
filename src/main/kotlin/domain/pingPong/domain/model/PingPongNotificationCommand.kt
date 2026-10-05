@@ -1,5 +1,6 @@
 package com.turnin.domain.pingPong.domain.model
 
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
 
@@ -21,5 +22,5 @@ data class PingPongNotificationCommand(
     val message: String,
     val refId: Long,
     val refType: String,
-    val refData: Map<String, String>,
+    val refData: Map<RefDataKey, String>,
 )

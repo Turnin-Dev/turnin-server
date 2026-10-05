@@ -1,7 +1,7 @@
 package com.turnin.domain.pingPong.application.usecase
 
 import com.turnin.common.db.DatabaseException
-import com.turnin.common.firebase.FcmDataKey
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.firebase.RefType
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.PingPongId
@@ -93,7 +93,7 @@ class CreatePingPongAnswerUseCase(
                         message = PingPongNotificationMessage.Answer.message(answererName.value),
                         refId = pingPong.userKeywordId.value,
                         refType = RefType.KEYWORD,
-                        refData = mapOf(FcmDataKey.REF_OWNER_ID to answererId.value.toString()),
+                        refData = mapOf(RefDataKey.REF_OWNER_ID to answererId.value.toString()),
                     ),
                 )
             }.onFailure { e ->

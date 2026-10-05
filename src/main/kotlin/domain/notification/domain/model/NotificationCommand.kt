@@ -1,5 +1,6 @@
 package com.turnin.domain.notification.domain.model
 
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.notification.exception.NotificationErrorCode
@@ -15,7 +16,7 @@ import com.turnin.domain.notification.exception.NotificationErrorCode
  * @property isBroadcast 브로드캐스트 여부
  * @property refId 참조 ID (발신자, 딥링크 용)
  * @property refType 참조 타입
- * @property refData 딥링크용 부가 데이터 (FCM data와 동일한 key-value 맵, refId/refType 외에 화면 이동에 필요한 값)
+ * @property refData 딥링크용 부가 데이터 (refId/refType 외에 화면 이동에 필요한 값, 알림 내역과 FCM data에 같은 키로 담긴다)
  */
 @ConsistentCopyVisibility
 data class NotificationCommand private constructor(
@@ -27,7 +28,7 @@ data class NotificationCommand private constructor(
     val isBroadcast: Boolean = false,
     val refId: Long? = null,
     val refType: String? = null,
-    val refData: Map<String, String>? = null,
+    val refData: Map<RefDataKey, String>? = null,
 ) {
     companion object {
         /**
@@ -42,7 +43,7 @@ data class NotificationCommand private constructor(
             imageUrl: String? = null,
             refId: Long? = null,
             refType: String? = null,
-            refData: Map<String, String>? = null,
+            refData: Map<RefDataKey, String>? = null,
         ): NotificationCommand {
             require(!notiType.isBroadcast) {
                 NotificationErrorCode.InvalidPersonalNotificationType.description

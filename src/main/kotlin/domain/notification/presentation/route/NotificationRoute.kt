@@ -2,6 +2,7 @@ package com.turnin.domain.notification.presentation.route
 
 import com.turnin.common.exception.toErrorResponse
 import com.turnin.common.firebase.FcmDataKey
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.firebase.RefType
 import com.turnin.common.plugin.AuthenticatedRoute
 import com.turnin.common.route.Api
@@ -147,8 +148,8 @@ private fun RouteConfig.getNotificationsDocs() {
         |---|---|---|---|---|
         | `FRIEND_REQUEST` | 요청한 사용자 프로필 | `${RefType.USER}` | 요청한 사용자 ID | - |
         | `FRIEND_ACCEPT` | 수락한 사용자 프로필 | `${RefType.USER}` | 수락한 사용자 ID | - |
-        | `PING_PONG_QUESTION` | 키워드 게시물 상세 | `${RefType.KEYWORD}` | 사용자 키워드 ID | `${FcmDataKey.REF_OWNER_ID}`: 게시물 작성자 ID |
-        | `PING_PONG_ANSWER` | 키워드 게시물 상세 | `${RefType.KEYWORD}` | 사용자 키워드 ID | `${FcmDataKey.REF_OWNER_ID}`: 게시물 작성자 ID |
+        | `PING_PONG_QUESTION` | 키워드 게시물 상세 | `${RefType.KEYWORD}` | 사용자 키워드 ID | `${RefDataKey.REF_OWNER_ID.key}`: 게시물 작성자 ID |
+        | `PING_PONG_ANSWER` | 키워드 게시물 상세 | `${RefType.KEYWORD}` | 사용자 키워드 ID | `${RefDataKey.REF_OWNER_ID.key}`: 게시물 작성자 ID |
         | `NOTICE`, `EVENT` | 알림 목록 | - | - | - |
 
         - 처음 보는 `notiType`/`refType`은 무시하고 알림 목록 화면으로 이동해야 한다. (신규 유형 추가 시 구버전 앱 호환)
@@ -164,11 +165,11 @@ private fun RouteConfig.getNotificationsDocs() {
         | `${FcmDataKey.BODY}` | message |
         | `${FcmDataKey.REF_TYPE}` | refType (없으면 키 생략) |
         | `${FcmDataKey.REF_ID}` | refId (없으면 키 생략) |
-        | refData의 각 키 | refData의 각 값 (예: `${FcmDataKey.REF_OWNER_ID}`) |
+        | refData의 각 키 | refData의 각 값 (예: `${RefDataKey.REF_OWNER_ID.key}`) |
 
         `NEW_KEYWORD`는 푸시로만 전송되며 알림 목록에 저장되지 않는다.
-        (`${FcmDataKey.REF_TYPE}`: `${RefType.KEYWORD}`, `${FcmDataKey.REF_ID}`: 사용자 키워드 ID, `${FcmDataKey.REF_OWNER_ID}`: 게시물 작성자 ID,
-        `user_id`: `${FcmDataKey.REF_OWNER_ID}`와 같은 값 - 구버전 앱 호환용, 제거 예정이므로 신규 구현은 `${FcmDataKey.REF_OWNER_ID}` 사용)
+        (`${FcmDataKey.REF_TYPE}`: `${RefType.KEYWORD}`, `${FcmDataKey.REF_ID}`: 사용자 키워드 ID, `${RefDataKey.REF_OWNER_ID.key}`: 게시물 작성자 ID,
+        `user_id`: `${RefDataKey.REF_OWNER_ID.key}`와 같은 값 - 구버전 앱 호환용, 제거 예정이므로 신규 구현은 `${RefDataKey.REF_OWNER_ID.key}` 사용)
     """.trimIndent()
     request {
         queryParameter<Long?>("cursor") {

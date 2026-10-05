@@ -1,6 +1,7 @@
 package com.turnin.domain.notification.infrastructure.repository
 
 import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
@@ -109,7 +110,7 @@ class NotificationRepositoryImplTest {
                 message = "작성자 님이 질문에 답변했어요.",
                 refId = 3L,
                 refType = "KEYWORD",
-                refData = mapOf("ref_owner_id" to "34"),
+                refData = mapOf(RefDataKey.REF_OWNER_ID to "34"),
             ),
         )
 

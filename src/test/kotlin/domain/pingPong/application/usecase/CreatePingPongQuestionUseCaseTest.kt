@@ -1,5 +1,6 @@
 package com.turnin.domain.pingPong.application.usecase
 
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.UserName
 import com.turnin.common.model.id.PingPongId
@@ -167,7 +168,7 @@ class CreatePingPongQuestionUseCaseTest {
             message = "질문자 님이 질문을 남겼어요.",
             refId = 3L,
             refType = "KEYWORD",
-            refData = mapOf("ref_owner_id" to "2"),
+            refData = mapOf(RefDataKey.REF_OWNER_ID to "2"),
         )
         coVerify(exactly = 1) { notificationProvider.sendNotification(any()) }
         assertEquals(expected, command.captured)

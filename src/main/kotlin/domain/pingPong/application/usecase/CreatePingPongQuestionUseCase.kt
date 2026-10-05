@@ -1,6 +1,6 @@
 package com.turnin.domain.pingPong.application.usecase
 
-import com.turnin.common.firebase.FcmDataKey
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.firebase.RefType
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
@@ -77,7 +77,7 @@ class CreatePingPongQuestionUseCase(
                         message = PingPongNotificationMessage.Question.message(questionerName.value),
                         refId = userKeywordIdVO.value,
                         refType = RefType.KEYWORD,
-                        refData = mapOf(FcmDataKey.REF_OWNER_ID to ownerId.value.toString()),
+                        refData = mapOf(RefDataKey.REF_OWNER_ID to ownerId.value.toString()),
                     ),
                 )
             }.onFailure { e ->

@@ -2,6 +2,7 @@ package com.turnin.domain.notification.application.usecase
 
 import com.turnin.common.firebase.FcmMessage
 import com.turnin.common.firebase.FcmService
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.notification.application.dto.toDto
@@ -79,7 +80,7 @@ class SendNotificationUseCaseTest {
             message = "작성자 님이 질문에 답변했어요.",
             refId = 3L,
             refType = "KEYWORD",
-            refData = mapOf("ref_owner_id" to "34"),
+            refData = mapOf(RefDataKey.REF_OWNER_ID to "34"),
         )
         val fcmMessage = slot<FcmMessage>()
         coEvery { notificationRepository.save(command) } returns notificationFixture(userId = userId, command = command)
