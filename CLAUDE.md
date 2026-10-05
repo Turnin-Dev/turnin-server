@@ -10,7 +10,7 @@ Kotlin 2.1.10 + Ktor 3.1.2 (Netty engine), Gradle Kotlin DSL, JDK 17. Exposed 0.
 
 Single Gradle module. Package-based modular monolith with Clean Architecture per feature (`presentation → application → domain ← infrastructure`). Top-level packages: `common/` (cross-cutting: di, jwt, db, batch, exception, firebase, ml, plugin, route, util) and `domain/<feature>/` (account, announcement, auth, block, discover, feed, file, friend, keyword, notification, report, user, userKeyword).
 
-Full layering conventions, folder structure per layer, and dependency-direction rules are documented in @README.md — read it before adding a new feature or layer.
+Layering conventions and dependency-direction rules are documented in @README.md, and code/commit rules in @CONTRIBUTING.md — read them before adding a new feature or layer.
 
 `domain/seed/` is a one-off seed-data insertion module — never wire it into normal application code, it exists only for initial data seeding (see its own README).
 
