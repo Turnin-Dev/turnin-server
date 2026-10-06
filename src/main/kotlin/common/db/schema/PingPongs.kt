@@ -23,7 +23,7 @@ object PingPongs : BaseLongIdTable("ping_pong") {
         index("idx_ping_pong_user_keyword_id", false, userKeywordId, id)
 
         // questionerId 인덱스는 저장 용량 절약을 위해 두지 않는다.
-        // 계정 Hard Delete 시 CASCADE가 ping_pong을 seq scan 하므로, 배치가 느려지면 인덱스를 추가한다.
+        // 계정 삭제(탈퇴) 시 질문자 조건으로 ping_pong을 seq scan 하므로, 탈퇴 API가 느려지면 새 마이그레이션으로 인덱스를 추가한다.
         // (연속 작성 제한은 DB가 아닌 RateLimit 플러그인으로 처리)
     }
 }

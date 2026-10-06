@@ -24,4 +24,12 @@ class UserKeywordDeletionSupportApi(private val userKeywordRepository: UserKeywo
      */
     suspend fun deleteByUserId(userId: UserId) =
         userKeywordRepository.deleteByUserId(userId)
+
+    /**
+     * 사용자의 키워드 중 신고 내역이 없는 키워드를 전부 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun deleteUnreportedByUserId(userId: UserId) =
+        userKeywordRepository.deleteUnreportedByUserId(userId)
 }

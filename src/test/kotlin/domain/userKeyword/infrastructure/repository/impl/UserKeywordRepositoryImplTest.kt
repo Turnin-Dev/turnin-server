@@ -5,6 +5,8 @@ import com.turnin.common.db.schema.BlockEntity
 import com.turnin.common.db.schema.BlockReasons
 import com.turnin.common.db.schema.KeywordEntity
 import com.turnin.common.db.schema.Keywords
+import com.turnin.common.db.schema.ReportReasons
+import com.turnin.common.db.schema.Reports
 import com.turnin.common.db.schema.UserEntity
 import com.turnin.common.db.schema.UserKeywordEntity
 import com.turnin.common.db.schema.UserKeywords
@@ -28,6 +30,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.After
 import org.junit.Before
@@ -329,6 +332,55 @@ class UserKeywordRepositoryImplTest {
         // then
         val count = repository.countByUserId(userId)
         assertEquals(0, count)
+    }
+
+    @Test
+    fun `deleteUnreportedByUserId 성공 테스트 - 신고 내역이 없는 사용자 키워드는 삭제된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = createForTest(userId = userId, keywordId = keywordId, description = TestDescription)
+
+        // when
+        repository.deleteUnreportedByUserId(userId)
+
+        // then
+        assertNull(findByIdForTest(userKeyword.id.value))
+    }
+
+    @Test
+    fun `deleteUnreportedByUserId 성공 테스트 - 신고 내역이 있는 사용자 키워드는 유지된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val reporterId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = createForTest(userId = userId, keywordId = keywordId, description = TestDescription)
+        insertUserKeywordReport(reporterId = reporterId, userKeywordId = userKeyword.id.value)
+
+        // when
+        repository.deleteUnreportedByUserId(userId)
+
+        // then
+        assertNotNull(findByIdForTest(userKeyword.id.value))
+    }
+
+    @Test
+    fun `deleteUnreportedByUserId 성공 테스트 - 다른 사용자의 사용자 키워드는 유지된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val otherUserId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(otherUserId, TEST_KEYWORD)
+        val otherUserKeyword = createForTest(
+            userId = otherUserId,
+            keywordId = keywordId,
+            description = TestDescription,
+        )
+
+        // when
+        repository.deleteUnreportedByUserId(userId)
+
+        // then
+        assertNotNull(findByIdForTest(otherUserKeyword.id.value))
     }
 
     @Test
@@ -762,6 +814,14 @@ class UserKeywordRepositoryImplTest {
 
     private suspend fun findByIdForTest(userKeywordId: Long): UserKeywordEntity? = TestDatabaseFactory.dbQuery {
         UserKeywordEntity.findById(userKeywordId)
+    }
+
+    private suspend fun insertUserKeywordReport(reporterId: UserId, userKeywordId: Long) = TestDatabaseFactory.dbQuery {
+        Reports.insert {
+            it[Reports.reporterId] = EntityID(reporterId.value, Users)
+            it[reportedUserKeywordId] = EntityID(userKeywordId, UserKeywords)
+            it[reasonId] = EntityID(1L, ReportReasons) // 기존 initData에서 생성된 신고 사유
+        }
     }
 
     companion object {

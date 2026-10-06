@@ -911,6 +911,107 @@ class PingPongRepositoryImplTest {
         assertFalse(result)
     }
 
+    @Test
+    fun `사용자 관련 핑퐁 전체 삭제 시 사용자가 다른 게시물에 남긴 질문과 답변이 삭제된다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        repository.deleteAllByUserId(questionerId)
+
+        // then
+        val (pingPongCount, answerCount) = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.count() to
+                PingPongAnswers.selectAll().where { PingPongAnswers.id eq answer.id.value }.count()
+        }
+        assertEquals(0, pingPongCount)
+        assertEquals(0, answerCount)
+    }
+
+    @Test
+    fun `사용자 관련 핑퐁 전체 삭제 시 사용자의 게시물에 달린 다른 사용자의 핑퐁이 삭제된다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        repository.deleteAllByUserId(ownerId)
+
+        // then
+        val (pingPongCount, answerCount) = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.count() to
+                PingPongAnswers.selectAll().where { PingPongAnswers.id eq answer.id.value }.count()
+        }
+        assertEquals(0, pingPongCount)
+        assertEquals(0, answerCount)
+    }
+
+    @Test
+    fun `사용자 관련 핑퐁 전체 삭제 시 사용자와 관련 없는 핑퐁은 유지된다`() = runTest {
+        // given
+        val targetUserId = insertUserAndReturnId("1")
+        val ownerId = insertUserAndReturnId("2")
+        val questionerId = insertUserAndReturnId("3")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+
+        // when
+        repository.deleteAllByUserId(targetUserId)
+
+        // then
+        val pingPongCount = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.count()
+        }
+        assertEquals(1, pingPongCount)
+    }
+
+    @Test
+    fun `게시물별 핑퐁 전체 삭제 시 해당 게시물의 핑퐁과 답변이 삭제된다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
+
+        // when
+        repository.deleteAllByUserKeywordId(userKeywordId)
+
+        // then
+        val (pingPongCount, answerCount) = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq pingPong.id.value }.count() to
+                PingPongAnswers.selectAll().where { PingPongAnswers.id eq answer.id.value }.count()
+        }
+        assertEquals(0, pingPongCount)
+        assertEquals(0, answerCount)
+    }
+
+    @Test
+    fun `게시물별 핑퐁 전체 삭제 시 다른 게시물의 핑퐁은 유지된다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val targetUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword1")
+        val otherUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword2")
+        val otherPingPong = repository.createQuestion(otherUserKeywordId, questionerId, PingPongContent("질문 내용"))
+
+        // when
+        repository.deleteAllByUserKeywordId(targetUserKeywordId)
+
+        // then
+        val pingPongCount = TestDatabaseFactory.dbQuery {
+            PingPongs.selectAll().where { PingPongs.id eq otherPingPong.id.value }.count()
+        }
+        assertEquals(1, pingPongCount)
+    }
+
     private suspend fun setQuestionHiddenAt(pingPongId: PingPongId, hiddenAt: OffsetDateTime) =
         TestDatabaseFactory.dbQuery {
             PingPongs.update({ PingPongs.id eq pingPongId.value }) {

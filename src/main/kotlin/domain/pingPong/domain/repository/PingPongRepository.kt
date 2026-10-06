@@ -129,4 +129,21 @@ interface PingPongRepository {
      * @return 이번 요청으로 숨김 처리되었다면 `true`, 답변이 없거나 이미 숨김 처리되었다면 `false`를 반환한다.
      */
     suspend fun hideAnswer(answerId: PingPongAnswerId): Boolean
+
+    /**
+     * 사용자와 관련된 핑퐁을 전부 삭제한다. (연결된 답변은 CASCADE로 함께 삭제된다)
+     *
+     * - 사용자가 다른 게시물에 남긴 질문
+     * - 사용자의 게시물(사용자 키워드)에 달린 모든 핑퐁
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun deleteAllByUserId(userId: UserId)
+
+    /**
+     * 게시물(사용자 키워드)에 달린 핑퐁을 전부 삭제한다. (연결된 답변은 CASCADE로 함께 삭제된다)
+     *
+     * @param userKeywordId 사용자 키워드(게시물) ID
+     */
+    suspend fun deleteAllByUserKeywordId(userKeywordId: UserKeywordId)
 }

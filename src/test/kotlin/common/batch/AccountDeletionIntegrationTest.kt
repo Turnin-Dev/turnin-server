@@ -4,10 +4,12 @@ import com.turnin.common.db.schema.AnnouncementEntity
 import com.turnin.common.db.schema.AnnouncementReads
 import com.turnin.common.db.schema.BlockReasons
 import com.turnin.common.db.schema.Blocks
+import com.turnin.common.db.schema.ContentReports
 import com.turnin.common.db.schema.Friends
 import com.turnin.common.db.schema.KeywordEntity
 import com.turnin.common.db.schema.Keywords
 import com.turnin.common.db.schema.Notifications
+import com.turnin.common.db.schema.PingPongs
 import com.turnin.common.db.schema.RefreshTokens
 import com.turnin.common.db.schema.ReportReasons
 import com.turnin.common.db.schema.Reports
@@ -19,6 +21,7 @@ import com.turnin.common.db.schema.Users
 import com.turnin.common.infrastructure.di.infraModule
 import com.turnin.common.model.AnnouncementAudience
 import com.turnin.common.model.AnnouncementStatus
+import com.turnin.common.model.ContentReportType
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.Role
@@ -35,6 +38,7 @@ import com.turnin.domain.file.di.fileModule
 import com.turnin.domain.friend.di.friendModule
 import com.turnin.domain.keyword.di.keywordModule
 import com.turnin.domain.notification.di.notificationModule
+import com.turnin.domain.pingPong.di.pingPongModule
 import com.turnin.domain.report.di.reportModule
 import com.turnin.domain.user.di.userModule
 import com.turnin.domain.userKeyword.di.userKeywordModule
@@ -45,6 +49,7 @@ import kotlin.time.toJavaDuration
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.update
@@ -80,6 +85,7 @@ class AccountDeletionIntegrationTest : KoinTest {
                 accountModule,
                 notificationModule,
                 announcementModule,
+                pingPongModule,
                 infraModule,
                 batchModule,
                 module {
@@ -116,6 +122,13 @@ class AccountDeletionIntegrationTest : KoinTest {
         insertBlock(blockerId = targetId, blockedId = otherUser.id.value)
         insertUserKeyword(userId = targetId, keywordId = keyword.id.value)
         insertReport(reporterId = otherUser.id.value, reportedId = targetId)
+        val otherUserKeywordId = insertUserKeywordAndReturnId(userId = otherUser.id.value, keywordId = keyword.id.value)
+        val pingPongId = insertPingPong(userKeywordId = otherUserKeywordId, questionerId = targetId)
+        insertPingPongQuestionReport(
+            reporterId = otherUser.id.value,
+            reportedUserId = targetId,
+            pingPongId = pingPongId,
+        )
 
         // when 1: 탈퇴 (SoftDelete)
         deleteAccountUseCase(targetId)
@@ -126,6 +139,20 @@ class AccountDeletionIntegrationTest : KoinTest {
             assertNotNull(user)
             assertFalse(user!!.isActive)
             assertNotNull(user.deletedAt)
+
+            // 핑퐁은 탈퇴 즉시 삭제되고, 핑퐁 신고 스냅샷은 남아있다.
+            assertTrue(
+                PingPongs
+                    .selectAll()
+                    .where { PingPongs.questionerId eq targetId }
+                    .empty(),
+            )
+            assertFalse(
+                ContentReports
+                    .selectAll()
+                    .where { ContentReports.reportedUserId eq targetId }
+                    .empty(),
+            )
         }
 
         // when 2: 1년 경과 후 배치 실행 - deletedAt을 1년 전으로 조작
@@ -190,6 +217,12 @@ class AccountDeletionIntegrationTest : KoinTest {
                 AnnouncementReads
                     .selectAll()
                     .where { AnnouncementReads.userId eq targetId }
+                    .empty(),
+            )
+            assertTrue(
+                ContentReports
+                    .selectAll()
+                    .where { (ContentReports.reporterId eq targetId) or (ContentReports.reportedUserId eq targetId) }
                     .empty(),
             )
 
@@ -290,6 +323,37 @@ class AccountDeletionIntegrationTest : KoinTest {
                 this.userId = EntityID(userId, Users)
                 this.keywordId = EntityID(keywordId, Keywords)
                 this.isActive = true
+            }
+        }
+    }
+
+    private suspend fun insertUserKeywordAndReturnId(userId: Long, keywordId: Long): Long =
+        TestDatabaseFactory.dbQuery {
+            UserKeywordEntity
+                .new {
+                    this.userId = EntityID(userId, Users)
+                    this.keywordId = EntityID(keywordId, Keywords)
+                    this.isActive = true
+                }.id.value
+        }
+
+    private suspend fun insertPingPong(userKeywordId: Long, questionerId: Long): Long = TestDatabaseFactory.dbQuery {
+        PingPongs.insertAndGetId {
+            it[PingPongs.userKeywordId] = EntityID(userKeywordId, UserKeywords)
+            it[PingPongs.questionerId] = EntityID(questionerId, Users)
+            it[question] = "질문 내용"
+        }.value
+    }
+
+    private suspend fun insertPingPongQuestionReport(reporterId: Long, reportedUserId: Long, pingPongId: Long) {
+        TestDatabaseFactory.dbQuery {
+            ContentReports.insert {
+                it[ContentReports.reporterId] = EntityID(reporterId, Users)
+                it[ContentReports.reportedUserId] = EntityID(reportedUserId, Users)
+                it[contentType] = ContentReportType.PING_PONG_QUESTION
+                it[contentId] = pingPongId
+                it[contentSnapshot] = "신고된 질문"
+                it[reasonId] = EntityID(1L, ReportReasons)
             }
         }
     }

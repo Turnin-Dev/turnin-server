@@ -4,6 +4,7 @@ import com.turnin.common.db.DatabaseUtils.isNotBlockedRelationship
 import com.turnin.common.db.extension.filterActiveUser
 import com.turnin.common.db.extension.filterActiveUserKeyword
 import com.turnin.common.db.schema.Keywords
+import com.turnin.common.db.schema.Reports
 import com.turnin.common.db.schema.UserKeywordEntity
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
@@ -24,6 +25,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
+import org.jetbrains.exposed.sql.notExists
 import org.jetbrains.exposed.sql.selectAll
 
 class UserKeywordRepositoryImpl : UserKeywordRepository {
@@ -200,6 +202,16 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
 
     override suspend fun deleteByUserId(userId: UserId): Unit = suspendTransaction {
         UserKeywords.deleteWhere { UserKeywords.userId eq userId.value }
+    }
+
+    override suspend fun deleteUnreportedByUserId(userId: UserId): Unit = suspendTransaction {
+        val reportOfUserKeyword = Reports
+            .select(Reports.id)
+            .where { Reports.reportedUserKeywordId eq UserKeywords.id }
+
+        UserKeywords.deleteWhere {
+            (UserKeywords.userId eq userId.value) and notExists(reportOfUserKeyword)
+        }
     }
 
     override suspend fun deactivate(

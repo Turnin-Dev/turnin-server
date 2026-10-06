@@ -2,6 +2,7 @@ package com.turnin.domain.pingPong.di
 
 import com.turnin.common.di.IOApplicationScopeQualifier
 import com.turnin.domain.pingPong.application.provider.PingPongContentReportApi
+import com.turnin.domain.pingPong.application.provider.PingPongDeletionSupportApi
 import com.turnin.domain.pingPong.application.usecase.CreatePingPongAnswerUseCase
 import com.turnin.domain.pingPong.application.usecase.CreatePingPongQuestionUseCase
 import com.turnin.domain.pingPong.application.usecase.DeletePingPongAnswerUseCase
@@ -30,6 +31,7 @@ val pingPongModule = module {
     single<UserProvider> { UserProviderImpl(get()) }
     single<NotificationProvider> { NotificationProviderImpl(get()) }
     single { PingPongContentReportApi(get()) }
+    single { PingPongDeletionSupportApi(get()) }
 
     // UseCases
     single { CreatePingPongQuestionUseCase(get(), get(), get(), get(), get(IOApplicationScopeQualifier)) }

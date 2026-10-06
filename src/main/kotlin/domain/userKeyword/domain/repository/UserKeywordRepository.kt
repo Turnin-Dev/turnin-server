@@ -125,6 +125,15 @@ interface UserKeywordRepository {
     suspend fun deleteByUserId(userId: UserId)
 
     /**
+     * 사용자의 키워드 중 신고 내역이 없는 키워드를 전부 삭제한다.
+     *
+     * 신고 내역이 있는 키워드는 신고 데이터와의 연계를 위해 남겨둔다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun deleteUnreportedByUserId(userId: UserId)
+
+    /**
      * 사용자 키워드를 비활성화한다.
      *
      * @param ownerId 사용자 ID

@@ -29,10 +29,12 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inSubQuery
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
+import org.jetbrains.exposed.sql.or
 
 class PingPongRepositoryImpl : PingPongRepository {
     override suspend fun createQuestion(
@@ -178,5 +180,20 @@ class PingPongRepositoryImpl : PingPongRepository {
         }) {
             it[hiddenAt] = TurninDateTime.now().toOffsetDateTime()
         } > 0
+    }
+
+    override suspend fun deleteAllByUserId(userId: UserId): Unit = suspendTransaction {
+        // 질문자 조건(questioner_id)은 인덱스가 없어 seq scan 된다. (PingPongs 주석 참고)
+        val userKeywordIdsOfUser = UserKeywords
+            .select(UserKeywords.id)
+            .where { UserKeywords.userId eq userId.value }
+
+        PingPongs.deleteWhere {
+            (questionerId eq userId.value) or (userKeywordId inSubQuery userKeywordIdsOfUser)
+        }
+    }
+
+    override suspend fun deleteAllByUserKeywordId(userKeywordId: UserKeywordId): Unit = suspendTransaction {
+        PingPongs.deleteWhere { PingPongs.userKeywordId eq userKeywordId.value }
     }
 }
