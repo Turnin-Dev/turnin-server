@@ -140,6 +140,14 @@ class AccountDeletionIntegrationTest : KoinTest {
             assertFalse(user!!.isActive)
             assertNotNull(user.deletedAt)
 
+            // 공지 읽음 기록은 탈퇴 즉시 삭제된다.
+            assertTrue(
+                AnnouncementReads
+                    .selectAll()
+                    .where { AnnouncementReads.userId eq targetId }
+                    .empty(),
+            )
+
             // 핑퐁은 탈퇴 즉시 삭제되고, 핑퐁 신고 스냅샷은 남아있다.
             assertTrue(
                 PingPongs

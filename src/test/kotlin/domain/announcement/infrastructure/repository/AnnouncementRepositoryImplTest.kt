@@ -263,6 +263,43 @@ class AnnouncementRepositoryImplTest {
         assertFalse(result)
     }
 
+    // =============== 사용자 읽음 기록 삭제 ===============
+
+    @Test
+    fun `사용자 읽음 기록 삭제 시 해당 사용자의 읽음 기록이 삭제된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val announcementId = createAnnouncementAndReturnId(AnnouncementStatus.ACTIVE)
+        repository.markAsRead(announcementId, userId)
+
+        // when
+        repository.deleteReadsByUserId(userId)
+
+        // then
+        val count = TestDatabaseFactory.dbQuery {
+            AnnouncementReads.selectAll().where { AnnouncementReads.userId eq userId.value }.count()
+        }
+        assertEquals(0L, count)
+    }
+
+    @Test
+    fun `사용자 읽음 기록 삭제 시 다른 사용자의 읽음 기록은 유지된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val otherUserId = insertUserAndReturnId("2")
+        val announcementId = createAnnouncementAndReturnId(AnnouncementStatus.ACTIVE)
+        repository.markAsRead(announcementId, otherUserId)
+
+        // when
+        repository.deleteReadsByUserId(userId)
+
+        // then
+        val count = TestDatabaseFactory.dbQuery {
+            AnnouncementReads.selectAll().where { AnnouncementReads.userId eq otherUserId.value }.count()
+        }
+        assertEquals(1L, count)
+    }
+
     // =============== 헬퍼 함수 ===============
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {

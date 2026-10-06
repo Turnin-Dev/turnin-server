@@ -1,5 +1,7 @@
 package com.turnin.domain.account.application
 
+import com.turnin.common.db.schema.AnnouncementEntity
+import com.turnin.common.db.schema.AnnouncementReads
 import com.turnin.common.db.schema.BlockEntity
 import com.turnin.common.db.schema.BlockReasons
 import com.turnin.common.db.schema.Blocks
@@ -18,12 +20,16 @@ import com.turnin.common.db.schema.UserEntity
 import com.turnin.common.db.schema.UserKeywordEntity
 import com.turnin.common.db.schema.UserKeywords
 import com.turnin.common.db.schema.Users
+import com.turnin.common.model.AnnouncementAudience
+import com.turnin.common.model.AnnouncementStatus
 import com.turnin.common.model.ContentReportType
 import com.turnin.common.model.FriendRequestStatus
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
 import com.turnin.domain.account.exception.AccountException
+import com.turnin.domain.announcement.application.provider.AnnouncementDeletionSupportApi
+import com.turnin.domain.announcement.infrastructure.repository.AnnouncementRepositoryImpl
 import com.turnin.domain.auth.application.provider.AuthDeletionSupportApi
 import com.turnin.domain.auth.infrastructure.repository.impl.RefreshTokenRepositoryImpl
 import com.turnin.domain.block.application.provider.BlockDeletionSupportApi
@@ -81,6 +87,7 @@ class DeleteAccountUseCaseIntegrationTest {
             FcmTokenRepositoryImpl(),
         ),
         pingPongDeletionSupportApi = PingPongDeletionSupportApi(PingPongRepositoryImpl()),
+        announcementDeletionSupportApi = AnnouncementDeletionSupportApi(AnnouncementRepositoryImpl()),
     )
 
     @Before
@@ -240,6 +247,7 @@ class DeleteAccountUseCaseIntegrationTest {
                 FcmTokenRepositoryImpl(),
             ),
             pingPongDeletionSupportApi = PingPongDeletionSupportApi(PingPongRepositoryImpl()),
+            announcementDeletionSupportApi = AnnouncementDeletionSupportApi(AnnouncementRepositoryImpl()),
         )
 
         // when & then
@@ -354,6 +362,22 @@ class DeleteAccountUseCaseIntegrationTest {
         assertEquals("신고된 질문", findContentReportSnapshotForTest(contentReportId))
     }
 
+    @Test
+    fun `계정 삭제 시 사용자의 공지 읽음 기록이 삭제된다`() = runTest {
+        // given
+        val user = insertUser("1", profileImageUrl = null)
+        insertAnnouncementRead(user.id.value)
+
+        // when
+        usecase(user.id.value)
+
+        // then
+        val count = TestDatabaseFactory.dbQuery {
+            AnnouncementReads.selectAll().where { AnnouncementReads.userId eq user.id.value }.count()
+        }
+        assertEquals(0L, count)
+    }
+
     // ------------------------------ Test Utils ------------------------------
 
     private suspend fun insertUser(
@@ -452,6 +476,19 @@ class DeleteAccountUseCaseIntegrationTest {
                 .map { it[RefreshTokens.refreshToken] }
                 .singleOrNull()
         }
+
+    private suspend fun insertAnnouncementRead(userId: Long) = TestDatabaseFactory.dbQuery {
+        val announcement = AnnouncementEntity.new {
+            this.title = "공지 제목"
+            this.content = "공지 내용"
+            this.targetAudience = AnnouncementAudience.ALL
+            this.status = AnnouncementStatus.ACTIVE
+        }
+        AnnouncementReads.insert {
+            it[announcementId] = announcement.id.value
+            it[AnnouncementReads.userId] = userId
+        }
+    }
 
     private suspend fun findUserKeywordByIdForTest(userKeywordId: Long): UserKeywordEntity? =
         TestDatabaseFactory.dbQuery {

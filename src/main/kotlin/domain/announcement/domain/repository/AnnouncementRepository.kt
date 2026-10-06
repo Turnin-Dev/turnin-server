@@ -61,4 +61,11 @@ interface AnnouncementRepository {
      * @param announcementId 삭제할 공지 ID
      */
     suspend fun deleteAnnouncement(announcementId: AnnouncementId): Boolean
+
+    /**
+     * 사용자의 공지 읽음 기록을 전부 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    suspend fun deleteReadsByUserId(userId: UserId)
 }

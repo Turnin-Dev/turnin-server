@@ -96,4 +96,8 @@ class AnnouncementRepositoryImpl : AnnouncementRepository {
             Announcements.id eq announcementId.value
         } > 0
     }
+
+    override suspend fun deleteReadsByUserId(userId: UserId): Unit = suspendTransaction {
+        AnnouncementReads.deleteWhere { AnnouncementReads.userId eq userId.value }
+    }
 }

@@ -7,6 +7,7 @@ import com.turnin.common.util.log.LogAction
 import com.turnin.common.util.log.LogTag
 import com.turnin.common.util.log.LogType
 import com.turnin.domain.account.exception.AccountException
+import com.turnin.domain.announcement.application.provider.AnnouncementDeletionSupportApi
 import com.turnin.domain.auth.application.provider.AuthDeletionSupportApi
 import com.turnin.domain.block.application.provider.BlockDeletionSupportApi
 import com.turnin.domain.file.application.provider.FileDeletionSupportApi
@@ -30,6 +31,7 @@ class DeleteAccountUseCase(
     private val fileDeletionSupportApi: FileDeletionSupportApi,
     private val notificationDeletionSupportApi: NotificationDeletionSupportApi,
     private val pingPongDeletionSupportApi: PingPongDeletionSupportApi,
+    private val announcementDeletionSupportApi: AnnouncementDeletionSupportApi,
 ) {
     /**
      * 계정을 삭제한다.
@@ -59,6 +61,7 @@ class DeleteAccountUseCase(
             // - 피드/탐색 조회 쿼리 때문에 삭제 시 트랜잭션 내부에서 정확한 순서대로 삭제해야 한다.
             authDeletionSupportApi.deleteRefreshToken(userIDVO)
             notificationDeletionSupportApi.deleteAll(userIDVO)
+            announcementDeletionSupportApi.deleteReadsByUserId(userIDVO)
             friendDeletionSupportApi.deleteAll(userIDVO)
             blockDeletionSupportApi.deleteAll(userIDVO)
             // 핑퐁은 신고 여부와 관계없이 즉시 삭제한다. (신고된 핑퐁은 content_report 스냅샷으로 보관된다)
