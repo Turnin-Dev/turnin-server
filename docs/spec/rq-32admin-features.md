@@ -21,7 +21,8 @@
         - 운영자가 숨긴 게시물 → 복구 대상
         - 작성자가 직접 삭제한 신고된 게시물 (Soft Delete, 핑퐁은 이미 삭제됨) → 복구하면 안 됨
         - 탈퇴한 사용자의 신고된 게시물 → 복구하면 안 됨 (사용자 `is_active`로 구분 가능)
-    - 두 번째 경우는 `is_active`만으로 구분할 수 없으므로, 운영자 숨김 또는 작성자 삭제 중 하나를 표시하는 컬럼 (예: `hidden_at` 또는 `deleted_at`) 추가를 검토한다.
+    - 두 번째 경우는 `is_active`만으로 구분할 수 없으므로, 작성자 삭제 시각 `user_keyword.deleted_at`을 추가한다. (작성자 삭제, 계정 탈퇴 시 기록)
+    - **복구 대상 판단:** `is_active = false AND deleted_at IS NULL`인 게시물만 복구 대상이다.
 - **[신고 목록 조회]**
     - 게시물/사용자 신고 (`report`)와 콘텐츠 신고 (`content_report`, 신고 시점 스냅샷 포함) 조회.
 - **[자동 숨김 콘텐츠 검토/복구]**
@@ -29,5 +30,5 @@
 
 # 참고
 
-- 계정 삭제 및 게시물 삭제 시 데이터 처리: [account-deletion.md](account-deletion.md)
-- 핑퐁 신고/숨김 정책: [ping-pong-spec.md](ping-pong-spec.md)
+- 계정 삭제 및 게시물 삭제 시 데이터 처리: [account-deletion.md](rq-3-account-deletion.md)
+- 핑퐁 신고/숨김 정책: [ping-pong-spec.md](rq-27-ping-pong-spec.md)

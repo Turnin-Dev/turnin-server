@@ -23,6 +23,7 @@ Layering conventions and dependency-direction rules are documented in @README.md
 - Tests: `./gradlew test` — this also triggers `koinTest` (finalizedBy), a separate task that runs `HardDeleteExpiredAccountsUseCaseIntegrationTest` and `AccountDeletionIntegrationTest` in one Gradle test process (`maxParallelForks = 1`) because they share Koin DI container state. The regular `test` task allows up to `Runtime.getRuntime().availableProcessors()` Gradle test processes for the other tests. Don't assume `koinTest` ran just because `test` passed — check both task results.
 - Integration tests use Testcontainers (Postgres) — **Docker must be running locally** or these tests fail immediately.
 - Single test class: `./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest`, then confirm it actually ran in `build/test-results/test/TEST-<fully.qualified.Name>.xml`.
+- Sandboxed sessions: Gradle builds must run on a daemon started **outside** the Claude Code sandbox. A daemon spawned inside the sandbox cannot read `application-prod.conf` (read-denied secret), so `processResources` fails with `Operation not permitted`. If you see that error, or the build reuses a sandboxed daemon, ask the user to run `! ./gradlew --stop && ./gradlew help`, then retry. Do not loosen the secret read-deny and do not fall back to IntelliJ MCP run tools.
 
 ## Skills
 
