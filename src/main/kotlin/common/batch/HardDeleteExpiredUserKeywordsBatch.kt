@@ -50,16 +50,26 @@ class HardDeleteExpiredUserKeywordsBatch(
                 hardDeleteExpiredUserKeywordsUseCase(expiredUserKeywordIds)
             }.onSuccess {
                 successCount += expiredUserKeywordIds.size
-            }.onFailure { e ->
-                failCount += expiredUserKeywordIds.size
-                LOGGER.error(
-                    message = "HardDeleteExpiredUserKeywordsBatch failed: userKeywordIds=$expiredUserKeywordIds",
-                    e = e,
-                    tags = mapOf(
-                        LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
-                        LogTag.ACTION.key to LogAction.DELETE_USER_KEYWORD_BATCH_ITEM_FAILED.value,
-                    ),
-                )
+            }.onFailure {
+                // 청크는 하나의 트랜잭션이라 한 건만 실패해도 전체가 롤백되므로,
+                // 실패한 청크는 하나씩 다시 삭제해 실패한 게시물만 건너뛴다.
+                expiredUserKeywordIds.forEach { userKeywordId ->
+                    runCatching {
+                        hardDeleteExpiredUserKeywordsUseCase(listOf(userKeywordId))
+                    }.onSuccess {
+                        successCount++
+                    }.onFailure { e ->
+                        failCount++
+                        LOGGER.error(
+                            message = "HardDeleteExpiredUserKeywordsBatch failed: userKeywordId=$userKeywordId",
+                            e = e,
+                            tags = mapOf(
+                                LogTag.LOG_TYPE.key to LogType.PRIVACY.value,
+                                LogTag.ACTION.key to LogAction.DELETE_USER_KEYWORD_BATCH_ITEM_FAILED.value,
+                            ),
+                        )
+                    }
+                }
             }
             afterId = expiredUserKeywordIds.last()
         }
