@@ -46,4 +46,13 @@ interface ReportRepository {
      * @param userId 사용자 ID
      */
     suspend fun deleteByUserId(userId: UserId)
+
+    /**
+     * 사용자 키워드를 대상으로 한 신고를 삭제한다.
+     *
+     * 사용자 신고가 함께 담긴 신고 행도 통째로 삭제한다.
+     *
+     * @param userKeywordIds 사용자 키워드 ID 목록
+     */
+    suspend fun deleteByUserKeywordIds(userKeywordIds: List<Long>)
 }

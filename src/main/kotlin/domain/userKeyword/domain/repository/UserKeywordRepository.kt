@@ -7,6 +7,7 @@ import com.turnin.domain.userKeyword.domain.model.Description
 import com.turnin.domain.userKeyword.domain.model.UserKeyword
 import com.turnin.domain.userKeyword.domain.model.UserKeywordDetail
 import com.turnin.domain.userKeyword.domain.model.UserKeywordPatch
+import java.time.Instant
 
 interface UserKeywordRepository {
     /**
@@ -144,11 +145,47 @@ interface UserKeywordRepository {
     suspend fun deactivate(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
 
     /**
-     * 사용자의 모든 사용자 키워드를 비활성화한다.
+     * 작성자가 삭제한 사용자 키워드를 Soft Delete 한다. (비활성화 + 삭제 시각 기록)
+     *
+     * 신고 내역 때문에 삭제할 수 없는 키워드에 사용하며, 삭제 시각 기준 1년 후 파기된다.
+     *
+     * @param ownerId 사용자 ID
+     * @param userKeywordId 사용자별 키워드 ID
+     *
+     * @return Soft Delete 성공 시 `true`, 대상이 없으면 `false`를 반환한다.
+     */
+    suspend fun softDelete(ownerId: UserId, userKeywordId: UserKeywordId): Boolean
+
+    /**
+     * 사용자의 모든 사용자 키워드를 Soft Delete 한다. (비활성화 + 삭제 시각 기록)
+     *
+     * 이미 삭제 시각이 기록된 키워드는 기존 삭제 시각을 유지한다.
      *
      * ###### 해당 메서드는 [userId]의 모든 데이터를 지우므로 주의해서 사용해야 한다.
      *
-     * @param userId 비활성화할 사용자 ID
+     * @param userId 사용자 ID
      */
-    suspend fun deactivateAll(userId: UserId)
+    suspend fun softDeleteAll(userId: UserId)
+
+    /**
+     * 삭제 시각이 [deletedBefore] 이전인 사용자 키워드 ID를 ID 오름차순으로 조회한다.
+     *
+     * @param deletedBefore 삭제 시각 기준 (이 시각 이전에 삭제된 키워드만 조회)
+     * @param limit 조회할 최대 개수
+     * @param afterId 이 ID보다 큰 키워드부터 조회, `null`이면 처음부터 조회
+     *
+     * @return 사용자 키워드 ID 목록
+     */
+    suspend fun findIdsDeletedBefore(
+        deletedBefore: Instant,
+        limit: Int,
+        afterId: Long?,
+    ): List<Long>
+
+    /**
+     * 사용자 키워드를 ID로 일괄 삭제한다.
+     *
+     * @param userKeywordIds 삭제할 사용자 키워드 ID 목록
+     */
+    suspend fun deleteByIds(userKeywordIds: List<Long>)
 }

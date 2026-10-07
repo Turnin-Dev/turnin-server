@@ -289,7 +289,7 @@ class DeleteAccountUseCaseIntegrationTest {
     }
 
     @Test
-    fun `계정 삭제 시 신고 내역이 있는 게시물은 비활성화되어 남는다`() = runTest {
+    fun `계정 삭제 시 신고 내역이 있는 게시물은 비활성화되고 삭제 시각이 기록되어 남는다`() = runTest {
         // given
         val user = insertUser("1", profileImageUrl = null)
         val reporter = insertUser("2", profileImageUrl = null)
@@ -303,6 +303,7 @@ class DeleteAccountUseCaseIntegrationTest {
         val foundUserKeyword = findUserKeywordByIdForTest(userKeyword.id.value)
         assertNotNull(foundUserKeyword)
         assertFalse(foundUserKeyword!!.isActive)
+        assertNotNull(foundUserKeyword.deletedAt)
     }
 
     @Test

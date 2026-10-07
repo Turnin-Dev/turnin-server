@@ -40,7 +40,7 @@ class DeleteUserKeywordUseCaseTest {
     fun `사용자 키워드 삭제 성공 테스트 - 해당 키워드가 신고 내역에 존재하면 Soft Delete를 수행한다`() = runTest {
         // given: 신고 내역에 존재하도록 설정
         coEvery { reportProvider.existsByUserKeywordId(TestUserKeywordId) } returns true
-        coEvery { userKeywordRepository.deactivate(TestUserId, TestUserKeywordId) } returns true
+        coEvery { userKeywordRepository.softDelete(TestUserId, TestUserKeywordId) } returns true
         coEvery { pingPongProvider.deleteAllByUserKeywordId(TestUserKeywordId) } just Runs
 
         // when
@@ -48,7 +48,7 @@ class DeleteUserKeywordUseCaseTest {
 
         // then: 삭제 결과는 성공, Soft Delete만 수행되어야 한다.
         assertTrue(result)
-        coVerify(exactly = 1) { userKeywordRepository.deactivate(TestUserId, TestUserKeywordId) }
+        coVerify(exactly = 1) { userKeywordRepository.softDelete(TestUserId, TestUserKeywordId) }
         coVerify(exactly = 0) { userKeywordRepository.delete(TestUserId, TestUserKeywordId) }
     }
 
@@ -63,15 +63,15 @@ class DeleteUserKeywordUseCaseTest {
 
         // then: 삭제 결과는 성공, Hard Delete만 수행되어야 한다.
         assertTrue(result)
-        coVerify(exactly = 0) { userKeywordRepository.deactivate(TestUserId, TestUserKeywordId) }
+        coVerify(exactly = 0) { userKeywordRepository.softDelete(TestUserId, TestUserKeywordId) }
         coVerify(exactly = 1) { userKeywordRepository.delete(TestUserId, TestUserKeywordId) }
     }
 
     @Test
-    fun `신고 내역이 있는 게시물이 비활성화되면 게시물의 핑퐁을 삭제한다`() = runTest {
+    fun `신고 내역이 있는 게시물이 Soft Delete 되면 게시물의 핑퐁을 삭제한다`() = runTest {
         // given
         coEvery { reportProvider.existsByUserKeywordId(TestUserKeywordId) } returns true
-        coEvery { userKeywordRepository.deactivate(TestUserId, TestUserKeywordId) } returns true
+        coEvery { userKeywordRepository.softDelete(TestUserId, TestUserKeywordId) } returns true
         coEvery { pingPongProvider.deleteAllByUserKeywordId(TestUserKeywordId) } just Runs
 
         // when
@@ -82,10 +82,10 @@ class DeleteUserKeywordUseCaseTest {
     }
 
     @Test
-    fun `신고 내역이 있는 게시물의 비활성화에 실패하면 핑퐁을 삭제하지 않고 false를 반환한다`() = runTest {
-        // given: 본인 게시물이 아니거나 존재하지 않아 비활성화되지 않는 경우
+    fun `신고 내역이 있는 게시물의 Soft Delete에 실패하면 핑퐁을 삭제하지 않고 false를 반환한다`() = runTest {
+        // given: 본인 게시물이 아니거나 존재하지 않아 Soft Delete 되지 않는 경우
         coEvery { reportProvider.existsByUserKeywordId(TestUserKeywordId) } returns true
-        coEvery { userKeywordRepository.deactivate(TestUserId, TestUserKeywordId) } returns false
+        coEvery { userKeywordRepository.softDelete(TestUserId, TestUserKeywordId) } returns false
 
         // when
         val result = usecase(TestUserId, TestUserKeywordId)

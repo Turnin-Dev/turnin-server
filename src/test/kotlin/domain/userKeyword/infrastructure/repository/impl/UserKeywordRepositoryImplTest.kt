@@ -32,6 +32,7 @@ import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.update
 import org.junit.After
 import org.junit.Before
 import org.junit.jupiter.api.assertThrows
@@ -714,7 +715,7 @@ class UserKeywordRepositoryImplTest {
     }
 
     @Test
-    fun `deactivateAll 성공 테스트`() = runTest {
+    fun `softDeleteAll 성공 테스트 - 모든 키워드가 비활성화된다`() = runTest {
         // given: 사용자 키워드 생성
         val userId = insertUserAndReturnId("1")
         val keywordId1 = insertKeywordAndReturnId(userId, TEST_KEYWORD)
@@ -740,8 +741,8 @@ class UserKeywordRepositoryImplTest {
         assertNotNull(findByIdForTest(userKeyword1.id.value))
         assertNotNull(findByIdForTest(userKeyword2.id.value))
 
-        // when: 모두 비활성화
-        repository.deactivateAll(userId)
+        // when: 모두 Soft Delete
+        repository.softDeleteAll(userId)
 
         // then: 모두 비활성화 됐는지 검증
         val userKeywordActiveList = TestDatabaseFactory.dbQuery {
@@ -760,6 +761,128 @@ class UserKeywordRepositoryImplTest {
         updatedAtList.zip(originalUpdatedAtList) { updatedAt, originalUpdatedAt ->
             assertTrue(updatedAt.isAfter(originalUpdatedAt))
         }
+    }
+
+    @Test
+    fun `softDeleteAll 성공 테스트 - 삭제 시각이 기록된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = createForTest(userId = userId, keywordId = keywordId, description = TestDescription)
+
+        // when
+        repository.softDeleteAll(userId)
+
+        // then
+        assertNotNull(findDeletedAtForTest(userKeyword.id.value))
+    }
+
+    @Test
+    fun `softDeleteAll 성공 테스트 - 이미 삭제 시각이 기록된 키워드는 기존 삭제 시각을 유지한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = createForTest(userId = userId, keywordId = keywordId, description = TestDescription)
+        setSoftDeletedForTest(userKeyword.id.value, Instant.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        repository.softDeleteAll(userId)
+
+        // then
+        assertEquals(Instant.parse("2026-01-01T00:00:00Z"), findDeletedAtForTest(userKeyword.id.value))
+    }
+
+    @Test
+    fun `softDelete 성공 테스트 - 본인 키워드가 비활성화되고 삭제 시각이 기록되며 true를 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val keywordId = insertKeywordAndReturnId(userId, TEST_KEYWORD)
+        val userKeyword = createForTest(userId = userId, keywordId = keywordId, description = TestDescription)
+
+        // when
+        val result = repository.softDelete(userId, UserKeywordId(userKeyword.id.value))
+
+        // then
+        assertTrue(result)
+        val found = findByIdForTest(userKeyword.id.value)
+        assertFalse(found!!.isActive)
+        assertNotNull(found.deletedAt)
+    }
+
+    @Test
+    fun `softDelete 실패 테스트 - 다른 사용자의 키워드는 변경하지 않고 false를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val otherUserId = insertUserAndReturnId("2")
+        val keywordId = insertKeywordAndReturnId(ownerId, TEST_KEYWORD)
+        val userKeyword = createForTest(userId = ownerId, keywordId = keywordId, description = TestDescription)
+
+        // when
+        val result = repository.softDelete(otherUserId, UserKeywordId(userKeyword.id.value))
+
+        // then
+        assertFalse(result)
+        val found = findByIdForTest(userKeyword.id.value)
+        assertTrue(found!!.isActive)
+        assertNull(found.deletedAt)
+    }
+
+    @Test
+    fun `findIdsDeletedBefore 성공 테스트 - 기준 시각 이전에 삭제된 키워드만 반환한다`() = runTest {
+        // given: 기준 이전 삭제, 기준 이후 삭제, 삭제되지 않은 키워드
+        val userId = insertUserAndReturnId("1")
+        val expired = createForTest(userId, insertKeywordAndReturnId(userId, "keyword1"), TestDescription)
+        val notExpired = createForTest(userId, insertKeywordAndReturnId(userId, "keyword2"), TestDescription)
+        createForTest(userId, insertKeywordAndReturnId(userId, "keyword3"), TestDescription)
+        setSoftDeletedForTest(expired.id.value, Instant.parse("2025-01-01T00:00:00Z"))
+        setSoftDeletedForTest(notExpired.id.value, Instant.parse("2025-12-01T00:00:00Z"))
+
+        // when
+        val result = repository.findIdsDeletedBefore(
+            deletedBefore = Instant.parse("2025-06-01T00:00:00Z"),
+            limit = 100,
+            afterId = null,
+        )
+
+        // then
+        assertEquals(listOf(expired.id.value), result)
+    }
+
+    @Test
+    fun `findIdsDeletedBefore 성공 테스트 - afterId보다 큰 ID부터 limit 개수만큼 반환한다`() = runTest {
+        // given: 기준 이전에 삭제된 키워드 3개
+        val userId = insertUserAndReturnId("1")
+        val first = createForTest(userId, insertKeywordAndReturnId(userId, "keyword1"), TestDescription)
+        val second = createForTest(userId, insertKeywordAndReturnId(userId, "keyword2"), TestDescription)
+        val third = createForTest(userId, insertKeywordAndReturnId(userId, "keyword3"), TestDescription)
+        listOf(first, second, third).forEach {
+            setSoftDeletedForTest(it.id.value, Instant.parse("2025-01-01T00:00:00Z"))
+        }
+
+        // when
+        val result = repository.findIdsDeletedBefore(
+            deletedBefore = Instant.parse("2025-06-01T00:00:00Z"),
+            limit = 1,
+            afterId = first.id.value,
+        )
+
+        // then
+        assertEquals(listOf(second.id.value), result)
+    }
+
+    @Test
+    fun `deleteByIds 성공 테스트 - 지정한 키워드만 삭제된다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        val target = createForTest(userId, insertKeywordAndReturnId(userId, "keyword1"), TestDescription)
+        val other = createForTest(userId, insertKeywordAndReturnId(userId, "keyword2"), TestDescription)
+
+        // when
+        repository.deleteByIds(listOf(target.id.value))
+
+        // then
+        assertNull(findByIdForTest(target.id.value))
+        assertNotNull(findByIdForTest(other.id.value))
     }
 
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
@@ -814,6 +937,17 @@ class UserKeywordRepositoryImplTest {
 
     private suspend fun findByIdForTest(userKeywordId: Long): UserKeywordEntity? = TestDatabaseFactory.dbQuery {
         UserKeywordEntity.findById(userKeywordId)
+    }
+
+    private suspend fun findDeletedAtForTest(userKeywordId: Long): Instant? = TestDatabaseFactory.dbQuery {
+        UserKeywordEntity.findById(userKeywordId)?.deletedAt
+    }
+
+    private suspend fun setSoftDeletedForTest(userKeywordId: Long, deletedAt: Instant) = TestDatabaseFactory.dbQuery {
+        UserKeywords.update({ UserKeywords.id eq userKeywordId }) {
+            it[isActive] = false
+            it[UserKeywords.deletedAt] = deletedAt
+        }
     }
 
     private suspend fun insertUserKeywordReport(reporterId: UserId, userKeywordId: Long) = TestDatabaseFactory.dbQuery {

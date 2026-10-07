@@ -66,10 +66,10 @@ class DeleteAccountUseCase(
             blockDeletionSupportApi.deleteAll(userIDVO)
             // 핑퐁은 신고 여부와 관계없이 즉시 삭제한다. (신고된 핑퐁은 content_report 스냅샷으로 보관된다)
             pingPongDeletionSupportApi.deleteAllByUserId(userIDVO)
-            // 게시물은 신고 데이터와의 연계에 필요한 것(신고된 게시물)만 비활성화하여 남기고, 나머지는 삭제한다.
+            // 게시물은 신고 데이터와의 연계에 필요한 것(신고된 게시물)만 Soft Delete 하여 남기고, 나머지는 삭제한다.
             // TODO: 사용자, 키워드 비활성화 시 필요없는 부분은 전부 null혹은 빈 문자열로 바꾸는 것을 고려해야 함.
             userKeywordDeletionSupportApi.deleteUnreportedByUserId(userIDVO)
-            userKeywordDeletionSupportApi.deactivateAll(userIDVO)
+            userKeywordDeletionSupportApi.softDeleteAll(userIDVO)
             userDeletionSupportApi.anonymizeProviderId(userIDVO, user.providerId)
             userDeletionSupportApi.deactivate(userIDVO)
 

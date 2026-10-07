@@ -13,6 +13,7 @@ import com.turnin.common.db.updateWithTimestamp
 import com.turnin.common.model.id.KeywordId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
+import com.turnin.common.util.TurninDateTime
 import com.turnin.domain.userKeyword.domain.model.Description
 import com.turnin.domain.userKeyword.domain.model.UserKeyword
 import com.turnin.domain.userKeyword.domain.model.UserKeywordDetail
@@ -20,9 +21,12 @@ import com.turnin.domain.userKeyword.domain.model.UserKeywordPatch
 import com.turnin.domain.userKeyword.domain.repository.UserKeywordRepository
 import com.turnin.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDetail
 import com.turnin.domain.userKeyword.infrastructure.mapper.UserKeywordMapper.toDomain
+import java.time.Instant
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.notExists
@@ -225,9 +229,43 @@ class UserKeywordRepositoryImpl : UserKeywordRepository {
         }
     } > 0
 
-    override suspend fun deactivateAll(userId: UserId): Unit = suspendTransaction {
-        UserKeywords.updateWithTimestamp({ UserKeywords.userId eq userId.value }) {
+    override suspend fun softDelete(
+        ownerId: UserId,
+        userKeywordId: UserKeywordId,
+    ): Boolean = suspendTransaction {
+        UserKeywords.updateWithTimestamp({
+            (UserKeywords.id eq userKeywordId.value) and (UserKeywords.userId eq ownerId.value)
+        }) {
             it[isActive] = false
+            it[deletedAt] = TurninDateTime.now()
         }
+    } > 0
+
+    override suspend fun softDeleteAll(userId: UserId): Unit = suspendTransaction {
+        // 이미 삭제된 키워드는 기존 삭제 시각을 유지한다. (삭제된 키워드는 이미 비활성화 상태)
+        UserKeywords.updateWithTimestamp({
+            (UserKeywords.userId eq userId.value) and UserKeywords.deletedAt.isNull()
+        }) {
+            it[isActive] = false
+            it[deletedAt] = TurninDateTime.now()
+        }
+    }
+
+    override suspend fun findIdsDeletedBefore(
+        deletedBefore: Instant,
+        limit: Int,
+        afterId: Long?,
+    ): List<Long> = suspendTransaction {
+        UserKeywords
+            .select(UserKeywords.id)
+            .where { UserKeywords.deletedAt lessEq deletedBefore }
+            .apply { afterId?.let { andWhere { UserKeywords.id greater it } } }
+            .orderBy(UserKeywords.id)
+            .limit(limit)
+            .map { it[UserKeywords.id].value }
+    }
+
+    override suspend fun deleteByIds(userKeywordIds: List<Long>): Unit = suspendTransaction {
+        UserKeywords.deleteWhere { UserKeywords.id inList userKeywordIds }
     }
 }
