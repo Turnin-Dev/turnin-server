@@ -112,10 +112,20 @@ tasks.withType<Test> {
     systemProperty("config.resource", "application-test.conf")
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// 테스트 태스크 구성: test(병렬) → koinTest, postgresTest (test에 finalizedBy로 연결)
+// koinTest/postgresTest 대상은 test에서 제외하고, 각 태스크에서 단일 프로세스로 실행한다.
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Koin DI 컨테이너(startKoin)를 공유하는 통합 테스트 → 같은 프로세스에서 병렬 실행되면 충돌하므로 분리한다.
+val koinTestPatterns = listOf(
+    "**/HardDeleteExpiredAccountsUseCaseIntegrationTest.class",
+    "**/AccountDeletionIntegrationTest.class",
+)
+
 // PostgresRule(Testcontainers)을 사용하는 테스트
-// customPostgresEnum은 테이블 객체가 처음 로드될 때의 DB 방언으로 enum 처리 방식을 정하므로,
-// H2 테스트와 같은 프로세스에서 실행하면 H2 테스트가 실패할 수 있어 별도 태스크로 분리한다.
-// PostgresRule을 사용하는 테스트를 추가하면 이 목록에도 추가해야 한다.
+// customPostgresEnum은 테이블 객체가 처음 로드될 때의 DB 기준 enum 처리 방식을 정하므로,
+// H2 테스트와 같은 프로세스에서 실행하면 H2 테스트가 실패할 수 있어 분리한다.
 val postgresTestPatterns = listOf(
     "**/CreateContentReportUseCaseIntegrationTest.class",
     "**/ContentReportRepositoryImplTest.class",
@@ -123,50 +133,41 @@ val postgresTestPatterns = listOf(
     "**/FeedRepositoryImplTest.class",
 )
 
-tasks.test {
-    // 순차 실행을 위해 제외
-    exclude("**/HardDeleteExpiredAccountsUseCaseIntegrationTest.class")
-    exclude("**/AccountDeletionIntegrationTest.class")
+/** test 소스셋을 사용하고, 지정한 테스트만 단일 프로세스에서 실행하는 태스크 */
+fun registerIsolatedTestTask(
+    name: String,
+    description: String,
+    patterns: List<String>,
+) = tasks.register<Test>(name) {
+    group = "verification"
+    this.description = description
 
-    // H2 테스트와 프로세스를 분리하기 위해 제외
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
+    include(patterns)
+    maxParallelForks = 1
+}
+
+val koinTest = registerIsolatedTestTask(
+    name = "koinTest",
+    description = "Koin DI 컨테이너를 공유하는 통합 테스트를 단일 프로세스에서 순차 실행합니다.",
+    patterns = koinTestPatterns,
+)
+
+val postgresTest = registerIsolatedTestTask(
+    name = "postgresTest",
+    description = "PostgresRule(Testcontainers)을 사용하는 테스트를 H2 테스트와 분리된 단일 프로세스에서 실행합니다.",
+    patterns = postgresTestPatterns,
+)
+
+tasks.test {
+    exclude(koinTestPatterns)
     exclude(postgresTestPatterns)
 
     // 일반 테스트는 코어 수만큼 병렬 실행
     maxParallelForks = Runtime.getRuntime().availableProcessors()
-}
 
-val koinTest by tasks.registering(Test::class) {
-    group = "verification"
-    description = "특정 Koin 관련 테스트만 싱글 스레드로 순차 실행합니다."
-
-    testClassesDirs = sourceSets["test"].output.classesDirs
-    classpath = sourceSets["test"].runtimeClasspath
-
-    // 위에서 제외한 2개 파일 포함
-    include("**/HardDeleteExpiredAccountsUseCaseIntegrationTest.class")
-    include("**/AccountDeletionIntegrationTest.class")
-
-    // 프로세스 개수를 1개로 고정하여 순차 실행 보장
-    maxParallelForks = 1
-}
-
-val postgresTest by tasks.registering(Test::class) {
-    group = "verification"
-    description = "PostgresRule(Testcontainers)을 사용하는 테스트만 H2 테스트와 분리된 프로세스에서 실행합니다."
-
-    testClassesDirs = sourceSets["test"].output.classesDirs
-    classpath = sourceSets["test"].runtimeClasspath
-
-    include(postgresTestPatterns)
-
-    // H2 테스트와 섞이지 않도록 프로세스 개수를 1개로 고정
-    maxParallelForks = 1
-
-    // --tests 로 다른 테스트만 실행할 때 이 태스크가 실패하지 않도록 한다.
-    filter.isFailOnNoMatchingTests = false
-}
-
-tasks.test {
     finalizedBy(koinTest, postgresTest)
 }
 
