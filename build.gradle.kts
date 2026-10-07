@@ -112,10 +112,24 @@ tasks.withType<Test> {
     systemProperty("config.resource", "application-test.conf")
 }
 
+// PostgresRule(Testcontainers)을 사용하는 테스트
+// customPostgresEnum은 테이블 객체가 처음 로드될 때의 DB 방언으로 enum 처리 방식을 정하므로,
+// H2 테스트와 같은 프로세스에서 실행하면 H2 테스트가 실패할 수 있어 별도 태스크로 분리한다.
+// PostgresRule을 사용하는 테스트를 추가하면 이 목록에도 추가해야 한다.
+val postgresTestPatterns = listOf(
+    "**/CreateContentReportUseCaseIntegrationTest.class",
+    "**/ContentReportRepositoryImplTest.class",
+    "**/DiscoverRepositoryImplTest.class",
+    "**/FeedRepositoryImplTest.class",
+)
+
 tasks.test {
     // 순차 실행을 위해 제외
     exclude("**/HardDeleteExpiredAccountsUseCaseIntegrationTest.class")
     exclude("**/AccountDeletionIntegrationTest.class")
+
+    // H2 테스트와 프로세스를 분리하기 위해 제외
+    exclude(postgresTestPatterns)
 
     // 일반 테스트는 코어 수만큼 병렬 실행
     maxParallelForks = Runtime.getRuntime().availableProcessors()
@@ -136,8 +150,24 @@ val koinTest by tasks.registering(Test::class) {
     maxParallelForks = 1
 }
 
+val postgresTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "PostgresRule(Testcontainers)을 사용하는 테스트만 H2 테스트와 분리된 프로세스에서 실행합니다."
+
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
+    include(postgresTestPatterns)
+
+    // H2 테스트와 섞이지 않도록 프로세스 개수를 1개로 고정
+    maxParallelForks = 1
+
+    // --tests 로 다른 테스트만 실행할 때 이 태스크가 실패하지 않도록 한다.
+    filter.isFailOnNoMatchingTests = false
+}
+
 tasks.test {
-    finalizedBy(koinTest)
+    finalizedBy(koinTest, postgresTest)
 }
 
 dependencies {
