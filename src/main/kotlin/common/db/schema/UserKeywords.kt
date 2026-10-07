@@ -14,7 +14,7 @@ object UserKeywords : BaseLongIdTable("user_keyword") {
     val description = text("description").nullable()
     val isActive = bool("is_active").default(true)
 
-    /** 작성자 쪽 사유(직접 삭제, 계정 탈퇴)로 삭제된 시각. 운영자 숨김과 구분하고 1년 후 파기하는 기준 */
+    /** 작성자 쪽 사유(직접 삭제, 계정 탈퇴)로 삭제된 시각. 관리자 숨김과 구분하고 1년 후 파기하는 기준 */
     val deletedAt = timestamp("deleted_at").nullable()
 
     init {
