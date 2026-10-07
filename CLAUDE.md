@@ -22,7 +22,7 @@ Layering conventions and dependency-direction rules are documented in @README.md
 - Fat jar for deploy: `./gradlew buildFatJar` → `turnin-api.jar`
 - Tests: `./gradlew test` runs three tasks: `test` (parallel), then `koinTest` (Koin integration tests sharing DI state, one process) and `postgresTest` (`PostgresRule` classes in `postgresTestPatterns`, kept apart from H2 tests). A green `test` doesn't mean the other two passed — check all three.
 - Integration tests use Testcontainers (Postgres) — **Docker must be running locally** or these tests fail immediately.
-- Single test class: `./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest`, then confirm it actually ran in `build/test-results/test/TEST-<fully.qualified.Name>.xml`.
+- Single test class: `./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest`, then confirm it actually ran in `build/test-results/test/TEST-<fully.qualified.Name>.xml`. For a `PostgresRule` class use `./gradlew postgresTest --tests "..."` (results in `build/test-results/postgresTest/`).
 - Sandboxed sessions: Gradle builds must run on a daemon started **outside** the Claude Code sandbox. A daemon spawned inside the sandbox cannot read `application-prod.conf` (read-denied secret), so `processResources` fails with `Operation not permitted`. If you see that error, or the build reuses a sandboxed daemon, ask the user to run `! ./gradlew --stop && ./gradlew help`, then retry. Do not loosen the secret read-deny and do not fall back to IntelliJ MCP run tools.
 
 ## Skills
