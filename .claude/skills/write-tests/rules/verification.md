@@ -14,12 +14,16 @@ and ask.
 ## 2. Run only the new test class
 
 ```bash
-./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest
+./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest -x postgresTest
 ```
 
-- `-x koinTest` skips the separate Koin task that `test` normally triggers; it is not needed for a single class.
+- `-x koinTest -x postgresTest` skips the two tasks that `test` triggers afterwards. `--tests` does not filter them,
+  so without `-x` they run their whole suites (including Docker-backed Postgres tests) on every single-class run.
 - Confirm the tests actually executed: check `build/test-results/test/TEST-<fully.qualified.Name>.xml` for the expected
   `tests=` count with `failures="0" errors="0"`. A fast green build can mean nothing ran.
+- `PostgresRule` test classes are excluded from `test` and run in the separate `postgresTest` task, so the command
+  above fails for them. Run `./gradlew postgresTest --tests "com.turnin.<package>.<TestClassName>"` instead and check
+  `build/test-results/postgresTest/TEST-<fully.qualified.Name>.xml`.
 - `PostgresRule` tests need Docker. On a container/connection error, tell the user to start Docker.
 
 ## 3. Investigate failures; keep contract-based expectations

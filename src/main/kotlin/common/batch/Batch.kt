@@ -24,6 +24,7 @@ fun Application.configureBatch(): List<Job> {
     val applicationScope by inject<CoroutineScope>(DefaultApplicationScopeQualifier)
     val logBackupBatch by inject<LogBackupBatch>()
     val hardDeleteExpiredAccountsBatch by inject<HardDeleteExpiredAccountsBatch>()
+    val hardDeleteExpiredUserKeywordsBatch by inject<HardDeleteExpiredUserKeywordsBatch>()
 
     // 로그 백업: KST 01:00
     val logBackupJob = applicationScope.launch {
@@ -37,11 +38,16 @@ fun Application.configureBatch(): List<Job> {
         }
     }
 
-    // 만료 계정 삭제(Hard Delete): KST 02:00
+    // 만료 게시물 파기 → 만료 계정 삭제(Hard Delete): KST 02:00
+    // 두 배치가 같은 게시물/신고 행을 동시에 삭제하지 않도록 하나의 작업에서 순서대로 실행한다.
     val accountDeletionJob = applicationScope.launch {
+        val userKeywordDeletionBatchName = "UserKeywordDeletionBatch"
         val accountDeletionBatchName = "AccountDeletionBatch"
         delayUntilNextRun(kstHour = 2, kstMinute = 0, batchName = accountDeletionBatchName)
         while (true) {
+            batchTryCatch(userKeywordDeletionBatchName) {
+                hardDeleteExpiredUserKeywordsBatch.run()
+            }
             batchTryCatch(accountDeletionBatchName) {
                 hardDeleteExpiredAccountsBatch.run()
             }

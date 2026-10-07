@@ -1,5 +1,6 @@
 package com.turnin.domain.announcement.di
 
+import com.turnin.domain.announcement.application.provider.AnnouncementDeletionSupportApi
 import com.turnin.domain.announcement.application.usecase.AnnouncementAdminUseCases
 import com.turnin.domain.announcement.application.usecase.AnnouncementUseCases
 import com.turnin.domain.announcement.application.usecase.CreateAnnouncementUseCase
@@ -14,6 +15,9 @@ import org.koin.dsl.module
 val announcementModule = module {
     // Repository
     single<AnnouncementRepository> { AnnouncementRepositoryImpl() }
+
+    // Provider
+    single { AnnouncementDeletionSupportApi(get()) }
 
     // Usecase
     single { CreateAnnouncementUseCase(get()) }

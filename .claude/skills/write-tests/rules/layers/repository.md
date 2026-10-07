@@ -35,6 +35,12 @@ class FeedRepositoryImplTest {
 }
 ```
 
+## New `PostgresRule` test classes
+
+Add every new `PostgresRule` test class to `postgresTestPatterns` in `build.gradle.kts`. Those classes run in the
+separate `postgresTest` task. If a `PostgresRule` class runs in the same process as H2 tests, it can make the H2 tests
+fail, because `customPostgresEnum` fixes enum handling to the DB dialect active when a table object is first loaded.
+
 ## New tables
 
 A table that is not registered in the test schema does not exist in tests. When testing a repository for a new table,

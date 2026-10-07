@@ -20,9 +20,10 @@ Layering conventions and dependency-direction rules are documented in @README.md
 - Run locally: `./gradlew runDev` (loads `.env.dev` + `application-dev.conf`) or `./gradlew runProd` (prod equivalent)
 - Lint: `./gradlew ktlintCheck` / `./gradlew ktlintFormat`
 - Fat jar for deploy: `./gradlew buildFatJar` → `turnin-api.jar`
-- Tests: `./gradlew test` — this also triggers `koinTest` (finalizedBy), a separate task that runs `HardDeleteExpiredAccountsUseCaseIntegrationTest` and `AccountDeletionIntegrationTest` in one Gradle test process (`maxParallelForks = 1`) because they share Koin DI container state. The regular `test` task allows up to `Runtime.getRuntime().availableProcessors()` Gradle test processes for the other tests. Don't assume `koinTest` ran just because `test` passed — check both task results.
+- Tests: `./gradlew test` runs three tasks: `test` (parallel), then `koinTest` (Koin integration tests sharing DI state, one process) and `postgresTest` (`PostgresRule` classes in `postgresTestPatterns`, kept apart from H2 tests). A green `test` doesn't mean the other two passed — check all three.
 - Integration tests use Testcontainers (Postgres) — **Docker must be running locally** or these tests fail immediately.
-- Single test class: `./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest`, then confirm it actually ran in `build/test-results/test/TEST-<fully.qualified.Name>.xml`.
+- Single test class: `./gradlew test --tests "com.turnin.<package>.<TestClassName>" -x koinTest -x postgresTest` (`--tests` doesn't reach the two finalizer tasks, so without `-x` they run in full), then confirm it actually ran in `build/test-results/test/TEST-<fully.qualified.Name>.xml`. For a `PostgresRule` class use `./gradlew postgresTest --tests "..."` (results in `build/test-results/postgresTest/`).
+- Sandboxed sessions: Gradle builds must run on a daemon started **outside** the Claude Code sandbox. A daemon spawned inside the sandbox cannot read `application-prod.conf` (read-denied secret), so `processResources` fails with `Operation not permitted`. If you see that error, or the build reuses a sandboxed daemon, ask the user to run `! ./gradlew --stop && ./gradlew help`, then retry. Do not loosen the secret read-deny and do not fall back to IntelliJ MCP run tools.
 
 ## Skills
 
@@ -31,7 +32,7 @@ Project skills live in `.claude/skills/`. Use them instead of improvising the sa
 | Skill | Use when |
 |---|---|
 | `write-tests` | Writing or planning tests for any code in this repo. Lists Given-When-Then test cases first, writes them, then compiles, runs, and lints them. Pass `cases-only` to stop at the list. |
-| `verify` | After code changes, before saying the work is done: `ktlintCheck` + full `test` + `koinTest`. |
+| `verify` | After code changes, before saying the work is done: `ktlintCheck` + full `test` + `koinTest` + `postgresTest`. |
 | `run-dev` | Starting the server locally. |
 
 ## Testing
@@ -47,6 +48,7 @@ When asked to write tests, invoke the `write-tests` skill; its `rules/` hold the
   - Repository impl → real SQL on `TestDatabaseFactory` (H2, default) or `PostgresRule` (Testcontainers; only for PostgreSQL-specific queries such as pgvector).
   - Route → `testApplication` + `TestEndpoint` tools (`testGetEndpoint`, `testPostEndpoint`, ...) with `testPlugin(authRouting = { ... })` and a mocked `...UseCases`.
 - **What to cover:** every code branch, each exception type, and each concrete HTTP status as its own test (never merge 400/401/403); both sides of each validation boundary. Skip same-class input variations, collection-size variations, and null for non-nullable parameters.
+- **New `PostgresRule` test classes** must be added to `postgresTestPatterns` in `build.gradle.kts`.
 - **New tables** must be registered in both `src/test/kotlin/util/db/TestDatabaseFactory.kt` and `PostgresRule.kt` (enum map and every `SchemaUtils.create` / `drop` list), or they do not exist in tests.
 - **Never change production code to make a test pass.**
 - **Never change an expected value to match the implementation.** Expected values come from the contract (`docs/spec/`, KDoc, API docs), not from what the code currently returns. If a test fails because the implementation differs from the contract, keep the expectation and report the implementation defect.
