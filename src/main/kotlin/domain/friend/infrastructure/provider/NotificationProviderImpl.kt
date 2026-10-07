@@ -7,7 +7,7 @@ import com.turnin.domain.notification.application.provider.NotificationProviderA
 class NotificationProviderImpl(private val notificationProviderApi: NotificationProviderApi) : NotificationProvider {
     override suspend fun sendNotification(command: FriendNotificationCommand) {
         notificationProviderApi.sendNotification(
-            userId = command.userId,
+            receiverId = command.receiverId,
             notiType = command.notiType,
             title = command.title,
             message = command.message,

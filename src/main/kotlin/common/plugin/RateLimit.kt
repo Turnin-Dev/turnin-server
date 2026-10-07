@@ -30,6 +30,8 @@ enum class RateLimitToken(
     TOKEN_REFRESH("token_refresh", limit = 10, refillPeriod = 60.seconds),
     AUTHENTICATED_DEFAULT("authenticated_default", limit = 100, refillPeriod = 60.seconds),
     CREATE_KEYWORD("create_keyword", limit = 5, refillPeriod = 10.seconds),
+    CREATE_PING_PONG_QUESTION_BURST("create_ping_pong_question_burst", limit = 1, refillPeriod = 5.seconds),
+    CREATE_PING_PONG_QUESTION("create_ping_pong_question", limit = 5, refillPeriod = 60.seconds),
     ADMIN("admin", limit = 60, refillPeriod = 60.seconds),
     ;
 
@@ -104,6 +106,21 @@ fun Application.configureRateLimit() {
             applyRateLimiter(RateLimitToken.CREATE_KEYWORD)
         }
 
+        // 핑퐁 질문 작성: 동일 사용자가 동일 게시물에 5초당 1회 / 1분당 5회 (두 토큰을 중첩 적용)
+        register(RateLimitToken.CREATE_PING_PONG_QUESTION_BURST.ktorName) {
+            applyRateLimiter(
+                token = RateLimitToken.CREATE_PING_PONG_QUESTION_BURST,
+                requestKeySelector = { call -> call.getUserKeywordScopedRequestKey() },
+            )
+        }
+
+        register(RateLimitToken.CREATE_PING_PONG_QUESTION.ktorName) {
+            applyRateLimiter(
+                token = RateLimitToken.CREATE_PING_PONG_QUESTION,
+                requestKeySelector = { call -> call.getUserKeywordScopedRequestKey() },
+            )
+        }
+
         // ------------------------------ 혼용 ------------------------------
         register(RateLimitToken.ADMIN.ktorName) {
             applyRateLimiter(RateLimitToken.ADMIN)
@@ -120,3 +137,13 @@ fun Application.configureRateLimit() {
  */
 private fun ApplicationCall.getRequestKey(): Any =
     this.principal<JWTPrincipal>()?.payload?.subject ?: this.clientIp()
+
+/**
+ * 게시물(userKeyword) 단위 RateLimit 요청 키
+ *
+ * `{userKeywordId}` 경로 파라미터가 있는 라우트에서 사용한다.
+ *
+ * 경로 파라미터가 없는 라우트에 적용하면 키가 `"{사용자 키}:null"`이 되어 게시물 구분 없이 사용자 단위로 제한된다.
+ */
+private fun ApplicationCall.getUserKeywordScopedRequestKey(): Any =
+    "${getRequestKey()}:${parameters["userKeywordId"]}"

@@ -282,6 +282,46 @@ class ReportRepositoryImplTest {
         assertEquals(0, count)
     }
 
+    @Test
+    fun `사용자 키워드 신고 삭제 - 지정한 키워드의 신고가 삭제된다`() = runTest {
+        // given
+        val reporterId = insertUserAndReturnId("1")
+        val ownerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        insertUserKeywordReport(reporterId = reporterId, userKeywordId = userKeywordId)
+
+        // when
+        repository.deleteByUserKeywordIds(listOf(userKeywordId.value))
+
+        // then
+        assertFalse(repository.existsByUserKeywordId(userKeywordId))
+    }
+
+    @Test
+    fun `사용자 키워드 신고 삭제 - 다른 키워드의 신고는 유지된다`() = runTest {
+        // given
+        val reporterId = insertUserAndReturnId("1")
+        val ownerId = insertUserAndReturnId("2")
+        val targetUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword1")
+        val otherUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword2")
+        insertUserKeywordReport(reporterId = reporterId, userKeywordId = otherUserKeywordId)
+
+        // when
+        repository.deleteByUserKeywordIds(listOf(targetUserKeywordId.value))
+
+        // then
+        assertTrue(repository.existsByUserKeywordId(otherUserKeywordId))
+    }
+
+    private suspend fun insertUserKeywordReport(reporterId: UserId, userKeywordId: UserKeywordId) =
+        TestDatabaseFactory.dbQuery {
+            Reports.insert {
+                it[Reports.reporterId] = EntityID(reporterId.value, Users)
+                it[reportedUserKeywordId] = EntityID(userKeywordId.value, UserKeywords)
+                it[reasonId] = EntityID(1L, ReportReasons) // 기존 initData에서 생성된 신고 사유
+            }
+        }
+
     private suspend fun insertUserAndReturnId(uniqueValue: String): UserId = TestDatabaseFactory.dbQuery {
         val savedUser = UserEntity.new {
             this.role = Role.USER
@@ -298,10 +338,13 @@ class ReportRepositoryImplTest {
         UserId(savedUser.id.value)
     }
 
-    private suspend fun insertUserKeywordAndReturnId(userId: Long): UserKeywordId = TestDatabaseFactory.dbQuery {
+    private suspend fun insertUserKeywordAndReturnId(
+        userId: Long,
+        keyword: String = "keyword",
+    ): UserKeywordId = TestDatabaseFactory.dbQuery {
         val keywordId = KeywordEntity
             .new {
-                this.keyword = "keyword"
+                this.keyword = keyword
                 this.embedding = "embedding"
                 this.createdBy = EntityID(userId, Users)
             }.id.value

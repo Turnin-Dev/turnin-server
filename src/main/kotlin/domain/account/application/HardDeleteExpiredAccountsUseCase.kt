@@ -37,7 +37,10 @@ class HardDeleteExpiredAccountsUseCase(
 
         suspendTransaction {
             // DeleteAccountUseCase에서 Soft Delete로 처리된 작업 외의 작업만 처리한다.
-            // AnnouncementRead(공지 읽음 여부) 테이블 같은 단순 매핑성 테이블은 CASCADE에 맡긴다.
+            // 단순 매핑성 테이블은 CASCADE에 맡긴다. (공지 읽음 기록은 DeleteAccountUseCase에서 이미 삭제되었다)
+            // PingPongs, PingPongAnswers는 DeleteAccountUseCase에서 이미 삭제되었고, ContentReports는 CASCADE로 삭제된다.
+            // ContentReports의 인덱스 없는 FK(reporter_id, reported_user_id)는 seq scan 되므로,
+            // 이 작업이 느려지면 ContentReports 테이블 클래스의 주석을 참고해 인덱스를 추가한다.
             val userIdVO = UserId(userId)
             reportDeletionSupportApi.deleteByUserId(userIdVO)
             userKeywordDeletionSupportApi.deleteByUserId(userIdVO)

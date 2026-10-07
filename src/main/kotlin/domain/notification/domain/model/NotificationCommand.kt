@@ -1,5 +1,6 @@
 package com.turnin.domain.notification.domain.model
 
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.id.UserId
 import com.turnin.domain.notification.exception.NotificationErrorCode
@@ -7,7 +8,7 @@ import com.turnin.domain.notification.exception.NotificationErrorCode
 /**
  * 알림 저장 요청용 모델
  *
- * @property userId 사용자 ID (수신자)
+ * @property receiverId 수신자 ID (브로드캐스트 알림은 null)
  * @property notiType 알림 유형
  * @property title 알림 제목
  * @property message 알림 본문
@@ -15,10 +16,11 @@ import com.turnin.domain.notification.exception.NotificationErrorCode
  * @property isBroadcast 브로드캐스트 여부
  * @property refId 참조 ID (발신자, 딥링크 용)
  * @property refType 참조 타입
+ * @property refData 딥링크용 부가 데이터 (refId/refType 외에 화면 이동에 필요한 값, 알림 내역과 FCM data에 같은 키로 담긴다)
  */
 @ConsistentCopyVisibility
 data class NotificationCommand private constructor(
-    val userId: UserId?,
+    val receiverId: UserId?,
     val notiType: NotificationType,
     val title: String?,
     val message: String,
@@ -26,6 +28,7 @@ data class NotificationCommand private constructor(
     val isBroadcast: Boolean = false,
     val refId: Long? = null,
     val refType: String? = null,
+    val refData: Map<RefDataKey, String>? = null,
 ) {
     companion object {
         /**
@@ -33,19 +36,20 @@ data class NotificationCommand private constructor(
          * @see [NotificationCommand]
          */
         fun personal(
-            userId: UserId,
+            receiverId: UserId,
             notiType: NotificationType,
             title: String?,
             message: String,
             imageUrl: String? = null,
             refId: Long? = null,
             refType: String? = null,
+            refData: Map<RefDataKey, String>? = null,
         ): NotificationCommand {
             require(!notiType.isBroadcast) {
                 NotificationErrorCode.InvalidPersonalNotificationType.description
             }
             return NotificationCommand(
-                userId = userId,
+                receiverId = receiverId,
                 notiType = notiType,
                 title = title,
                 message = message,
@@ -53,6 +57,7 @@ data class NotificationCommand private constructor(
                 isBroadcast = false,
                 refId = refId,
                 refType = refType,
+                refData = refData,
             )
         }
 
@@ -71,7 +76,7 @@ data class NotificationCommand private constructor(
                 NotificationErrorCode.InvalidBroadcastNotificationType.description
             }
             return NotificationCommand(
-                userId = null,
+                receiverId = null,
                 notiType = notiType,
                 title = title,
                 message = message,

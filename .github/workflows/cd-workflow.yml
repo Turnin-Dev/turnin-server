@@ -94,7 +94,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           fingerprint: ${{ secrets.SSH_HOST_FINGERPRINT }}
-          envs: DOCKERHUB_USERNAME,DOCKERHUB_TOKEN
+          envs: DOCKERHUB_USERNAME,DOCKERHUB_TOKEN,IMAGE_TAG
           script: |
             # Docker Login
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -113,9 +113,10 @@ jobs:
             docker compose exec nginx nginx -t
             docker compose exec nginx nginx -s reload
             
-            # Docker
-            docker compose pull ktor
-            docker compose up -d --no-deps --force-recreate ktor            
+            # Docker (build job이 push한 run_number 태그를 받아 로컬 latest로 지정, 숫자 태그는 롤백용으로 보관)
+            docker pull turnindev/turnin-api:$IMAGE_TAG
+            docker tag turnindev/turnin-api:$IMAGE_TAG turnindev/turnin-api:latest
+            docker compose up -d --no-deps --force-recreate ktor
             docker image prune -f
             
             # healthy 될 때까지 대기 (최대 60초)
@@ -125,7 +126,7 @@ jobs:
               done
             "
             
-            if [ \$? -ne 0 ]; then
+            if [ $? -ne 0 ]; then
               echo "Deploy failed"
               docker compose logs --tail=50 ktor
               exit 1
@@ -139,9 +140,10 @@ jobs:
             # 이미지 정리 (최근 3개 유지)
             docker images turnindev/turnin-api --format "{{.Tag}}" \
               | grep -v latest \
-              | sort -n \
+              | sort -rn \
               | tail -n +4 \
               | xargs -r -I {} docker rmi turnindev/turnin-api:{}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          IMAGE_TAG: ${{ github.run_number }}

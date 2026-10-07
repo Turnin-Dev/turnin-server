@@ -95,7 +95,7 @@ class UpdateFriendRequestStatusUseCase(
             runCatching {
                 notificationProvider.sendNotification(
                     FriendNotificationCommand(
-                        userId = requesterIdVO,
+                        receiverId = requesterIdVO,
                         notiType = NotificationType.FRIEND_ACCEPT,
                         title = FriendNotificationMessage.FriendAccept.TITLE,
                         message = FriendNotificationMessage.FriendAccept.message(updaterName),

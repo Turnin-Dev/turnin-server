@@ -15,6 +15,7 @@ import com.turnin.domain.report.domain.repository.ReportRepository
 import com.turnin.domain.report.infrastructure.mapper.ReportReasonMapper.toDomain
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
@@ -67,5 +68,9 @@ class ReportRepositoryImpl : ReportRepository {
             (Reports.reporterId eq userId.value) or
                 (Reports.reportedId eq userId.value)
         }
+    }
+
+    override suspend fun deleteByUserKeywordIds(userKeywordIds: List<Long>): Unit = suspendTransaction {
+        Reports.deleteWhere { Reports.reportedUserKeywordId inList userKeywordIds }
     }
 }

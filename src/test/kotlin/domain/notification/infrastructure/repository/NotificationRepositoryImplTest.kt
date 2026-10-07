@@ -1,6 +1,7 @@
 package com.turnin.domain.notification.infrastructure.repository
 
 import com.turnin.common.db.schema.UserEntity
+import com.turnin.common.firebase.RefDataKey
 import com.turnin.common.model.NotificationType
 import com.turnin.common.model.Role
 import com.turnin.common.model.SocialLoginProvider
@@ -40,7 +41,7 @@ class NotificationRepositoryImplTest {
         // given
         val userId = insertUserAndReturnId("1")
         val command = NotificationCommand.personal(
-            userId = userId,
+            receiverId = userId,
             notiType = NotificationType.FRIEND_REQUEST,
             title = "친구 요청",
             message = "테스트 유저님이 친구 요청을 보냈어요.",
@@ -84,7 +85,7 @@ class NotificationRepositoryImplTest {
         // given
         val userId = insertUserAndReturnId("1")
         val command = NotificationCommand.personal(
-            userId = userId,
+            receiverId = userId,
             notiType = NotificationType.FRIEND_ACCEPT,
             title = null,
             message = "친구 요청이 수락됐어요.",
@@ -97,6 +98,51 @@ class NotificationRepositoryImplTest {
         assertNull(result.title)
     }
 
+    @Test
+    fun `딥링크 부가 데이터와 함께 저장한 알림은 조회 시 같은 부가 데이터를 반환한다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        repository.save(
+            NotificationCommand.personal(
+                receiverId = userId,
+                notiType = NotificationType.PING_PONG_ANSWER,
+                title = "새 답변",
+                message = "작성자 님이 질문에 답변했어요.",
+                refId = 3L,
+                refType = "KEYWORD",
+                refData = mapOf(RefDataKey.REF_OWNER_ID to "34"),
+            ),
+        )
+
+        // when
+        val result = repository.findByUserId(userId, cursor = null, size = 10)
+
+        // then
+        assertEquals(mapOf("ref_owner_id" to "34"), result.single().refData)
+    }
+
+    @Test
+    fun `딥링크 부가 데이터 없이 저장한 알림은 조회 시 부가 데이터가 null이다`() = runTest {
+        // given
+        val userId = insertUserAndReturnId("1")
+        repository.save(
+            NotificationCommand.personal(
+                receiverId = userId,
+                notiType = NotificationType.FRIEND_REQUEST,
+                title = "친구 요청",
+                message = "테스트 유저님이 친구 요청을 보냈어요.",
+                refId = 2L,
+                refType = "USER",
+            ),
+        )
+
+        // when
+        val result = repository.findByUserId(userId, cursor = null, size = 10)
+
+        // then
+        assertNull(result.single().refData)
+    }
+
     // ======================== findByUserId ========================
 
     @Test
@@ -106,7 +152,7 @@ class NotificationRepositoryImplTest {
         repeat(3) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId,
+                    receiverId = userId,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -129,7 +175,7 @@ class NotificationRepositoryImplTest {
         val userId = insertUserAndReturnId("1")
         repository.save(
             NotificationCommand.personal(
-                userId = userId,
+                receiverId = userId,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",
@@ -158,7 +204,7 @@ class NotificationRepositoryImplTest {
         repeat(5) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId,
+                    receiverId = userId,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -208,7 +254,7 @@ class NotificationRepositoryImplTest {
         val userId = insertUserAndReturnId("1")
         val notification = repository.save(
             NotificationCommand.personal(
-                userId = userId,
+                receiverId = userId,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",
@@ -244,7 +290,7 @@ class NotificationRepositoryImplTest {
         val userId2 = insertUserAndReturnId("2")
         val notification = repository.save(
             NotificationCommand.personal(
-                userId = userId1,
+                receiverId = userId1,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",
@@ -269,7 +315,7 @@ class NotificationRepositoryImplTest {
         repeat(3) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId,
+                    receiverId = userId,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -293,7 +339,7 @@ class NotificationRepositoryImplTest {
         repeat(3) {
             repository.save(
                 NotificationCommand.personal(
-                    userId = userId1,
+                    receiverId = userId1,
                     notiType = NotificationType.FRIEND_REQUEST,
                     title = "친구 요청 $it",
                     message = "message $it",
@@ -302,7 +348,7 @@ class NotificationRepositoryImplTest {
         }
         repository.save(
             NotificationCommand.personal(
-                userId = userId2,
+                receiverId = userId2,
                 notiType = NotificationType.FRIEND_REQUEST,
                 title = "친구 요청",
                 message = "message",

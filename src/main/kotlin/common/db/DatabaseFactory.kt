@@ -49,6 +49,9 @@ object DatabaseFactory {
                 password = dbPassword
                 maximumPoolSize = 5
                 connectionInitSql = "SET TIME ZONE 'UTC'"
+                // 주의: 격리 수준은 PostgreSQL 기본값(READ COMMITTED)을 전제로 한다.
+                // REPEATABLE READ로 바꾸면 트랜잭션의 첫 쿼리 시점 스냅샷만 보게 되어,
+                // 잠금 획득 후 최신 상태를 다시 읽는 로직(예: CreateContentReportUseCase의 콘텐츠 단위 잠금)이 깨진다.
 //            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
             },
         )

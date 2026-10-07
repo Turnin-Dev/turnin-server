@@ -85,6 +85,22 @@ object Api {
             fun detail(pathParam: String): String = "$ROUTE/$pathParam/detail"
         }
 
+        object PingPong {
+            const val ROUTE = "/ping-pong"
+            const val TAG = "PingPong"
+
+            fun byUserKeyword(pathParam: String): String = "${UserKeyword.ROUTE}/$pathParam$ROUTE"
+
+            fun byId(pathParam: String): String = "$ROUTE/$pathParam"
+
+            fun answer(pathParam: String): String = "$ROUTE/$pathParam/answer"
+        }
+
+        object ContentReport {
+            const val ROUTE = "/content-report"
+            const val TAG = "ContentReport"
+        }
+
         object Report {
             const val ROUTE = "/report"
             const val TAG = "Report"

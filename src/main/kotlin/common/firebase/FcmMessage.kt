@@ -28,11 +28,13 @@ data class FcmMessage(
     /**
      * data-only 방식 전송을 위한 데이터 맵 변환
      * title, body, notiType 과 추가 data 를 포함한다.
+     *
+     * 추가 data 에 같은 키가 있어도 title, body, notiType 이 우선한다. (알림 유형/표시 내용 덮어쓰기 방지)
      */
     fun toDataMap(): Map<String, String> = buildMap {
+        putAll(data)
         put(FcmDataKey.TITLE, title)
         put(FcmDataKey.BODY, body)
         put(FcmDataKey.NOTI_TYPE, notiType.name)
-        putAll(data)
     }
 }

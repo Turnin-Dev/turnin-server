@@ -17,6 +17,7 @@ import com.turnin.common.model.id.UserId
  * @property isBroadcast 브로드캐스트 여부
  * @param refId 참조 ID
  * @param refType 참조 타입
+ * @param refData 딥링크용 부가 데이터 (FCM data와 동일한 key-value 맵)
  * @param createdAt 생성 일자
  * @param updatedAt 수정 일자
  */
@@ -31,6 +32,7 @@ data class Notification(
     val isBroadcast: Boolean,
     val refId: Long? = null,
     val refType: String? = null,
+    val refData: Map<String, String>? = null,
     val createdAt: Long,
     val updatedAt: Long,
 )
