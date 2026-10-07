@@ -23,7 +23,7 @@
 
 - 탈퇴 철회/계정 복구는 미지원.
 - 재가입 방지 (탈퇴한 소셜 식별자로 재가입 시 확인)는 미구현. 1년 보관 중인 소셜 식별자를 이후 기능에서 활용.
-- 사용자가 직접 삭제한 게시물 중 신고된 게시물은 비활성화로 남으며, 별도 파기 기한 없음. (작성자 계정의 1년 후 파기 시 함께 삭제)
+- 사용자가 직접 삭제한 게시물 중 신고된 게시물은 삭제 시각 기준 1년 후 신고 내역과 함께 파기. ([rq-5-user-keyword-spec.md](rq-5-user-keyword-spec.md))
 - 운영자에 의한 게시물 비활성화 (신고 검토 후 숨김/복구)는 별도 기능으로 분리. 현재는 DB 수동 처리.
 
 # 상세 기능 명세
@@ -34,7 +34,7 @@
         - 이름 → `"탈퇴한 사용자"`, 소개 → 빈 문자열, 프로필 이미지 URL → `null`.
         - 소셜 식별자 → `DELETED_{탈퇴 시각}_{원본}` (재가입 허용 + 1년 보관).
     - 게시물 (사용자 키워드)
-        - 신고 내역이 있는 게시물: 비활성화하여 1년 보관.
+        - 신고 내역이 있는 게시물: 비활성화 + 삭제 시각 (`deleted_at`) 기록하여 1년 보관.
         - 신고 내역이 없는 게시물: 즉시 삭제.
     - 핑퐁: 즉시 삭제.
         - 탈퇴자가 다른 게시물에 남긴 질문 (연결된 답변 포함).
@@ -44,7 +44,9 @@
     - 프로필 사진 파일: 스토리지에서 즉시 삭제하여 스토리지 비용을 절감. 실패해도 탈퇴는 성공 처리하고 경고 로그를 남김.
         - 현재 서비스에서는 프로필 사진에서만 사진을 사용하므로 프로필 사진만 삭제하면 된다.
 - **[1년 후 파기]**
-    - 매일 KST 02:00 배치가 비활성 사용자 중 `deleted_at`이 365일 지난 사용자를 파기.
+    - 매일 KST 02:00, 하나의 작업에서 아래 두 배치를 순서대로 실행해 같은 행을 동시에 삭제하지 않도록 함.
+        1. 게시물 파기: `user_keyword.deleted_at`이 365일 지난 게시물을 신고 행과 함께 파기.
+        2. 계정 파기: 비활성 사용자 중 `deleted_at`이 365일 지난 사용자를 파기.
     - 신고 내역 (`report`) → 게시물 (`user_keyword`) → 사용자 순으로 삭제하며, 나머지 연관 데이터 (`content_report` 등)는 CASCADE로 삭제.
 - **[게시물 삭제와의 관계]**
     - 사용자가 게시물을 직접 삭제할 때도 탈퇴와 같은 규칙을 따름.
@@ -81,13 +83,14 @@
         3. 친구 관계 삭제
         4. 차단 삭제
         5. 핑퐁 삭제
-        6. 게시물 처리: 신고됨 → 비활성화, 신고 안 됨 → 삭제
+        6. 게시물 처리: 신고 안 됨 → 삭제, 남은 게시물 (신고됨) → 비활성화 + 삭제 시각 기록 (`softDeleteAll`)
         7. 소셜 식별자 변조, 사용자 비활성화 및 비식별화
         8. (트랜잭션 밖) 프로필 사진 파일 삭제
-    - 1년 후 파기: `HardDeleteExpiredAccountsBatch` → `HardDeleteExpiredAccountsUseCase`
+    - 1년 후 파기: `HardDeleteExpiredUserKeywordsBatch` → `HardDeleteExpiredUserKeywordsUseCase`, 이어서 `HardDeleteExpiredAccountsBatch` → `HardDeleteExpiredAccountsUseCase`
     - DB 제약:
         - `report.reported_user_keyword_id`는 `ON DELETE RESTRICT`이므로 신고된 게시물은 신고 내역보다 먼저 삭제할 수 없음.
         - `ping_pong.user_keyword_id`, `ping_pong.questioner_id`, `ping_pong_answer.ping_pong_id`는 `ON DELETE CASCADE`.
+        - `keyword.created_by`는 `ON DELETE SET NULL` (V11). 키워드는 공유 데이터라 등록자가 파기되어도 유지.
         - `content_report`는 콘텐츠 (핑퐁)에 FK가 없어 원본 삭제 후에도 유지되고, 신고자/피신고자 FK는 `ON DELETE CASCADE`.
         - `ping_pong.questioner_id`에는 인덱스가 없어 핑퐁 삭제 시 seq scan. 느려지면 새 마이그레이션으로 인덱스 추가.
 - **앱 (Client) 처리:**

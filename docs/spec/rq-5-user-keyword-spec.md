@@ -41,7 +41,7 @@
     - 사용자는 본인 키워드를 삭제할 수 있음.
     - 게시물에 달린 핑퐁 (질문/답변)은 신고 여부와 관계없이 함께 삭제됨.
     - 신고 내역이 없는 게시물은 즉시 삭제됨.
-    - 신고 내역이 있는 게시물은 비활성화되어 사용자에게 노출되지 않고, 삭제 시각을 기록해 1년간 격리 보관 후 신고 내역과 함께 파기됨. **(파기 구현 예정)**
+    - 신고 내역이 있는 게시물은 비활성화되어 사용자에게 노출되지 않고, 삭제 시각을 기록해 1년간 격리 보관 후 신고 내역과 함께 파기됨.
     - 계정 탈퇴 시 게시물 처리는 [account-deletion.md](rq-3-account-deletion.md)를 따름.
 
 # 기술 명세 및 참고
@@ -56,13 +56,14 @@
     - DB Table:
         - `user_keyword`
             - `is_active`: `false`면 비노출 (작성자 삭제 중 신고된 게시물, 탈퇴, 운영자 숨김)
-            - `deleted_at`: 작성자 쪽 사유 (직접 삭제, 계정 탈퇴)로 삭제된 시각. 운영자 숨김과 구분하는 기준 **(추가 예정)**
+            - `deleted_at`: 작성자 쪽 사유 (직접 삭제, 계정 탈퇴)로 삭제된 시각. 운영자 숨김과 구분하는 기준
+            - `idx_user_keyword_deleted_at`: 파기 배치 조회용 부분 인덱스 (`deleted_at IS NOT NULL`)
             - `uq_user_id_keyword_id`: 사용자별 키워드 중복 등록 방지
     - 삭제 처리 (`DeleteUserKeywordUseCase`, 하나의 트랜잭션):
         - 신고 내역 없음: 게시물 삭제, 핑퐁은 FK `ON DELETE CASCADE`로 함께 삭제.
-        - 신고 내역 있음: `report.reported_user_keyword_id`가 `ON DELETE RESTRICT`이므로 삭제할 수 없어, 비활성화 + `deleted_at` 기록 **(추가 예정)** 후 핑퐁을 명시적으로 삭제.
+        - 신고 내역 있음: `report.reported_user_keyword_id`가 `ON DELETE RESTRICT`이므로 삭제할 수 없어, 비활성화 + `deleted_at` 기록 (`softDelete`) 후 핑퐁을 명시적으로 삭제.
         - 핑퐁 삭제는 유스케이스에서만 수행하고, 리포지토리의 비활성화 메서드에 두지 않음. (운영자 숨김 시 핑퐁 유지)
-    - 파기 배치 **(구현 예정)**:
+    - 파기 배치 (`HardDeleteExpiredUserKeywordsBatch` → `HardDeleteExpiredUserKeywordsUseCase`):
         - `deleted_at`이 1년 지난 게시물의 신고 행을 먼저 삭제한 뒤 게시물을 삭제.
         - 계정 삭제 배치와 같은 작업 안에서 계정 삭제 배치보다 먼저 실행해 동시 실행을 방지.
 - **참고 문서:**
