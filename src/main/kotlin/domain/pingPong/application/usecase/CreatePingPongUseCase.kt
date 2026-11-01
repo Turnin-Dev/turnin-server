@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
  * @throws [PingPongException.UserKeywordNotFound] 게시물이 없거나, 비활성화/차단 관계로 조회할 수 없는 경우
  * @throws [PingPongException.CannotQuestionOwnUserKeyword] 본인 게시물에 질문을 등록하려는 경우
  */
-class CreatePingPongQuestionUseCase(
+class CreatePingPongUseCase(
     private val pingPongRepository: PingPongRepository,
     private val userKeywordProvider: UserKeywordProvider,
     private val userProvider: UserProvider,
@@ -62,7 +62,7 @@ class CreatePingPongQuestionUseCase(
             throw PingPongException.CannotQuestionOwnUserKeyword()
         }
 
-        val pingPong = pingPongRepository.createQuestion(userKeywordIdVO, questionerId, questionVO)
+        val pingPong = pingPongRepository.createPingPong(userKeywordIdVO, questionerId, questionVO)
 
         // 게시물 작성자에게 질문 알림 전송 (비동기 - 사용자 응답과 무관)
         applicationScope.launch {
@@ -90,4 +90,4 @@ class CreatePingPongQuestionUseCase(
     }
 }
 
-private val LOGGER = AppLoggerFactory.createLogger<CreatePingPongQuestionUseCase>()
+private val LOGGER = AppLoggerFactory.createLogger<CreatePingPongUseCase>()

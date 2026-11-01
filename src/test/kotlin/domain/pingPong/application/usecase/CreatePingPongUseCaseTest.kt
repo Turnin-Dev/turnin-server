@@ -32,7 +32,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.assertThrows
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CreatePingPongQuestionUseCaseTest {
+class CreatePingPongUseCaseTest {
     private val pingPongRepository = mockk<PingPongRepository>()
     private val userKeywordProvider = mockk<UserKeywordProvider>()
     private val userProvider = mockk<UserProvider>()
@@ -40,7 +40,7 @@ class CreatePingPongQuestionUseCaseTest {
 
     // 알림 전송 코루틴은 advanceUntilIdle() 호출 시에만 실행된다.
     private val applicationScope = TestScope()
-    private val usecase = CreatePingPongQuestionUseCase(
+    private val usecase = CreatePingPongUseCase(
         pingPongRepository,
         userKeywordProvider,
         userProvider,
@@ -53,7 +53,7 @@ class CreatePingPongQuestionUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         } returns PingPong(
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
@@ -83,7 +83,7 @@ class CreatePingPongQuestionUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         } returns TestPingPong
 
         // when
@@ -91,7 +91,7 @@ class CreatePingPongQuestionUseCaseTest {
 
         // then
         coVerify(exactly = 1) {
-            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         }
     }
 
@@ -105,7 +105,7 @@ class CreatePingPongQuestionUseCaseTest {
             usecase(UserId(1L), 3L, "질문 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         }
     }
 
@@ -119,7 +119,7 @@ class CreatePingPongQuestionUseCaseTest {
             usecase(UserId(1L), 3L, "질문 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         }
     }
 
@@ -150,7 +150,7 @@ class CreatePingPongQuestionUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery {
-            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         } returns TestPingPong
         coEvery { userProvider.findUserName(UserId(1L)) } returns UserName("질문자")
         val command = slot<PingPongNotificationCommand>()
@@ -179,7 +179,7 @@ class CreatePingPongQuestionUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createQuestion(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
         } returns TestPingPong
         coEvery { userProvider.findUserName(UserId(1L)) } returns null
 

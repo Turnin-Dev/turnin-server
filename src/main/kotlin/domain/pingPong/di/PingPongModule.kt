@@ -4,9 +4,9 @@ import com.turnin.common.di.IOApplicationScopeQualifier
 import com.turnin.domain.pingPong.application.provider.PingPongContentReportApi
 import com.turnin.domain.pingPong.application.provider.PingPongDeletionSupportApi
 import com.turnin.domain.pingPong.application.usecase.CreatePingPongAnswerUseCase
-import com.turnin.domain.pingPong.application.usecase.CreatePingPongQuestionUseCase
+import com.turnin.domain.pingPong.application.usecase.CreatePingPongUseCase
 import com.turnin.domain.pingPong.application.usecase.DeletePingPongAnswerUseCase
-import com.turnin.domain.pingPong.application.usecase.DeletePingPongQuestionUseCase
+import com.turnin.domain.pingPong.application.usecase.DeletePingPongUseCase
 import com.turnin.domain.pingPong.application.usecase.GetPingPongsUseCase
 import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
 import com.turnin.domain.pingPong.domain.provider.BlockProvider
@@ -34,10 +34,10 @@ val pingPongModule = module {
     single { PingPongDeletionSupportApi(get()) }
 
     // UseCases
-    single { CreatePingPongQuestionUseCase(get(), get(), get(), get(), get(IOApplicationScopeQualifier)) }
+    single { CreatePingPongUseCase(get(), get(), get(), get(), get(IOApplicationScopeQualifier)) }
     single { CreatePingPongAnswerUseCase(get(), get(), get(), get(), get(), get(IOApplicationScopeQualifier)) }
     single { GetPingPongsUseCase(get(), get()) }
-    single { DeletePingPongQuestionUseCase(get(), get()) }
+    single { DeletePingPongUseCase(get(), get()) }
     single { DeletePingPongAnswerUseCase(get(), get()) }
     single { PingPongUseCases(get(), get(), get(), get(), get()) }
 }

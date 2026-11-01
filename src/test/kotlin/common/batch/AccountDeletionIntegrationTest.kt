@@ -124,7 +124,7 @@ class AccountDeletionIntegrationTest : KoinTest {
         insertReport(reporterId = otherUser.id.value, reportedId = targetId)
         val otherUserKeywordId = insertUserKeywordAndReturnId(userId = otherUser.id.value, keywordId = keyword.id.value)
         val pingPongId = insertPingPong(userKeywordId = otherUserKeywordId, questionerId = targetId)
-        insertPingPongQuestionReport(
+        insertPingPongReport(
             reporterId = otherUser.id.value,
             reportedUserId = targetId,
             pingPongId = pingPongId,
@@ -353,7 +353,7 @@ class AccountDeletionIntegrationTest : KoinTest {
         }.value
     }
 
-    private suspend fun insertPingPongQuestionReport(reporterId: Long, reportedUserId: Long, pingPongId: Long) {
+    private suspend fun insertPingPongReport(reporterId: Long, reportedUserId: Long, pingPongId: Long) {
         TestDatabaseFactory.dbQuery {
             ContentReports.insert {
                 it[ContentReports.reporterId] = EntityID(reporterId, Users)

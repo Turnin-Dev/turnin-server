@@ -37,7 +37,7 @@ import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.or
 
 class PingPongRepositoryImpl : PingPongRepository {
-    override suspend fun createQuestion(
+    override suspend fun createPingPong(
         userKeywordId: UserKeywordId,
         questionerId: UserId,
         question: PingPongContent,
@@ -160,7 +160,7 @@ class PingPongRepositoryImpl : PingPongRepository {
             }
     }
 
-    override suspend fun deleteQuestion(pingPongId: PingPongId): Boolean = suspendTransaction {
+    override suspend fun deletePingPong(pingPongId: PingPongId): Boolean = suspendTransaction {
         PingPongs.deleteWhere { PingPongs.id eq pingPongId.value } > 0
     }
 
