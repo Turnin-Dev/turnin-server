@@ -17,7 +17,7 @@ class ReportableContentProviderImpl(
     ): ReportableContent? {
         val content = when (contentType) {
             ContentReportType.PING_PONG_QUESTION -> {
-                pingPongContentReportApi.findVisibleQuestion(PingPongId(contentId))
+                pingPongContentReportApi.findVisiblePingPong(PingPongId(contentId))
             }
             ContentReportType.PING_PONG_ANSWER -> {
                 pingPongContentReportApi.findVisibleAnswer(PingPongAnswerId(contentId))

@@ -8,11 +8,11 @@ import kotlinx.serialization.Serializable
  * @property question 질문 내용
  */
 @Serializable
-data class CreatePingPongQuestionRequest(
+data class CreatePingPongRequest(
     val question: String,
 ) {
     companion object {
-        val sample = CreatePingPongQuestionRequest(
+        val sample = CreatePingPongRequest(
             question = "이 키워드를 고른 이유가 궁금해요!",
         )
     }
