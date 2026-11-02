@@ -1,6 +1,7 @@
 package com.turnin
 
 import com.turnin.ApplicationUtils.initDatabase
+import com.turnin.ApplicationUtils.printAppVersion
 import com.turnin.ApplicationUtils.printSection
 import com.turnin.ApplicationUtils.printServerSettings
 import com.turnin.ApplicationUtils.printTimeZone
@@ -60,6 +61,7 @@ fun Application.module() {
     // ------------------------------ Print ------------------------------
     val timeZoneInfo = getTimeZoneInfo()
     printSection {
+        printAppVersion()
         printServerSettings()
         printTimeZone(timeZoneInfo)
     }
