@@ -46,6 +46,12 @@ ktlint {
     }
 }
 
+tasks.withType<Jar>().configureEach {
+    manifest {
+        attributes("Implementation-Version" to project.version)
+    }
+}
+
 tasks.named<ShadowJar>("shadowJar") {
     exclude("firebase-service-account.json")
     exclude("model_int8.onnx")
