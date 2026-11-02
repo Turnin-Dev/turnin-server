@@ -16,7 +16,7 @@ class PingPongContentReportApi(private val pingPongRepository: PingPongRepositor
      *
      * @return 노출 중인 질문이 있다면 [ReportablePingPongContentDto]를 반환하고, 없거나 숨김 처리되었다면 `null`을 반환한다.
      */
-    suspend fun findVisibleQuestion(pingPongId: PingPongId): ReportablePingPongContentDto? =
+    suspend fun findVisiblePingPong(pingPongId: PingPongId): ReportablePingPongContentDto? =
         pingPongRepository.findVisibleById(pingPongId)?.let {
             ReportablePingPongContentDto(authorId = it.questionerId, content = it.question.value)
         }

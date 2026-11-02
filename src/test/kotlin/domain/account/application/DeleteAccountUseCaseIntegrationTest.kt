@@ -348,7 +348,7 @@ class DeleteAccountUseCaseIntegrationTest {
         val owner = insertUser("2", profileImageUrl = null)
         val ownerUserKeyword = insertUserKeyword(owner.id.value)
         val pingPongId = insertPingPong(userKeywordId = ownerUserKeyword.id.value, questionerId = user.id.value)
-        val contentReportId = insertPingPongQuestionReport(
+        val contentReportId = insertPingPongReport(
             reporterId = owner.id.value,
             reportedUserId = user.id.value,
             pingPongId = pingPongId,
@@ -519,7 +519,7 @@ class DeleteAccountUseCaseIntegrationTest {
         }.value
     }
 
-    private suspend fun insertPingPongQuestionReport(
+    private suspend fun insertPingPongReport(
         reporterId: Long,
         reportedUserId: Long,
         pingPongId: Long,

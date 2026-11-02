@@ -57,7 +57,7 @@ class PingPongRepositoryImplTest {
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
 
         // when
-        val result = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val result = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // then
         assertEquals(userKeywordId, result.userKeywordId)
@@ -73,7 +73,7 @@ class PingPongRepositoryImplTest {
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
 
         // when
-        val result = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val result = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // then
         val savedRows = TestDatabaseFactory.dbQuery {
@@ -93,10 +93,10 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        repository.createQuestion(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
+        repository.createPingPong(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
 
         // when
-        repository.createQuestion(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
+        repository.createPingPong(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
 
         // then
         val count = TestDatabaseFactory.dbQuery {
@@ -116,7 +116,7 @@ class PingPongRepositoryImplTest {
 
         // when, then
         assertThrows<DatabaseException.ForeignKeyViolationException> {
-            repository.createQuestion(notExistsUserKeywordId, questionerId, PingPongContent("질문 내용"))
+            repository.createPingPong(notExistsUserKeywordId, questionerId, PingPongContent("질문 내용"))
         }
     }
 
@@ -126,7 +126,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         val result = repository.findVisibleById(pingPong.id)
@@ -157,7 +157,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         TestDatabaseFactory.dbQuery {
             PingPongs.update({ PingPongs.id eq pingPong.id.value }) {
                 it[questionHiddenAt] = OffsetDateTime.parse("2026-01-01T00:00:00Z")
@@ -177,7 +177,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         val result = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
@@ -193,7 +193,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         val result = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
@@ -216,7 +216,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         repository.createAnswer(pingPong.id, PingPongContent("첫 번째 답변"))
 
         // when, then
@@ -242,8 +242,8 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val first = repository.createQuestion(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
-        val second = repository.createQuestion(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
+        val first = repository.createPingPong(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
+        val second = repository.createPingPong(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
 
         // when
         val result = repository.findVisibleDetailsByUserKeywordId(
@@ -266,8 +266,8 @@ class PingPongRepositoryImplTest {
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword1")
         val otherUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword2")
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
-        repository.createQuestion(otherUserKeywordId, questionerId, PingPongContent("다른 게시물 질문"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.createPingPong(otherUserKeywordId, questionerId, PingPongContent("다른 게시물 질문"))
 
         // when
         val result = repository.findVisibleDetailsByUserKeywordId(
@@ -288,8 +288,8 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val visible = repository.createQuestion(userKeywordId, questionerId, PingPongContent("노출 질문"))
-        val hidden = repository.createQuestion(userKeywordId, questionerId, PingPongContent("숨김 질문"))
+        val visible = repository.createPingPong(userKeywordId, questionerId, PingPongContent("노출 질문"))
+        val hidden = repository.createPingPong(userKeywordId, questionerId, PingPongContent("숨김 질문"))
         TestDatabaseFactory.dbQuery {
             PingPongs.update({ PingPongs.id eq hidden.id.value }) {
                 it[questionHiddenAt] = OffsetDateTime.parse("2026-01-01T00:00:00Z")
@@ -316,8 +316,8 @@ class PingPongRepositoryImplTest {
         val activeQuestionerId = insertUserAndReturnId("2")
         val inactiveQuestionerId = insertUserAndReturnId("3")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val visible = repository.createQuestion(userKeywordId, activeQuestionerId, PingPongContent("활성 사용자 질문"))
-        repository.createQuestion(userKeywordId, inactiveQuestionerId, PingPongContent("비활성 사용자 질문"))
+        val visible = repository.createPingPong(userKeywordId, activeQuestionerId, PingPongContent("활성 사용자 질문"))
+        repository.createPingPong(userKeywordId, inactiveQuestionerId, PingPongContent("비활성 사용자 질문"))
         setUserInactiveForTest(inactiveQuestionerId)
 
         // when
@@ -341,8 +341,8 @@ class PingPongRepositoryImplTest {
         val questionerId = insertUserAndReturnId("3")
         val blockedQuestionerId = insertUserAndReturnId("4")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val visible = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
-        repository.createQuestion(userKeywordId, blockedQuestionerId, PingPongContent("차단된 사용자 질문"))
+        val visible = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.createPingPong(userKeywordId, blockedQuestionerId, PingPongContent("차단된 사용자 질문"))
         insertBlock(blockerId = viewerId, blockedId = blockedQuestionerId)
 
         // when
@@ -366,8 +366,8 @@ class PingPongRepositoryImplTest {
         val questionerId = insertUserAndReturnId("3")
         val blockingQuestionerId = insertUserAndReturnId("4")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val visible = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
-        repository.createQuestion(userKeywordId, blockingQuestionerId, PingPongContent("차단한 사용자 질문"))
+        val visible = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.createPingPong(userKeywordId, blockingQuestionerId, PingPongContent("차단한 사용자 질문"))
         insertBlock(blockerId = blockingQuestionerId, blockedId = viewerId)
 
         // when
@@ -389,7 +389,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val blockedQuestionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, blockedQuestionerId, PingPongContent("차단된 사용자 질문"))
+        val pingPong = repository.createPingPong(userKeywordId, blockedQuestionerId, PingPongContent("차단된 사용자 질문"))
         insertBlock(blockerId = ownerId, blockedId = blockedQuestionerId)
 
         // when
@@ -411,7 +411,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val blockingQuestionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, blockingQuestionerId, PingPongContent("차단한 사용자 질문"))
+        val pingPong = repository.createPingPong(userKeywordId, blockingQuestionerId, PingPongContent("차단한 사용자 질문"))
         insertBlock(blockerId = blockingQuestionerId, blockedId = ownerId)
 
         // when
@@ -433,7 +433,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val viewerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val myPingPong = repository.createQuestion(userKeywordId, viewerId, PingPongContent("내 질문"))
+        val myPingPong = repository.createPingPong(userKeywordId, viewerId, PingPongContent("내 질문"))
 
         // when
         val result = repository.findVisibleDetailsByUserKeywordId(
@@ -458,7 +458,7 @@ class PingPongRepositoryImplTest {
             profileImageUrl = "https://example.com/profile.jpg",
         )
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         val result = repository.findVisibleDetailsByUserKeywordId(
@@ -482,7 +482,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -508,7 +508,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         val result = repository.findVisibleDetailsByUserKeywordId(
@@ -529,7 +529,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
         TestDatabaseFactory.dbQuery {
             PingPongAnswers.update({ PingPongAnswers.id eq answer.id.value }) {
@@ -557,9 +557,9 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val first = repository.createQuestion(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
-        val second = repository.createQuestion(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
-        repository.createQuestion(userKeywordId, questionerId, PingPongContent("세 번째 질문"))
+        val first = repository.createPingPong(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
+        val second = repository.createPingPong(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
+        repository.createPingPong(userKeywordId, questionerId, PingPongContent("세 번째 질문"))
 
         // when
         val result = repository.findVisibleDetailsByUserKeywordId(
@@ -580,9 +580,9 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        repository.createQuestion(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
-        val second = repository.createQuestion(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
-        val third = repository.createQuestion(userKeywordId, questionerId, PingPongContent("세 번째 질문"))
+        repository.createPingPong(userKeywordId, questionerId, PingPongContent("첫 번째 질문"))
+        val second = repository.createPingPong(userKeywordId, questionerId, PingPongContent("두 번째 질문"))
+        val third = repository.createPingPong(userKeywordId, questionerId, PingPongContent("세 번째 질문"))
 
         // when
         val result = repository.findVisibleDetailsByUserKeywordId(
@@ -622,7 +622,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -641,7 +641,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         val result = repository.findVisibleAnswerByPingPongId(pingPong.id)
@@ -656,7 +656,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
         setAnswerHiddenAt(answer.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
 
@@ -673,7 +673,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -693,7 +693,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
         setAnswerHiddenAt(answer.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
 
@@ -710,7 +710,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
         setQuestionHiddenAt(pingPong.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
 
@@ -739,11 +739,11 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
-        val result = repository.deleteQuestion(pingPong.id)
+        val result = repository.deletePingPong(pingPong.id)
 
         // then
         assertTrue(result)
@@ -761,7 +761,7 @@ class PingPongRepositoryImplTest {
         val notExistsPingPongId = PingPongId(999L)
 
         // when
-        val result = repository.deleteQuestion(notExistsPingPongId)
+        val result = repository.deletePingPong(notExistsPingPongId)
 
         // then
         assertFalse(result)
@@ -773,7 +773,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -807,7 +807,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         val result = repository.hideQuestion(pingPong.id)
@@ -826,7 +826,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         setQuestionHiddenAt(pingPong.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
 
         // when
@@ -858,7 +858,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -881,7 +881,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
         setAnswerHiddenAt(answer.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
 
@@ -917,7 +917,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -938,7 +938,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -960,7 +960,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("2")
         val questionerId = insertUserAndReturnId("3")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         repository.deleteAllByUserId(targetUserId)
@@ -978,7 +978,7 @@ class PingPongRepositoryImplTest {
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
-        val pingPong = repository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         val answer = repository.createAnswer(pingPong.id, PingPongContent("답변 내용"))
 
         // when
@@ -1000,7 +1000,7 @@ class PingPongRepositoryImplTest {
         val questionerId = insertUserAndReturnId("2")
         val targetUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword1")
         val otherUserKeywordId = insertUserKeywordAndReturnId(ownerId.value, keyword = "keyword2")
-        val otherPingPong = repository.createQuestion(otherUserKeywordId, questionerId, PingPongContent("질문 내용"))
+        val otherPingPong = repository.createPingPong(otherUserKeywordId, questionerId, PingPongContent("질문 내용"))
 
         // when
         repository.deleteAllByUserKeywordId(targetUserKeywordId)

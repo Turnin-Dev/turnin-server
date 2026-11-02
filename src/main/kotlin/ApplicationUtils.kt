@@ -5,6 +5,7 @@ import com.turnin.common.util.config.AppConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
 import kotlin.getValue
+import kotlin.jvm.java
 import org.koin.ktor.ext.get
 import org.koin.ktor.ext.inject
 
@@ -19,6 +20,11 @@ object ApplicationUtils {
                 "Active Connections: ${dataSource.hikariPoolMXBean?.activeConnections ?: "N/A"}, " +
                 "Idle Connections: ${dataSource.hikariPoolMXBean?.idleConnections ?: "N/A"}",
         )
+    }
+
+    fun Application.printAppVersion() {
+        val appVersion: String = ApplicationUtils::class.java.`package`?.implementationVersion ?: "dev"
+        println("Version: $appVersion")
     }
 
     /** 출력해야 하는 경우 깔끔한 출력을 도와준다. */

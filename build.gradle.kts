@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.turnin"
-version = "1.6.0"
+version = "1.6.1"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
@@ -43,6 +43,12 @@ ktlint {
         exclude("**/build/generated/ksp/**")
         exclude("**/build/generated/source/ksp/**")
         exclude("**/build/generated/ksp/main/kotlin/**")
+    }
+}
+
+tasks.withType<Jar>().configureEach {
+    manifest {
+        attributes("Implementation-Version" to project.version)
     }
 }
 

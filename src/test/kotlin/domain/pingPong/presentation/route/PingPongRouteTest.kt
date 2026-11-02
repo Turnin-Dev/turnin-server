@@ -14,7 +14,7 @@ import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
 import com.turnin.domain.pingPong.domain.model.PingPongContentValidationException
 import com.turnin.domain.pingPong.exception.PingPongException
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongAnswerRequest
-import com.turnin.domain.pingPong.presentation.dto.CreatePingPongQuestionRequest
+import com.turnin.domain.pingPong.presentation.dto.CreatePingPongRequest
 import com.turnin.util.testDeleteEndpoint
 import com.turnin.util.testGetEndpoint
 import com.turnin.util.testPlugin
@@ -35,7 +35,7 @@ class PingPongRouteTest {
     @Test
     fun `질문 작성 - 성공 시 201과 생성된 핑퐁을 반환한다`() = testApplication {
         coEvery {
-            usecase.createQuestion(UserId(1L), any(), any())
+            usecase.createPingPong(UserId(1L), any(), any())
         } returns PingPongDto(
             id = 10L,
             userKeywordId = 3L,
@@ -47,7 +47,7 @@ class PingPongRouteTest {
 
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
-            requestBody = CreatePingPongQuestionRequest(question = "질문 내용"),
+            requestBody = CreatePingPongRequest(question = "질문 내용"),
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -64,12 +64,12 @@ class PingPongRouteTest {
     @Test
     fun `질문 작성 - 토큰의 사용자 ID와 경로의 게시물 ID, 바디의 질문을 유스케이스에 전달한다`() = testApplication {
         coEvery {
-            usecase.createQuestion(UserId(1L), any(), any())
+            usecase.createPingPong(UserId(1L), any(), any())
         } returns TestPingPongDto
 
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
-            requestBody = CreatePingPongQuestionRequest(question = "질문 내용"),
+            requestBody = CreatePingPongRequest(question = "질문 내용"),
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -78,7 +78,7 @@ class PingPongRouteTest {
             tokenSubject = "1",
             expectedStatus = HttpStatusCode.Created,
             additionalAssertions = {
-                coVerify(exactly = 1) { usecase.createQuestion(UserId(1L), 3L, "질문 내용") }
+                coVerify(exactly = 1) { usecase.createPingPong(UserId(1L), 3L, "질문 내용") }
             },
         )
     }
@@ -87,7 +87,7 @@ class PingPongRouteTest {
     fun `질문 작성 - 토큰 없이 요청 시 401 에러를 반환한다`() = testApplication {
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
-            requestBody = TestCreateQuestionRequest,
+            requestBody = TestCreatePingPongRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -102,7 +102,7 @@ class PingPongRouteTest {
     fun `질문 작성 - 게시물 ID가 숫자가 아니면 400 에러를 반환한다`() = testApplication {
         testPostEndpoint(
             endpoint = route.byUserKeyword("abc"),
-            requestBody = TestCreateQuestionRequest,
+            requestBody = TestCreatePingPongRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -134,12 +134,12 @@ class PingPongRouteTest {
     @Test
     fun `질문 작성 - 질문 내용 유효성 검사 실패 시 400 에러를 반환한다`() = testApplication {
         coEvery {
-            usecase.createQuestion(UserId(1L), any(), any())
+            usecase.createPingPong(UserId(1L), any(), any())
         } throws PingPongContentValidationException("핑퐁 내용이 비어있습니다.")
 
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
-            requestBody = CreatePingPongQuestionRequest(question = " "),
+            requestBody = CreatePingPongRequest(question = " "),
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -157,12 +157,12 @@ class PingPongRouteTest {
     fun `질문 작성 - 본인 게시물에 질문하면 400 에러를 반환한다`() = testApplication {
         val expectedException = PingPongException.CannotQuestionOwnUserKeyword()
         coEvery {
-            usecase.createQuestion(UserId(1L), any(), any())
+            usecase.createPingPong(UserId(1L), any(), any())
         } throws expectedException
 
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
-            requestBody = TestCreateQuestionRequest,
+            requestBody = TestCreatePingPongRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -183,12 +183,12 @@ class PingPongRouteTest {
     fun `질문 작성 - 게시물을 조회할 수 없으면 404 에러를 반환한다`() = testApplication {
         val expectedException = PingPongException.UserKeywordNotFound()
         coEvery {
-            usecase.createQuestion(UserId(1L), any(), any())
+            usecase.createPingPong(UserId(1L), any(), any())
         } throws expectedException
 
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
-            requestBody = TestCreateQuestionRequest,
+            requestBody = TestCreatePingPongRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -213,12 +213,12 @@ class PingPongRouteTest {
             message = "unexpected error",
         )
         coEvery {
-            usecase.createQuestion(UserId(1L), any(), any())
+            usecase.createPingPong(UserId(1L), any(), any())
         } throws expectedException
 
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
-            requestBody = TestCreateQuestionRequest,
+            requestBody = TestCreatePingPongRequest,
             testPlugin = {
                 testPlugin(
                     authRouting = { pingPongRoutes(route, usecase) },
@@ -817,7 +817,7 @@ class PingPongRouteTest {
 
     @Test
     fun `질문 삭제 - 성공 시 204를 반환한다`() = testApplication {
-        coEvery { usecase.deleteQuestion(UserId(1L), any()) } just Runs
+        coEvery { usecase.deletePingPong(UserId(1L), any()) } just Runs
 
         testDeleteEndpoint(
             endpoint = route.byId("10"),
@@ -833,7 +833,7 @@ class PingPongRouteTest {
 
     @Test
     fun `질문 삭제 - 토큰의 사용자 ID와 경로의 핑퐁 ID를 유스케이스에 전달한다`() = testApplication {
-        coEvery { usecase.deleteQuestion(UserId(1L), any()) } just Runs
+        coEvery { usecase.deletePingPong(UserId(1L), any()) } just Runs
 
         testDeleteEndpoint(
             endpoint = route.byId("10"),
@@ -845,7 +845,7 @@ class PingPongRouteTest {
             tokenSubject = "1",
             expectedStatus = HttpStatusCode.NoContent,
             additionalAssertions = {
-                coVerify(exactly = 1) { usecase.deleteQuestion(UserId(1L), 10L) }
+                coVerify(exactly = 1) { usecase.deletePingPong(UserId(1L), 10L) }
             },
         )
     }
@@ -881,7 +881,7 @@ class PingPongRouteTest {
     @Test
     fun `질문 삭제 - 유효성 검사 실패 시 400 에러를 반환한다`() = testApplication {
         coEvery {
-            usecase.deleteQuestion(UserId(1L), any())
+            usecase.deletePingPong(UserId(1L), any())
         } throws PingPongIdValidationException("핑퐁 ID는 0이나 음수가 될 수 없습니다.")
 
         testDeleteEndpoint(
@@ -902,7 +902,7 @@ class PingPongRouteTest {
     @Test
     fun `질문 삭제 - 삭제 권한이 없으면 403 에러를 반환한다`() = testApplication {
         val expectedException = PingPongException.NoPermissionToDelete()
-        coEvery { usecase.deleteQuestion(UserId(1L), any()) } throws expectedException
+        coEvery { usecase.deletePingPong(UserId(1L), any()) } throws expectedException
 
         testDeleteEndpoint(
             endpoint = route.byId("10"),
@@ -925,7 +925,7 @@ class PingPongRouteTest {
     @Test
     fun `질문 삭제 - 핑퐁을 찾을 수 없으면 404 에러를 반환한다`() = testApplication {
         val expectedException = PingPongException.PingPongNotFound()
-        coEvery { usecase.deleteQuestion(UserId(1L), any()) } throws expectedException
+        coEvery { usecase.deletePingPong(UserId(1L), any()) } throws expectedException
 
         testDeleteEndpoint(
             endpoint = route.byId("10"),
@@ -952,7 +952,7 @@ class PingPongRouteTest {
             status = HttpStatusCode.InternalServerError,
             message = "unexpected error",
         )
-        coEvery { usecase.deleteQuestion(UserId(1L), any()) } throws expectedException
+        coEvery { usecase.deletePingPong(UserId(1L), any()) } throws expectedException
 
         testDeleteEndpoint(
             endpoint = route.byId("10"),
@@ -1161,7 +1161,7 @@ class PingPongRouteTest {
             createdAt = 2000L,
             updatedAt = 2000L,
         )
-        private val TestCreateQuestionRequest = CreatePingPongQuestionRequest(question = "question")
+        private val TestCreatePingPongRequest = CreatePingPongRequest(question = "question")
         private val TestPingPongDto = PingPongDto(
             id = 10L,
             userKeywordId = 3L,

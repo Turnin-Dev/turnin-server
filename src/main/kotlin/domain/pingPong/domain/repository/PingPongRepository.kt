@@ -21,7 +21,7 @@ interface PingPongRepository {
      *
      * @return 생성된 [PingPong]을 반환한다.
      */
-    suspend fun createQuestion(
+    suspend fun createPingPong(
         userKeywordId: UserKeywordId,
         questionerId: UserId,
         question: PingPongContent,
@@ -101,7 +101,7 @@ interface PingPongRepository {
      *
      * @return 삭제되었다면 `true`, 삭제할 질문이 없다면 `false`를 반환한다.
      */
-    suspend fun deleteQuestion(pingPongId: PingPongId): Boolean
+    suspend fun deletePingPong(pingPongId: PingPongId): Boolean
 
     /**
      * 답변을 삭제한다.

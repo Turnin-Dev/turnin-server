@@ -55,7 +55,7 @@ class CreateContentReportUseCaseIntegrationTest {
             val ownerId = insertUserAndReturnId("owner")
             val questionerId = insertUserAndReturnId("questioner")
             val userKeywordId = insertUserKeywordAndReturnId(ownerId)
-            val pingPong = pingPongRepository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+            val pingPong = pingPongRepository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
             repeat(4) { index ->
                 usecase(insertUserAndReturnId("reporter$index"), questionReportDto(pingPong.id))
             }
@@ -84,7 +84,7 @@ class CreateContentReportUseCaseIntegrationTest {
         val ownerId = insertUserAndReturnId("owner")
         val questionerId = insertUserAndReturnId("questioner")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId)
-        val pingPong = pingPongRepository.createQuestion(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = pingPongRepository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
         repeat(4) { index ->
             usecase(insertUserAndReturnId("reporter$index"), questionReportDto(pingPong.id))
         }

@@ -18,7 +18,7 @@ import com.turnin.domain.pingPong.exception.PingPongException
  * @throws [PingPongException.PingPongNotFound] 핑퐁이 없거나, 질문이 신고 누적으로 숨김 처리된 경우
  * @throws [PingPongException.NoPermissionToDelete] 질문자도 게시물 작성자도 아닌 경우
  */
-class DeletePingPongQuestionUseCase(
+class DeletePingPongUseCase(
     private val pingPongRepository: PingPongRepository,
     private val userKeywordProvider: UserKeywordProvider,
 ) {
@@ -41,6 +41,6 @@ class DeletePingPongQuestionUseCase(
         }
 
         // 조회 이후 동시 삭제된 경우에도 결과(삭제됨)는 같으므로 삭제 여부는 확인하지 않는다.
-        pingPongRepository.deleteQuestion(pingPongIdVO)
+        pingPongRepository.deletePingPong(pingPongIdVO)
     }
 }

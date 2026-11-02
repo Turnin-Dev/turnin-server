@@ -16,23 +16,23 @@ import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.assertThrows
 
-class DeletePingPongQuestionUseCaseTest {
+class DeletePingPongUseCaseTest {
     private val pingPongRepository = mockk<PingPongRepository>()
     private val userKeywordProvider = mockk<UserKeywordProvider>()
-    private val usecase = DeletePingPongQuestionUseCase(pingPongRepository, userKeywordProvider)
+    private val usecase = DeletePingPongUseCase(pingPongRepository, userKeywordProvider)
 
     @Test
     fun `질문자가 삭제를 요청하면 질문을 삭제한다`() = runTest {
         // given
         val questionerId = UserId(1L)
         coEvery { pingPongRepository.findVisibleById(PingPongId(10L)) } returns TestPingPong
-        coEvery { pingPongRepository.deleteQuestion(PingPongId(10L)) } returns true
+        coEvery { pingPongRepository.deletePingPong(PingPongId(10L)) } returns true
 
         // when
         usecase(questionerId, 10L)
 
         // then
-        coVerify(exactly = 1) { pingPongRepository.deleteQuestion(PingPongId(10L)) }
+        coVerify(exactly = 1) { pingPongRepository.deletePingPong(PingPongId(10L)) }
     }
 
     @Test
@@ -41,13 +41,13 @@ class DeletePingPongQuestionUseCaseTest {
         val ownerId = UserId(2L)
         coEvery { pingPongRepository.findVisibleById(PingPongId(10L)) } returns TestPingPong
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
-        coEvery { pingPongRepository.deleteQuestion(PingPongId(10L)) } returns true
+        coEvery { pingPongRepository.deletePingPong(PingPongId(10L)) } returns true
 
         // when
         usecase(ownerId, 10L)
 
         // then
-        coVerify(exactly = 1) { pingPongRepository.deleteQuestion(PingPongId(10L)) }
+        coVerify(exactly = 1) { pingPongRepository.deletePingPong(PingPongId(10L)) }
     }
 
     @Test
@@ -61,7 +61,7 @@ class DeletePingPongQuestionUseCaseTest {
         assertThrows<PingPongException.NoPermissionToDelete> {
             usecase(otherUserId, 10L)
         }
-        coVerify(exactly = 0) { pingPongRepository.deleteQuestion(PingPongId(10L)) }
+        coVerify(exactly = 0) { pingPongRepository.deletePingPong(PingPongId(10L)) }
     }
 
     @Test
@@ -86,7 +86,7 @@ class DeletePingPongQuestionUseCaseTest {
         assertThrows<PingPongException.PingPongNotFound> {
             usecase(UserId(1L), 10L)
         }
-        coVerify(exactly = 0) { pingPongRepository.deleteQuestion(PingPongId(10L)) }
+        coVerify(exactly = 0) { pingPongRepository.deletePingPong(PingPongId(10L)) }
     }
 
     @Test

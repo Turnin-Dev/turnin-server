@@ -12,7 +12,7 @@ import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
 import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.domain.pingPong.exception.PingPongErrorCode
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongAnswerRequest
-import com.turnin.domain.pingPong.presentation.dto.CreatePingPongQuestionRequest
+import com.turnin.domain.pingPong.presentation.dto.CreatePingPongRequest
 import com.turnin.domain.pingPong.presentation.dto.PingPongAnswerResponse
 import com.turnin.domain.pingPong.presentation.dto.PingPongDetailResponse
 import com.turnin.domain.pingPong.presentation.dto.PingPongResponse
@@ -35,16 +35,16 @@ fun AuthenticatedRoute.pingPongRoutes(route: Api.V1.PingPong, usecase: PingPongU
         // 동일 사용자가 동일 게시물에 5초당 1회 / 1분당 5회 (두 토큰을 중첩 적용)
         rateLimit(RateLimitToken.CREATE_PING_PONG_QUESTION_BURST.ktorName) {
             rateLimit(RateLimitToken.CREATE_PING_PONG_QUESTION.ktorName) {
-                post(route.byUserKeyword(pathParam = "{userKeywordId}"), { createQuestionDocs() }) {
+                post(route.byUserKeyword(pathParam = "{userKeywordId}"), { createPingPongDocs() }) {
                     val userKeywordIdParam = call.parameters["userKeywordId"]
                         ?.toLongOrNull()
                         .inputValidationAndReturn("사용자 키워드 ID")
                     val questionerId = extractUserIdWithToken()
-                    val createQuestionRequest = call.receive<CreatePingPongQuestionRequest>()
-                    val pingPongDto = usecase.createQuestion(
+                    val createPingPongRequest = call.receive<CreatePingPongRequest>()
+                    val pingPongDto = usecase.createPingPong(
                         questionerId,
                         userKeywordIdParam,
-                        createQuestionRequest.question,
+                        createPingPongRequest.question,
                     )
                     call.respond(HttpStatusCode.Created, pingPongDto.toResponse())
                 }
@@ -83,12 +83,12 @@ fun AuthenticatedRoute.pingPongRoutes(route: Api.V1.PingPong, usecase: PingPongU
             call.respond(HttpStatusCode.OK, response)
         }
 
-        delete(route.byId(pathParam = "{pingPongId}"), { deleteQuestionDocs() }) {
+        delete(route.byId(pathParam = "{pingPongId}"), { deletePingPongDocs() }) {
             val pingPongIdParam = call.parameters["pingPongId"]
                 ?.toLongOrNull()
                 .inputValidationAndReturn("핑퐁 ID")
             val requesterId = extractUserIdWithToken()
-            usecase.deleteQuestion(requesterId, pingPongIdParam)
+            usecase.deletePingPong(requesterId, pingPongIdParam)
             call.respond(HttpStatusCode.NoContent)
         }
 
@@ -103,7 +103,7 @@ fun AuthenticatedRoute.pingPongRoutes(route: Api.V1.PingPong, usecase: PingPongU
     }
 }
 
-private fun RouteConfig.createQuestionDocs() {
+private fun RouteConfig.createPingPongDocs() {
     summary = "질문 작성"
     description = """
         게시물(사용자 키워드)에 질문을 등록한다.
@@ -116,10 +116,10 @@ private fun RouteConfig.createQuestionDocs() {
         pathParameter<Long>("userKeywordId") {
             description = "질문을 등록할 사용자 키워드(게시물) ID"
         }
-        body<CreatePingPongQuestionRequest> {
+        body<CreatePingPongRequest> {
             description = "질문 작성 요청 바디"
-            example("CreatePingPongQuestionRequest") {
-                value = CreatePingPongQuestionRequest.sample
+            example("CreatePingPongRequest") {
+                value = CreatePingPongRequest.sample
             }
         }
     }
@@ -261,7 +261,7 @@ private fun RouteConfig.getPingPongsDocs() {
     }
 }
 
-private fun RouteConfig.deleteQuestionDocs() {
+private fun RouteConfig.deletePingPongDocs() {
     summary = "질문 삭제"
     description = """
         질문을 삭제한다. 질문에 달린 답변도 함께 삭제된다.
