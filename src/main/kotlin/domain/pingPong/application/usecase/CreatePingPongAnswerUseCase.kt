@@ -11,7 +11,7 @@ import com.turnin.common.validator.ValidatorException
 import com.turnin.domain.pingPong.application.dto.PingPongAnswerDto
 import com.turnin.domain.pingPong.application.dto.toDto
 import com.turnin.domain.pingPong.domain.message.PingPongNotificationMessage
-import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongNotificationCommand
 import com.turnin.domain.pingPong.domain.provider.BlockProvider
 import com.turnin.domain.pingPong.domain.provider.NotificationProvider
@@ -60,7 +60,7 @@ class CreatePingPongAnswerUseCase(
         answer: String,
     ): PingPongAnswerDto {
         val pingPongIdVO = PingPongId(pingPongId)
-        val answerVO = PingPongContent(answer)
+        val answerVO = PingPongAnswerContent(answer)
 
         val pingPong = pingPongRepository.findVisibleById(pingPongIdVO)
             ?: throw PingPongException.PingPongNotFound()

@@ -19,7 +19,7 @@ import com.turnin.domain.contentReport.infrastructure.repository.ContentReportRe
 import com.turnin.domain.discover.util.TestVectorFixture
 import com.turnin.domain.discover.util.TestVectorFixture.toPgVectorString
 import com.turnin.domain.pingPong.application.provider.PingPongContentReportApi
-import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.infrastructure.repository.PingPongRepositoryImpl
 import com.turnin.util.db.PostgresRule
 import java.time.Instant
@@ -55,7 +55,11 @@ class CreateContentReportUseCaseIntegrationTest {
             val ownerId = insertUserAndReturnId("owner")
             val questionerId = insertUserAndReturnId("questioner")
             val userKeywordId = insertUserKeywordAndReturnId(ownerId)
-            val pingPong = pingPongRepository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
+            val pingPong = pingPongRepository.createPingPong(
+                userKeywordId,
+                questionerId,
+                PingPongQuestionContent("질문 내용"),
+            )
             repeat(4) { index ->
                 usecase(insertUserAndReturnId("reporter$index"), questionReportDto(pingPong.id))
             }
@@ -84,7 +88,11 @@ class CreateContentReportUseCaseIntegrationTest {
         val ownerId = insertUserAndReturnId("owner")
         val questionerId = insertUserAndReturnId("questioner")
         val userKeywordId = insertUserKeywordAndReturnId(ownerId)
-        val pingPong = pingPongRepository.createPingPong(userKeywordId, questionerId, PingPongContent("질문 내용"))
+        val pingPong = pingPongRepository.createPingPong(
+            userKeywordId,
+            questionerId,
+            PingPongQuestionContent("질문 내용"),
+        )
         repeat(4) { index ->
             usecase(insertUserAndReturnId("reporter$index"), questionReportDto(pingPong.id))
         }

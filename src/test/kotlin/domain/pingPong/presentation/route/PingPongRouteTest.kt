@@ -11,7 +11,8 @@ import com.turnin.domain.pingPong.application.dto.PingPongDetailDto
 import com.turnin.domain.pingPong.application.dto.PingPongDto
 import com.turnin.domain.pingPong.application.dto.PingPongQuestionerDto
 import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
-import com.turnin.domain.pingPong.domain.model.PingPongContentValidationException
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContentValidationException
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContentValidationException
 import com.turnin.domain.pingPong.exception.PingPongException
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongAnswerRequest
 import com.turnin.domain.pingPong.presentation.dto.CreatePingPongRequest
@@ -135,7 +136,7 @@ class PingPongRouteTest {
     fun `질문 작성 - 질문 내용 유효성 검사 실패 시 400 에러를 반환한다`() = testApplication {
         coEvery {
             usecase.createPingPong(UserId(1L), any(), any())
-        } throws PingPongContentValidationException("핑퐁 내용이 비어있습니다.")
+        } throws PingPongQuestionContentValidationException("질문 내용이 비어있습니다.")
 
         testPostEndpoint(
             endpoint = route.byUserKeyword("3"),
@@ -148,7 +149,7 @@ class PingPongRouteTest {
             tokenSubject = "1",
             expectedStatus = HttpStatusCode.BadRequest,
             responseValidator = {
-                containsAll(CommonErrorCode.ValidationDefault.code, "핑퐁 내용이 비어있습니다.")
+                containsAll(CommonErrorCode.ValidationDefault.code, "질문 내용이 비어있습니다.")
             },
         )
     }
@@ -337,7 +338,7 @@ class PingPongRouteTest {
     fun `답변 작성 - 답변 내용 유효성 검사 실패 시 400 에러를 반환한다`() = testApplication {
         coEvery {
             usecase.createAnswer(UserId(1L), any(), any())
-        } throws PingPongContentValidationException("핑퐁 내용이 비어있습니다.")
+        } throws PingPongAnswerContentValidationException("답변 내용이 비어있습니다.")
 
         testPostEndpoint(
             endpoint = route.answer("10"),
@@ -350,7 +351,7 @@ class PingPongRouteTest {
             tokenSubject = "1",
             expectedStatus = HttpStatusCode.BadRequest,
             responseValidator = {
-                containsAll(CommonErrorCode.ValidationDefault.code, "핑퐁 내용이 비어있습니다.")
+                containsAll(CommonErrorCode.ValidationDefault.code, "답변 내용이 비어있습니다.")
             },
         )
     }

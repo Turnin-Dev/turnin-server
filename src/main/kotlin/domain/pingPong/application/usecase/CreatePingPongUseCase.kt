@@ -10,8 +10,8 @@ import com.turnin.common.validator.ValidatorException
 import com.turnin.domain.pingPong.application.dto.PingPongDto
 import com.turnin.domain.pingPong.application.dto.toDto
 import com.turnin.domain.pingPong.domain.message.PingPongNotificationMessage
-import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.domain.pingPong.domain.model.PingPongNotificationCommand
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.provider.NotificationProvider
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.provider.UserProvider
@@ -26,11 +26,13 @@ import kotlinx.coroutines.launch
  *
  * 게시물(사용자 키워드)에 질문을 등록한다.
  *
+ * 질문은 [PingPongQuestionContent.create]의 형식 규칙에 따라 끝에 물음표가 없으면 붙여서 저장한다.
+ *
  * 연속 작성 제한은 유스케이스가 아닌 라우트의 RateLimit으로 처리한다.
  *
  * 질문 등록 후 게시물 작성자에게 질문 알림을 비동기로 전송한다. (알림 전송 실패 시에도 질문 등록은 성공으로 처리)
  *
- * @throws [ValidatorException] 질문 내용이 비어있거나 최대 글자 수를 초과한 경우
+ * @throws [ValidatorException] 질문 내용이 비어있거나 (물음표만 있는 경우 포함) 물음표를 포함해 최대 글자 수를 초과한 경우
  * @throws [PingPongException.UserKeywordNotFound] 게시물이 없거나, 비활성화/차단 관계로 조회할 수 없는 경우
  * @throws [PingPongException.CannotQuestionOwnUserKeyword] 본인 게시물에 질문을 등록하려는 경우
  */
@@ -54,7 +56,7 @@ class CreatePingPongUseCase(
         question: String,
     ): PingPongDto {
         val userKeywordIdVO = UserKeywordId(userKeywordId)
-        val questionVO = PingPongContent(question)
+        val questionVO = PingPongQuestionContent.create(question)
 
         val ownerId = userKeywordProvider.findOwnerId(questionerId, userKeywordIdVO)
             ?: throw PingPongException.UserKeywordNotFound()

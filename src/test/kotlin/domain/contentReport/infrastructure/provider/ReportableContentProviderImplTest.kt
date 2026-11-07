@@ -10,8 +10,9 @@ import com.turnin.domain.contentReport.domain.model.ReportableContent
 import com.turnin.domain.pingPong.application.provider.PingPongContentReportApi
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerWithAnswerer
-import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -33,7 +34,7 @@ class ReportableContentProviderImplTest {
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(1L),
-            question = PingPongContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용"),
             createdAt = 1000L,
             updatedAt = 1000L,
         )
@@ -53,7 +54,7 @@ class ReportableContentProviderImplTest {
                 answer = PingPongAnswer(
                     id = PingPongAnswerId(20L),
                     pingPongId = PingPongId(10L),
-                    answer = PingPongContent("답변 내용"),
+                    answer = PingPongAnswerContent("답변 내용"),
                     createdAt = 2000L,
                     updatedAt = 2000L,
                 ),

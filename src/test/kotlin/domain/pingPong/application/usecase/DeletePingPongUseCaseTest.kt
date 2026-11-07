@@ -5,7 +5,7 @@ import com.turnin.common.model.id.PingPongIdValidationException
 import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.pingPong.domain.model.PingPong
-import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.exception.PingPongException
@@ -105,7 +105,7 @@ class DeletePingPongUseCaseTest {
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(1L),
-            question = PingPongContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용"),
             createdAt = 1000L,
             updatedAt = 1000L,
         )
