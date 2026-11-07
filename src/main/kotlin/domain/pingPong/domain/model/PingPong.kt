@@ -22,7 +22,7 @@ data class PingPong(
     val id: PingPongId,
     val userKeywordId: UserKeywordId,
     val questionerId: UserId,
-    val question: PingPongContent,
+    val question: PingPongQuestionContent,
     val createdAt: Long,
     val updatedAt: Long,
 )

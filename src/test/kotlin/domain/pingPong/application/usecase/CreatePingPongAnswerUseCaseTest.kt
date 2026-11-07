@@ -12,9 +12,10 @@ import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.pingPong.application.dto.PingPongAnswerDto
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
-import com.turnin.domain.pingPong.domain.model.PingPongContent
-import com.turnin.domain.pingPong.domain.model.PingPongContentValidationException
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContentValidationException
 import com.turnin.domain.pingPong.domain.model.PingPongNotificationCommand
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.provider.BlockProvider
 import com.turnin.domain.pingPong.domain.provider.NotificationProvider
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
@@ -62,11 +63,11 @@ class CreatePingPongAnswerUseCaseTest {
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery { blockProvider.isBlockedRelationship(UserId(2L), UserId(1L)) } returns false
         coEvery {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         } returns PingPongAnswer(
             id = PingPongAnswerId(20L),
             pingPongId = PingPongId(10L),
-            answer = PingPongContent("답변 내용"),
+            answer = PingPongAnswerContent("답변 내용"),
             createdAt = 2000L,
             updatedAt = 2000L,
         )
@@ -92,7 +93,7 @@ class CreatePingPongAnswerUseCaseTest {
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery { blockProvider.isBlockedRelationship(UserId(2L), UserId(1L)) } returns false
         coEvery {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         } returns TestAnswer
 
         // when
@@ -100,7 +101,7 @@ class CreatePingPongAnswerUseCaseTest {
 
         // then
         coVerify(exactly = 1) {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         }
     }
 
@@ -114,7 +115,7 @@ class CreatePingPongAnswerUseCaseTest {
             usecase(UserId(2L), 10L, "답변 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         }
     }
 
@@ -129,7 +130,7 @@ class CreatePingPongAnswerUseCaseTest {
             usecase(UserId(2L), 10L, "답변 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         }
     }
 
@@ -145,7 +146,7 @@ class CreatePingPongAnswerUseCaseTest {
             usecase(notOwnerId, 10L, "답변 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         }
     }
 
@@ -161,7 +162,7 @@ class CreatePingPongAnswerUseCaseTest {
             usecase(UserId(2L), 10L, "답변 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         }
     }
 
@@ -172,7 +173,7 @@ class CreatePingPongAnswerUseCaseTest {
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery { blockProvider.isBlockedRelationship(UserId(2L), UserId(1L)) } returns false
         coEvery {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         } throws DatabaseException.DuplicatedDataException(SQLException("duplicate key"))
 
         // when, then
@@ -187,7 +188,7 @@ class CreatePingPongAnswerUseCaseTest {
         val blankAnswer = " "
 
         // when, then
-        assertThrows<PingPongContentValidationException> {
+        assertThrows<PingPongAnswerContentValidationException> {
             usecase(UserId(2L), 10L, blankAnswer)
         }
     }
@@ -209,7 +210,7 @@ class CreatePingPongAnswerUseCaseTest {
         coEvery { pingPongRepository.findVisibleById(PingPongId(10L)) } returns TestPingPong
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery { blockProvider.isBlockedRelationship(UserId(2L), UserId(1L)) } returns false
-        coEvery { pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용")) } returns TestAnswer
+        coEvery { pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용")) } returns TestAnswer
         coEvery { userProvider.findUserName(UserId(2L)) } returns UserName("작성자")
         val command = slot<PingPongNotificationCommand>()
         coEvery { notificationProvider.sendNotification(capture(command)) } just Runs
@@ -238,7 +239,7 @@ class CreatePingPongAnswerUseCaseTest {
         coEvery { pingPongRepository.findVisibleById(PingPongId(10L)) } returns TestPingPong
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery { blockProvider.isBlockedRelationship(UserId(2L), UserId(1L)) } returns false
-        coEvery { pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용")) } returns TestAnswer
+        coEvery { pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용")) } returns TestAnswer
         coEvery { userProvider.findUserName(UserId(2L)) } returns null
 
         // when
@@ -256,7 +257,7 @@ class CreatePingPongAnswerUseCaseTest {
         coEvery { userKeywordProvider.findOwnerId(UserId(2L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery { blockProvider.isBlockedRelationship(UserId(2L), UserId(1L)) } returns false
         coEvery {
-            pingPongRepository.createAnswer(PingPongId(10L), PingPongContent("답변 내용"))
+            pingPongRepository.createAnswer(PingPongId(10L), PingPongAnswerContent("답변 내용"))
         } throws DatabaseException.DuplicatedDataException(SQLException("duplicate key"))
 
         // when
@@ -274,14 +275,14 @@ class CreatePingPongAnswerUseCaseTest {
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(1L),
-            question = PingPongContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용"),
             createdAt = 1000L,
             updatedAt = 1000L,
         )
         private val TestAnswer = PingPongAnswer(
             id = PingPongAnswerId(20L),
             pingPongId = PingPongId(10L),
-            answer = PingPongContent("답변 내용"),
+            answer = PingPongAnswerContent("답변 내용"),
             createdAt = 2000L,
             updatedAt = 2000L,
         )

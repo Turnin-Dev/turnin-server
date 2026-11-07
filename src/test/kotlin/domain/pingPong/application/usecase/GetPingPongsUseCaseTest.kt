@@ -12,8 +12,9 @@ import com.turnin.domain.pingPong.application.dto.PingPongDto
 import com.turnin.domain.pingPong.application.dto.PingPongQuestionerDto
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
-import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongDetail
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.model.PingPongQuestioner
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
@@ -78,7 +79,7 @@ class GetPingPongsUseCaseTest {
                     id = PingPongId(20L),
                     userKeywordId = UserKeywordId(3L),
                     questionerId = UserId(5L),
-                    question = PingPongContent("두 번째 질문"),
+                    question = PingPongQuestionContent("두 번째 질문"),
                     createdAt = 2000L,
                     updatedAt = 2000L,
                 ),
@@ -94,7 +95,7 @@ class GetPingPongsUseCaseTest {
                     id = PingPongId(10L),
                     userKeywordId = UserKeywordId(3L),
                     questionerId = UserId(5L),
-                    question = PingPongContent("첫 번째 질문"),
+                    question = PingPongQuestionContent("첫 번째 질문"),
                     createdAt = 1000L,
                     updatedAt = 1000L,
                 ),
@@ -106,7 +107,7 @@ class GetPingPongsUseCaseTest {
                 answer = PingPongAnswer(
                     id = PingPongAnswerId(100L),
                     pingPongId = PingPongId(10L),
-                    answer = PingPongContent("답변 내용"),
+                    answer = PingPongAnswerContent("답변 내용"),
                     createdAt = 1500L,
                     updatedAt = 1500L,
                 ),
@@ -270,7 +271,7 @@ class GetPingPongsUseCaseTest {
             id = PingPongId(id),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(5L),
-            question = PingPongContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용"),
             createdAt = 1000L,
             updatedAt = 1000L,
         ),

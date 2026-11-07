@@ -9,9 +9,9 @@ import com.turnin.common.model.id.UserKeywordId
 import com.turnin.common.model.id.UserKeywordIdValidationException
 import com.turnin.domain.pingPong.application.dto.PingPongDto
 import com.turnin.domain.pingPong.domain.model.PingPong
-import com.turnin.domain.pingPong.domain.model.PingPongContent
-import com.turnin.domain.pingPong.domain.model.PingPongContentValidationException
 import com.turnin.domain.pingPong.domain.model.PingPongNotificationCommand
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContentValidationException
 import com.turnin.domain.pingPong.domain.provider.NotificationProvider
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.provider.UserProvider
@@ -53,12 +53,12 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
         } returns PingPong(
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(1L),
-            question = PingPongContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용"),
             createdAt = 1000L,
             updatedAt = 1000L,
         )
@@ -83,7 +83,7 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
         } returns TestPingPong
 
         // when
@@ -91,7 +91,7 @@ class CreatePingPongUseCaseTest {
 
         // then
         coVerify(exactly = 1) {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
         }
     }
 
@@ -105,7 +105,7 @@ class CreatePingPongUseCaseTest {
             usecase(UserId(1L), 3L, "질문 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
         }
     }
 
@@ -119,7 +119,7 @@ class CreatePingPongUseCaseTest {
             usecase(UserId(1L), 3L, "질문 내용")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
         }
     }
 
@@ -129,7 +129,7 @@ class CreatePingPongUseCaseTest {
         val blankQuestion = " "
 
         // when, then
-        assertThrows<PingPongContentValidationException> {
+        assertThrows<PingPongQuestionContentValidationException> {
             usecase(UserId(1L), 3L, blankQuestion)
         }
     }
@@ -150,7 +150,7 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
         } returns TestPingPong
         coEvery { userProvider.findUserName(UserId(1L)) } returns UserName("질문자")
         val command = slot<PingPongNotificationCommand>()
@@ -179,7 +179,7 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
         } returns TestPingPong
         coEvery { userProvider.findUserName(UserId(1L)) } returns null
 
@@ -212,7 +212,7 @@ class CreatePingPongUseCaseTest {
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(1L),
-            question = PingPongContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용"),
             createdAt = 1000L,
             updatedAt = 1000L,
         )

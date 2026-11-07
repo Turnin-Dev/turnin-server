@@ -18,9 +18,10 @@ import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.toOffsetDateTime
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerWithAnswerer
-import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.domain.pingPong.domain.model.PingPongDetail
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toAnswer
 import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toDomain
@@ -40,7 +41,7 @@ class PingPongRepositoryImpl : PingPongRepository {
     override suspend fun createPingPong(
         userKeywordId: UserKeywordId,
         questionerId: UserId,
-        question: PingPongContent,
+        question: PingPongQuestionContent,
     ): PingPong = suspendTransaction {
         val savedPingPongEntity = PingPongEntity.new {
             this.userKeywordId = EntityID(userKeywordId.value, UserKeywords)
@@ -110,7 +111,7 @@ class PingPongRepositoryImpl : PingPongRepository {
 
     override suspend fun createAnswer(
         pingPongId: PingPongId,
-        answer: PingPongContent,
+        answer: PingPongAnswerContent,
     ): PingPongAnswer = suspendTransaction {
         val savedAnswerEntity = PingPongAnswerEntity.new {
             this.pingPongId = EntityID(pingPongId.value, PingPongs)

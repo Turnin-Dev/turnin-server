@@ -15,7 +15,7 @@ import com.turnin.common.model.id.PingPongId
 data class PingPongAnswer(
     val id: PingPongAnswerId,
     val pingPongId: PingPongId,
-    val answer: PingPongContent,
+    val answer: PingPongAnswerContent,
     val createdAt: Long,
     val updatedAt: Long,
 )

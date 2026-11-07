@@ -10,8 +10,8 @@ import com.turnin.common.validator.ValidatorException
 import com.turnin.domain.pingPong.application.dto.PingPongDto
 import com.turnin.domain.pingPong.application.dto.toDto
 import com.turnin.domain.pingPong.domain.message.PingPongNotificationMessage
-import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.domain.pingPong.domain.model.PingPongNotificationCommand
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.provider.NotificationProvider
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.provider.UserProvider
@@ -54,7 +54,7 @@ class CreatePingPongUseCase(
         question: String,
     ): PingPongDto {
         val userKeywordIdVO = UserKeywordId(userKeywordId)
-        val questionVO = PingPongContent(question)
+        val questionVO = PingPongQuestionContent(question)
 
         val ownerId = userKeywordProvider.findOwnerId(questionerId, userKeywordIdVO)
             ?: throw PingPongException.UserKeywordNotFound()
