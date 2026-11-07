@@ -109,7 +109,8 @@ private fun RouteConfig.createPingPongDocs() {
     description = """
         게시물(사용자 키워드)에 질문을 등록한다.
 
-        - 질문은 공백만으로 이루어질 수 없으며, 최대 ${PingPongQuestionContent.MAX_LENGTH}자까지 작성할 수 있다.
+        - 질문은 앞뒤 공백을 제거한 뒤, 마지막 글자가 `?`가 아니면 `?`를 붙여 저장한다. (이미 `?`로 끝나면 그대로 저장)
+        - 질문은 공백만으로 이루어지거나 `?` 하나만으로 이루어질 수 없으며, 붙인 `?`를 포함해 최대 ${PingPongQuestionContent.MAX_LENGTH}자까지 작성할 수 있다.
         - Rate Limit (동일 사용자 + 동일 게시물 기준): ${RateLimitToken.CREATE_PING_PONG_QUESTION_BURST.toPrettyString()}, ${RateLimitToken.CREATE_PING_PONG_QUESTION.toPrettyString()}
         - 등록 시 게시물 작성자에게 `PING_PONG_QUESTION` 알림을 전송한다. (딥링크 데이터는 알림 목록 조회 API 참고)
     """.trimIndent()
@@ -134,13 +135,34 @@ private fun RouteConfig.createPingPongDocs() {
             }
         }
         code(HttpStatusCode.BadRequest) {
-            description = "질문이 비어있거나 최대 글자 수를 초과한 경우, 본인 게시물에 질문하는 경우, 요청 형식이 잘못된 경우"
+            description = """
+                질문이 비어있거나 (`?`만 있는 경우 포함) `?`를 포함해 최대 글자 수를 초과한 경우 (`${CommonErrorCode.ValidationDefault.code}`)
+
+                - UI 메시지: "질문 형식이 올바르지 않아요."
+
+                게시물 ID가 0 이하인 경우 (`${CommonErrorCode.ValidationDefault.code}`),
+                요청 바디 또는 게시물 ID 형식이 잘못된 경우 (`${CommonErrorCode.MalformedRequest.code}`)
+
+                - UI 메시지: "요청을 처리할 수 없어요. 잠시 후 다시 시도해 주세요."
+
+                본인 게시물에 질문하려는 경우 (`${PingPongErrorCode.CannotQuestionOwnUserKeyword.code}`)
+
+                - UI 메시지: "내 게시물에는 질문할 수 없어요."
+            """.trimIndent()
         }
         code(HttpStatusCode.NotFound) {
-            description = "게시물을 조회할 수 없는 경우 (존재하지 않음, 비활성화, 차단 관계)"
+            description = """
+                게시물을 조회할 수 없는 경우 (존재하지 않음, 비활성화, 차단 관계) (`${PingPongErrorCode.UserKeywordNotFound.code}`)
+
+                - UI 메시지: "삭제되었거나 볼 수 없는 게시물이에요."
+            """.trimIndent()
         }
         code(HttpStatusCode.TooManyRequests) {
-            description = "작성 간격 제한을 초과한 경우"
+            description = """
+                작성 간격 제한을 초과한 경우 (`${CommonErrorCode.TooManyRequests.code}`)
+
+                - UI 메시지: "질문을 너무 자주 작성하고 있어요. 잠시 후 다시 시도해 주세요."
+            """.trimIndent()
         }
     }
 }

@@ -53,25 +53,25 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
         } returns PingPong(
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(1L),
-            question = PingPongQuestionContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용?"),
             createdAt = 1000L,
             updatedAt = 1000L,
         )
 
         // when
-        val result = usecase(UserId(1L), 3L, "질문 내용")
+        val result = usecase(UserId(1L), 3L, "질문 내용?")
 
         // then
         val expected = PingPongDto(
             id = 10L,
             userKeywordId = 3L,
             questionerId = 1L,
-            question = "질문 내용",
+            question = "질문 내용?",
             createdAt = 1000L,
             updatedAt = 1000L,
         )
@@ -83,7 +83,24 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
+        } returns TestPingPong
+
+        // when
+        usecase(UserId(1L), 3L, "질문 내용?")
+
+        // then
+        coVerify(exactly = 1) {
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
+        }
+    }
+
+    @Test
+    fun `질문 작성 시 끝에 물음표가 없으면 물음표를 붙여 저장한다`() = runTest {
+        // given
+        coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
+        coEvery {
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
         } returns TestPingPong
 
         // when
@@ -91,7 +108,7 @@ class CreatePingPongUseCaseTest {
 
         // then
         coVerify(exactly = 1) {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
         }
     }
 
@@ -102,10 +119,10 @@ class CreatePingPongUseCaseTest {
 
         // when, then
         assertThrows<PingPongException.UserKeywordNotFound> {
-            usecase(UserId(1L), 3L, "질문 내용")
+            usecase(UserId(1L), 3L, "질문 내용?")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
         }
     }
 
@@ -116,10 +133,10 @@ class CreatePingPongUseCaseTest {
 
         // when, then
         assertThrows<PingPongException.CannotQuestionOwnUserKeyword> {
-            usecase(UserId(1L), 3L, "질문 내용")
+            usecase(UserId(1L), 3L, "질문 내용?")
         }
         coVerify(exactly = 0) {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
         }
     }
 
@@ -141,7 +158,7 @@ class CreatePingPongUseCaseTest {
 
         // when, then
         assertThrows<UserKeywordIdValidationException> {
-            usecase(UserId(1L), invalidUserKeywordId, "질문 내용")
+            usecase(UserId(1L), invalidUserKeywordId, "질문 내용?")
         }
     }
 
@@ -150,14 +167,14 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns UserId(2L)
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
         } returns TestPingPong
         coEvery { userProvider.findUserName(UserId(1L)) } returns UserName("질문자")
         val command = slot<PingPongNotificationCommand>()
         coEvery { notificationProvider.sendNotification(capture(command)) } just Runs
 
         // when
-        usecase(UserId(1L), 3L, "질문 내용")
+        usecase(UserId(1L), 3L, "질문 내용?")
         applicationScope.advanceUntilIdle()
 
         // then
@@ -179,12 +196,12 @@ class CreatePingPongUseCaseTest {
         // given
         coEvery { userKeywordProvider.findOwnerId(UserId(1L), UserKeywordId(3L)) } returns TestOwnerId
         coEvery {
-            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용"))
+            pingPongRepository.createPingPong(UserKeywordId(3L), UserId(1L), PingPongQuestionContent("질문 내용?"))
         } returns TestPingPong
         coEvery { userProvider.findUserName(UserId(1L)) } returns null
 
         // when
-        usecase(UserId(1L), 3L, "질문 내용")
+        usecase(UserId(1L), 3L, "질문 내용?")
         applicationScope.advanceUntilIdle()
 
         // then
@@ -198,7 +215,7 @@ class CreatePingPongUseCaseTest {
 
         // when
         assertThrows<PingPongException.UserKeywordNotFound> {
-            usecase(UserId(1L), 3L, "질문 내용")
+            usecase(UserId(1L), 3L, "질문 내용?")
         }
         applicationScope.advanceUntilIdle()
 
@@ -212,7 +229,7 @@ class CreatePingPongUseCaseTest {
             id = PingPongId(10L),
             userKeywordId = UserKeywordId(3L),
             questionerId = UserId(1L),
-            question = PingPongQuestionContent("질문 내용"),
+            question = PingPongQuestionContent("질문 내용?"),
             createdAt = 1000L,
             updatedAt = 1000L,
         )

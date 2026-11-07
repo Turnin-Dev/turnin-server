@@ -27,7 +27,7 @@ data class PingPongResponse(
             id = 1,
             userKeywordId = 1,
             questionerId = 2,
-            question = "이 키워드를 고른 이유가 궁금해요!",
+            question = "이 키워드를 고른 이유가 뭐예요?",
             createdAt = 1697875200L,
             updatedAt = 1697875200L,
         )
