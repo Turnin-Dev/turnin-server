@@ -7,9 +7,10 @@ import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerWithAnswerer
-import com.turnin.domain.pingPong.domain.model.PingPongContent
 import com.turnin.domain.pingPong.domain.model.PingPongDetail
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 
 interface PingPongRepository {
     /**
@@ -24,7 +25,7 @@ interface PingPongRepository {
     suspend fun createPingPong(
         userKeywordId: UserKeywordId,
         questionerId: UserId,
-        question: PingPongContent,
+        question: PingPongQuestionContent,
     ): PingPong
 
     /**
@@ -71,7 +72,7 @@ interface PingPongRepository {
      */
     suspend fun createAnswer(
         pingPongId: PingPongId,
-        answer: PingPongContent,
+        answer: PingPongAnswerContent,
     ): PingPongAnswer
 
     /**

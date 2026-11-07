@@ -13,7 +13,7 @@ data class CreatePingPongRequest(
 ) {
     companion object {
         val sample = CreatePingPongRequest(
-            question = "이 키워드를 고른 이유가 궁금해요!",
+            question = "이 키워드를 고른 이유가 뭐예요?",
         )
     }
 }

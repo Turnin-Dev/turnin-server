@@ -12,8 +12,9 @@ import com.turnin.common.model.id.UserId
 import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
-import com.turnin.domain.pingPong.domain.model.PingPongContent
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongDetail
+import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.model.PingPongQuestioner
 import org.jetbrains.exposed.sql.ResultRow
 
@@ -23,7 +24,7 @@ internal object PingPongMapper {
             id = PingPongId(this.id.value),
             userKeywordId = UserKeywordId(this.userKeywordId.value),
             questionerId = UserId(this.questionerId.value),
-            question = PingPongContent(this.question),
+            question = PingPongQuestionContent(this.question),
             createdAt = this.createdAt.toEpochSecond(),
             updatedAt = this.updatedAt.toEpochSecond(),
         )
@@ -32,7 +33,7 @@ internal object PingPongMapper {
         PingPongAnswer(
             id = PingPongAnswerId(this.id.value),
             pingPongId = PingPongId(this.pingPongId.value),
-            answer = PingPongContent(this.answer),
+            answer = PingPongAnswerContent(this.answer),
             createdAt = this.createdAt.toEpochSecond(),
             updatedAt = this.updatedAt.toEpochSecond(),
         )
@@ -46,7 +47,7 @@ internal object PingPongMapper {
                 id = PingPongId(this[PingPongs.id].value),
                 userKeywordId = UserKeywordId(this[PingPongs.userKeywordId].value),
                 questionerId = UserId(this[PingPongs.questionerId].value),
-                question = PingPongContent(this[PingPongs.question]),
+                question = PingPongQuestionContent(this[PingPongs.question]),
                 createdAt = this[PingPongs.createdAt].toEpochSecond(),
                 updatedAt = this[PingPongs.updatedAt].toEpochSecond(),
             ),
@@ -65,7 +66,7 @@ internal object PingPongMapper {
         PingPongAnswer(
             id = PingPongAnswerId(this[PingPongAnswers.id].value),
             pingPongId = PingPongId(this[PingPongAnswers.pingPongId].value),
-            answer = PingPongContent(this[PingPongAnswers.answer]),
+            answer = PingPongAnswerContent(this[PingPongAnswers.answer]),
             createdAt = this[PingPongAnswers.createdAt].toEpochSecond(),
             updatedAt = this[PingPongAnswers.updatedAt].toEpochSecond(),
         )
