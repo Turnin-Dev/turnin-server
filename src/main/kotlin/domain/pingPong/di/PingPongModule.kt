@@ -9,12 +9,10 @@ import com.turnin.domain.pingPong.application.usecase.DeletePingPongAnswerUseCas
 import com.turnin.domain.pingPong.application.usecase.DeletePingPongUseCase
 import com.turnin.domain.pingPong.application.usecase.GetPingPongsUseCase
 import com.turnin.domain.pingPong.application.usecase.PingPongUseCases
-import com.turnin.domain.pingPong.domain.provider.BlockProvider
 import com.turnin.domain.pingPong.domain.provider.NotificationProvider
 import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.provider.UserProvider
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
-import com.turnin.domain.pingPong.infrastructure.provider.BlockProviderImpl
 import com.turnin.domain.pingPong.infrastructure.provider.NotificationProviderImpl
 import com.turnin.domain.pingPong.infrastructure.provider.UserKeywordProviderImpl
 import com.turnin.domain.pingPong.infrastructure.provider.UserProviderImpl
@@ -27,7 +25,6 @@ val pingPongModule = module {
 
     // Provider
     single<UserKeywordProvider> { UserKeywordProviderImpl(get()) }
-    single<BlockProvider> { BlockProviderImpl(get()) }
     single<UserProvider> { UserProviderImpl(get()) }
     single<NotificationProvider> { NotificationProviderImpl(get()) }
     single { PingPongContentReportApi(get()) }
@@ -35,9 +32,9 @@ val pingPongModule = module {
 
     // UseCases
     single { CreatePingPongUseCase(get(), get(), get(), get(), get(IOApplicationScopeQualifier)) }
-    single { CreatePingPongAnswerUseCase(get(), get(), get(), get(), get(), get(IOApplicationScopeQualifier)) }
+    single { CreatePingPongAnswerUseCase(get(), get(), get(), get(IOApplicationScopeQualifier)) }
     single { GetPingPongsUseCase(get(), get()) }
     single { DeletePingPongUseCase(get(), get()) }
-    single { DeletePingPongAnswerUseCase(get(), get()) }
+    single { DeletePingPongAnswerUseCase(get()) }
     single { PingPongUseCases(get(), get(), get(), get(), get()) }
 }

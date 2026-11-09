@@ -20,6 +20,7 @@ import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.util.db.TestDatabaseFactory
 import com.turnin.util.db.setUserInactiveForTest
+import com.turnin.util.db.setUserKeywordInactiveForTest
 import java.time.Instant
 import java.time.OffsetDateTime
 import kotlin.test.assertEquals
@@ -654,7 +655,160 @@ class PingPongRepositoryImplTest {
     }
 
     @Test
-    fun `질문별 답변 조회 시 답변이 있으면 해당 답변을 반환한다`() = runTest {
+    fun `답변 작성 대상 조회 시 게시물 작성자가 요청하면 질문과 작성자 ID를 반환하고 차단 관계가 아니다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+
+        // when
+        val result = repository.findAnswerCreationTarget(ownerId, pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertEquals(pingPong.id, result.pingPong.id)
+        assertEquals(userKeywordId, result.pingPong.userKeywordId)
+        assertEquals(questionerId, result.pingPong.questionerId)
+        assertEquals("질문 내용", result.pingPong.question.value)
+        assertEquals(ownerId, result.ownerId)
+        assertFalse(result.isQuestionerBlocked)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 작성자가 아닌 사용자가 요청해도 차단 관계가 아니면 작성자 ID를 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val otherUserId = insertUserAndReturnId("3")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+
+        // when
+        val result = repository.findAnswerCreationTarget(otherUserId, pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertEquals(ownerId, result.ownerId)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 핑퐁이 없으면 null을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val notExistsPingPongId = PingPongId(999L)
+
+        // when
+        val result = repository.findAnswerCreationTarget(ownerId, notExistsPingPongId)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 질문이 숨김 처리되었으면 null을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        setQuestionHiddenAt(pingPong.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        val result = repository.findAnswerCreationTarget(ownerId, pingPong.id)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 게시물이 비활성화되었으면 작성자 ID를 null로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        setUserKeywordInactiveForTest(userKeywordId)
+
+        // when
+        val result = repository.findAnswerCreationTarget(ownerId, pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertNull(result.ownerId)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 게시물 작성자가 비활성화되었으면 작성자 ID를 null로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        setUserInactiveForTest(ownerId)
+
+        // when
+        val result = repository.findAnswerCreationTarget(ownerId, pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertNull(result.ownerId)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 요청자와 게시물 작성자가 차단 관계이면 작성자 ID를 null로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val otherUserId = insertUserAndReturnId("3")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        insertBlock(blockerId = ownerId, blockedId = otherUserId)
+
+        // when
+        val result = repository.findAnswerCreationTarget(otherUserId, pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertNull(result.ownerId)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 답변자가 질문자를 차단했으면 질문자 차단 여부를 true로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        insertBlock(blockerId = ownerId, blockedId = questionerId)
+
+        // when
+        val result = repository.findAnswerCreationTarget(ownerId, pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertTrue(result.isQuestionerBlocked)
+    }
+
+    @Test
+    fun `답변 작성 대상 조회 시 질문자가 답변자를 차단했으면 질문자 차단 여부를 true로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        insertBlock(blockerId = questionerId, blockedId = ownerId)
+
+        // when
+        val result = repository.findAnswerCreationTarget(ownerId, pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertTrue(result.isQuestionerBlocked)
+    }
+
+    @Test
+    fun `답변 삭제 대상 조회 시 답변이 있으면 작성자 ID와 답변 ID를 반환한다`() = runTest {
         // given
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
@@ -663,17 +817,16 @@ class PingPongRepositoryImplTest {
         val answer = repository.createAnswer(pingPong.id, PingPongAnswerContent("답변 내용"))
 
         // when
-        val result = repository.findVisibleAnswerByPingPongId(pingPong.id)
+        val result = repository.findAnswerDeletionTarget(pingPong.id)
 
         // then
         assertNotNull(result)
-        assertEquals(answer.id, result.id)
-        assertEquals(pingPong.id, result.pingPongId)
-        assertEquals("답변 내용", result.answer.value)
+        assertEquals(ownerId, result.ownerId)
+        assertEquals(answer.id, result.answerId)
     }
 
     @Test
-    fun `질문별 답변 조회 시 답변이 없으면 null을 반환한다`() = runTest {
+    fun `답변 삭제 대상 조회 시 답변이 없으면 답변 ID를 null로 반환한다`() = runTest {
         // given
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
@@ -681,14 +834,16 @@ class PingPongRepositoryImplTest {
         val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
 
         // when
-        val result = repository.findVisibleAnswerByPingPongId(pingPong.id)
+        val result = repository.findAnswerDeletionTarget(pingPong.id)
 
         // then
-        assertNull(result)
+        assertNotNull(result)
+        assertEquals(ownerId, result.ownerId)
+        assertNull(result.answerId)
     }
 
     @Test
-    fun `질문별 답변 조회 시 숨김 처리된 답변이면 null을 반환한다`() = runTest {
+    fun `답변 삭제 대상 조회 시 답변이 숨김 처리되었으면 답변 ID를 null로 반환한다`() = runTest {
         // given
         val ownerId = insertUserAndReturnId("1")
         val questionerId = insertUserAndReturnId("2")
@@ -698,10 +853,77 @@ class PingPongRepositoryImplTest {
         setAnswerHiddenAt(answer.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
 
         // when
-        val result = repository.findVisibleAnswerByPingPongId(pingPong.id)
+        val result = repository.findAnswerDeletionTarget(pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertEquals(ownerId, result.ownerId)
+        assertNull(result.answerId)
+    }
+
+    @Test
+    fun `답변 삭제 대상 조회 시 핑퐁이 없으면 null을 반환한다`() = runTest {
+        // given
+        val notExistsPingPongId = PingPongId(999L)
+
+        // when
+        val result = repository.findAnswerDeletionTarget(notExistsPingPongId)
 
         // then
         assertNull(result)
+    }
+
+    @Test
+    fun `답변 삭제 대상 조회 시 질문이 숨김 처리되었으면 null을 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        repository.createAnswer(pingPong.id, PingPongAnswerContent("답변 내용"))
+        setQuestionHiddenAt(pingPong.id, OffsetDateTime.parse("2026-01-01T00:00:00Z"))
+
+        // when
+        val result = repository.findAnswerDeletionTarget(pingPong.id)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `답변 삭제 대상 조회 시 게시물이 비활성화되었으면 작성자 ID를 null로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        repository.createAnswer(pingPong.id, PingPongAnswerContent("답변 내용"))
+        setUserKeywordInactiveForTest(userKeywordId)
+
+        // when
+        val result = repository.findAnswerDeletionTarget(pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertNull(result.ownerId)
+    }
+
+    @Test
+    fun `답변 삭제 대상 조회 시 게시물 작성자가 비활성화되었으면 작성자 ID를 null로 반환한다`() = runTest {
+        // given
+        val ownerId = insertUserAndReturnId("1")
+        val questionerId = insertUserAndReturnId("2")
+        val userKeywordId = insertUserKeywordAndReturnId(ownerId.value)
+        val pingPong = repository.createPingPong(userKeywordId, questionerId, PingPongQuestionContent("질문 내용"))
+        repository.createAnswer(pingPong.id, PingPongAnswerContent("답변 내용"))
+        setUserInactiveForTest(ownerId)
+
+        // when
+        val result = repository.findAnswerDeletionTarget(pingPong.id)
+
+        // then
+        assertNotNull(result)
+        assertNull(result.ownerId)
     }
 
     @Test

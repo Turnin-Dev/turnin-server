@@ -13,9 +13,7 @@ import com.turnin.domain.pingPong.application.dto.toDto
 import com.turnin.domain.pingPong.domain.message.PingPongNotificationMessage
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
 import com.turnin.domain.pingPong.domain.model.PingPongNotificationCommand
-import com.turnin.domain.pingPong.domain.provider.BlockProvider
 import com.turnin.domain.pingPong.domain.provider.NotificationProvider
-import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.provider.UserProvider
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.exception.PingPongException
@@ -41,8 +39,6 @@ import kotlinx.coroutines.launch
  */
 class CreatePingPongAnswerUseCase(
     private val pingPongRepository: PingPongRepository,
-    private val userKeywordProvider: UserKeywordProvider,
-    private val blockProvider: BlockProvider,
     private val userProvider: UserProvider,
     private val notificationProvider: NotificationProvider,
     private val applicationScope: CoroutineScope,
@@ -62,14 +58,15 @@ class CreatePingPongAnswerUseCase(
         val pingPongIdVO = PingPongId(pingPongId)
         val answerVO = PingPongAnswerContent(answer)
 
-        val pingPong = pingPongRepository.findVisibleById(pingPongIdVO)
+        val target = pingPongRepository.findAnswerCreationTarget(answererId, pingPongIdVO)
             ?: throw PingPongException.PingPongNotFound()
-        val ownerId = userKeywordProvider.findOwnerId(answererId, pingPong.userKeywordId)
+        val pingPong = target.pingPong
+        val ownerId = target.ownerId
             ?: throw PingPongException.UserKeywordNotFound()
         if (ownerId != answererId) {
             throw PingPongException.NotUserKeywordOwner()
         }
-        if (blockProvider.isBlockedRelationship(answererId, pingPong.questionerId)) {
+        if (target.isQuestionerBlocked) {
             throw PingPongException.CannotAnswerBlockedQuestioner()
         }
 
