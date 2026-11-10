@@ -7,7 +7,8 @@
 - **키워드별 보유자 상한**: 비슷한 키워드마다 최근 활동(`user_keyword.updated_at`) 순으로 최대 500명만 후보로 읽는다.
   - 키워드 하나에 500명이 몰리기 전까지는 결과가 이전과 동일하다.
   - 인덱스 `idx_user_keyword_active_combo`를 `(keyword_id, updated_at DESC, user_id) WHERE is_active`로 교체 (V13).
-- **탐색 요청 로그**: `LogAction.DISCOVER_REQUEST` (target, viewer, seed, firstPage, resultCount)
+- **탐색 요청 로그**: `LogAction.DISCOVER_REQUEST` (target, seed, firstPage, resultCount)
+  - 조회자(viewer)는 남기지 않는다. target과 함께 남으면 열람 이력이 되고 분석에도 필요 없다.
 
 측정 기준 (PG17, Supabase Nano 사양 재현: 메모리 512MB · CPU 0.5, 사용자 20만 · 키워드 3만):
 
