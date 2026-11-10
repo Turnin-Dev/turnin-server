@@ -1,5 +1,5 @@
 # 실행 스테이지
-FROM eclipse-temurin:17.0.20.1_1-jre-jammy@sha256:c35794d1348777e6bc310b9b7f420098ef8f37e988199549b545fded79a895a2
+FROM eclipse-temurin:17.0.21_9-jre-jammy@sha256:2a9eb226abb654c9d1f91b53cf638d20cb3abb726d1b18a67909c29515545469
 
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
