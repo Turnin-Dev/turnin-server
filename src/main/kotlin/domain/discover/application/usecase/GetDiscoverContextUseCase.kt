@@ -66,7 +66,6 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
         // 결과 캐시 도입 판단용 로그 (docs/note 참고)
         // - 같은 대상(targetUserId)이 짧은 시간 안에 다시 요청되는 비율 → 대상별 캐시 적중률
         // - 같은 seed(탐색 세션)로 이어지는 요청 수 → 페이지 넘김 비율
-        // 조회자(viewer)는 남기지 않는다. target과 함께 남으면 '누가 누구를 봤는지' 열람 이력이 되고, 분석에도 필요 없다.
         LOGGER.info(
             message = "Discover request: target=$targetUserId, seed=$seed, " +
                 "firstPage=${cursorDto == null}, resultCount=${minOf(resultsWithOneExtra.size, pageSize)}",

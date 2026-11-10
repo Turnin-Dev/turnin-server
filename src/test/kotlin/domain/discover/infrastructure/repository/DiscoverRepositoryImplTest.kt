@@ -453,7 +453,7 @@ class DiscoverRepositoryImplTest {
     }
 
     @Test
-    fun `findUserIdsWithSimilarKeywords - 상한을 넘을 때 활동 시각이 같으면 사용자 ID가 작은 순으로 후보가 된다`() = runTest {
+    fun `findUserIdsWithSimilarKeywords - 상한을 넘을 때 활동 시각이 같으면 사용자 ID가 큰 사용자부터 후보에서 제외된다`() = runTest {
         // given: 사용자 2L~502L(501명)이 같은 키워드를 보유하고, 한 번에 저장되어 updated_at이 모두 같다
         val targetUserId = UserId(1L)
         val testVector = TestVectorFixture.unitVector(1.0f)
