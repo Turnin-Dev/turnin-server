@@ -19,6 +19,7 @@ import com.turnin.domain.discover.util.TestVectorFixture.toPgVectorString
 import com.turnin.util.db.PostgresRule
 import com.turnin.util.db.setUserKeywordInactiveForTest
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import junit.framework.TestCase.assertTrue
 import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -411,6 +412,94 @@ class DiscoverRepositoryImplTest {
     }
 
     @Test
+    fun `findUserIdsWithSimilarKeywords - 비슷한 키워드 보유자가 상한보다 많으면 최근 활동 순으로 상한 인원만 후보가 된다`() = runTest {
+        // given: 대상(1L)과 같은 벡터의 키워드(2번)를 사용자 2L~502L(501명)이 보유한다
+        val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+        setupKeywordRelations(
+            userCount = 502,
+            keywordsWithVectors = listOf("BaseKey" to testVector, "SameKey" to testVector),
+            userKeywordRelation = mapOf(targetUserId.value to listOf(1L)) + (2L..502L).associateWith { listOf(2L) },
+        )
+        // 사용자 2L의 게시물(사용자 키워드 ID 2)만 하루 전에 수정된 것으로 만들어 가장 오래된 활동으로 둔다
+        setUserKeywordUpdatedAtForTest(UserKeywordId(2L), Instant.now().minus(1, ChronoUnit.DAYS))
+        val snapshotAt = TurninDateTime.now().plusSeconds(1).toEpochMilli()
+
+        // when
+        val result = search(targetUserId = targetUserId, snapshotAt = snapshotAt, pageSize = 1000)
+
+        // then
+        assertEquals(500, result.size)
+        assertTrue(result.none { it.userId == UserId(2L) })
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - 비슷한 키워드 보유자가 상한과 같으면 전원 후보가 된다`() = runTest {
+        // given: 대상(1L)과 같은 벡터의 키워드(2번)를 사용자 2L~501L(500명)이 보유한다
+        val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+        setupKeywordRelations(
+            userCount = 501,
+            keywordsWithVectors = listOf("BaseKey" to testVector, "SameKey" to testVector),
+            userKeywordRelation = mapOf(targetUserId.value to listOf(1L)) + (2L..501L).associateWith { listOf(2L) },
+        )
+        val snapshotAt = TurninDateTime.now().plusSeconds(1).toEpochMilli()
+
+        // when
+        val result = search(targetUserId = targetUserId, snapshotAt = snapshotAt, pageSize = 1000)
+
+        // then
+        assertEquals(500, result.size)
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - 상한을 넘을 때 활동 시각이 같으면 사용자 ID가 작은 순으로 후보가 된다`() = runTest {
+        // given: 사용자 2L~502L(501명)이 같은 키워드를 보유하고, 한 번에 저장되어 updated_at이 모두 같다
+        val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+        setupKeywordRelations(
+            userCount = 502,
+            keywordsWithVectors = listOf("BaseKey" to testVector, "SameKey" to testVector),
+            userKeywordRelation = mapOf(targetUserId.value to listOf(1L)) + (2L..502L).associateWith { listOf(2L) },
+        )
+        val sameUpdatedAt = Instant.parse("2026-01-01T00:00:00Z")
+        setAllUserKeywordsUpdatedAtForTest(sameUpdatedAt)
+        val snapshotAt = Instant.parse("2026-01-01T00:00:01Z").toEpochMilli()
+
+        // when
+        val result = search(targetUserId = targetUserId, snapshotAt = snapshotAt, pageSize = 1000)
+
+        // then: 사용자 ID가 가장 큰 502L만 상한에서 빠진다
+        assertEquals(500, result.size)
+        assertTrue(result.none { it.userId == UserId(502L) })
+    }
+
+    @Test
+    fun `findUserIdsWithSimilarKeywords - 상한은 비슷한 키워드마다 따로 적용된다`() = runTest {
+        // given: 같은 벡터의 키워드 2개(2번, 3번)를 서로 다른 사용자 300명씩(총 600명) 보유한다
+        val targetUserId = UserId(1L)
+        val testVector = TestVectorFixture.unitVector(1.0f)
+        setupKeywordRelations(
+            userCount = 601,
+            keywordsWithVectors = listOf(
+                "BaseKey" to testVector,
+                "SameKey1" to testVector,
+                "SameKey2" to testVector,
+            ),
+            userKeywordRelation = mapOf(targetUserId.value to listOf(1L)) +
+                (2L..301L).associateWith { listOf(2L) } +
+                (302L..601L).associateWith { listOf(3L) },
+        )
+        val snapshotAt = TurninDateTime.now().plusSeconds(1).toEpochMilli()
+
+        // when
+        val result = search(targetUserId = targetUserId, snapshotAt = snapshotAt, pageSize = 1000)
+
+        // then: 키워드별로는 상한(500명) 이하이므로 600명 전원이 후보가 된다
+        assertEquals(600, result.size)
+    }
+
+    @Test
     fun `fetchSharedUserKeywords - 사용자 ID 리스트를 전달하면 해당 사용자들의 상세 정보와 키워드 목록을 최신순으로 반환한다`() = runTest {
         // 변경 없음
         val fakeVector = TestVectorFixture.unitVector(1.0f)
@@ -499,6 +588,12 @@ class DiscoverRepositoryImplTest {
         updatedAt: Instant,
     ) = dbRule.dbQuery {
         UserKeywords.update({ UserKeywords.id eq userKeywordId.value }) {
+            it[UserKeywords.updatedAt] = updatedAt.toOffsetDateTime()
+        }
+    }
+
+    private suspend fun setAllUserKeywordsUpdatedAtForTest(updatedAt: Instant) = dbRule.dbQuery {
+        UserKeywords.update {
             it[UserKeywords.updatedAt] = updatedAt.toOffsetDateTime()
         }
     }
