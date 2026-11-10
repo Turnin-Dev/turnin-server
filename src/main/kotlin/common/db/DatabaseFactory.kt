@@ -48,6 +48,10 @@ object DatabaseFactory {
                 username = dbUser
                 password = dbPassword
                 maximumPoolSize = 5
+                // 풀에서 커넥션을 얻기까지 기다리는 최대 시간 (기본값 30초)
+                // 앱 readTimeout(10초)보다 먼저 실패하도록, (요청당 커넥션 획득 횟수 × 3초) < 10초를 기준으로 정했다.
+                // 과부하 시 앱이 포기한 요청을 서버가 뒤늦게 처리하지 않도록 빨리 실패시킨다.
+                connectionTimeout = 3_000
                 connectionInitSql = "SET TIME ZONE 'UTC'"
                 // 주의: 격리 수준은 PostgreSQL 기본값(READ COMMITTED)을 전제로 한다.
                 // REPEATABLE READ로 바꾸면 트랜잭션의 첫 쿼리 시점 스냅샷만 보게 되어,

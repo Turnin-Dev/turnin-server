@@ -4,6 +4,9 @@ import com.turnin.common.db.suspendTransaction
 import com.turnin.common.model.id.UserId
 import com.turnin.common.util.TurninDateTime
 import com.turnin.common.util.log.AppLoggerFactory
+import com.turnin.common.util.log.LogAction
+import com.turnin.common.util.log.LogTag
+import com.turnin.common.util.log.LogType
 import com.turnin.common.util.pagination.cursor.CursorCodec
 import com.turnin.common.util.pagination.cursor.CursorPage
 import com.turnin.domain.discover.application.dto.DiscoverContextDto
@@ -58,6 +61,18 @@ class GetDiscoverContextUseCase(private val discoverRepository: DiscoverReposito
             snapshotAt = snapshotAt,
             cursor = domainCursor,
             pageSize = pageSize + 1,
+        )
+
+        // 결과 캐시 도입 판단용 로그 (docs/note 참고)
+        // - 같은 대상(targetUserId)이 짧은 시간 안에 다시 요청되는 비율 → 대상별 캐시 적중률
+        // - 같은 seed(탐색 세션)로 이어지는 요청 수 → 페이지 넘김 비율
+        LOGGER.info(
+            message = "Discover request: target=$targetUserId, seed=$seed, " +
+                "firstPage=${cursorDto == null}, resultCount=${minOf(resultsWithOneExtra.size, pageSize)}",
+            tags = mapOf(
+                LogTag.LOG_TYPE.key to LogType.NORMAL.value,
+                LogTag.ACTION.key to LogAction.DISCOVER_REQUEST.value,
+            ),
         )
 
         if (resultsWithOneExtra.isEmpty()) {

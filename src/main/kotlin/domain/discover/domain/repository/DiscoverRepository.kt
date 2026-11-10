@@ -30,8 +30,11 @@ interface DiscoverRepository {
      *    탐색하고, 유사도가 [similarityThreshold] 이상인 것만 채택
      * 3. candidate_scores: 유사 키워드를 보유한 사용자별로 최고 유사도(MAX)를 매칭 점수로 산출.
      *    동점자 처리를 위한 시드 기반 셔플 키도 함께 계산.
-     *    [snapshotAt] 이후 변경된(updated_at 기준) 사용자 키워드는 제외하여, 세션 내
-     *    페이지 이동 중 후보 풀 구성이 흔들리지 않도록 고정한다
+     *    - 유사 키워드 1개당 보유자는 최근 활동(updated_at DESC, user_id) 순으로 최대 500명만 후보로 읽는다.
+     *      인기 키워드에 사용자가 몰려도 읽는 양이 일정하며, 키워드당 500명 이하에서는 전원이 후보가 된다
+     *    - 전체 후보 풀은 (유사도 DESC, updated_at DESC, user_id) 순으로 최대 20,000명까지 사용한다
+     *    - [snapshotAt] 이후 변경된(updated_at 기준) 사용자 키워드는 제외하여, 세션 내
+     *      페이지 이동 중 후보 풀 구성이 흔들리지 않도록 고정한다
      * 4. scored_chunks: candidate_scores의 match_score를 기준으로 NTILE(5)를 적용해
      *    상위(1)~하위(5) 5개 구간으로 균등 분할. 절대 점수 대신 상대적 순위 구간으로 노출해
      *    특정 인원에게 결과가 편중되는 것을 완화한다
@@ -49,7 +52,8 @@ interface DiscoverRepository {
      * 결과 중복/누락이 발생할 수 있다. 최초 호출 시 [snapshotAt]을 현재 시각으로 발급하고,
      * 이후 페이지 호출부터는 최초 발급값을 그대로 재사용해야 한다 (호출부 책임)
      *
-     * #### 해당 쿼리는 초기 서비스 단계에서만 유효하다. 후보 규모가 커지면 인덱스/쿼리 재검토가 필요하다.
+     * #### 키워드별 상한으로 요청 1건의 비용은 데이터 규모와 무관하게 제한되지만, 매 페이지마다 후보 풀을 다시 계산한다.
+     * 동시 요청이 많아지면 결과 캐시 도입을 검토한다. (docs/note/discover-scaling-plan.md 참고)
      *
      * @param targetUserId 매칭 기준이 되는 사용자 ID (재탐색 시 다른 사용자 ID로 대체 가능)
      * @param viewerUserId 현재 로그인한 사용자 ID (결과에서 본인 제외용, 없으면 null)

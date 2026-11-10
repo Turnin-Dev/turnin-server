@@ -179,13 +179,21 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             FROM (
                 SELECT sk.candidate_kw_id, sk.similarity, uk.user_id
                 FROM similar_keywords sk
-                JOIN user_keyword uk ON uk.keyword_id = sk.candidate_kw_id
-                WHERE uk.is_active = true
-                  AND uk.user_id != ?
-                  AND (?::bigint IS NULL OR uk.user_id != ?)
-                  AND uk.updated_at <= to_timestamp(? / 1000.0)
-                ORDER BY sk.similarity DESC, uk.user_id
-                LIMIT 20000	-- 이상 상황 대비 후보 풀 상한 값 (결정적 정렬 후 적용)
+                CROSS JOIN LATERAL (
+                    -- 키워드별 보유자 상한: 최근 활동(게시물 작성/수정) 순으로 최대 N명만 읽는다.
+                    -- 인기 키워드에 사용자가 몰려도 읽는 양이 일정하다. (idx_user_keyword_active_combo 순서 사용)
+                    SELECT uk.user_id, uk.updated_at
+                    FROM user_keyword uk
+                    WHERE uk.keyword_id = sk.candidate_kw_id
+                      AND uk.is_active = true
+                      AND uk.user_id != ?
+                      AND (?::bigint IS NULL OR uk.user_id != ?)
+                      AND uk.updated_at <= to_timestamp(? / 1000.0)
+                    ORDER BY uk.updated_at DESC, uk.user_id
+                    LIMIT $MAX_CANDIDATES_PER_KEYWORD
+                ) uk
+                ORDER BY sk.similarity DESC, uk.updated_at DESC, uk.user_id
+                LIMIT $MAX_CANDIDATE_POOL_SIZE	-- 이상 상황 대비 후보 풀 상한 값 (결정적 정렬 후 적용)
             ) capped
             GROUP BY capped.user_id
         ),
@@ -219,5 +227,13 @@ class DiscoverRepositoryImpl : DiscoverRepository {
             sc.user_id DESC
         LIMIT ?;
             """.trimIndent()
+    }
+
+    companion object {
+        /** 비슷한 키워드 1개당 후보로 읽는 최대 보유자 수 (최근 활동 순) */
+        internal const val MAX_CANDIDATES_PER_KEYWORD = 500
+
+        /** 전체 후보 풀 상한 (이상 상황 대비) */
+        internal const val MAX_CANDIDATE_POOL_SIZE = 20000
     }
 }
