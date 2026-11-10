@@ -8,6 +8,8 @@ import com.turnin.common.model.id.UserKeywordId
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerCreationTarget
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerDeletionTarget
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerWithAnswerer
 import com.turnin.domain.pingPong.domain.model.PingPongDetail
 import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
@@ -76,14 +78,28 @@ interface PingPongRepository {
     ): PingPongAnswer
 
     /**
-     * 질문에 달린 노출 중인 답변을 조회한다.
-     * (신고 누적으로 숨김 처리된 답변 제외)
+     * 답변 작성 가능 여부 판단에 필요한 질문, 게시물 작성자, 차단 여부를 한 번에 조회한다.
+     * (질문이 신고 누적으로 숨김 처리된 핑퐁 제외)
+     *
+     * @param answererId 답변자(요청자) ID
+     * @param pingPongId 핑퐁 ID
+     *
+     * @return 노출 중인 핑퐁이 있다면 [PingPongAnswerCreationTarget]을 반환하고, 없거나 숨김 처리되었다면 `null`을 반환한다.
+     */
+    suspend fun findAnswerCreationTarget(
+        answererId: UserId,
+        pingPongId: PingPongId,
+    ): PingPongAnswerCreationTarget?
+
+    /**
+     * 답변 삭제 가능 여부 판단에 필요한 게시물 작성자와 답변 ID를 한 번에 조회한다.
+     * (질문이 신고 누적으로 숨김 처리된 핑퐁 제외)
      *
      * @param pingPongId 핑퐁 ID
      *
-     * @return 노출 중인 답변이 있다면 [PingPongAnswer]를 반환하고, 없거나 숨김 처리되었다면 `null`을 반환한다.
+     * @return 노출 중인 핑퐁이 있다면 [PingPongAnswerDeletionTarget]을 반환하고, 없거나 숨김 처리되었다면 `null`을 반환한다.
      */
-    suspend fun findVisibleAnswerByPingPongId(pingPongId: PingPongId): PingPongAnswer?
+    suspend fun findAnswerDeletionTarget(pingPongId: PingPongId): PingPongAnswerDeletionTarget?
 
     /**
      * 노출 중인 답변을 답변자 정보와 함께 조회한다.

@@ -19,20 +19,26 @@ import com.turnin.common.util.toOffsetDateTime
 import com.turnin.domain.pingPong.domain.model.PingPong
 import com.turnin.domain.pingPong.domain.model.PingPongAnswer
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerContent
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerCreationTarget
+import com.turnin.domain.pingPong.domain.model.PingPongAnswerDeletionTarget
 import com.turnin.domain.pingPong.domain.model.PingPongAnswerWithAnswerer
 import com.turnin.domain.pingPong.domain.model.PingPongDetail
 import com.turnin.domain.pingPong.domain.model.PingPongQuestionContent
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toAnswer
 import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toDomain
+import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toPingPong
 import com.turnin.domain.pingPong.infrastructure.mapper.PingPongMapper.toPingPongDetail
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.Case
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inSubQuery
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.booleanLiteral
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.or
@@ -121,11 +127,95 @@ class PingPongRepositoryImpl : PingPongRepository {
         savedAnswerEntity.toDomain()
     }
 
-    override suspend fun findVisibleAnswerByPingPongId(pingPongId: PingPongId): PingPongAnswer? = suspendTransaction {
-        PingPongAnswerEntity
-            .find { (PingPongAnswers.pingPongId eq pingPongId.value) and PingPongAnswers.hiddenAt.isNull() }
-            .singleOrNull()
-            ?.toDomain()
+    override suspend fun findAnswerCreationTarget(
+        answererId: UserId,
+        pingPongId: PingPongId,
+    ): PingPongAnswerCreationTarget? = suspendTransaction {
+        // 답변자와 게시물 작성자가 차단 관계이면 게시물을 조회할 수 없는 것으로 본다. (본인이면 항상 조회 가능)
+        val isOwnerVisible = Case()
+            .When(
+                SqlExpressionBuilder.isNotBlockedRelationship(answererId.value, UserKeywords.userId),
+                booleanLiteral(true),
+            ).Else(booleanLiteral(false))
+        val isQuestionerBlocked = Case()
+            .When(
+                SqlExpressionBuilder.isNotBlockedRelationship(answererId.value, PingPongs.questionerId),
+                booleanLiteral(false),
+            ).Else(booleanLiteral(true))
+
+        PingPongs
+            .innerJoin(
+                otherTable = UserKeywords,
+                onColumn = { PingPongs.userKeywordId },
+                otherColumn = { UserKeywords.id },
+            ).innerJoin(
+                otherTable = Users,
+                onColumn = { UserKeywords.userId },
+                otherColumn = { Users.id },
+            ).select(
+                PingPongs.id,
+                PingPongs.userKeywordId,
+                PingPongs.questionerId,
+                PingPongs.question,
+                PingPongs.createdAt,
+                PingPongs.updatedAt,
+                UserKeywords.userId,
+                UserKeywords.isActive,
+                Users.isActive,
+                isOwnerVisible,
+                isQuestionerBlocked,
+            ).where {
+                (PingPongs.id eq pingPongId.value) and PingPongs.questionHiddenAt.isNull()
+            }.singleOrNull()
+            ?.let { row ->
+                // 게시물/작성자가 비활성이거나 요청자와 작성자가 차단 관계이면 작성자 ID를 비운다.
+                // (이 조건을 WHERE에 넣으면 '핑퐁 없음'과 구분할 수 없어 조회 후 판단한다)
+                val isOwnerAvailable = row[UserKeywords.isActive] && row[Users.isActive] && row[isOwnerVisible]
+                PingPongAnswerCreationTarget(
+                    pingPong = row.toPingPong(),
+                    ownerId = if (isOwnerAvailable) UserId(row[UserKeywords.userId].value) else null,
+                    isQuestionerBlocked = row[isQuestionerBlocked],
+                )
+            }
+    }
+
+    override suspend fun findAnswerDeletionTarget(
+        pingPongId: PingPongId,
+    ): PingPongAnswerDeletionTarget? = suspendTransaction {
+        // 답변은 LEFT JOIN으로 붙여 '핑퐁 없음'과 '답변 없음'을 구분하고,
+        // 숨김 처리된 답변은 JOIN 조건에서 제외해 '답변 없음'으로 취급한다. (질문당 답변은 최대 1개)
+        PingPongs
+            .innerJoin(
+                otherTable = UserKeywords,
+                onColumn = { PingPongs.userKeywordId },
+                otherColumn = { UserKeywords.id },
+            ).innerJoin(
+                otherTable = Users,
+                onColumn = { UserKeywords.userId },
+                otherColumn = { Users.id },
+            ).join(
+                PingPongAnswers,
+                JoinType.LEFT,
+                PingPongs.id,
+                PingPongAnswers.pingPongId,
+                additionalConstraint = { PingPongAnswers.hiddenAt.isNull() },
+            ).select(
+                UserKeywords.userId,
+                UserKeywords.isActive,
+                Users.isActive,
+                PingPongAnswers.id,
+            ).where {
+                (PingPongs.id eq pingPongId.value) and PingPongs.questionHiddenAt.isNull()
+            }.singleOrNull()
+            ?.let { row ->
+                // 게시물/작성자가 비활성이면 작성자 ID를 비운다.
+                // (이 조건을 WHERE에 넣으면 '핑퐁 없음'과 구분할 수 없어 조회 후 판단한다)
+                val isOwnerAvailable = row[UserKeywords.isActive] && row[Users.isActive]
+                PingPongAnswerDeletionTarget(
+                    ownerId = if (isOwnerAvailable) UserId(row[UserKeywords.userId].value) else null,
+                    answerId = row.getOrNull(PingPongAnswers.id)?.let { PingPongAnswerId(it.value) },
+                )
+            }
     }
 
     override suspend fun findVisibleAnswerWithAnswererById(

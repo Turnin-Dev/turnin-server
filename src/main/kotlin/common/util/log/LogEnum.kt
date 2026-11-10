@@ -106,4 +106,7 @@ enum class LogAction(val value: String) {
 
     // 성능 튜닝 목적의 액션
     FEED_WINDOW_POOL_EXHAUSTION("FEED_WINDOW_POOL_EXHAUSTION"),
+
+    /** 탐색 조회 (결과 캐시 도입 판단용: 같은 대상 재요청 비율, 페이지 넘김 비율 분석) */
+    DISCOVER_REQUEST("DISCOVER_REQUEST"),
 }

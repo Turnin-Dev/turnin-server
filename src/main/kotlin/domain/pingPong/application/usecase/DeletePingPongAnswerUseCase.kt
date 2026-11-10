@@ -3,7 +3,6 @@ package com.turnin.domain.pingPong.application.usecase
 import com.turnin.common.model.id.PingPongId
 import com.turnin.common.model.id.UserId
 import com.turnin.common.validator.ValidatorException
-import com.turnin.domain.pingPong.domain.provider.UserKeywordProvider
 import com.turnin.domain.pingPong.domain.repository.PingPongRepository
 import com.turnin.domain.pingPong.exception.PingPongException
 
@@ -19,7 +18,6 @@ import com.turnin.domain.pingPong.exception.PingPongException
  */
 class DeletePingPongAnswerUseCase(
     private val pingPongRepository: PingPongRepository,
-    private val userKeywordProvider: UserKeywordProvider,
 ) {
     /**
      * @param requesterId 삭제 요청자 ID
@@ -31,15 +29,15 @@ class DeletePingPongAnswerUseCase(
     ) {
         val pingPongIdVO = PingPongId(pingPongId)
 
-        val pingPong = pingPongRepository.findVisibleById(pingPongIdVO)
+        val target = pingPongRepository.findAnswerDeletionTarget(pingPongIdVO)
             ?: throw PingPongException.PingPongNotFound()
-        if (userKeywordProvider.findOwnerId(requesterId, pingPong.userKeywordId) != requesterId) {
+        if (target.ownerId != requesterId) {
             throw PingPongException.NoPermissionToDelete()
         }
-        val answer = pingPongRepository.findVisibleAnswerByPingPongId(pingPongIdVO)
+        val answerId = target.answerId
             ?: throw PingPongException.PingPongAnswerNotFound()
 
         // 질문 ID가 아닌 답변 ID로 삭제하여, 조회 이후 재등록된 답변이 삭제되지 않도록 한다.
-        pingPongRepository.deleteAnswer(answer.id)
+        pingPongRepository.deleteAnswer(answerId)
     }
 }

@@ -43,20 +43,26 @@ internal object PingPongMapper {
      */
     fun ResultRow.toPingPongDetail(): PingPongDetail =
         PingPongDetail(
-            pingPong = PingPong(
-                id = PingPongId(this[PingPongs.id].value),
-                userKeywordId = UserKeywordId(this[PingPongs.userKeywordId].value),
-                questionerId = UserId(this[PingPongs.questionerId].value),
-                question = PingPongQuestionContent(this[PingPongs.question]),
-                createdAt = this[PingPongs.createdAt].toEpochSecond(),
-                updatedAt = this[PingPongs.updatedAt].toEpochSecond(),
-            ),
+            pingPong = this.toPingPong(),
             questioner = PingPongQuestioner(
                 userId = UserId(this[Users.id].value),
                 userName = UserName(this[Users.name]),
                 profileImageUrl = this[Users.profileImageUrl],
             ),
             answer = this.getOrNull(PingPongAnswers.id)?.let { this.toAnswer() },
+        )
+
+    /**
+     * `ping_pong` 컬럼을 포함한 조회 결과를 [PingPong]으로 변환한다.
+     */
+    fun ResultRow.toPingPong(): PingPong =
+        PingPong(
+            id = PingPongId(this[PingPongs.id].value),
+            userKeywordId = UserKeywordId(this[PingPongs.userKeywordId].value),
+            questionerId = UserId(this[PingPongs.questionerId].value),
+            question = PingPongQuestionContent(this[PingPongs.question]),
+            createdAt = this[PingPongs.createdAt].toEpochSecond(),
+            updatedAt = this[PingPongs.updatedAt].toEpochSecond(),
         )
 
     /**
